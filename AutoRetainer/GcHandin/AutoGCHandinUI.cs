@@ -1,0 +1,16 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace AutoRetainer.GcHandin
+{
+    internal static class AutoGCHandinUI
+    {
+        internal static void Draw()
+        {
+            ImGui.Checkbox("Enable Automatic GC Handin", ref P.config.EnableAutoGCHandin);
+        }
+    }
+}

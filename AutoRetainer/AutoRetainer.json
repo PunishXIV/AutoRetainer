@@ -1,0 +1,11 @@
+﻿{
+  "Author": "Puni.sh",
+  "Name": "AutoRetainer",
+  "InternalName": "AutoRetainer",
+  "Punchline": "Collect and assign ventures to your retainers from the comfort of your bed.",
+  "Description": "Collect and assign ventures to your retainers from the comfort of your bed.",
+  "ApplicableVersion": "any",
+  "DalamudApiLevel": 8,
+  "LoadPriority": 0,
+  "IconUrl": "https://love.puni.sh/resources/auto-retainer.png"
+}
