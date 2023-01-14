@@ -17,27 +17,21 @@
 		<EnableWindowsTargeting>true</EnableWindowsTargeting>
 		<UseWindowsForms>true</UseWindowsForms>
 		<NoWarn>CS1591</NoWarn>
-	</PropertyGroup>
+    <Nullable>disable</Nullable>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <Platforms>x64</Platforms>
+    <LangVersion>preview</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
-		<TargetFramework>net7.0-windows</TargetFramework>
-		<Platforms>x64</Platforms>
-		<Nullable>enable</Nullable>
-		<LangVersion>latest</LangVersion>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
-		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
 		<OutputPath>bin/Release</OutputPath>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-		<TargetFramework>net7.0-windows</TargetFramework>
-		<Platforms>x64</Platforms>
-		<Nullable>enable</Nullable>
-		<LangVersion>latest</LangVersion>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<OutputPath>$(DalamudDevPlugins)</OutputPath>
 	</PropertyGroup>
 
@@ -48,9 +42,9 @@
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)' == 'Debug'">
-  		<ProjectReference Include="..\..\PunishLib\PunishLib\PunishLib.csproj" />
-  		<ProjectReference Include="..\..\ECommons\ECommons\ECommons.csproj" />
-                <ProjectReference Include="..\..\ClickLib\ClickLib\ClickLib.csproj" />
+  		<ProjectReference Include="..\PunishLib\PunishLib\PunishLib.csproj" />
+  		<ProjectReference Include="..\ECommons\ECommons\ECommons.csproj" />
+        <ProjectReference Include="..\ClickLib\ClickLib\ClickLib.csproj" />
 	</ItemGroup>
 
 	<PropertyGroup Condition="'$(OS)' != 'Windows_NT' OR '$(CI)' == 'true'">
