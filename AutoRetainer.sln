@@ -5,6 +5,18 @@ VisualStudioVersion = 17.2.32427.441
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoRetainer", "AutoRetainer\AutoRetainer.csproj", "{C60CB325-B487-4F98-AE4B-E5751906A088}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PunishLib", "PunishLib", "{288B3BEF-A2D0-4ABD-AA35-451C4593B861}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PunishLib", "PunishLib\PunishLib\PunishLib.csproj", "{94664A09-0B16-4950-8B1F-EC1B995EF505}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ECommons", "ECommons", "{7498B86D-1036-46C3-A522-780A4B275C5D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommons", "ECommons\ECommons\ECommons.csproj", "{50EB8078-8E25-400E-BE3A-29E8EAF269B2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ClickLib", "ClickLib", "{857039DB-53C3-49DB-A36A-21649D01C132}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickLib", "ClickLib\ClickLib\ClickLib.csproj", "{C596851D-CD82-4D81-BDE5-F99C4459835A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,11 +33,40 @@ Global
 		{C60CB325-B487-4F98-AE4B-E5751906A088}.Release|Any CPU.Build.0 = Release|x64
 		{C60CB325-B487-4F98-AE4B-E5751906A088}.Release|x64.ActiveCfg = Release|Any CPU
 		{C60CB325-B487-4F98-AE4B-E5751906A088}.Release|x64.Build.0 = Release|Any CPU
+		{94664A09-0B16-4950-8B1F-EC1B995EF505}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{94664A09-0B16-4950-8B1F-EC1B995EF505}.Debug|Any CPU.Build.0 = Debug|x64
+		{94664A09-0B16-4950-8B1F-EC1B995EF505}.Debug|x64.ActiveCfg = Debug|x64
+		{94664A09-0B16-4950-8B1F-EC1B995EF505}.Debug|x64.Build.0 = Debug|x64
+		{94664A09-0B16-4950-8B1F-EC1B995EF505}.Release|Any CPU.ActiveCfg = Release|x64
+		{94664A09-0B16-4950-8B1F-EC1B995EF505}.Release|Any CPU.Build.0 = Release|x64
+		{94664A09-0B16-4950-8B1F-EC1B995EF505}.Release|x64.ActiveCfg = Release|x64
+		{94664A09-0B16-4950-8B1F-EC1B995EF505}.Release|x64.Build.0 = Release|x64
+		{50EB8078-8E25-400E-BE3A-29E8EAF269B2}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{50EB8078-8E25-400E-BE3A-29E8EAF269B2}.Debug|Any CPU.Build.0 = Debug|x64
+		{50EB8078-8E25-400E-BE3A-29E8EAF269B2}.Debug|x64.ActiveCfg = Debug|x64
+		{50EB8078-8E25-400E-BE3A-29E8EAF269B2}.Debug|x64.Build.0 = Debug|x64
+		{50EB8078-8E25-400E-BE3A-29E8EAF269B2}.Release|Any CPU.ActiveCfg = Release|x64
+		{50EB8078-8E25-400E-BE3A-29E8EAF269B2}.Release|Any CPU.Build.0 = Release|x64
+		{50EB8078-8E25-400E-BE3A-29E8EAF269B2}.Release|x64.ActiveCfg = Release|x64
+		{50EB8078-8E25-400E-BE3A-29E8EAF269B2}.Release|x64.Build.0 = Release|x64
+		{C596851D-CD82-4D81-BDE5-F99C4459835A}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{C596851D-CD82-4D81-BDE5-F99C4459835A}.Debug|Any CPU.Build.0 = Debug|x64
+		{C596851D-CD82-4D81-BDE5-F99C4459835A}.Debug|x64.ActiveCfg = Debug|x64
+		{C596851D-CD82-4D81-BDE5-F99C4459835A}.Debug|x64.Build.0 = Debug|x64
+		{C596851D-CD82-4D81-BDE5-F99C4459835A}.Release|Any CPU.ActiveCfg = Release|x64
+		{C596851D-CD82-4D81-BDE5-F99C4459835A}.Release|Any CPU.Build.0 = Release|x64
+		{C596851D-CD82-4D81-BDE5-F99C4459835A}.Release|x64.ActiveCfg = Release|x64
+		{C596851D-CD82-4D81-BDE5-F99C4459835A}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A0EF4C68-A3FF-49D8-B6D4-20AB77125C34}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{94664A09-0B16-4950-8B1F-EC1B995EF505} = {288B3BEF-A2D0-4ABD-AA35-451C4593B861}
+		{50EB8078-8E25-400E-BE3A-29E8EAF269B2} = {7498B86D-1036-46C3-A522-780A4B275C5D}
+		{C596851D-CD82-4D81-BDE5-F99C4459835A} = {857039DB-53C3-49DB-A36A-21649D01C132}
 	EndGlobalSection
 EndGlobal
