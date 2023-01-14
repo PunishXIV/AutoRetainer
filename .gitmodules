@@ -1,0 +1,9 @@
+[submodule "PunishLib"]
+	path = PunishLib
+	url = https://github.com/PunishXIV/PunishLib
+[submodule "ECommons"]
+	path = ECommons
+	url = https://github.com/NightmareXIV/ECommons
+[submodule "ClickLib"]
+	path = ClickLib
+	url = https://github.com/daemitus/ClickLib
