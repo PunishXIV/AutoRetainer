@@ -48,7 +48,7 @@ internal unsafe class AutoLogin
         PluginLog.Information("Autologin module initialized");
     }
 
-    internal void SwapCharacter(string WorldName, uint characterIndex, uint? serviceAccount = null)
+    internal void SwapCharacter(string WorldName, uint characterIndex, int serviceAccount)
     {
 
         var world = Svc.Data.Excel.GetSheet<World>()?.FirstOrDefault(w => w.Name.ToDalamudString().TextValue.Equals(WorldName, StringComparison.InvariantCultureIgnoreCase));
@@ -65,7 +65,7 @@ internal unsafe class AutoLogin
             return;
         }
 
-        if(serviceAccount != null && serviceAccount >= 10)
+        if(serviceAccount < 0 || serviceAccount >= 10)
         {
             PluginLog.Error("Invalid Service account Index. Must be between 0 and 9.");
             return;
@@ -82,7 +82,7 @@ internal unsafe class AutoLogin
         actionQueue.Enqueue(VariableDelay(5));
         actionQueue.Enqueue(OpenDataCenterMenu);
         actionQueue.Enqueue(SelectDataCentre);
-        if (tempServiceAccount != null) actionQueue.Enqueue(SelectServiceAccount);
+        actionQueue.Enqueue(SelectServiceAccount);
         actionQueue.Enqueue(SelectWorld);
         actionQueue.Enqueue(VariableDelay(10));
         actionQueue.Enqueue(SelectCharacter);
@@ -180,6 +180,10 @@ internal unsafe class AutoLogin
     {
         var dcMenu = (AtkUnitBase*)Svc.GameGui.GetAddonByName("TitleDCWorldMap", 1);
         if (dcMenu != null) dcMenu->Hide(true);
+        if(TryGetAddonByName<AtkUnitBase>("_CharaSelectWorldServer", out _))
+        {
+            return true;
+        }
         if (GenericHelpers.TryGetAddonByName<AddonSelectString>("SelectString", out var addon) && IsAddonReady(&addon->AtkUnitBase)
             && addon->AtkUnitBase.UldManager.NodeListCount >= 4)
         {
@@ -188,7 +192,7 @@ internal unsafe class AutoLogin
             if(text == compareTo)
             {
                 PluginLog.Information($"Selecting service account");
-                ClickSelectString.Using((nint)addon).SelectItem((ushort)tempServiceAccount!.Value);
+                ClickSelectString.Using((nint)addon).SelectItem((ushort)tempServiceAccount);
                 return true;
             }
             else
@@ -287,7 +291,7 @@ internal unsafe class AutoLogin
         tempWorld = null;
         tempDc = null;
         tempCharacter = null;
-        tempServiceAccount = null;
+        tempServiceAccount = 0;
         return true;
     }
 
@@ -295,7 +299,7 @@ internal unsafe class AutoLogin
     private uint? tempDc = null;
     private uint? tempWorld = null;
     private uint? tempCharacter = null;
-    private uint? tempServiceAccount = null;
+    private int tempServiceAccount = 0;
 
     internal void DrawUI()
     {

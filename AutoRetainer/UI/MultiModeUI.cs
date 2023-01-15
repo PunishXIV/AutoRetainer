@@ -14,6 +14,7 @@ internal unsafe static class MultiModeUI
         {
             ImGuiEx.TextWrapped(ImGuiColors.DalamudRed, "Multi Mode requires Auto-afk option to be turned off");
         }
+        ImGuiEx.TextWrapped(ImGuiColors.DalamudOrange, "Please use this feature within the sane limits. Keeping it on for abnormally large amount of time may attract unwanted attention.");
         if (ImGui.CollapsingHeader("Setup Guide"))
         {
             ImGuiEx.TextWrapped("1. Log into each of your characters, assign necessary ventures to your retainers and enable retainers that you want to resend on each character.");
@@ -24,7 +25,7 @@ internal unsafe static class MultiModeUI
         }
         if (ImGui.CollapsingHeader("Configuration")) 
         {
-            ImGui.Checkbox($"I have multiple service accounts", ref P.config.MultipleServiceAccounts);
+            //ImGui.Checkbox($"I have multiple service accounts", ref P.config.MultipleServiceAccounts);
             ImGui.Checkbox("Wait for all retainers to be done before logging into character", ref P.config.MultiWaitForAll);
             ImGui.SetNextItemWidth(60);
             ImGui.DragInt("Relog in advance, seconds", ref P.config.AdvanceTimer.ValidateRange(0, 300), 0.1f, 0, 300);
@@ -107,7 +108,7 @@ internal unsafe static class MultiModeUI
                     ImGui.EndCombo();
                 }
 
-                if (P.config.MultipleServiceAccounts)
+                //if (P.config.MultipleServiceAccounts)
                 {
                     ImGui.SameLine();
                     ImGui.SetNextItemWidth(150);
