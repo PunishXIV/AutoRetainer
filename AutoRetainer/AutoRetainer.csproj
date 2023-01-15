@@ -36,8 +36,8 @@
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(Configuration)' == 'Release'">
-		<PackageReference Include="PunishLib" Version="1.0.1.1" />
-		<PackageReference Include="ECommons" Version="2.0.0" />
+		<PackageReference Include="PunishLib" Version="1.0.1.2" />
+		<PackageReference Include="ECommons" Version="2.0.0.1" />
                 <PackageReference Include="ClickLib" Version="1.2.0.1" />
 	</ItemGroup>
 
