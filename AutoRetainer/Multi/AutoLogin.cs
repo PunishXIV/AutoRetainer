@@ -2,10 +2,12 @@
 #nullable enable
 
 
+using ClickLib.Clicks;
 using Dalamud.Game;
 using Dalamud.Memory;
 using Dalamud.Utility;
 using ECommons.Automation;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
 using System.Diagnostics;
@@ -46,7 +48,7 @@ internal unsafe class AutoLogin
         PluginLog.Information("Autologin module initialized");
     }
 
-    internal void SwapCharacter(string WorldName, uint characterIndex)
+    internal void SwapCharacter(string WorldName, uint characterIndex, int serviceAccount)
     {
 
         var world = Svc.Data.Excel.GetSheet<World>()?.FirstOrDefault(w => w.Name.ToDalamudString().TextValue.Equals(WorldName, StringComparison.InvariantCultureIgnoreCase));
@@ -63,9 +65,16 @@ internal unsafe class AutoLogin
             return;
         }
 
+        if(serviceAccount < 0 || serviceAccount >= 10)
+        {
+            PluginLog.Error("Invalid Service account Index. Must be between 0 and 9.");
+            return;
+        }
+
         tempDc = world.DataCenter.Row;
         tempWorld = world.RowId;
         tempCharacter = characterIndex;
+        tempServiceAccount = serviceAccount;
         actionQueue.Clear();
         actionQueue.Enqueue(VariableDelay(5));
         actionQueue.Enqueue(Logout);
@@ -73,6 +82,7 @@ internal unsafe class AutoLogin
         actionQueue.Enqueue(VariableDelay(5));
         actionQueue.Enqueue(OpenDataCenterMenu);
         actionQueue.Enqueue(SelectDataCentre);
+        actionQueue.Enqueue(SelectServiceAccount);
         actionQueue.Enqueue(SelectWorld);
         actionQueue.Enqueue(VariableDelay(10));
         actionQueue.Enqueue(SelectCharacter);
@@ -166,6 +176,34 @@ internal unsafe class AutoLogin
         return true;
     }
 
+    public bool SelectServiceAccount()
+    {
+        var dcMenu = (AtkUnitBase*)Svc.GameGui.GetAddonByName("TitleDCWorldMap", 1);
+        if (dcMenu != null) dcMenu->Hide(true);
+        if(TryGetAddonByName<AtkUnitBase>("_CharaSelectWorldServer", out _))
+        {
+            return true;
+        }
+        if (GenericHelpers.TryGetAddonByName<AddonSelectString>("SelectString", out var addon) && IsAddonReady(&addon->AtkUnitBase)
+            && addon->AtkUnitBase.UldManager.NodeListCount >= 4)
+        {
+            var text = MemoryHelper.ReadSeString(&addon->AtkUnitBase.UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText).ExtractText();
+            var compareTo = Svc.Data.GetExcelSheet<Lobby>()?.GetRow(11)?.Text.ToString();
+            if(text == compareTo)
+            {
+                PluginLog.Information($"Selecting service account");
+                ClickSelectString.Using((nint)addon).SelectItem((ushort)tempServiceAccount);
+                return true;
+            }
+            else
+            {
+                PluginLog.Information($"Found different SelectString: {text}");
+                return false;
+            }
+        }
+        return false;
+    }
+
     public bool SelectDataCentre()
     {
         var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("TitleDCWorldMap", 1);
@@ -253,6 +291,7 @@ internal unsafe class AutoLogin
         tempWorld = null;
         tempDc = null;
         tempCharacter = null;
+        tempServiceAccount = 0;
         return true;
     }
 
@@ -260,6 +299,8 @@ internal unsafe class AutoLogin
     private uint? tempDc = null;
     private uint? tempWorld = null;
     private uint? tempCharacter = null;
+    private int tempServiceAccount = 0;
+
     internal void DrawUI()
     {
         if (ImGui.Button("Clear Queue"))

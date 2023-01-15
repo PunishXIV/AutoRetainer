@@ -18,6 +18,7 @@ internal class Config : IPluginConfiguration
     public bool _autoCloseRetainerWindow = false;
     public List<OfflineCharacterData> OfflineData = new();
     public bool MultiWaitForAll = false;
+    //public bool MultipleServiceAccounts = false;
     public bool NoNames = false;
     public int UnsyncCompensation = -5;
     public int AdvanceTimer = 60;

@@ -14,6 +14,7 @@ internal unsafe static class MultiModeUI
         {
             ImGuiEx.TextWrapped(ImGuiColors.DalamudRed, "Multi Mode requires Auto-afk option to be turned off");
         }
+        ImGuiEx.TextWrapped(ImGuiColors.DalamudOrange, "Please use this feature within the sane limits. Keeping it on for abnormally large amount of time may attract unwanted attention.");
         if (ImGui.CollapsingHeader("Setup Guide"))
         {
             ImGuiEx.TextWrapped("1. Log into each of your characters, assign necessary ventures to your retainers and enable retainers that you want to resend on each character.");
@@ -23,7 +24,8 @@ internal unsafe static class MultiModeUI
             ImGuiEx.TextWrapped("5. You may set up one character to be preferred. When no retainers have upcoming ventures in next 15 minutes, you will be relogged back on that character.");
         }
         if (ImGui.CollapsingHeader("Configuration")) 
-        { 
+        {
+            //ImGui.Checkbox($"I have multiple service accounts", ref P.config.MultipleServiceAccounts);
             ImGui.Checkbox("Wait for all retainers to be done before logging into character", ref P.config.MultiWaitForAll);
             ImGui.SetNextItemWidth(60);
             ImGui.DragInt("Relog in advance, seconds", ref P.config.AdvanceTimer.ValidateRange(0, 300), 0.1f, 0, 300);
@@ -90,6 +92,7 @@ internal unsafe static class MultiModeUI
                 }
                 pad = ImGui.GetStyle().FramePadding.Y;
                 var enabledRetainers = x.GetEnabledRetainers();
+
                 ImGuiEx.TextV("Character index:");
                 ImGui.SameLine();
                 ImGui.SetNextItemWidth(100);
@@ -104,6 +107,24 @@ internal unsafe static class MultiModeUI
                     }
                     ImGui.EndCombo();
                 }
+
+                //if (P.config.MultipleServiceAccounts)
+                {
+                    ImGui.SameLine();
+                    ImGui.SetNextItemWidth(150);
+                    if (ImGui.BeginCombo("##sindex", $"Service account {x.ServiceAccount+1}"))
+                    {
+                        for (var i = 1; i <= 10; i++)
+                        {
+                            if (ImGui.Selectable($"Service account {i}"))
+                            {
+                                x.ServiceAccount = i-1;
+                            }
+                        }
+                        ImGui.EndCombo();
+                    }
+                }
+
                 ImGui.SameLine();
                 if(ImGui.Checkbox("Preferred character", ref x.Preferred))
                 {

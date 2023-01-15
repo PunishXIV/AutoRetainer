@@ -27,8 +27,9 @@ public class AutoRetainer : IDalamudPlugin
 
     public AutoRetainer(DalamudPluginInterface pi)
     {
-        PunishLibMain.Init(pi, this, Module.DalamudReflector);
-	SponsorManager.SetSponsorInfo("https://ko-fi.com/spetsnaz");
+        ECommonsMain.Init(pi, this, Module.DalamudReflector);
+        PunishLibMain.Init(pi, this);
+	      SponsorManager.SetSponsorInfo("https://ko-fi.com/spetsnaz");
         P = this;
         new TickScheduler(delegate
         {
@@ -152,6 +153,7 @@ public class AutoRetainer : IDalamudPlugin
         });
         Safe(StatisticsManager.Dispose);
         PunishLibMain.Dispose();
+        ECommonsMain.Dispose();
     }
 
     internal HashSet<string> GetSelectedRetainers(ulong cid)
