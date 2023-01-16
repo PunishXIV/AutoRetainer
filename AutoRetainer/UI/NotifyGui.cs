@@ -14,7 +14,7 @@ namespace AutoRetainer.UI
             ImGui.Checkbox($"Do not display overlay in duty or combat", ref P.config.NotifyCombatDutyNoDisplay);
             ImGui.Checkbox($"Include other characters", ref P.config.NotifyIncludeAllChara);
             ImGui.Checkbox($"Ignore other characters that have not been enabled in MultiMode", ref P.config.NotifyIgnoreNoMultiMode);
-            ImGui.Checkbox($"Display notification in game chat", ref P.config.NotifyDisplayInChat);
+            ImGui.Checkbox($"Display notification in game chat", ref P.config.NotifyDisplayInChatX);
             ImGuiEx.Text($"If game is inactive: (requires NotificationMaster to be installed and enabled)");
             ImGui.Checkbox($"Send desktop notification on retainers available", ref P.config.NotifyDeskopToast);
             ImGui.Checkbox($"Flash taskbar", ref P.config.NotifyFlashTaskbar);

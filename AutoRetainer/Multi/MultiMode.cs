@@ -3,6 +3,7 @@ using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using ECommons.CircularBuffers;
 using ECommons.Events;
+using ECommons.ExcelServices;
 using ECommons.GameFunctions;
 using ECommons.MathHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game;
@@ -182,7 +183,7 @@ internal unsafe static class MultiMode
         {
             ErrorMessage = "Invalid character index";
         }
-        else if (!GameMain.IsInSanctuary())
+        else if (!GameMain.IsInSanctuary() && !ExcelTerritoryHelper.IsSanctuary(Svc.ClientState.TerritoryType) && !P.config.BypassSanctuaryCheck)
         {
             ErrorMessage = "You are not in the sanctuary";
         }

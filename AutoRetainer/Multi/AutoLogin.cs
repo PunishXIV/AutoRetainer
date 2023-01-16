@@ -78,7 +78,7 @@ internal unsafe class AutoLogin
         actionQueue.Clear();
         actionQueue.Enqueue(VariableDelay(5));
         actionQueue.Enqueue(Logout);
-        actionQueue.Enqueue(SelectYes);
+        actionQueue.Enqueue(SelectYesLogout);
         actionQueue.Enqueue(VariableDelay(5));
         actionQueue.Enqueue(OpenDataCenterMenu);
         actionQueue.Enqueue(SelectDataCentre);
@@ -150,7 +150,7 @@ internal unsafe class AutoLogin
             var hasNext = actionQueue.TryPeek(out var next);
             if (hasNext)
             {
-                if (next())
+                if (next!())
                 {
                     actionQueue.Dequeue();
                     sw.Reset();
@@ -252,6 +252,15 @@ internal unsafe class AutoLogin
         GenerateCallback(addon, 17, 0, tempCharacter);
         var nextAddon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("SelectYesno", 1);
         return nextAddon != null;
+    }
+
+    public bool SelectYesLogout()
+    {
+        var addon = Utils.GetSpecificYesno(Svc.Data.GetExcelSheet<Addon>()?.GetRow(115)?.Text.ToDalamudString().ExtractText());
+        if (addon == null) return false;
+        GenerateCallback(addon, 0);
+        addon->Hide(true);
+        return true;
     }
 
     public bool SelectYes()
