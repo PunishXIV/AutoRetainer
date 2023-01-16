@@ -27,6 +27,7 @@ internal class Config : IPluginConfiguration
     public bool RecordStats = true;
     public bool EnableAutoGCHandin = false;
     public bool SS = false;
+    internal bool BypassSanctuaryCheck = false;
 
     internal bool AutoCloseRetainerWindow
     {

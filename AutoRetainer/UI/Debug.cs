@@ -6,6 +6,8 @@ using AutoRetainer.QSI;
 using AutoRetainer.Statistics;
 using AutoRetainer.GcHandin;
 using ECommons.Throttlers;
+using FFXIVClientStructs.FFXIV.Client.Game;
+using ECommons.ExcelServices;
 
 namespace AutoRetainer.UI;
 
@@ -16,6 +18,9 @@ internal unsafe static class Debug
     {
         Safe(delegate
         {
+            ImGuiEx.Text($"Is in sanctuary: {GameMain.IsInSanctuary()}");
+            ImGuiEx.Text($"Is in sanctuary ExcelTerritoryHelper: {ExcelTerritoryHelper.IsSanctuary(Svc.ClientState.TerritoryType)}");
+            ImGui.Checkbox($"Bypass sanctuary check", ref P.config.BypassSanctuaryCheck);
             if (Svc.ClientState.LocalPlayer != null && Svc.Targets.Target != null)
             {
                 ImGuiEx.Text($"Distance to target: {Vector3.Distance(Svc.ClientState.LocalPlayer.Position, Svc.Targets.Target.Position)}");
