@@ -3,8 +3,10 @@ using Dalamud;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Memory;
 using ECommons.Events;
 using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
 using System.Text.RegularExpressions;
 
@@ -12,6 +14,35 @@ namespace AutoRetainer;
 
 internal static unsafe class Utils
 {
+
+    internal static AtkUnitBase* GetSpecificYesno(string s)
+    {
+        for (int i = 1; i < 100; i++)
+        {
+            try
+            {
+                var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("SelectYesno", i);
+                if (addon == null) return null;
+                if (IsAddonReady(addon))
+                {
+                    var textNode = addon->UldManager.NodeList[15]->GetAsAtkTextNode();
+                    var text = MemoryHelper.ReadSeString(&textNode->NodeText).ExtractText();
+                    if(text == s)
+                    {
+                        PluginLog.Verbose($"SelectYesno {s} addon {i}");
+                        return addon;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.Log();
+                return null;
+            }
+        }
+        return null;
+    }
+
     internal static bool TryMatch(this string s, string pattern, out Match match)
     {
         var m = Regex.Match(s, pattern);
