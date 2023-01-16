@@ -64,7 +64,7 @@ internal class Config : IPluginConfiguration
     public bool NotifyCombatDutyNoDisplay = true;
     public bool NotifyIncludeAllChara = true;
     public bool NotifyIgnoreNoMultiMode = false;
-    public bool NotifyDisplayInChat = true;
+    public bool NotifyDisplayInChatX = false;
     public bool NotifyDeskopToast = false;
     public bool NotifyFlashTaskbar = false;
     public bool NotifyNoToastWhenRunning = true;
