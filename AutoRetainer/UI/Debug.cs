@@ -18,6 +18,22 @@ internal unsafe static class Debug
     {
         Safe(delegate
         {
+            if (ImGui.CollapsingHeader("Task debug"))
+            {
+                ImGuiEx.Text($"Busy: {P.TaskManager.IsBusy}, abort in {P.TaskManager.AbortAt - Environment.TickCount64}");
+                if (ImGui.Button($"Generate random numbers 1/500"))
+                {
+                    P.TaskManager.Enqueue(() => { var r = new Random().Next(0, 500); InternalLog.Verbose($"Gen 1/500: {r}"); return r == 0; });
+                }
+                if (ImGui.Button($"Generate random numbers 1/5000"))
+                {
+                    P.TaskManager.Enqueue(() => { var r = new Random().Next(0, 5000); InternalLog.Verbose($"Gen 1/5000: {r}"); return r == 0; });
+                }
+                if (ImGui.Button($"Generate random numbers 1/100"))
+                {
+                    P.TaskManager.Enqueue(() => { var r = new Random().Next(0, 100); InternalLog.Verbose($"Gen 1/100: {r}"); return r == 0; });
+                }
+            }
             ImGuiEx.Text($"Is in sanctuary: {GameMain.IsInSanctuary()}");
             ImGuiEx.Text($"Is in sanctuary ExcelTerritoryHelper: {ExcelTerritoryHelper.IsSanctuary(Svc.ClientState.TerritoryType)}");
             ImGui.Checkbox($"Bypass sanctuary check", ref P.config.BypassSanctuaryCheck);

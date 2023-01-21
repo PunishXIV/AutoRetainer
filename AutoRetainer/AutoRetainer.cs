@@ -10,6 +10,7 @@ using AutoRetainer.GcHandin;
 using ECommons.Events;
 using PunishLib;
 using PunishLib.Sponsor;
+using ECommons.Automation;
 
 namespace AutoRetainer;
 
@@ -24,6 +25,7 @@ public class AutoRetainer : IDalamudPlugin
     private bool Enabled = false;
     internal bool NoConditionEvent = false;
     internal QuickSellItems quickSellItems;
+    internal TaskManager TaskManager;
 
     public AutoRetainer(DalamudPluginInterface pi)
     {
@@ -37,6 +39,7 @@ public class AutoRetainer : IDalamudPlugin
             retainerManager = new(Svc.SigScanner);
             ws = new();
             configGui = new();
+            TaskManager = new();
             Svc.PluginInterface.UiBuilder.Draw += ws.Draw;
             Svc.PluginInterface.UiBuilder.OpenConfigUi += delegate { configGui.IsOpen = true; };
             Svc.ClientState.Logout += Logout;
@@ -152,6 +155,7 @@ public class AutoRetainer : IDalamudPlugin
             Multi.YesAlready.EnableIfNeeded();
         });
         Safe(StatisticsManager.Dispose);
+        Safe(TaskManager.Dispose);
         PunishLibMain.Dispose();
         ECommonsMain.Dispose();
     }
