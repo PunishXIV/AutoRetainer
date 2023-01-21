@@ -5,6 +5,9 @@ using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Memory;
 using ECommons.Events;
+using ECommons.ExcelServices.TerritoryEnumeration;
+using ECommons.GameFunctions;
+using ECommons.MathHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
@@ -14,6 +17,46 @@ namespace AutoRetainer;
 
 internal static unsafe class Utils
 {
+    internal static float GetValidInteractionDistance(GameObject bell)
+    {
+        if(bell.ObjectKind == ObjectKind.Housing)
+        {
+            return 6.5f;
+        }
+        else if (Inns.List.Contains(Svc.ClientState.TerritoryType))
+        {
+            return 4.75f;
+        }
+        else
+        {
+            return 4.6f;
+        }
+    }
+
+    internal static float GetAngleTo(Vector2 pos)
+    {
+        return (MathHelper.GetRelativeAngle(Svc.ClientState.LocalPlayer.Position.ToVector2(), pos) + Svc.ClientState.LocalPlayer.Rotation.RadToDeg()) % 360;
+    }
+
+    internal static GameObject GetNearestEntrance(out float Distance)
+    {
+        var currentDistance = float.MaxValue;
+        GameObject currentObject = null;
+        foreach(var x in Svc.Objects)
+        {
+            if(x.IsTargetable() && x.Name.ToString() == "Entrance")
+            {
+                var distance = Vector3.Distance(Svc.ClientState.LocalPlayer.Position, x.Position);
+                if(distance < currentDistance)
+                {
+                    currentDistance = distance;
+                    currentObject = x;
+                }
+            }
+        }
+        Distance = currentDistance;
+        return currentObject;
+    }
 
     internal static AtkUnitBase* GetSpecificYesno(string s)
     {

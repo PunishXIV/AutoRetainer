@@ -28,6 +28,7 @@ internal class Config : IPluginConfiguration
     public bool EnableAutoGCHandin = false;
     public bool SS = false;
     internal bool BypassSanctuaryCheck = false;
+    public bool MultiAllowHET = false;
 
     internal bool AutoCloseRetainerWindow
     {

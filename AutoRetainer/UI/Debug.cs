@@ -8,6 +8,8 @@ using AutoRetainer.GcHandin;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using ECommons.ExcelServices;
+using ECommons.ExcelServices.TerritoryEnumeration;
+using AutoRetainer.Multi;
 
 namespace AutoRetainer.UI;
 
@@ -18,6 +20,24 @@ internal unsafe static class Debug
     {
         Safe(delegate
         {
+            if (ImGui.Button("InstallInteractHook"))
+            {
+                P.Memory.InstallInteractHook();
+            }
+            if (ImGui.CollapsingHeader("HET"))
+            {
+                ImGuiEx.Text($"HouseEntranceAllowed: {MultiMode.HouseEntranceAllowed}");
+                ImGuiEx.Text($"Nearest entrance: {Utils.GetNearestEntrance(out var d)}, d={d}");
+                if(ImGui.Button("Enter house"))
+                {
+                    HouseEnterTask.EnqueueTask();
+                }
+            }
+            if(ImGui.CollapsingHeader("Estate territories"))
+            {
+                ImGuiEx.Text(ResidentalAreas.List.Select(x => GenericHelpers.GetTerritoryName(x)).Join("\n"));
+                ImGuiEx.Text($"In residental area: {ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType)}");
+            }
             if (ImGui.CollapsingHeader("Task debug"))
             {
                 ImGuiEx.Text($"Busy: {P.TaskManager.IsBusy}, abort in {P.TaskManager.AbortAt - Environment.TickCount64}");

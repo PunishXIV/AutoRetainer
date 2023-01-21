@@ -69,11 +69,6 @@ internal static class Settings
         {
             ImGui.Checkbox($"Record venture statistics", ref P.config.RecordStats);
         });
-        if (P.config.SS)
-        {
-            InfoBox.DrawBox("Auto GC Expert Delivery", AutoGCHandinUI.Draw);
-            InfoBox.DrawBox("Notification settings", NotifyGui.Draw);
-        }
     }
 
     static void QRA(string text, ref Keys key)

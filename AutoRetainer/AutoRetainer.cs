@@ -26,6 +26,7 @@ public class AutoRetainer : IDalamudPlugin
     internal bool NoConditionEvent = false;
     internal QuickSellItems quickSellItems;
     internal TaskManager TaskManager;
+    internal Memory Memory;
 
     public AutoRetainer(DalamudPluginInterface pi)
     {
@@ -40,6 +41,7 @@ public class AutoRetainer : IDalamudPlugin
             ws = new();
             configGui = new();
             TaskManager = new();
+            Memory = new();
             Svc.PluginInterface.UiBuilder.Draw += ws.Draw;
             Svc.PluginInterface.UiBuilder.OpenConfigUi += delegate { configGui.IsOpen = true; };
             Svc.ClientState.Logout += Logout;
@@ -156,6 +158,7 @@ public class AutoRetainer : IDalamudPlugin
         });
         Safe(StatisticsManager.Dispose);
         Safe(TaskManager.Dispose);
+        Safe(Memory.Dispose);
         PunishLibMain.Dispose();
         ECommonsMain.Dispose();
     }

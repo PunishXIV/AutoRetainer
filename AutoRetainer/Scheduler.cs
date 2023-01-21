@@ -168,12 +168,12 @@ internal unsafe class Scheduler
                 }
                 else
                 {
-                    if (IsDoneConsolidating)
+                    //if (true || IsDoneConsolidating)
                     {
                         Log($"Retainer {retName} exiting");
                         Clicker.SelectQuit();
                     }
-                    else
+                    /*else
                     {
                         if (P.config.SS)
                         {
@@ -193,7 +193,7 @@ internal unsafe class Scheduler
                             P.TaskManager.Enqueue(x);
                         }
                         IsDoneConsolidating = true;
-                    }
+                    }*/
                 }
             }
             else if (TryGetAddonByName<AddonRetainerTaskAsk>("RetainerTaskAsk", out var addon3) && IsAddonReady(&addon3->AtkUnitBase) && IsCurrentRetainerEnabled())
