@@ -8,6 +8,7 @@ using ECommons.Events;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameFunctions;
 using ECommons.MathHelpers;
+using ECommons.Reflection;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
@@ -17,6 +18,17 @@ namespace AutoRetainer;
 
 internal static unsafe class Utils
 {
+    internal static void TryNotify(string s)
+    {
+        if (DalamudReflector.TryGetDalamudPlugin("NotificationMaster", out var instance, true, true))
+        {
+            Safe(delegate
+            {
+                instance.GetType().Assembly.GetType("NotificationMaster.TrayIconManager", true).GetMethod("ShowToast").Invoke(null, new object[] { s, P.Name });
+            });
+        }
+    }
+
     internal static float GetValidInteractionDistance(GameObject bell)
     {
         if(bell.ObjectKind == ObjectKind.Housing)

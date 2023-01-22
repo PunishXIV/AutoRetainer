@@ -26,6 +26,7 @@ internal class Config : IPluginConfiguration
     public bool StatsUnifyHQ = false;
     public bool RecordStats = true;
     public bool EnableAutoGCHandin = false;
+    public bool GCHandinNotify = true;
     public bool SS = false;
     internal bool BypassSanctuaryCheck = false;
     public bool MultiAllowHET = false;

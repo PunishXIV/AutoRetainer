@@ -40,7 +40,7 @@ public class AutoRetainer : IDalamudPlugin
             retainerManager = new(Svc.SigScanner);
             ws = new();
             configGui = new();
-            TaskManager = new();
+            TaskManager = new() { AbortOnTimeout = true };
             Memory = new();
             Svc.PluginInterface.UiBuilder.Draw += ws.Draw;
             Svc.PluginInterface.UiBuilder.OpenConfigUi += delegate { configGui.IsOpen = true; };

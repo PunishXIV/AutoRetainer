@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
 
 namespace AutoRetainer.GcHandin
@@ -83,7 +84,12 @@ namespace AutoRetainer.GcHandin
                         }
                         if (IsDone(addon))
                         {
-                            DuoLog.Information($"Automatic handin has been completed");
+                            var s = $"Automatic handin has been completed";
+                            DuoLog.Information(s);
+                            if (P.config.GCHandinNotify)
+                            {
+                                Utils.TryNotify(s);
+                            }
                             Operation = false;
                         }
                         else
@@ -132,6 +138,10 @@ namespace AutoRetainer.GcHandin
                                 {
                                     Operation = false;
                                     DuoLog.Information($"{e.Message}");
+                                    if (P.config.GCHandinNotify)
+                                    {
+                                        Utils.TryNotify(e.Message);
+                                    }
                                 }
                                 catch (Exception e)
                                 {
