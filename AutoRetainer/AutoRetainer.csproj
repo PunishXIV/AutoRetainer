@@ -6,45 +6,45 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
+		<TargetFramework>net7.0-windows</TargetFramework>
+		<Platforms>x64</Platforms>
+		<LangVersion>preview</LangVersion>
+		<DalamudDevPlugins>$(appdata)\XIVLauncher\devPlugins\AutoRetainer\</DalamudDevPlugins>
 		<DalamudLibPath>$(appdata)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
 		<DalamudPluginPath>$(appdata)\XIVLauncher\installedPlugins\AutoRetainer\$(version)</DalamudPluginPath>
-		<DalamudDevPlugins>$(appdata)\XIVLauncher\devPlugins\AutoRetainer\</DalamudDevPlugins>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-		<AssemblyName>AutoRetainer</AssemblyName>
-		<RootNamespace>AutoRetainer</RootNamespace>
-		<PackageId>AutoRetainer</PackageId>
-		<Product>AutoRetainer</Product>
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 		<EnableWindowsTargeting>true</EnableWindowsTargeting>
 		<UseWindowsForms>true</UseWindowsForms>
+		<AssemblyName>AutoRetainer</AssemblyName>
+		<PackageId>AutoRetainer</PackageId>
+		<Product>AutoRetainer</Product>
+		<RootNamespace>AutoRetainer</RootNamespace>
+		<Nullable>disable</Nullable>
 		<NoWarn>CS1591</NoWarn>
-    <Nullable>disable</Nullable>
-    <TargetFramework>net7.0-windows</TargetFramework>
-    <Platforms>x64</Platforms>
-    <LangVersion>preview</LangVersion>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-  </PropertyGroup>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
 		<OutputPath>bin/Release</OutputPath>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<OutputPath>$(DalamudDevPlugins)</OutputPath>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(Configuration)' == 'Release'">
-		<PackageReference Include="PunishLib" Version="1.0.1.1" />
-		<PackageReference Include="ECommons" Version="2.0.0" />
+		<PackageReference Include="PunishLib" Version="1.0.1.2" />
+		<PackageReference Include="ECommons" Version="2.0.0.2" />
                 <PackageReference Include="ClickLib" Version="1.2.0.1" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)' == 'Debug'">
-  		<ProjectReference Include="..\PunishLib\PunishLib\PunishLib.csproj" />
-  		<ProjectReference Include="..\ECommons\ECommons\ECommons.csproj" />
-        <ProjectReference Include="..\ClickLib\ClickLib\ClickLib.csproj" />
+		<ProjectReference Include="..\PunishLib\PunishLib\PunishLib.csproj" />
+		<ProjectReference Include="..\ECommons\ECommons\ECommons.csproj" />
+		<ProjectReference Include="..\ClickLib\ClickLib\ClickLib.csproj" />
 	</ItemGroup>
 
 	<PropertyGroup Condition="'$(OS)' != 'Windows_NT' OR '$(CI)' == 'true'">
