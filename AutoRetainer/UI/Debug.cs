@@ -26,7 +26,6 @@ internal unsafe static class Debug
             }
             if (ImGui.CollapsingHeader("HET"))
             {
-                ImGuiEx.Text($"HouseEntranceAllowed: {MultiMode.HouseEntranceAllowed}");
                 ImGuiEx.Text($"Nearest entrance: {Utils.GetNearestEntrance(out var d)}, d={d}");
                 if(ImGui.Button("Enter house"))
                 {

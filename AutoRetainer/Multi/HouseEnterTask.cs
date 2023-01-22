@@ -1,5 +1,6 @@
 ﻿using ClickLib.Clicks;
 using ECommons.Automation;
+using ECommons.Events;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameFunctions;
 using ECommons.MathHelpers;
@@ -18,19 +19,21 @@ namespace AutoRetainer.Multi
     {
         internal static void EnqueueTask()
         {
-            P.TaskManager.Enqueue(WaitUntilNotBusy);
-            P.TaskManager.Enqueue(Turn);
+            P.TaskManager.Enqueue(WaitUntilNotBusy, 180 * 1000);
+            P.TaskManager.Enqueue(() => SetTarget(20f));
+            P.TaskManager.Enqueue(Lockon);
             P.TaskManager.Enqueue(Approach);
             P.TaskManager.Enqueue(AutorunOff);
             P.TaskManager.Enqueue(() => { Chat.Instance.SendMessage("/automove off"); return true; });
-            P.TaskManager.Enqueue(SetTarget);
+            P.TaskManager.Enqueue(() => SetTarget(5f));
             P.TaskManager.Enqueue(Interact);
             P.TaskManager.Enqueue(SelectYesno);
             P.TaskManager.Enqueue(WaitUntilLeavingZone);
         }
 
-        internal static bool WaitUntilNotBusy()
+        internal static bool? WaitUntilNotBusy()
         {
+            if (!ProperOnLogin.PlayerPresent || !ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType)) return null;
             if (MultiMode.IsInteractionAllowed())
             {
                 return true;
@@ -38,12 +41,12 @@ namespace AutoRetainer.Multi
             return false;
         }
 
-        internal static bool Turn()
+        internal static bool? Lockon()
         {
             var entrance = Utils.GetNearestEntrance(out var d);
-            if(entrance != null && d < 20f)
+            if (entrance != null && d < 20f && EzThrottler.Throttle("HET.Lockon"))
             {
-                if(Utils.GetAngleTo(entrance.Position.ToVector2()).InRange(178, 183))
+                /*if(Utils.GetAngleTo(entrance.Position.ToVector2()).InRange(178, 183))
                 {
                     return true;
                 }
@@ -54,22 +57,24 @@ namespace AutoRetainer.Multi
                         PluginLog.Debug($"Turning...");
                         P.Memory.Turn(entrance.Position);
                     }
-                }
+                }*/
+                Chat.Instance.SendMessage("/lockon");
+                return true;
             }
             return false;
         }
 
-        internal static bool Approach()
+        internal static bool? Approach()
         {
-            PluginLog.Debug($"Enabling");
+            PluginLog.Debug($"Enabling automove");
             Chat.Instance.SendMessage("/automove on");
             return true;
         }
-        
-        internal static bool AutorunOff()
+
+        internal static bool? AutorunOff()
         {
             var entrance = Utils.GetNearestEntrance(out var d);
-            if(entrance != null && d < 2f)
+            if (entrance != null && d < 4f && EzThrottler.Throttle("HET.DisableAutomove"))
             {
                 PluginLog.Debug($"Disabling automove");
                 Chat.Instance.SendMessage("/automove off");
@@ -78,19 +83,19 @@ namespace AutoRetainer.Multi
             return false;
         }
 
-        internal static bool SetTarget()
+        internal static bool? SetTarget(float distance)
         {
             var entrance = Utils.GetNearestEntrance(out var d);
-            if (entrance != null && d < 5f)
+            if (entrance != null && d < distance && EzThrottler.Throttle("HET.SetTarget", 200))
             {
-                PluginLog.Debug($"Setting entrance target");
+                PluginLog.Debug($"Setting entrance target ({distance})");
                 Svc.Targets.SetTarget(entrance);
                 return true;
             }
             return false;
         }
 
-        internal static bool Interact()
+        internal static bool? Interact()
         {
             var entrance = Utils.GetNearestEntrance(out var d);
             if (entrance != null && Svc.Targets.Target?.Address == entrance.Address && EzThrottler.Throttle("HET.Interact", 1000))
@@ -102,14 +107,14 @@ namespace AutoRetainer.Multi
             return false;
         }
 
-        internal static bool SelectYesno()
+        internal static bool? SelectYesno()
         {
             if (!ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType))
             {
-                return true;
+                return null;
             }
             var addon = Utils.GetSpecificYesno("Enter the estate hall?");
-            if(addon != null && IsAddonReady(addon) && EzThrottler.Throttle("HET.SelectYesno", 500))
+            if (addon != null && IsAddonReady(addon) && EzThrottler.Throttle("HET.SelectYesno"))
             {
                 PluginLog.Debug("Select yes");
                 ClickSelectYesNo.Using((nint)addon).Yes();
@@ -118,7 +123,7 @@ namespace AutoRetainer.Multi
             return false;
         }
 
-        internal static bool WaitUntilLeavingZone()
+        internal static bool? WaitUntilLeavingZone()
         {
             return !ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType);
         }
