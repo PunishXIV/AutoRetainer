@@ -1,9 +1,11 @@
-﻿using ECommons.Automation;
+﻿using ClickLib.Clicks;
+using ECommons.Automation;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameFunctions;
 using ECommons.MathHelpers;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +25,7 @@ namespace AutoRetainer.Multi
             P.TaskManager.Enqueue(() => { Chat.Instance.SendMessage("/automove off"); return true; });
             P.TaskManager.Enqueue(SetTarget);
             P.TaskManager.Enqueue(Interact);
+            P.TaskManager.Enqueue(SelectYesno);
             P.TaskManager.Enqueue(WaitUntilLeavingZone);
         }
 
@@ -94,6 +97,22 @@ namespace AutoRetainer.Multi
             {
                 PluginLog.Debug($"Interacting with entrance");
                 TargetSystem.Instance()->InteractWithObject((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)entrance.Address);
+                return true;
+            }
+            return false;
+        }
+
+        internal static bool SelectYesno()
+        {
+            if (!ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType))
+            {
+                return true;
+            }
+            var addon = Utils.GetSpecificYesno("Enter the estate hall?");
+            if(addon != null && IsAddonReady(addon) && EzThrottler.Throttle("HET.SelectYesno", 500))
+            {
+                PluginLog.Debug("Select yes");
+                ClickSelectYesNo.Using((nint)addon).Yes();
                 return true;
             }
             return false;

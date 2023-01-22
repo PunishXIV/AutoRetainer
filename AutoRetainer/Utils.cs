@@ -70,7 +70,7 @@ internal static unsafe class Utils
         return currentObject;
     }
 
-    internal static AtkUnitBase* GetSpecificYesno(string s)
+    internal static AtkUnitBase* GetSpecificYesno(params string[] s)
     {
         for (int i = 1; i < 100; i++)
         {
@@ -82,7 +82,7 @@ internal static unsafe class Utils
                 {
                     var textNode = addon->UldManager.NodeList[15]->GetAsAtkTextNode();
                     var text = MemoryHelper.ReadSeString(&textNode->NodeText).ExtractText();
-                    if(text == s)
+                    if(text.EqualsAny(s))
                     {
                         PluginLog.Verbose($"SelectYesno {s} addon {i}");
                         return addon;
