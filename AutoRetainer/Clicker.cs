@@ -299,7 +299,7 @@ internal unsafe class Clicker
             {
                 if((x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Consts.BellName, "リテイナーベル"))
                 {
-                    if(Vector3.Distance(x.Position, Svc.ClientState.LocalPlayer.Position) < 5f && ((GameObject*)x.Address)->GetIsTargetable())
+                    if(Vector3.Distance(x.Position, Svc.ClientState.LocalPlayer.Position) < Utils.GetValidInteractionDistance(x) && ((GameObject*)x.Address)->GetIsTargetable())
                     {
                         if (IsClickAllowed())
                         {
@@ -309,7 +309,7 @@ internal unsafe class Clicker
                                 RecordClickTime();
                                 P.NoConditionEvent = true;
                                 ImGui.SetWindowFocus(null);
-                                TargetSystem.Instance()->InteractWithObject((GameObject*)x.Address);
+                                TargetSystem.Instance()->InteractWithObject((GameObject*)x.Address, false);
                                 success = true;
                                 if (P.config.Verbose) Notify.Success($"Interacted with bell");
                             }

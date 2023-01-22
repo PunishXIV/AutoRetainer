@@ -15,6 +15,7 @@ internal unsafe class Scheduler
     const int RetListLife = 200;
     internal static int RandomAddition = 0;
     static bool ChangeRandomAddition = false;
+    static bool IsDoneConsolidating = false;
 
     internal static void Tick()
     {
@@ -61,6 +62,10 @@ internal unsafe class Scheduler
         {
             DuoLog.Error("Please go to System settings - Other and disable idle afk camera.");
             P.DisablePlugin();
+            return;
+        }
+        if (P.TaskManager.IsBusy)
+        {
             return;
         }
         if (P.retainerManager.Ready) {
@@ -120,6 +125,7 @@ internal unsafe class Scheduler
                     Log($"Retainer {retainer}");
                     Ban(retainer, 10 * 10);
                     Clicker.SelectRetainerByName(retainer);
+                    IsDoneConsolidating = false;
                 }
                 else
                 {
@@ -162,8 +168,32 @@ internal unsafe class Scheduler
                 }
                 else
                 {
-                    Log($"Retainer {retName} exiting");
-                    Clicker.SelectQuit();
+                    //if (true || IsDoneConsolidating)
+                    {
+                        Log($"Retainer {retName} exiting");
+                        Clicker.SelectQuit();
+                    }
+                    /*else
+                    {
+                        if (P.config.SS)
+                        {
+                            DuoLog.Information($"Instead of exiting, injecting additional tasks");
+                            var x = () =>
+                            {
+                                if (new Random().Next(0, 50) == 0)
+                                {
+                                    DuoLog.Information($"Task simulation completed!");
+                                    return true;
+                                }
+                                return false;
+                            };
+
+                            P.TaskManager.Enqueue(x);
+                            P.TaskManager.Enqueue(x);
+                            P.TaskManager.Enqueue(x);
+                        }
+                        IsDoneConsolidating = true;
+                    }*/
                 }
             }
             else if (TryGetAddonByName<AddonRetainerTaskAsk>("RetainerTaskAsk", out var addon3) && IsAddonReady(&addon3->AtkUnitBase) && IsCurrentRetainerEnabled())

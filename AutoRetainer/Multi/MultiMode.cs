@@ -4,6 +4,7 @@ using Dalamud.Game.ClientState.Objects.Types;
 using ECommons.CircularBuffers;
 using ECommons.Events;
 using ECommons.ExcelServices;
+using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameFunctions;
 using ECommons.MathHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game;
@@ -20,11 +21,13 @@ internal unsafe static class MultiMode
     internal static long NextInteractionAt { get; private set; } = 0;
     internal static ulong LastLongin = 0;
     internal static CircularBuffer<long> Interactions = new(5);
+    internal static bool HouseEntranceAllowed = true;
 
     internal static void Init()
     {
         ProperOnLogin.Register(delegate
         {
+            HouseEntranceAllowed = true;
             WriteVentureAndInventory();
             if(LastLongin == Svc.ClientState.LocalContentId && Enabled)
             {
@@ -56,6 +59,26 @@ internal unsafe static class MultiMode
                 Enabled = false;
                 return;
             }
+            if (GenericHelpers.IsOccupied() || !ProperOnLogin.PlayerPresent)
+            {
+                BlockInteraction(3);
+            }
+            if (P.TaskManager.IsBusy)
+            {
+                return;
+            }
+            else
+            {
+                if (P.config.MultiAllowHET && HouseEntranceAllowed && ProperOnLogin.PlayerPresent && ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType))
+                {
+                    var entrance = Utils.GetNearestEntrance(out var dist);
+                    if(entrance != null && dist < 20) 
+                    {
+                        HouseEntranceAllowed = false;
+                        HouseEnterTask.EnqueueTask();
+                    }
+                }
+            }
             if(Interactions.Count() == Interactions.Capacity && Interactions.All(x => Environment.TickCount64 - x < 180000))
             {
                 if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data) && data.Enabled)
@@ -72,10 +95,6 @@ internal unsafe static class MultiMode
                     Interactions.Clear();
                     return;
                 }
-            }
-            if (GenericHelpers.IsOccupied() || !ProperOnLogin.PlayerPresent)
-            {
-                BlockInteraction(3);
             }
             if(ProperOnLogin.PlayerPresent && !AutoLogin.Instance.IsRunning && IsInteractionAllowed()
                 && (!Synchronize || P.config.OfflineData.All(x => x.GetEnabledRetainers().All(z => z.GetVentureSecondsRemaining() <= P.config.UnsyncCompensation))))
@@ -261,7 +280,7 @@ internal unsafe static class MultiMode
         {
             if ((x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Consts.BellName, "リテイナーベル"))
             {
-                if (Vector3.Distance(x.Position, Svc.ClientState.LocalPlayer.Position) < 5f && x.Struct()->GetIsTargetable())
+                if (Vector3.Distance(x.Position, Svc.ClientState.LocalPlayer.Position) < Utils.GetValidInteractionDistance(x) && x.Struct()->GetIsTargetable())
                 {
                     return x;
                 }
