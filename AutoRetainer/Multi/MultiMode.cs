@@ -21,13 +21,11 @@ internal unsafe static class MultiMode
     internal static long NextInteractionAt { get; private set; } = 0;
     internal static ulong LastLongin = 0;
     internal static CircularBuffer<long> Interactions = new(5);
-    internal static bool HouseEntranceAllowed = true;
 
     internal static void Init()
     {
         ProperOnLogin.Register(delegate
         {
-            HouseEntranceAllowed = true;
             WriteVentureAndInventory();
             if(LastLongin == Svc.ClientState.LocalContentId && Enabled)
             {
@@ -36,6 +34,11 @@ internal unsafe static class MultiMode
             }
             LastLongin = Svc.ClientState.LocalContentId;
             Interactions.Clear();
+            if (Enabled && P.config.MultiAllowHET && ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType))
+            {
+                PluginLog.Debug($"ProperOnLogin: {Svc.ClientState.LocalPlayer}, residental area, scheduling HET");
+                HouseEnterTask.EnqueueTask();
+            }
         });
         if(ProperOnLogin.PlayerPresent)
         {
@@ -66,18 +69,6 @@ internal unsafe static class MultiMode
             if (P.TaskManager.IsBusy)
             {
                 return;
-            }
-            else
-            {
-                if (P.config.MultiAllowHET && HouseEntranceAllowed && ProperOnLogin.PlayerPresent && ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType))
-                {
-                    var entrance = Utils.GetNearestEntrance(out var dist);
-                    if(entrance != null && dist < 20) 
-                    {
-                        HouseEntranceAllowed = false;
-                        HouseEnterTask.EnqueueTask();
-                    }
-                }
             }
             if(Interactions.Count() == Interactions.Capacity && Interactions.All(x => Environment.TickCount64 - x < 180000))
             {
