@@ -1,5 +1,6 @@
 ﻿using AutoRetainer.Multi;
 using AutoRetainer.Statistics;
+using ECommons.Configuration;
 using PunishLib.ImGuiMethods;
 
 namespace AutoRetainer.UI;
@@ -66,7 +67,7 @@ unsafe internal class ConfigGui : Window
 
     public override void OnClose()
     {
-        Svc.PluginInterface.SavePluginConfig(P.config);
+        EzConfig.Save();
         P.DisablePlugin();
         StatisticsUI.Data.Clear();
         Notify.Success("Auto Retainer disabled");

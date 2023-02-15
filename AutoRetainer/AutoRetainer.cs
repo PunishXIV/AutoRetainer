@@ -11,6 +11,7 @@ using ECommons.Events;
 using PunishLib;
 using PunishLib.Sponsor;
 using ECommons.Automation;
+using ECommons.Configuration;
 
 namespace AutoRetainer;
 
@@ -36,7 +37,8 @@ public class AutoRetainer : IDalamudPlugin
         P = this;
         new TickScheduler(delegate
         {
-            config = Svc.PluginInterface.GetPluginConfig() as Config ?? new();
+            EzConfig.Migrate<Config>();
+            config = EzConfig.Init<Config>();
             retainerManager = new(Svc.SigScanner);
             ws = new();
             configGui = new();
@@ -142,7 +144,6 @@ public class AutoRetainer : IDalamudPlugin
     public void Dispose()
     {
         Safe(DisablePlugin);
-        Safe(delegate { Svc.PluginInterface.SavePluginConfig(config); });
         Safe(this.quickSellItems.Disable);
         Safe(this.quickSellItems.Dispose);
         Svc.PluginInterface.UiBuilder.Draw -= ws.Draw;

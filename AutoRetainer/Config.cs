@@ -1,13 +1,13 @@
 ﻿using AutoRetainer.Offline;
 using Dalamud.Configuration;
+using ECommons.Configuration;
 using System.Windows.Forms;
 
 namespace AutoRetainer;
 
 [Serializable]
-internal class Config : IPluginConfiguration
+internal class Config : IEzConfig
 {
-    public int Version { get; set; } =  1;
     public Dictionary<ulong, HashSet<string>> SelectedRetainers = new();
     public bool AutoEnableDisable = false;
     public bool TurboMode = false;
