@@ -8,6 +8,7 @@ namespace AutoRetainer.UI;
 
 internal unsafe static class MultiModeUI
 {
+    static Dictionary<string, (Vector2 start, Vector2 end)> bars = new();
     internal static void Draw()
     {
         if(MultiMode.GetAutoAfkOpt() != 0)
@@ -34,20 +35,28 @@ internal unsafe static class MultiModeUI
         }
         for(var index = 0; index < P.config.OfflineData.Count; index++)
         {
-            var x = P.config.OfflineData[index];
-            if (x.World.IsNullOrEmpty()) continue;
-            ImGui.PushID(x.CID.ToString());
+            var data = P.config.OfflineData[index];
+            if (data.World.IsNullOrEmpty()) continue;
+            ImGui.PushID(data.CID.ToString());
             var rCurPos = ImGui.GetCursorPos();
-            if (ImGui.Checkbox("##enable", ref x.Enabled))
+            var colen = false;
+            if (data.Enabled)
             {
-                if(x.Enabled && !x.Index.InRange(1, 9))
+                ImGui.PushStyleColor(ImGuiCol.Button, 0xFF097000);
+                colen = true;
+            }
+            if (ImGuiEx.IconButton("\uf021"))
+            {
+                data.Enabled = !data.Enabled;
+                if (data.Enabled && !data.Index.InRange(1, 9))
                 {
-                    x.Enabled = false;
+                    data.Enabled = false;
                     Notify.Error("Set character index first");
                 }
             }
-            ImGui.SameLine();
-            if (ImGui.Button("Relog"))
+            if (colen) ImGui.PopStyleColor();
+            ImGui.SameLine(0, 3);
+            if (ImGuiEx.IconButton(FontAwesomeIcon.DoorOpen))
             {
                 if (MultiMode.Enabled)
                 {
@@ -57,7 +66,7 @@ internal unsafe static class MultiModeUI
                     }
                     Notify.Warning("Preferred character has been reset");
                 }
-                if(MultiMode.Relog(x, out var error))
+                if(MultiMode.Relog(data, out var error))
                 {
                     Notify.Success("Relogging...");
                 }
@@ -66,9 +75,14 @@ internal unsafe static class MultiModeUI
                     Notify.Error(error);
                 }
             }
-            ImGui.SameLine();
+            ImGui.SameLine(0, 3);
+            if (ImGuiEx.IconButton(FontAwesomeIcon.Cog))
+            {
+
+            }
+            ImGui.SameLine(0, 3);
             var initCurpos = ImGui.GetCursorPos();
-            var lowestRetainer = P.config.MultiWaitForAll? x.GetEnabledRetainers().OrderBy(z => z.GetVentureSecondsRemaining()).LastOrDefault() : x.GetEnabledRetainers().OrderBy(z => z.GetVentureSecondsRemaining()).FirstOrDefault();
+            var lowestRetainer = P.config.MultiWaitForAll? data.GetEnabledRetainers().OrderBy(z => z.GetVentureSecondsRemaining()).LastOrDefault() : data.GetEnabledRetainers().OrderBy(z => z.GetVentureSecondsRemaining()).FirstOrDefault();
             if (lowestRetainer != default)
             {
                 ImGui.PushStyleColor(ImGuiCol.PlotHistogram, 0xbb500000);
@@ -77,32 +91,32 @@ internal unsafe static class MultiModeUI
                 ImGui.SetCursorPos(initCurpos);
             }
             float pad = 0;
-            var col = x.Preferred;
+            var col = data.Preferred;
             if (col)
             {
                 ImGui.PushStyleColor(ImGuiCol.Text, GradientColor.Get(ImGui.GetStyle().Colors[(int)ImGuiCol.Text], ImGuiColors.ParsedGreen));
             }
-            if (ImGui.CollapsingHeader((P.config.NoNames?$"Character {index+1}":$"{x}")+$"###chara{x.CID}"))
+            if (ImGui.CollapsingHeader((P.config.NoNames?$"Character {index+1}":$"{data}")+$"###chara{data.CID}"))
             {
-                SetAsPreferred(x);
+                SetAsPreferred(data);
                 if (col)
                 {
                     ImGui.PopStyleColor();
                     col = false;
                 }
                 pad = ImGui.GetStyle().FramePadding.Y;
-                var enabledRetainers = x.GetEnabledRetainers();
+                var enabledRetainers = data.GetEnabledRetainers();
 
-                ImGuiEx.TextV("Character index:");
+                /*ImGuiEx.TextV("Character index:");
                 ImGui.SameLine();
                 ImGui.SetNextItemWidth(100);
-                if (ImGui.BeginCombo("##index", x.Index == 0?"n/a":x.Index.ToString()))
+                if (ImGui.BeginCombo("##index", data.Index == 0?"n/a":data.Index.ToString()))
                 {
                     for(var i = 1; i <= 8; i++)
                     {
                         if (ImGui.Selectable($"{i}"))
                         {
-                            x.Index = i;
+                            data.Index = i;
                         }
                     }
                     ImGui.EndCombo();
@@ -112,13 +126,13 @@ internal unsafe static class MultiModeUI
                 {
                     ImGui.SameLine();
                     ImGui.SetNextItemWidth(150);
-                    if (ImGui.BeginCombo("##sindex", $"Service account {x.ServiceAccount+1}"))
+                    if (ImGui.BeginCombo("##sindex", $"Service account {data.ServiceAccount+1}"))
                     {
                         for (var i = 1; i <= 10; i++)
                         {
                             if (ImGui.Selectable($"Service account {i}"))
                             {
-                                x.ServiceAccount = i-1;
+                                data.ServiceAccount = i-1;
                             }
                         }
                         ImGui.EndCombo();
@@ -126,11 +140,11 @@ internal unsafe static class MultiModeUI
                 }
 
                 ImGui.SameLine();
-                if(ImGui.Checkbox("Preferred character", ref x.Preferred))
+                if(ImGui.Checkbox("Preferred character", ref data.Preferred))
                 {
                     foreach(var z in P.config.OfflineData)
                     {
-                        if(z.CID != x.CID)
+                        if(z.CID != data.CID)
                         {
                             z.Preferred = false;
                         }
@@ -159,43 +173,87 @@ internal unsafe static class MultiModeUI
                     {
                         e.Log();
                     }
-                }
-                ImGuiEx.Text($"Ventures: {x.Ventures}");
-                ImGui.SameLine();
-                ImGuiEx.Text($"Inventory slots: {x.InventorySpace}");
-                //ImGui.SameLine();
-                //ImGuiEx.Text($"Venture coffers: {x.VentureCoffers}");
-                for (var n=0;n < x.RetainerData.Count;n++)
+                }*/
+                ImGui.PushID(data.CID.ToString());
+
+                var storePos = ImGui.GetCursorPos();
+                for (var i = 0; i < data.RetainerData.Count; i++)
                 {
-                    var r = x.RetainerData[n];
-                    if (r.Name.IsNullOrEmpty()) continue;
-                    ImGui.PushID(r.Name);
-                    ImGuiEx.Text(enabledRetainers.Contains(r) ? ImGuiColors.ParsedGreen : ImGuiColors.DalamudGrey, $"{(P.config.NoNames?"Retainer "+(n+1):r.Name)}");
-                    ImGui.SameLine();
-                    ImGui.SetCursorPosX(150f);
-                    ImGuiEx.Text(r.HasVenture ? Utils.ToTimeString(r.GetVentureSecondsRemaining()) : "No venture");
-                    ImGui.SameLine();
-                    ImGui.SetCursorPosX(250f);
-                    ImGuiEx.Text("Level "+r.Level);
-                    ImGui.PopID();
+                    if (bars.TryGetValue($"{data.CID}{data.RetainerData[i].Name}", out var v))
+                    {
+                        var ret = data.RetainerData[i];
+                        if (!ret.HasVenture || ret.Level == 0 || ret.Name.ToString().IsNullOrEmpty()) continue;
+                        ImGui.SetCursorPos(v.start - ImGui.GetStyle().CellPadding with { Y = 0 });
+                        ImGui.PushStyleColor(ImGuiCol.PlotHistogram, 0xbb500000);
+                        ImGui.PushStyleColor(ImGuiCol.FrameBg, 0);
+                        ImGui.ProgressBar(1f - Math.Min(1f, (float)ret.GetVentureSecondsRemaining(false) / (60f * 60f)),
+                            new(ImGui.GetContentRegionAvail().X, v.end.Y - v.start.Y - ImGui.GetStyle().CellPadding.Y), "");
+                        ImGui.PopStyleColor(2);
+                    }
                 }
+                ImGui.SetCursorPos(storePos);
+                ImGui.BeginTable("##ertainertable", 3, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Borders);
+                ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
+                ImGui.TableSetupColumn("Venture");
+                ImGui.TableSetupColumn("Interaction");
+                ImGui.TableHeadersRow();
+                var retainers = P.GetSelectedRetainers(data.CID);
+                for (var i = 0; i < data.RetainerData.Count; i++)
+                {
+                    var ret = data.RetainerData[i];
+                    if (ret.Level == 0 || ret.Name.ToString().IsNullOrEmpty()) continue;
+                    ImGui.TableNextRow();
+                    ImGui.TableNextColumn();
+                    ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
+                    var start = ImGui.GetCursorPos();
+                    var selected = retainers.Contains(ret.Name.ToString());
+                    if (ImGui.Checkbox($"Retainer {(P.config.NoNames ? (i + 1) : ret.Name)}", ref selected))
+                    {
+                        if (selected)
+                        {
+                            retainers.Add(ret.Name.ToString());
+                        }
+                        else
+                        {
+                            retainers.Remove(ret.Name.ToString());
+                        }
+                    }
+                    var end = ImGui.GetCursorPos();
+                    bars[$"{data.CID}{data.RetainerData[i].Name}"] = (start, end);
+                    ImGui.TableNextColumn();
+                    ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
+                    ImGuiEx.Text($"{(!ret.HasVenture ? "No Venture" : Utils.ToTimeString(ret.GetVentureSecondsRemaining(false)))}");
+                    ImGui.TableNextColumn();
+                    ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
+                    ImGuiEx.Text($"{Utils.ToTimeString(Scheduler.GetRemainingBanTime(ret.Name.ToString()))}");
+                }
+                ImGui.EndTable();
+                ImGui.Dummy(new(2, 2));
+                ImGui.PopID();
             }
             else
             {
-                SetAsPreferred(x);
+                SetAsPreferred(data);
                 if (col)
                 {
                     ImGui.PopStyleColor();
                     col = false;
                 }
             }
-            var rightText = $"V: {x.Ventures} | I: {x.InventorySpace}";
+            var rightText = $"V: {data.Ventures} | I: {data.InventorySpace}";
             var cur = ImGui.GetCursorPos();
             ImGui.SameLine();
             ImGui.SetCursorPos(new(ImGui.GetContentRegionMax().X - ImGui.CalcTextSize(rightText).X - ImGui.GetStyle().FramePadding.X, rCurPos.Y + pad));
             ImGuiEx.Text(rightText);
             ImGui.PopID();
         }
+        ImGuiEx.ImGuiLineCentered("AYSButtonClear Interaction Timeouts", delegate
+        {
+            if (ImGui.SmallButton("Clear Interaction Timeouts"))
+            {
+                Scheduler.Bans.Clear();
+            }
+        });
 
 
         if (P.config.Verbose && ImGui.CollapsingHeader("Debug"))
