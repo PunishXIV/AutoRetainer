@@ -110,7 +110,7 @@ internal class MultiModeOverlay : Window
                         {
                             NotificationHandler.IsHidden = true;
                         }
-                        ImGui.SetTooltip("Left click - open AutoRetainer;\nRight click - dismiss.");
+                        ImGui.SetTooltip("Some retainers completed their ventures. \nLeft click - open AutoRetainer;\nRight click - dismiss.");
                     }
                 }
                 else

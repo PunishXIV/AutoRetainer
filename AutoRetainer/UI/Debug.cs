@@ -12,6 +12,8 @@ using ECommons.ExcelServices.TerritoryEnumeration;
 using AutoRetainer.Multi;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Environment;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
+using Lumina.Excel.GeneratedSheets;
+using Dalamud.Utility;
 
 namespace AutoRetainer.UI;
 
@@ -22,6 +24,7 @@ internal unsafe static class Debug
     {
         Safe(delegate
         {
+            ImGuiEx.Text($"{Svc.Data.GetExcelSheet<Addon>()?.GetRow(115)?.Text.ToDalamudString().ExtractText()}");
             ImGuiEx.Text($"Server time: {Framework.GetServerTime()}");
             ImGuiEx.Text($"PC time: {DateTimeOffset.Now.ToUnixTimeSeconds()}");
             if (ImGui.Button("InstallInteractHook"))

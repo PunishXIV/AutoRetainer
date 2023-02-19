@@ -81,10 +81,10 @@ internal static unsafe class Utils
                 if (IsAddonReady(addon))
                 {
                     var textNode = addon->UldManager.NodeList[15]->GetAsAtkTextNode();
-                    var text = MemoryHelper.ReadSeString(&textNode->NodeText).ExtractText();
-                    if(text.EqualsAny(s))
+                    var text = MemoryHelper.ReadSeString(&textNode->NodeText).ExtractText().Replace(" ", "");
+                    if(text.EqualsAny(s.Select(x => x.Replace(" ", ""))))
                     {
-                        PluginLog.Verbose($"SelectYesno {s} addon {i}");
+                        PluginLog.Verbose($"SelectYesno {s.Print()} addon {i}");
                         return addon;
                     }
                 }
