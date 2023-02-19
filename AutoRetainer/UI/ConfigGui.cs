@@ -1,13 +1,15 @@
 ﻿using AutoRetainer.Multi;
 using AutoRetainer.Statistics;
 using ECommons.Configuration;
+using ECommons.Reflection;
 using PunishLib.ImGuiMethods;
+using System.Reflection;
 
 namespace AutoRetainer.UI;
 
 unsafe internal class ConfigGui : Window
 {
-    public ConfigGui() : base($"{P.Name} configuration")
+    public ConfigGui() : base($"{P.Name} {P.GetType().Assembly.GetName().Version}")
     {
         this.SizeConstraints = new()
         {
@@ -19,7 +21,11 @@ unsafe internal class ConfigGui : Window
 
     public override void PreDraw()
     {
-        P.Style.Push();
+        if (!P.config.NoTheme)
+        {
+            P.Style.Push();
+            P.StylePushed = true;
+        }
     }
 
     public override void Draw()
@@ -62,7 +68,11 @@ unsafe internal class ConfigGui : Window
 
     public override void PostDraw()
     {
-        P.Style.Pop();
+        if (P.StylePushed)
+        {
+            P.Style.Pop();
+            P.StylePushed = false; 
+        }
     }
 
     public override void OnClose()

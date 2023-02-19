@@ -15,14 +15,14 @@ internal unsafe static class MultiModeUI
         {
             ImGuiEx.TextWrapped(ImGuiColors.DalamudRed, "Multi Mode requires Auto-afk option to be turned off");
         }
-        if (ImGui.CollapsingHeader("Setup Guide"))
+        /*if (ImGui.CollapsingHeader("Setup Guide"))
         {
             ImGuiEx.TextWrapped("1. Log into each of your characters, assign necessary ventures to your retainers and enable retainers that you want to resend on each character.");
             ImGuiEx.TextWrapped("2. For each character, configure character index. Character index is position of your character on a screen where you select characters. If you only have one character per world, it's usually just 1.");
             ImGuiEx.TextWrapped("3. Ensure that your characters are in their home worlds and close to retainer bells, preferably in not crowded areas. No housing retainer bells. The suggested place is the inn.");
             ImGuiEx.TextWrapped("4. Characters that ran out of ventures or inventory space will be automatically excluded from rotation. You will need to reenable them once you clean up inventory and restock ventures.");
             ImGuiEx.TextWrapped("5. You may set up one character to be preferred. When no retainers have upcoming ventures in next 15 minutes, you will be relogged back on that character.");
-        }
+        }*/
         for(var index = 0; index < P.config.OfflineData.Count; index++)
         {
             var data = P.config.OfflineData[index];
@@ -45,6 +45,7 @@ internal unsafe static class MultiModeUI
                 }
             }
             if (colen) ImGui.PopStyleColor();
+            ImGuiEx.Tooltip($"Enable multi-mode for this character");
             ImGui.SameLine(0, 3);
             if (ImGuiEx.IconButton(FontAwesomeIcon.DoorOpen))
             {
@@ -65,15 +66,27 @@ internal unsafe static class MultiModeUI
                     Notify.Error(error);
                 }
             }
+            if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+            {
+                ImGui.SetClipboardText($"/ays relog {data.Name}@{data.World}");
+            }
+            ImGuiEx.Tooltip($"Left click - relog to this character\nRight click - copy relog command into clipboard");
             ImGui.SameLine(0, 3);
             if (ImGuiEx.IconButton(FontAwesomeIcon.Cog))
             {
                 ImGui.OpenPopup($"popup{data.CID}");
             }
+            ImGuiEx.Tooltip($"Configure character");
             ImGui.SameLine(0, 3);
 
             if (ImGui.BeginPopup($"popup{data.CID}"))
             {
+                var b = true;
+                ImGui.CollapsingHeader($"{data.Name} configuration##conf", ref b, ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.Bullet | ImGuiTreeNodeFlags.OpenOnArrow);
+                if(b == false)
+                {
+                    ImGui.CloseCurrentPopup();
+                }
                 ImGuiEx.TextV("Character index:");
                 ImGui.SameLine();
                 ImGui.SetNextItemWidth(100);

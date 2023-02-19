@@ -33,6 +33,8 @@ internal class Config : IEzConfig
     public bool MultiAllowHET = false;
     public bool UseServerTime = true;
     public bool DisableOnClose = false;
+    public bool NoTheme = false;
+
 
     internal bool AutoCloseRetainerWindow
     {

@@ -33,6 +33,7 @@ public class AutoRetainer : IDalamudPlugin
     internal long Time => P.config.UseServerTime ? FFXIVClientStructs.FFXIV.Client.System.Framework.Framework.GetServerTime() : DateTimeOffset.Now.ToUnixTimeSeconds();
 
     internal StyleModel Style;
+    internal bool StylePushed = false;
 
     public AutoRetainer(DalamudPluginInterface pi)
     {
@@ -102,6 +103,18 @@ public class AutoRetainer : IDalamudPlugin
             DuoLog.Information($"Super Secret mode {(config.SS ? "enabled" : "disabled")}");
             if (config.SS) DuoLog.Warning($"Super Secret settings contain features that may be incomplete, incompatible with certain plugins, may cause damage or other unwanted effects to your character, account and game as a whole. Disabling Super Secret mode will not automatically disable previously enabled Super Secret options; you must disable them first before enabling it.");
             return;
+        }
+        else if(arguments.StartsWith("relog "))
+        {
+            var target = P.config.OfflineData.Where(x => $"{x.Name}@{x.World}" == arguments[6..]).FirstOrDefault();
+            if(target != null)
+            {
+                if(!AutoLogin.Instance.IsRunning) AutoLogin.Instance.SwapCharacter(target.World, target.CharaIndex, target.ServiceAccount);
+            }
+            else
+            {
+                Notify.Error($"Could not find target character");
+            }
         }
         else
             configGui.IsOpen = !configGui.IsOpen;

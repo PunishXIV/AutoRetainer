@@ -29,6 +29,6 @@ public class OfflineCharacterData
 
     public override string ToString()
     {
-        return $"{Name}@{World} #{CID:X16}";
+        return P.config.Verbose?$"{Name}@{World} #{CID:X16}":$"{Name}@{World}";
     }
 }

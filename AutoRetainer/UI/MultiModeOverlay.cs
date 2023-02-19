@@ -11,113 +11,106 @@ internal class MultiModeOverlay : Window
     {
         this.IsOpen = true;
         this.ShowCloseButton = false;
-        this.Position = new(0, 20);
         this.RespectCloseHotkey = false;
     }
 
     public override void Draw()
     {
         CImGui.igBringWindowToDisplayBack(CImGui.igGetCurrentWindow());
-        this.SizeConstraints = new()
+        if (MultiMode.Enabled)
         {
-            MaximumSize = ImGuiHelpers.MainViewport.Size,
-            MinimumSize = new(ImGuiHelpers.MainViewport.Size.X, 0)
-        };
-        ImGuiEx.ImGuiLineCentered("multi", delegate
+            if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "multi.png"), out var t))
+            {
+                ImGui.Image(t.ImGuiHandle, new(128, 128));
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+                    if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
+                    {
+                        Svc.Commands.ProcessCommand("/ays");
+                    }
+                    if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                    {
+                        MultiMode.Enabled = false;
+                    }
+                    ImGui.SetTooltip("MultiMode enabled. \nLeft click - open AutoRetainer. \nRight click - disable Multi Mode.");
+                }
+            }
+            else
+            {
+                ImGuiEx.Text($"loading multi.png");
+            }
+        }
+        else if(AutoLogin.Instance.IsRunning)
         {
-            if (MultiMode.Enabled)
+            if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "login.png"), out var t))
             {
-                if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "multi.png"), out var t))
+                ImGui.Image(t.ImGuiHandle, new(128, 128));
+                if (ImGui.IsItemHovered())
                 {
-                    ImGui.Image(t.ImGuiHandle, new(128, 128));
-                    if (ImGui.IsItemHovered())
+                    ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+                    if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
                     {
-                        ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-                        if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
-                        {
-                            Svc.Commands.ProcessCommand("/ays");
-                        }
-                        if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
-                        {
-                            MultiMode.Enabled = false;
-                        }
-                        ImGui.SetTooltip("MultiMode enabled. \nLeft click - open AutoRetainer. \nRight click - disable Multi Mode.");
+                        AutoLogin.Instance.Abort();
                     }
-                }
-                else
-                {
-                    ImGuiEx.Text($"loading multi.png");
+                    ImGui.SetTooltip("Autologin is running, click to abort");
                 }
             }
-            else if(AutoLogin.Instance.IsRunning)
+            else
             {
-                if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "login.png"), out var t))
+                ImGuiEx.Text($"loading login.png");
+            }
+        }
+        else if (P.IsEnabled() && !P.configGui.IsOpen)
+        {
+            if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "bell.png"), out var t))
+            {
+                ImGui.Image(t.ImGuiHandle, new(128, 128));
+                if (ImGui.IsItemHovered())
                 {
-                    ImGui.Image(t.ImGuiHandle, new(128, 128));
-                    if (ImGui.IsItemHovered())
+                    ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+                    if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
                     {
-                        ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-                        if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
-                        {
-                            AutoLogin.Instance.Abort();
-                        }
-                        ImGui.SetTooltip("Autologin is running, click to abort");
+                        Svc.Commands.ProcessCommand("/ays");
                     }
-                }
-                else
-                {
-                    ImGuiEx.Text($"loading login.png");
+                    if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                    {
+                        P.DisablePlugin();
+                    }
+                    ImGui.SetTooltip("AutoRetainer enabled. \nLeft click - open AutoRetainer. \nRight click - disable AutoRetainer.");
                 }
             }
-            else if (P.IsEnabled() && !P.configGui.IsOpen)
+            else
             {
-                if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "bell.png"), out var t))
+                ImGuiEx.Text($"loading bell.png");
+            }
+        }
+        else if(P.config.NotifyEnableOverlay && NotificationHandler.CurrentState && !NotificationHandler.IsHidden && (!P.config.NotifyCombatDutyNoDisplay || !(Svc.Condition[ConditionFlag.BoundByDuty56] && Svc.Condition[ConditionFlag.InCombat])))
+        {
+            if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "notify.png"), out var t))
+            {
+                ImGui.Image(t.ImGuiHandle, new(128, 128));
+                if (ImGui.IsItemHovered())
                 {
-                    ImGui.Image(t.ImGuiHandle, new(128, 128));
-                    if (ImGui.IsItemHovered())
+                    ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+                    if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
                     {
-                        ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-                        if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
-                        {
-                            Svc.Commands.ProcessCommand("/ays");
-                        }
-                        if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
-                        {
-                            P.DisablePlugin();
-                        }
-                        ImGui.SetTooltip("AutoRetainer enabled. \nLeft click - open AutoRetainer. \nRight click - disable AutoRetainer.");
+                        NotificationHandler.IsHidden = true;
+                        Svc.Commands.ProcessCommand("/ays");
                     }
-                }
-                else
-                {
-                    ImGuiEx.Text($"loading bell.png");
+                    if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                    {
+                        NotificationHandler.IsHidden = true;
+                    }
+                    ImGui.SetTooltip("Some retainers completed their ventures. \nLeft click - open AutoRetainer;\nRight click - dismiss.");
                 }
             }
-            else if(P.config.NotifyEnableOverlay && NotificationHandler.CurrentState && !NotificationHandler.IsHidden && (!P.config.NotifyCombatDutyNoDisplay || !(Svc.Condition[ConditionFlag.BoundByDuty56] && Svc.Condition[ConditionFlag.InCombat])))
+            else
             {
-                if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "notify.png"), out var t))
-                {
-                    ImGui.Image(t.ImGuiHandle, new(128, 128));
-                    if (ImGui.IsItemHovered())
-                    {
-                        ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-                        if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
-                        {
-                            NotificationHandler.IsHidden = true;
-                            Svc.Commands.ProcessCommand("/ays");
-                        }
-                        if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
-                        {
-                            NotificationHandler.IsHidden = true;
-                        }
-                        ImGui.SetTooltip("Some retainers completed their ventures. \nLeft click - open AutoRetainer;\nRight click - dismiss.");
-                    }
-                }
-                else
-                {
-                    ImGuiEx.Text($"loading notify.png");
-                }
+                ImGuiEx.Text($"loading notify.png");
             }
-        });
+        }
+
+        this.Position = new(ImGuiHelpers.MainViewport.Size.X/2 - ImGui.GetWindowSize().X/2, 20);
     }
 }

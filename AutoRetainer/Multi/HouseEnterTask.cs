@@ -101,7 +101,7 @@ namespace AutoRetainer.Multi
             if (entrance != null && Svc.Targets.Target?.Address == entrance.Address && EzThrottler.Throttle("HET.Interact", 1000))
             {
                 PluginLog.Debug($"Interacting with entrance");
-                TargetSystem.Instance()->InteractWithObject((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)entrance.Address);
+                TargetSystem.Instance()->InteractWithObject((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)entrance.Address, false);
                 return true;
             }
             return false;
