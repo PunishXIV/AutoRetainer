@@ -52,15 +52,14 @@ unsafe internal class ConfigGui : Window
             ImGuiEx.Text(Environment.TickCount % 1000 > 500 ? ImGuiColors.DalamudRed : ImGuiColors.DalamudYellow, "Turbo active");
         }
         ImGuiEx.EzTabBar("tabbar",
-                ("Retainers", Retainers.Draw, null, true),
 
-                ("Multi Mode", MultiModeUI.Draw, null, true),
-
-                (P.config.RecordStats?"Statistics":null, StatisticsUI.Draw, null, true),
+                ("Retainers", MultiModeUI.Draw, null, true),
+                (P.config.RecordStats ? "Statistics" : null, StatisticsUI.Draw, null, true),
                 ("Settings", Settings.Draw, null, true),
                 ("Beta", TabBeta.Draw, null, true),
                 ("About", delegate { AboutTab.Draw(P); }, null, true),
                 (P.config.Verbose ? "Log" : null, InternalLog.PrintImgui, null, false),
+                (P.config.Verbose?"Retainers (old)":null, Retainers.Draw, null, true),
                 (P.config.Verbose?"Debug":null, Debug.Draw, null, true)
                 );
     }

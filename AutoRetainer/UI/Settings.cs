@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.GcHandin;
+using AutoRetainer.Multi;
 using Dalamud.Interface.Components;
 using ECommons.Configuration;
 using ECommons.MathHelpers;
@@ -68,6 +69,15 @@ internal static class Settings
         InfoBox.DrawBox("Statistics", delegate
         {
             ImGui.Checkbox($"Record venture statistics", ref P.config.RecordStats);
+        });
+        InfoBox.DrawBox("Multi Mode", delegate
+        {
+
+            ImGui.Checkbox("Wait for all retainers to be done before logging into character", ref P.config.MultiWaitForAll);
+            ImGui.SetNextItemWidth(60);
+            ImGui.DragInt("Relog in advance, seconds", ref P.config.AdvanceTimer.ValidateRange(0, 300), 0.1f, 0, 300);
+            ImGui.Checkbox("Synchronize retainers (one time)", ref MultiMode.Synchronize);
+            ImGuiComponents.HelpMarker("If this setting is on, plugin will wait until all enabled retainers have done their ventures. After that this setting will be disabled automatically and all characters will be processed.");
         });
     }
 

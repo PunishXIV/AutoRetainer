@@ -11,11 +11,10 @@ internal unsafe static class MultiModeUI
     static Dictionary<string, (Vector2 start, Vector2 end)> bars = new();
     internal static void Draw()
     {
-        if(MultiMode.GetAutoAfkOpt() != 0)
+        if(MultiMode.Enabled && MultiMode.GetAutoAfkOpt() != 0)
         {
             ImGuiEx.TextWrapped(ImGuiColors.DalamudRed, "Multi Mode requires Auto-afk option to be turned off");
         }
-        ImGuiEx.TextWrapped(ImGuiColors.DalamudOrange, "Please use this feature within the sane limits. Keeping it on for abnormally large amount of time may attract unwanted attention.");
         if (ImGui.CollapsingHeader("Setup Guide"))
         {
             ImGuiEx.TextWrapped("1. Log into each of your characters, assign necessary ventures to your retainers and enable retainers that you want to resend on each character.");
@@ -23,15 +22,6 @@ internal unsafe static class MultiModeUI
             ImGuiEx.TextWrapped("3. Ensure that your characters are in their home worlds and close to retainer bells, preferably in not crowded areas. No housing retainer bells. The suggested place is the inn.");
             ImGuiEx.TextWrapped("4. Characters that ran out of ventures or inventory space will be automatically excluded from rotation. You will need to reenable them once you clean up inventory and restock ventures.");
             ImGuiEx.TextWrapped("5. You may set up one character to be preferred. When no retainers have upcoming ventures in next 15 minutes, you will be relogged back on that character.");
-        }
-        if (ImGui.CollapsingHeader("Configuration")) 
-        {
-            //ImGui.Checkbox($"I have multiple service accounts", ref P.config.MultipleServiceAccounts);
-            ImGui.Checkbox("Wait for all retainers to be done before logging into character", ref P.config.MultiWaitForAll);
-            ImGui.SetNextItemWidth(60);
-            ImGui.DragInt("Relog in advance, seconds", ref P.config.AdvanceTimer.ValidateRange(0, 300), 0.1f, 0, 300);
-            ImGui.Checkbox("Synchronize retainers (one time)", ref MultiMode.Synchronize);
-            ImGuiComponents.HelpMarker("If this setting is on, plugin will wait until all enabled retainers have done their ventures. After that this setting will be disabled automatically and all characters will be processed.");
         }
         for(var index = 0; index < P.config.OfflineData.Count; index++)
         {
@@ -78,9 +68,83 @@ internal unsafe static class MultiModeUI
             ImGui.SameLine(0, 3);
             if (ImGuiEx.IconButton(FontAwesomeIcon.Cog))
             {
-
+                ImGui.OpenPopup($"popup{data.CID}");
             }
             ImGui.SameLine(0, 3);
+
+            if (ImGui.BeginPopup($"popup{data.CID}"))
+            {
+                ImGuiEx.TextV("Character index:");
+                ImGui.SameLine();
+                ImGui.SetNextItemWidth(100);
+                if (ImGui.BeginCombo("##index", data.Index == 0 ? "n/a" : data.Index.ToString()))
+                {
+                    for (var i = 1; i <= 8; i++)
+                    {
+                        if (ImGui.Selectable($"{i}"))
+                        {
+                            data.Index = i;
+                        }
+                    }
+                    ImGui.EndCombo();
+                }
+
+                //if (P.config.MultipleServiceAccounts)
+                {
+                    ImGui.SameLine();
+                    ImGui.SetNextItemWidth(150);
+                    if (ImGui.BeginCombo("##sindex", $"Service account {data.ServiceAccount + 1}"))
+                    {
+                        for (var i = 1; i <= 10; i++)
+                        {
+                            if (ImGui.Selectable($"Service account {i}"))
+                            {
+                                data.ServiceAccount = i - 1;
+                            }
+                        }
+                        ImGui.EndCombo();
+                    }
+                }
+
+                if (ImGui.Checkbox("Preferred character", ref data.Preferred))
+                {
+                    foreach (var z in P.config.OfflineData)
+                    {
+                        if (z.CID != data.CID)
+                        {
+                            z.Preferred = false;
+                        }
+                    }
+                }
+
+                ImGuiEx.Text($"Change character order:");
+                
+                if (ImGui.ArrowButton("##up", ImGuiDir.Up) && index > 0)
+                {
+                    try
+                    {
+                        (P.config.OfflineData[index - 1], P.config.OfflineData[index]) = (P.config.OfflineData[index], P.config.OfflineData[index - 1]);
+                    }
+                    catch (Exception e)
+                    {
+                        e.Log();
+                    }
+                }
+                ImGui.SameLine();
+                if (ImGui.ArrowButton("##down", ImGuiDir.Down) && index < P.config.OfflineData.Count - 1)
+                {
+                    try
+                    {
+                        (P.config.OfflineData[index + 1], P.config.OfflineData[index]) = (P.config.OfflineData[index], P.config.OfflineData[index + 1]);
+                    }
+                    catch (Exception e)
+                    {
+                        e.Log();
+                    }
+                }
+                ImGui.EndPopup();
+            }
+
             var initCurpos = ImGui.GetCursorPos();
             var lowestRetainer = P.config.MultiWaitForAll? data.GetEnabledRetainers().OrderBy(z => z.GetVentureSecondsRemaining()).LastOrDefault() : data.GetEnabledRetainers().OrderBy(z => z.GetVentureSecondsRemaining()).FirstOrDefault();
             if (lowestRetainer != default)
@@ -106,74 +170,6 @@ internal unsafe static class MultiModeUI
                 }
                 pad = ImGui.GetStyle().FramePadding.Y;
                 var enabledRetainers = data.GetEnabledRetainers();
-
-                /*ImGuiEx.TextV("Character index:");
-                ImGui.SameLine();
-                ImGui.SetNextItemWidth(100);
-                if (ImGui.BeginCombo("##index", data.Index == 0?"n/a":data.Index.ToString()))
-                {
-                    for(var i = 1; i <= 8; i++)
-                    {
-                        if (ImGui.Selectable($"{i}"))
-                        {
-                            data.Index = i;
-                        }
-                    }
-                    ImGui.EndCombo();
-                }
-
-                //if (P.config.MultipleServiceAccounts)
-                {
-                    ImGui.SameLine();
-                    ImGui.SetNextItemWidth(150);
-                    if (ImGui.BeginCombo("##sindex", $"Service account {data.ServiceAccount+1}"))
-                    {
-                        for (var i = 1; i <= 10; i++)
-                        {
-                            if (ImGui.Selectable($"Service account {i}"))
-                            {
-                                data.ServiceAccount = i-1;
-                            }
-                        }
-                        ImGui.EndCombo();
-                    }
-                }
-
-                ImGui.SameLine();
-                if(ImGui.Checkbox("Preferred character", ref data.Preferred))
-                {
-                    foreach(var z in P.config.OfflineData)
-                    {
-                        if(z.CID != data.CID)
-                        {
-                            z.Preferred = false;
-                        }
-                    }
-                }
-                ImGui.SameLine();
-                if (ImGui.ArrowButton("##up", ImGuiDir.Up) && index > 0)
-                {
-                    try
-                    {
-                        (P.config.OfflineData[index - 1], P.config.OfflineData[index]) = (P.config.OfflineData[index], P.config.OfflineData[index - 1]);
-                    }
-                    catch(Exception e)
-                    {
-                        e.Log();
-                    }
-                }
-                ImGui.SameLine();
-                if (ImGui.ArrowButton("##down", ImGuiDir.Down) && index < P.config.OfflineData.Count - 1)
-                {
-                    try
-                    {
-                        (P.config.OfflineData[index + 1], P.config.OfflineData[index]) = (P.config.OfflineData[index], P.config.OfflineData[index + 1]);
-                    }
-                    catch(Exception e)
-                    {
-                        e.Log();
-                    }
-                }*/
                 ImGui.PushID(data.CID.ToString());
 
                 var storePos = ImGui.GetCursorPos();
