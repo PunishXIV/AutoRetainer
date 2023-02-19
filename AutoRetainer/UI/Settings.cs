@@ -18,6 +18,7 @@ internal static class Settings
         {
             ImGui.Checkbox("Semi-automatic Mode", ref P.config.AutoEnableDisable);
             ImGuiComponents.HelpMarker("Automatically enables the plugin on Summoning Bell interaction. You can hold down the SHIFT key to disable this behavior.");
+            ImGui.Checkbox("Auto-open AutoRetainer window on enabling", ref P.config.OpenOnEnable);
             ImGui.Checkbox("Turbo Mode", ref P.config.TurboMode);
             ImGuiComponents.HelpMarker("Rapidly collect rewards and despatch retainers on new ventures. Only works in semi-automatic mode/with manual player interaction.");
             ImGui.SetNextItemWidth(100f);
@@ -28,6 +29,7 @@ internal static class Settings
             ImGuiComponents.HelpMarker("The higher this value is the faster plugin will operate retainers. When dealing with low FPS or high latency you may want to decrease this value. If you want the plugin to operate faster you may increase it.");
             ImGui.Checkbox("Anonymise Retainers", ref P.config.NoNames);
             ImGuiComponents.HelpMarker("Retainer names will be redacted from general UI elements. They will not be hidden in debug menus and plugin logs however. While this option is on, character and retainer numbers are not guaranteed to be equal in different sections of a plugin (for example, retainer 1 in retainers view is not guaranteed to be the same retainer as in statistics view).");
+            ImGui.Checkbox($"Auto-disable plugin when closing window", ref P.config.DisableOnClose);
         });
         InfoBox.DrawBox("Operation", delegate
         {

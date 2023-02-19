@@ -10,6 +10,7 @@ internal class Config : IEzConfig
 {
     public Dictionary<ulong, HashSet<string>> SelectedRetainers = new();
     public bool AutoEnableDisable = false;
+    public bool OpenOnEnable = true;
     public bool TurboMode = false;
     public bool EnableAssigningQuickExploration = false;
     public bool Verbose = false;
@@ -31,6 +32,7 @@ internal class Config : IEzConfig
     internal bool BypassSanctuaryCheck = false;
     public bool MultiAllowHET = false;
     public bool UseServerTime = true;
+    public bool DisableOnClose = false;
 
     internal bool AutoCloseRetainerWindow
     {

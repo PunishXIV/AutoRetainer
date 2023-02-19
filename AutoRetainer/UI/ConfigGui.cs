@@ -19,14 +19,6 @@ unsafe internal class ConfigGui : Window
 
     public override void Draw()
     {
-        if (P.retainerManager.Ready && Svc.ClientState.LocalPlayer != null)
-        {
-            Scheduler.Tick();
-            if (!P.config.SelectedRetainers.ContainsKey(Svc.ClientState.LocalContentId))
-            {
-                P.config.SelectedRetainers[Svc.ClientState.LocalContentId] = new();
-            }
-        }
         var en = P.IsEnabled();
         if (ImGui.Checkbox($"Enable {P.Name}", ref en))
         {
@@ -66,9 +58,12 @@ unsafe internal class ConfigGui : Window
     public override void OnClose()
     {
         EzConfig.Save();
-        P.DisablePlugin();
-        StatisticsUI.Data.Clear();
-        Notify.Success("Auto Retainer disabled");
+        if (P.config.DisableOnClose) 
+        {
+            P.DisablePlugin();
+            StatisticsUI.Data.Clear();
+            Notify.Success("Auto Retainer disabled");
+        }
     }
 
 }

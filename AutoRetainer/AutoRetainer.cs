@@ -60,7 +60,6 @@ public class AutoRetainer : IDalamudPlugin
             AutoGCHandin.Init();
 
             ws.AddWindow(new MultiModeOverlay());
-            ws.AddWindow(new NotifyOverlay());
             MultiMode.Init();
 
         });
@@ -106,6 +105,14 @@ public class AutoRetainer : IDalamudPlugin
 
     private void Tick(Framework framework)
     {
+        if (P.IsEnabled() && P.retainerManager.Ready && Svc.ClientState.LocalPlayer != null)
+        {
+            Scheduler.Tick();
+            if (!P.config.SelectedRetainers.ContainsKey(Svc.ClientState.LocalContentId))
+            {
+                P.config.SelectedRetainers[Svc.ClientState.LocalContentId] = new();
+            }
+        }
         OfflineDataManager.Tick();
         AutoGCHandin.Tick();
         MultiMode.Tick();
@@ -197,7 +204,7 @@ public class AutoRetainer : IDalamudPlugin
                             Scheduler.turbo = true;
                         }
                         EnablePlugin();
-                        configGui.IsOpen = true;
+                        if(P.config.OpenOnEnable) configGui.IsOpen = true;
                     }
                     else
                     {
