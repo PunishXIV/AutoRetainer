@@ -17,6 +17,11 @@ unsafe internal class ConfigGui : Window
         P.ws.AddWindow(this);
     }
 
+    public override void PreDraw()
+    {
+        P.Style.Push();
+    }
+
     public override void Draw()
     {
         var en = P.IsEnabled();
@@ -53,6 +58,11 @@ unsafe internal class ConfigGui : Window
                 (P.config.Verbose?"Retainers (old)":null, Retainers.Draw, null, true),
                 (P.config.Verbose?"Debug":null, Debug.Draw, null, true)
                 );
+    }
+
+    public override void PostDraw()
+    {
+        P.Style.Pop();
     }
 
     public override void OnClose()
