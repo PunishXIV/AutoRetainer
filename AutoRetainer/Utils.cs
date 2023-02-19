@@ -160,13 +160,13 @@ internal static unsafe class Utils
 
     internal static long GetVentureSecondsRemaining(this SeRetainer ret, bool allowNegative = true)
     {
-        var x = ret.VentureCompleteTimeStamp - DateTimeOffset.Now.ToUnixTimeSeconds();
+        var x = ret.VentureCompleteTimeStamp - P.Time;
         return allowNegative ? x : Math.Max(0, x);
     }
 
     internal static long GetVentureSecondsRemaining(this OfflineRetainerData ret, bool allowNegative = true)
     {
-        var x = ret.VentureEndsAt - DateTimeOffset.Now.ToUnixTimeSeconds();
+        var x = ret.VentureEndsAt - P.Time;
         return allowNegative? x : Math.Max(0, x);
     }
 

@@ -30,6 +30,7 @@ internal class Config : IEzConfig
     public bool SS = false;
     internal bool BypassSanctuaryCheck = false;
     public bool MultiAllowHET = false;
+    public bool UseServerTime = true;
 
     internal bool AutoCloseRetainerWindow
     {

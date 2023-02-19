@@ -10,6 +10,8 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using AutoRetainer.Multi;
+using FFXIVClientStructs.FFXIV.Client.Graphics.Environment;
+using FFXIVClientStructs.FFXIV.Client.System.Framework;
 
 namespace AutoRetainer.UI;
 
@@ -20,6 +22,8 @@ internal unsafe static class Debug
     {
         Safe(delegate
         {
+            ImGuiEx.Text($"Server time: {Framework.GetServerTime()}");
+            ImGuiEx.Text($"PC time: {DateTimeOffset.Now.ToUnixTimeSeconds()}");
             if (ImGui.Button("InstallInteractHook"))
             {
                 P.Memory.InstallInteractHook();

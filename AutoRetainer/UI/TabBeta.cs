@@ -14,6 +14,10 @@ namespace AutoRetainer.UI
         internal static void Draw()
         {
             ImGuiEx.Text(ImGuiColors.DalamudOrange, $"These features might be incomplete or cause minor problems.");
+            InfoBox.DrawBox("Server time", delegate
+            {
+                ImGui.Checkbox($"Use server time instead of PC time", ref P.config.UseServerTime);
+            });
             InfoBox.DrawBox("Auto GC Expert Delivery", AutoGCHandinUI.Draw);
             InfoBox.DrawBox("House Enter Task", delegate
             {

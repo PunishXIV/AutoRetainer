@@ -29,6 +29,8 @@ public class AutoRetainer : IDalamudPlugin
     internal TaskManager TaskManager;
     internal Memory Memory;
 
+    internal long Time => P.config.UseServerTime ? FFXIVClientStructs.FFXIV.Client.System.Framework.Framework.GetServerTime() : DateTimeOffset.Now.ToUnixTimeSeconds();
+
     public AutoRetainer(DalamudPluginInterface pi)
     {
         ECommonsMain.Init(pi, this, Module.DalamudReflector);
@@ -77,7 +79,7 @@ public class AutoRetainer : IDalamudPlugin
                 && P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var offlineData) 
                 && offlineData.RetainerData.TryGetFirst(x => x.Name == ret, out var offlineRetainerData))
             {
-                offlineRetainerData.VentureBeginsAt = DateTimeOffset.Now.ToUnixTimeSeconds();
+                offlineRetainerData.VentureBeginsAt = P.Time;
                 PluginLog.Debug($"Recorded venture start time = {offlineRetainerData.VentureBeginsAt}");
             }
         }

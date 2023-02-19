@@ -7,8 +7,7 @@ namespace AutoRetainer.UI;
 
 unsafe internal class ConfigGui : Window
 {
-    public ConfigGui() : base($"{P.Name} configuration",
-        ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoFocusOnAppearing)
+    public ConfigGui() : base($"{P.Name} configuration")
     {
         this.SizeConstraints = new()
         {

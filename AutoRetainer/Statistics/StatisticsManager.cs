@@ -57,7 +57,7 @@ internal static class StatisticsManager
                         {
                             ItemId = p.ItemId,
                             IsHQ = p.IsHQ,
-                            Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds(),
+                            Timestamp = P.Time,
                             Amount = amount
                         });
                         break;
