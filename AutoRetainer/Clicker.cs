@@ -290,11 +290,6 @@ internal unsafe class Clicker
         success = false;
         if (IsClickAllowed())
         {
-            if(AtkStage.GetSingleton()->GetFocus() == null)
-            {
-                AtkStage.GetSingleton()->ClearFocus();
-                PluginLog.Debug("Cleared atk stage focus");
-            }
             foreach(var x in Svc.Objects)
             {
                 if((x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Consts.BellName, "リテイナーベル"))
@@ -308,7 +303,6 @@ internal unsafe class Clicker
                                 VerifyClick(ActionType.BellInteract);
                                 RecordClickTime();
                                 P.NoConditionEvent = true;
-                                ImGui.SetWindowFocus(null);
                                 TargetSystem.Instance()->InteractWithObject((GameObject*)x.Address, false);
                                 success = true;
                                 if (P.config.Verbose) Notify.Success($"Interacted with bell");
