@@ -5,6 +5,16 @@ namespace AutoRetainer;
 
 internal static class Consts
 {
+    internal static string QuickExploration => Svc.ClientState.ClientLanguage switch
+    {
+        //402	TEXT_CMNDEFRETAINERCALL_00010_TASK_CATEGORY_FORTUNE	Quick Exploration.s
+        ClientLanguage.Japanese => "",
+        ClientLanguage.German => "",
+        ClientLanguage.French => "",
+        _ => "Quick Exploration."
+    };
+
+
     internal static string RetainerAskCategoryText => Svc.ClientState.ClientLanguage switch
     {
         ClientLanguage.Japanese => "依頼するリテイナーベンチャーを選んでください",

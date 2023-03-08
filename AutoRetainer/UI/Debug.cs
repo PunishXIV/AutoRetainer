@@ -14,6 +14,10 @@ using FFXIVClientStructs.FFXIV.Client.Graphics.Environment;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using Lumina.Excel.GeneratedSheets;
 using Dalamud.Utility;
+using ClickLib;
+using ClickLib.Clicks;
+using AutoRetainer.Handlers;
+using AutoRetainer.Tasks;
 
 namespace AutoRetainer.UI;
 
@@ -24,6 +28,107 @@ internal unsafe static class Debug
     {
         Safe(delegate
         {
+            if (ImGui.Button($"SelectAssignVenture"))
+            {
+                DuoLog.Information($"{RetainerHandlers.SelectAssignVenture()}");
+            }
+            if (ImGui.Button($"SelectQuit"))
+            {
+                DuoLog.Information($"{RetainerHandlers.SelectQuit()}");
+            }
+            if (ImGui.Button($"SelectViewVentureReport"))
+            {
+                DuoLog.Information($"{RetainerHandlers.SelectViewVentureReport()}");
+            }
+            if (ImGui.Button($"ClickResultReassign"))
+            {
+                DuoLog.Information($"{RetainerHandlers.ClickResultReassign()}");
+            }
+            if (ImGui.Button($"ClickResultConfirm"))
+            {
+                DuoLog.Information($"{RetainerHandlers.ClickResultConfirm()}");
+            }
+            if (ImGui.Button($"ClickAskAssign"))
+            {
+                DuoLog.Information($"{RetainerHandlers.ClickAskAssign()}");
+            }
+            if (ImGui.Button($"SelectQuickExploration"))
+            {
+                DuoLog.Information($"{RetainerHandlers.SelectQuickExploration()}");
+            }
+            if (ImGui.Button($"SelectEntrustItems"))
+            {
+                DuoLog.Information($"{RetainerHandlers.SelectEntrustItems()}");
+            }
+            if (ImGui.Button($"SelectEntrustGil"))
+            {
+                DuoLog.Information($"{RetainerHandlers.SelectEntrustGil()}");
+            }
+            if (ImGui.Button($"ClickEntrustDuplicates"))
+            {
+                DuoLog.Information($"{RetainerHandlers.ClickEntrustDuplicates()}");
+            }
+            if (ImGui.Button($"ClickEntrustDuplicatesConfirm"))
+            {
+                DuoLog.Information($"{RetainerHandlers.ClickEntrustDuplicatesConfirm()}");
+            }
+            if (ImGui.Button($"ClickCloseEntrustWindow"))
+            {
+                DuoLog.Information($"{RetainerHandlers.ClickCloseEntrustWindow()}");
+            }
+            if (ImGui.Button($"CloseRetainerInventory"))
+            {
+                DuoLog.Information($"{RetainerHandlers.CloseRetainerInventory()}");
+            }
+            if (ImGui.Button($"CloseRetainerInventory"))
+            {
+                DuoLog.Information($"{RetainerHandlers.CloseRetainerInventory()}");
+            }
+            if (ImGui.Button($"SetWithdrawGilAmount (1%)"))
+            {
+                DuoLog.Information($"{RetainerHandlers.SetWithdrawGilAmount(1)}");
+            }
+            if (ImGui.Button($"SetWithdrawGilAmount (50%)"))
+            {
+                DuoLog.Information($"{RetainerHandlers.SetWithdrawGilAmount(50)}");
+            }
+            if (ImGui.Button($"SetWithdrawGilAmount (99%)"))
+            {
+                DuoLog.Information($"{RetainerHandlers.SetWithdrawGilAmount(99)}");
+            }
+            if (ImGui.Button($"SetWithdrawGilAmount (100%)"))
+            {
+                DuoLog.Information($"{RetainerHandlers.SetWithdrawGilAmount(100)}");
+            }
+            if (ImGui.Button($"WithdrawGilOrCancel"))
+            {
+                DuoLog.Information($"{RetainerHandlers.WithdrawGilOrCancel()}");
+            }
+            if (ImGui.Button($"WithdrawGilOrCancel (force cancel)"))
+            {
+                DuoLog.Information($"{RetainerHandlers.WithdrawGilOrCancel(true)}");
+            }
+
+            ImGui.Separator();
+
+            if (ImGui.Button($"TaskEntrustDuplicates"))
+            {
+                TaskEntrustDuplicates.Enqueue();
+            }
+
+            if (TryGetAddonByName<AddonSelectString>("SelectString", out var sel))
+            {
+                var entries = Utils.GetEntries(sel);
+                foreach (var x in entries)
+                {
+                    var index = entries.IndexOf(x);
+                    if (ImGui.SmallButton($"{x} / {index}") && index >= 0)
+                    {
+                        ClickSelectString.Using((nint)sel).SelectItem((ushort)index);
+                    }
+                }
+            }
+            ImGui.Separator();
             ImGuiEx.Text($"{Svc.Data.GetExcelSheet<Addon>()?.GetRow(115)?.Text.ToDalamudString().ExtractText()}");
             ImGuiEx.Text($"Server time: {Framework.GetServerTime()}");
             ImGuiEx.Text($"PC time: {DateTimeOffset.Now.ToUnixTimeSeconds()}");

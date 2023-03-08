@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.Offline;
+using ClickLib.Clicks;
 using Dalamud;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Enums;
@@ -9,15 +10,63 @@ using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameFunctions;
 using ECommons.MathHelpers;
 using ECommons.Reflection;
+using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
 using System.Text.RegularExpressions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace AutoRetainer;
 
 internal static unsafe class Utils
 {
+    internal static bool GenericThrottle => EzThrottler.Throttle("AutoRetainerGenericThrottle", 200);
+
+    internal static bool TrySelectSpecificEntry(string text)
+    {
+        return TrySelectSpecificEntry(new string[] { text });
+    }
+
+    internal static bool TrySelectSpecificEntry(IEnumerable<string> text)
+    {
+        if (TryGetAddonByName<AddonSelectString>("SelectString", out var addon) && IsAddonReady(&addon->AtkUnitBase))
+        {
+            var entry = Utils.GetEntries(addon).FirstOrDefault(x => x.EqualsAny(text));
+            if (entry != null)
+            {
+                var index = Utils.GetEntries(addon).IndexOf(entry);
+                if (index >= 0 && Utils.IsSelectItemEnabled(addon, index) && GenericThrottle)
+                {
+                    ClickSelectString.Using((nint)addon).SelectItem((ushort)index);
+                    PluginLog.Debug($"SelectAssignVenture: selecting {entry}/{index}");
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    internal static bool IsSelectItemEnabled(AddonSelectString* addon, int index)
+    {
+        var step1 = (AtkTextNode*)addon->AtkUnitBase
+                    .UldManager.NodeList[2]
+                    ->GetComponent()->UldManager.NodeList[index+1]
+                    ->GetComponent()->UldManager.NodeList[3];
+        return GenericHelpers.IsSelectItemEnabled(step1);
+    }
+
+    internal static List<string> GetEntries(AddonSelectString* addon)
+    {
+        var list = new List<string>();
+        for (int i = 0; i < addon->PopupMenu.PopupMenu.EntryCount; i++)
+        {
+            list.Add(MemoryHelper.ReadSeStringNullTerminated((nint)addon->PopupMenu.PopupMenu.EntryNames[i]).ExtractText());
+        }
+        return list;
+    }
+
     internal static void TryNotify(string s)
     {
         if (DalamudReflector.TryGetDalamudPlugin("NotificationMaster", out var instance, true, true))

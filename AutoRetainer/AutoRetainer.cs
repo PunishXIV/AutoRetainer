@@ -13,6 +13,8 @@ using PunishLib.Sponsor;
 using ECommons.Automation;
 using ECommons.Configuration;
 using Dalamud.Interface.Style;
+using Dalamud.Utility;
+using AutoRetainer.Tasks;
 
 namespace AutoRetainer;
 
@@ -138,6 +140,13 @@ public class AutoRetainer : IDalamudPlugin
 
     private void Toasts_ErrorToast(ref Dalamud.Game.Text.SeStringHandling.SeString message, ref bool isHandled)
     {
+        var text = message.ExtractText();
+        //10350	60	8	0	False	You have no applicable items to entrust.
+
+        if (text == Svc.Data.GetExcelSheet<LogMessage>().GetRow(10350).Text.ToDalamudString().ExtractText())
+        {
+            TaskEntrustDuplicates.NoDuplicates = true;
+        }
         if (IsEnabled())
         {
             if (message.ToString().Equals(Svc.Data.GetExcelSheet<LogMessage>().GetRow(1308).Text.ToString(), StringComparison.OrdinalIgnoreCase))
