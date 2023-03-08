@@ -41,7 +41,12 @@ namespace AutoRetainer.Handlers
                 if (addon->ReassignButton->IsEnabled && Utils.GenericThrottle)
                 {
                     ClickRetainerTaskResult.Using((IntPtr)addon).Reassign();
+                    return true;
                 }
+            }
+            else
+            {
+                Utils.RethrottleGeneric();
             }
             return false;
         }
@@ -55,6 +60,10 @@ namespace AutoRetainer.Handlers
                     ClickRetainerTaskResult.Using((IntPtr)addon).Confirm();
                 }
             }
+            else
+            {
+                Utils.RethrottleGeneric();
+            }
             return false;
         }
 
@@ -65,8 +74,13 @@ namespace AutoRetainer.Handlers
                 if (addon->AssignButton->IsEnabled && Utils.GenericThrottle)
                 {
                     ClickRetainerTaskAsk.Using((IntPtr)addon).Assign();
+                    PluginLog.Debug("Clicking assign...");
                     return true;
                 }
+            }
+            else
+            {
+                Utils.RethrottleGeneric();
             }
             return false;
         }
@@ -101,6 +115,10 @@ namespace AutoRetainer.Handlers
                     return true;
                 }
             }
+            else
+            {
+                Utils.RethrottleGeneric();
+            }
             return false;
         }
 
@@ -114,6 +132,10 @@ namespace AutoRetainer.Handlers
                     new ClickButtonGeneric(addon, "RetainerItemTransferList").Click(button);
                     return true;
                 }
+            }
+            else
+            {
+                Utils.RethrottleGeneric();
             }
             return false;
         }
@@ -132,6 +154,10 @@ namespace AutoRetainer.Handlers
                     return true;
                 }
             }
+            else
+            {
+                Utils.RethrottleGeneric();
+            }
             return false;
         }
 
@@ -148,6 +174,10 @@ namespace AutoRetainer.Handlers
                     }
                     return true;
                 }
+            }
+            else
+            {
+                Utils.RethrottleGeneric();
             }
             return false;
         }
@@ -172,6 +202,10 @@ namespace AutoRetainer.Handlers
                 {
                     return true;
                 }
+            }
+            else
+            {
+                Utils.RethrottleGeneric();
             }
             return false;
         }
@@ -220,6 +254,10 @@ namespace AutoRetainer.Handlers
                         }
                     }
                 }
+            }
+            else
+            {
+                Utils.RethrottleGeneric();
             }
             return true;
         }

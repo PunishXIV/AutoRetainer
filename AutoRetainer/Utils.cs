@@ -23,6 +23,7 @@ namespace AutoRetainer;
 internal static unsafe class Utils
 {
     internal static bool GenericThrottle => EzThrottler.Throttle("AutoRetainerGenericThrottle", 200);
+    internal static void RethrottleGeneric(int num = 200) => EzThrottler.Throttle("AutoRetainerGenericThrottle", num, true);
 
     internal static bool TrySelectSpecificEntry(string text)
     {
@@ -44,6 +45,10 @@ internal static unsafe class Utils
                     return true;
                 }
             }
+        }
+        else
+        {
+            Utils.RethrottleGeneric();
         }
         return false;
     }

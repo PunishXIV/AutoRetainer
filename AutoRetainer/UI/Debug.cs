@@ -115,6 +115,18 @@ internal unsafe static class Debug
             {
                 TaskEntrustDuplicates.Enqueue();
             }
+            if (ImGui.Button($"TaskAssignQuickVenture"))
+            {
+                TaskAssignQuickVenture.Enqueue();
+            }
+            if (ImGui.Button($"TaskReassignVenture"))
+            {
+                TaskReassignVenture.Enqueue();
+            }
+            if (ImGui.Button($"TaskWithdrawGil (50%)"))
+            {
+                TaskWithdrawGil.Enqueue(50);
+            }
 
             if (TryGetAddonByName<AddonSelectString>("SelectString", out var sel))
             {
