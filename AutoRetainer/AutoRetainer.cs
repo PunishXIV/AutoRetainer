@@ -14,7 +14,7 @@ using ECommons.Automation;
 using ECommons.Configuration;
 using Dalamud.Interface.Style;
 using Dalamud.Utility;
-using AutoRetainer.Tasks;
+using AutoRetainer.NewScheduler.Tasks;
 
 namespace AutoRetainer;
 

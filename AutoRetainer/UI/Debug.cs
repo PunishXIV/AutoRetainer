@@ -16,8 +16,8 @@ using Lumina.Excel.GeneratedSheets;
 using Dalamud.Utility;
 using ClickLib;
 using ClickLib.Clicks;
-using AutoRetainer.Handlers;
-using AutoRetainer.Tasks;
+using AutoRetainer.NewScheduler.Handlers;
+using AutoRetainer.NewScheduler.Tasks;
 
 namespace AutoRetainer.UI;
 

@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AutoRetainer.Handlers
+namespace AutoRetainer.NewScheduler.Handlers
 {
     internal unsafe static class RetainerHandlers
     {
@@ -85,6 +85,24 @@ namespace AutoRetainer.Handlers
             return false;
         }
 
+        internal static bool? ClickAskReturn()
+        {
+            if (TryGetAddonByName<AddonRetainerTaskAsk>("RetainerTaskAsk", out var addon) && IsAddonReady(&addon->AtkUnitBase))
+            {
+                if (addon->AssignButton->IsEnabled && Utils.GenericThrottle)
+                {
+                    ClickRetainerTaskAsk.Using((IntPtr)addon).Return();
+                    PluginLog.Debug("Clicking return...");
+                    return true;
+                }
+            }
+            else
+            {
+                Utils.RethrottleGeneric();
+            }
+            return false;
+        }
+
         internal static bool? SelectQuickExploration()
         {
             return Utils.TrySelectSpecificEntry(Consts.QuickExploration);
@@ -108,7 +126,7 @@ namespace AutoRetainer.Handlers
         {
             if (TryGetAddonByName<AtkUnitBase>("InventoryRetainerLarge", out var addon) && IsAddonReady(addon))
             {
-                var button = (AtkComponentButton*)(addon->UldManager.NodeList[8]->GetComponent());
+                var button = (AtkComponentButton*)addon->UldManager.NodeList[8]->GetComponent();
                 if (addon->UldManager.NodeList[8]->IsVisible && button->IsEnabled && Utils.GenericThrottle)
                 {
                     new ClickButtonGeneric(addon, "InventoryRetainerLarge").Click(button);
@@ -126,7 +144,7 @@ namespace AutoRetainer.Handlers
         {
             if (TryGetAddonByName<AtkUnitBase>("RetainerItemTransferList", out var addon) && IsAddonReady(addon))
             {
-                var button = (AtkComponentButton*)(addon->UldManager.NodeList[3]->GetComponent());
+                var button = (AtkComponentButton*)addon->UldManager.NodeList[3]->GetComponent();
                 if (addon->UldManager.NodeList[3]->IsVisible && button->IsEnabled && Utils.GenericThrottle)
                 {
                     new ClickButtonGeneric(addon, "RetainerItemTransferList").Click(button);
@@ -146,7 +164,7 @@ namespace AutoRetainer.Handlers
             var text = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(13530).Text.ToDalamudString().ExtractText();
             if (TryGetAddonByName<AtkUnitBase>("RetainerItemTransferProgress", out var addon) && IsAddonReady(addon))
             {
-                var button = (AtkComponentButton*)(addon->UldManager.NodeList[2]->GetComponent());
+                var button = (AtkComponentButton*)addon->UldManager.NodeList[2]->GetComponent();
                 var nodetext = MemoryHelper.ReadSeString(&addon->UldManager.NodeList[2]->GetComponent()->UldManager.NodeList[2]->GetAsAtkTextNode()->NodeText).ExtractText();
                 if (nodetext == text && addon->UldManager.NodeList[2]->IsVisible && button->IsEnabled && Utils.GenericThrottle)
                 {
@@ -184,11 +202,11 @@ namespace AutoRetainer.Handlers
 
         internal static bool? SetWithdrawGilAmount(int percent)
         {
-            if(TryGetAddonByName<AtkUnitBase>("Bank", out var addon) && IsAddonReady(addon) && Utils.TryGetCurrentRetainer(out var name) && Utils.TryGetRetainerByName(name, out var retainer))
+            if (TryGetAddonByName<AtkUnitBase>("Bank", out var addon) && IsAddonReady(addon) && Utils.TryGetCurrentRetainer(out var name) && Utils.TryGetRetainerByName(name, out var retainer))
             {
                 if (percent < 1 || percent > 100) throw new ArgumentOutOfRangeException(nameof(percent), percent, "Percent must be between 1 and 100");
-                var gilToWithdraw = (uint)(percent == 100?retainer.Gil : (float)retainer.Gil / 100f * (float)percent);
-                if(gilToWithdraw > 0 && gilToWithdraw <= retainer.Gil && Utils.GenericThrottle)
+                var gilToWithdraw = (uint)(percent == 100 ? retainer.Gil : retainer.Gil / 100f * percent);
+                if (gilToWithdraw > 0 && gilToWithdraw <= retainer.Gil && Utils.GenericThrottle)
                 {
                     var v = stackalloc AtkValue[]
                     {

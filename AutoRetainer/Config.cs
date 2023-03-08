@@ -1,4 +1,5 @@
-﻿using AutoRetainer.Offline;
+﻿using AutoRetainer.NewScheduler;
+using AutoRetainer.Offline;
 using Dalamud.Configuration;
 using ECommons.Configuration;
 using System.Windows.Forms;
@@ -34,6 +35,8 @@ internal class Config : IEzConfig
     public bool UseServerTime = true;
     public bool DisableOnClose = false;
     public bool NoTheme = false;
+
+    public HashSet<TaskType> EnabledTasks = new();
 
 
     internal bool AutoCloseRetainerWindow

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AutoRetainer.Handlers
+namespace AutoRetainer.NewScheduler.Handlers
 {
     internal unsafe static class RetainerListHandlers
     {
