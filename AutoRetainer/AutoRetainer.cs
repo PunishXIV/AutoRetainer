@@ -15,6 +15,7 @@ using ECommons.Configuration;
 using Dalamud.Interface.Style;
 using Dalamud.Utility;
 using AutoRetainer.NewScheduler.Tasks;
+using AutoRetainer.NewScheduler;
 
 namespace AutoRetainer;
 
@@ -26,7 +27,6 @@ public class AutoRetainer : IDalamudPlugin
     internal WindowSystem ws;
     internal ConfigGui configGui;
     internal RetainerManager retainerManager;
-    private bool Enabled = false;
     internal bool NoConditionEvent = false;
     internal QuickSellItems quickSellItems;
     internal TaskManager TaskManager;
@@ -124,9 +124,9 @@ public class AutoRetainer : IDalamudPlugin
 
     private void Tick(Framework framework)
     {
-        if (P.IsEnabled() && P.retainerManager.Ready && Svc.ClientState.LocalPlayer != null)
+        if (Svc.Condition[ConditionFlag.OccupiedSummoningBell] && P.retainerManager.Ready && Svc.ClientState.LocalPlayer != null)
         {
-            Scheduler.Tick();
+            SchedulerMain.Tick();
             if (!P.config.SelectedRetainers.ContainsKey(Svc.ClientState.LocalContentId))
             {
                 P.config.SelectedRetainers[Svc.ClientState.LocalContentId] = new();

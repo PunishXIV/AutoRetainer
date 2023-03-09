@@ -27,10 +27,7 @@ internal unsafe class Scheduler
                 Safe(TickInternal);
             }
             AddonLifeTracker.Tick();
-            if (TryGetAddonByName<AddonTalk>("Talk", out var addon) && addon->AtkUnitBase.IsVisible)
-            {
-                ClickTalk.Using((IntPtr)addon).Click();
-            }
+            
         }
         else
         {

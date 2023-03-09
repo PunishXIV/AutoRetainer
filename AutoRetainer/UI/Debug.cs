@@ -28,6 +28,21 @@ internal unsafe static class Debug
     {
         Safe(delegate
         {
+            if (ImGui.CollapsingHeader("Agent"))
+            {
+                /*var agent = Framework.Instance()->UIModule->GetAgentModule()->GetAgentByInternalId(FFXIVClientStructs.FFXIV.Client.UI.Agent.AgentId.GatheringNote);
+                if(agent != null && agent->IsAgentActive())
+                {
+                    
+                    var ptr = (nint)agent->AtkEventInterface.vtbl;
+                    ImGuiEx.Text($"Vtable: {ptr:X16}");
+                    for(var i = 0; i < 8; i++)
+                    {
+                        ImGuiEx.Text($"Vfunc{i}: {*(nint*)(ptr + 8 * i)}");
+                    }
+                }*/
+                //in next life I guess
+            }
             if (ImGui.Button($"SelectAssignVenture"))
             {
                 DuoLog.Information($"{RetainerHandlers.SelectAssignVenture()}");

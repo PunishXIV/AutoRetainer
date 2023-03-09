@@ -206,15 +206,18 @@ namespace AutoRetainer.NewScheduler.Handlers
             {
                 if (percent < 1 || percent > 100) throw new ArgumentOutOfRangeException(nameof(percent), percent, "Percent must be between 1 and 100");
                 var gilToWithdraw = (uint)(percent == 100 ? retainer.Gil : retainer.Gil / 100f * percent);
-                if (gilToWithdraw > 0 && gilToWithdraw <= retainer.Gil && Utils.GenericThrottle)
+                if (gilToWithdraw > 0 && gilToWithdraw <= retainer.Gil)
                 {
-                    var v = stackalloc AtkValue[]
+                    if (Utils.GenericThrottle)
                     {
-                        new() { Type = FFXIVClientStructs.FFXIV.Component.GUI.ValueType.Int, Int = 3 },
-                        new() { Type = FFXIVClientStructs.FFXIV.Component.GUI.ValueType.UInt, UInt = gilToWithdraw }
-                    };
-                    addon->FireCallback(2, v);
-                    return true;
+                        var v = stackalloc AtkValue[]
+                        {
+                            new() { Type = FFXIVClientStructs.FFXIV.Component.GUI.ValueType.Int, Int = 3 },
+                            new() { Type = FFXIVClientStructs.FFXIV.Component.GUI.ValueType.UInt, UInt = gilToWithdraw }
+                        };
+                        addon->FireCallback(2, v);
+                        return true;
+                    }
                 }
                 else
                 {
