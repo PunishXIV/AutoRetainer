@@ -18,7 +18,32 @@ internal class MultiModeOverlay : Window
     public override void Draw()
     {
         CImGui.igBringWindowToDisplayBack(CImGui.igGetCurrentWindow());
-        if (MultiMode.Enabled)
+
+        if (P.TaskManager.IsBusy)
+        {
+            if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "processing.png"), out var t))
+            {
+                ImGui.Image(t.ImGuiHandle, new(128, 128));
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+                    if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
+                    {
+                        Svc.Commands.ProcessCommand("/ays");
+                    }
+                    if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                    {
+                        P.TaskManager.Abort();
+                    }
+                    ImGui.SetTooltip("AutoRetainer is processing tasks. \nLeft click - open AutoRetainer. \nRight click - abort.");
+                }
+            }
+            else
+            {
+                ImGuiEx.Text($"loading multi.png");
+            }
+        }
+        else if (MultiMode.Enabled)
         {
             if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "multi.png"), out var t))
             {

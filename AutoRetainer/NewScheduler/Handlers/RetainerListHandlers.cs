@@ -23,12 +23,12 @@ namespace AutoRetainer.NewScheduler.Handlers
                     var retainerEntry = (AtkComponentNode*)list->Component->UldManager.NodeList[i];
                     var text = (AtkTextNode*)retainerEntry->Component->UldManager.NodeList[13];
                     var nodeName = text->NodeText.ToString();
-                    PluginLog.Debug($"Retainer {i} text {nodeName}");
+                    P.DebugLog($"Retainer {i} text {nodeName}");
                     if (name == nodeName)
                     {
                         if (Utils.GenericThrottle)
                         {
-                            PluginLog.Debug($"Selecting {nodeName}");
+                            P.DebugLog($"Selecting {nodeName}");
                             ClickRetainerList.Using((IntPtr)retainerList).Select(list, retainerEntry, i - 1);
                             return true;
                         }
@@ -54,7 +54,7 @@ namespace AutoRetainer.NewScheduler.Handlers
                         }
                     };
                     retainerList->FireCallback(1, v);
-                    PluginLog.Debug($"Closing retainer window");
+                    P.DebugLog($"Closing retainer window");
                     return true;
                 }
             }

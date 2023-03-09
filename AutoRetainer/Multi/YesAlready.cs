@@ -1,4 +1,5 @@
-﻿using ECommons.Reflection;
+﻿using AutoRetainer.GcHandin;
+using ECommons.Reflection;
 
 namespace AutoRetainer.Multi;
 
@@ -32,5 +33,28 @@ internal static class YesAlready
             return pl.GetStaticFoP("YesAlready.Service", "Configuration").GetFoP<bool>("Enabled");
         }
         return false;
+    }
+
+    internal static void Tick()
+    {
+        if(P.TaskManager.IsBusy || AutoLogin.Instance.IsRunning || AutoGCHandin.Operation)
+        {
+            if (IsEnabled())
+            {
+                DisableIfNeeded();
+            }
+        }
+        else
+        {
+            if (Reenable)
+            {
+                EnableIfNeeded();
+            }
+        }
+    }
+
+    internal static bool? WaitForYesAlreadyDisabledTask()
+    {
+        return !YesAlready.IsEnabled();
     }
 }

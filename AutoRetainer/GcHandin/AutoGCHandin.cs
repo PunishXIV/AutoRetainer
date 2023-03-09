@@ -37,35 +37,27 @@ namespace AutoRetainer.GcHandin
             {
                 if (TryGetAddonByName<AddonGrandCompanySupplyReward>("GrandCompanySupplyReward", out var addonGCSR) && IsAddonReady(&addonGCSR->AtkUnitBase) && Operation)
                 {
-                    if (YesAlready.IsEnabled())
-                    {
-                        YesAlready.DisableIfNeeded();
-                    }
                     if (TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon) && IsAddonReady(addon) && EzThrottler.Throttle("CloseSupplyList", 200))
                     {
                         UiHelper.Close(addon);
-                        PluginLog.Information($"Closing Supply List");
+                        P.DebugLog($"Closing Supply List");
                     }
                     if (EzThrottler.Throttle("Handin", 200) && addonGCSR->DeliverButton->IsEnabled)
                     {
                         ClickGrandCompanySupplyReward.Using((IntPtr)addonGCSR).Deliver();
-                        PluginLog.Information($"Delivering Item");
+                        P.DebugLog($"Delivering Item");
                     }
                 }
                 else if (TryGetAddonByName<AddonSelectYesno>("SelectYesno", out var addonSS) && IsAddonReady(&addonSS->AtkUnitBase) && Operation)
                 {
-                    if (YesAlready.IsEnabled())
-                    {
-                        YesAlready.DisableIfNeeded();
-                    }
                     if (EzThrottler.Throttle("Yesno", 200) && addonSS->YesButton->IsEnabled)
                     {
                         var str = MemoryHelper.ReadSeString(&addonSS->PromptText->NodeText).ToString();
-                        PluginLog.Information($"SelectYesno encountered: {str}");
+                        P.DebugLog($"SelectYesno encountered: {str}");
                         if (str.EqualsAny("Do you really want to trade a high-quality item?"))
                         {
                             ClickSelectYesNo.Using((IntPtr)addonSS).Yes();
-                            PluginLog.Information($"Selecting yes");
+                            P.DebugLog($"Selecting yes");
                         }
                     }
                 }
@@ -78,10 +70,6 @@ namespace AutoRetainer.GcHandin
                     Overlay.Position = new(addon->X, addon->Y);
                     if (Operation)
                     {
-                        if (YesAlready.IsEnabled())
-                        {
-                            YesAlready.DisableIfNeeded();
-                        }
                         if (IsDone(addon))
                         {
                             var s = $"Automatic handin has been completed";
@@ -117,7 +105,7 @@ namespace AutoRetainer.GcHandin
                                     var step3 = step2->GetAsAtkComponentNode()->Component->UldManager.NodeList[5];
                                     var text = MemoryHelper.ReadSeString(&step3->GetAsAtkTextNode()->NodeText).ExtractText();
                                     var has = !text.IsNullOrWhitespace() && HasInInventory(text);
-                                    PluginLog.Information($"Seals: {seals}/{maxSeals}, for item {sealsForItem} | {text}: {has}");
+                                    P.DebugLog($"Seals: {seals}/{maxSeals}, for item {sealsForItem} | {text}: {has}");
                                     EzThrottler.Throttle("AutoGCHandin", 500, true);
                                     if (!has)
                                     {
@@ -127,7 +115,7 @@ namespace AutoRetainer.GcHandin
                                     {
                                         throw new GCHandinInterruptedException($"Too many seals, please spend them");
                                     }
-                                    DuoLog.Information($"Handing in item {text} for {sealsForItem} seals");
+                                    P.DebugLog($"Handing in item {text} for {sealsForItem} seals");
                                     InvokeHandin(addon);
                                 }
                                 catch (FormatException e)
@@ -154,20 +142,12 @@ namespace AutoRetainer.GcHandin
                     else
                     {
                         Overlay.IsOpen = IsReadyToOperate(addon);
-                        if (YesAlready.Reenable)
-                        {
-                            YesAlready.EnableIfNeeded();
-                        }
                     }
                 }
                 else
                 {
                     Overlay.IsOpen = Operation || IsReadyToOperate(addon);
                     AddonOpenedAt = 0;
-                    if (!Operation && YesAlready.Reenable)
-                    {
-                        YesAlready.EnableIfNeeded();
-                    }
                 }
             }
             else
@@ -183,10 +163,6 @@ namespace AutoRetainer.GcHandin
                 if(AddonOpenedAt != 0)
                 {
                     AddonOpenedAt = 0;
-                }
-                if (YesAlready.Reenable)
-                {
-                    YesAlready.EnableIfNeeded();
                 }
             }
         }

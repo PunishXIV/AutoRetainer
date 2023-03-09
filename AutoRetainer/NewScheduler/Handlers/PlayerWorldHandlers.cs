@@ -24,7 +24,7 @@ namespace AutoRetainer.NewScheduler.Handlers
                     if (Utils.GenericThrottle)
                     {
                         Svc.Targets.SetTarget(x);
-                        PluginLog.Debug($"Set target to {x}");
+                        P.DebugLog($"Set target to {x}");
                         return true;
                     }
                 }
@@ -42,7 +42,7 @@ namespace AutoRetainer.NewScheduler.Handlers
                     if (Utils.GenericThrottle && EzThrottler.Throttle("InteractWithBell", 5000))
                     {
                         TargetSystem.Instance()->InteractWithObject((GameObject*)x.Address, false);
-                        PluginLog.Debug($"Interacted with {x}");
+                        P.DebugLog($"Interacted with {x}");
                         return true;
                     }
                 }

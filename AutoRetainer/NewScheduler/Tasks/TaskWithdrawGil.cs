@@ -1,4 +1,5 @@
-﻿using AutoRetainer.NewScheduler.Handlers;
+﻿using AutoRetainer.Multi;
+using AutoRetainer.NewScheduler.Handlers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace AutoRetainer.NewScheduler.Tasks
         internal static void Enqueue(int percent)
         {
             HasGil = false;
+            P.TaskManager.Enqueue(YesAlready.WaitForYesAlreadyDisabledTask);
             P.TaskManager.Enqueue(() =>
             {
                 var g = CurrentRetainerHasGil();

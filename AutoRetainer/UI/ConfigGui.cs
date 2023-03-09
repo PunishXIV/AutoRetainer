@@ -10,7 +10,7 @@ namespace AutoRetainer.UI;
 
 unsafe internal class ConfigGui : Window
 {
-    public ConfigGui() : base($"{P.Name} {P.GetType().Assembly.GetName().Version}")
+    public ConfigGui() : base($"{P.Name} {P.GetType().Assembly.GetName().Version}###AutoRetainer")
     {
         this.SizeConstraints = new()
         {

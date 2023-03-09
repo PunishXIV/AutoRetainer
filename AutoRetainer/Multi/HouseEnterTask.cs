@@ -19,6 +19,7 @@ namespace AutoRetainer.Multi
     {
         internal static void EnqueueTask()
         {
+            P.TaskManager.Enqueue(YesAlready.WaitForYesAlreadyDisabledTask);
             P.TaskManager.Enqueue(WaitUntilNotBusy, 180 * 1000);
             P.TaskManager.Enqueue(() => SetTarget(20f));
             P.TaskManager.Enqueue(Lockon);
@@ -54,7 +55,7 @@ namespace AutoRetainer.Multi
                 {
                     if(EzThrottler.Throttle("HET.Turn", 1000))
                     {
-                        PluginLog.Debug($"Turning...");
+                        P.DebugLog($"Turning...");
                         P.Memory.Turn(entrance.Position);
                     }
                 }*/
@@ -66,7 +67,7 @@ namespace AutoRetainer.Multi
 
         internal static bool? Approach()
         {
-            PluginLog.Debug($"Enabling automove");
+            P.DebugLog($"Enabling automove");
             Chat.Instance.SendMessage("/automove on");
             return true;
         }
@@ -76,7 +77,7 @@ namespace AutoRetainer.Multi
             var entrance = Utils.GetNearestEntrance(out var d);
             if (entrance != null && d < 4f && EzThrottler.Throttle("HET.DisableAutomove"))
             {
-                PluginLog.Debug($"Disabling automove");
+                P.DebugLog($"Disabling automove");
                 Chat.Instance.SendMessage("/automove off");
                 return true;
             }
@@ -88,7 +89,7 @@ namespace AutoRetainer.Multi
             var entrance = Utils.GetNearestEntrance(out var d);
             if (entrance != null && d < distance && EzThrottler.Throttle("HET.SetTarget", 200))
             {
-                PluginLog.Debug($"Setting entrance target ({distance})");
+                P.DebugLog($"Setting entrance target ({distance})");
                 Svc.Targets.SetTarget(entrance);
                 return true;
             }
@@ -100,7 +101,7 @@ namespace AutoRetainer.Multi
             var entrance = Utils.GetNearestEntrance(out var d);
             if (entrance != null && Svc.Targets.Target?.Address == entrance.Address && EzThrottler.Throttle("HET.Interact", 1000))
             {
-                PluginLog.Debug($"Interacting with entrance");
+                P.DebugLog($"Interacting with entrance");
                 TargetSystem.Instance()->InteractWithObject((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)entrance.Address, false);
                 return true;
             }
@@ -116,7 +117,7 @@ namespace AutoRetainer.Multi
             var addon = Utils.GetSpecificYesno("Enter the estate hall?");
             if (addon != null && IsAddonReady(addon) && EzThrottler.Throttle("HET.SelectYesno"))
             {
-                PluginLog.Debug("Select yes");
+                P.DebugLog("Select yes");
                 ClickSelectYesNo.Using((nint)addon).Yes();
                 return true;
             }

@@ -38,7 +38,7 @@ internal unsafe static class MultiMode
             Interactions.Clear();
             if (Enabled && P.config.MultiAllowHET && ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType))
             {
-                PluginLog.Debug($"ProperOnLogin: {Svc.ClientState.LocalPlayer}, residental area, scheduling HET");
+                P.DebugLog($"ProperOnLogin: {Svc.ClientState.LocalPlayer}, residental area, scheduling HET");
                 HouseEnterTask.EnqueueTask();
             }
         });
@@ -123,7 +123,7 @@ internal unsafe static class MultiMode
                 }
                 else if(!IsOccupied() && AnyRetainersAvailable())
                 {
-                    DuoLog.Information($"1234");
+                    //DuoLog.Information($"1234");
                     EnsureCharacterValidity();
                     if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data) && data.Enabled)
                     {

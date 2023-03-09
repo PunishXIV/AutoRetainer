@@ -16,10 +16,13 @@ using Dalamud.Interface.Style;
 using Dalamud.Utility;
 using AutoRetainer.NewScheduler.Tasks;
 using AutoRetainer.NewScheduler;
+using ClickLib.Clicks;
+using FFXIVClientStructs.FFXIV.Client.UI;
+using ECommons.Logging;
 
 namespace AutoRetainer;
 
-public class AutoRetainer : IDalamudPlugin
+public unsafe class AutoRetainer : IDalamudPlugin
 {
     public string Name => "AutoRetainer";
     internal static AutoRetainer P;
@@ -87,7 +90,7 @@ public class AutoRetainer : IDalamudPlugin
                 && offlineData.RetainerData.TryGetFirst(x => x.Name == ret, out var offlineRetainerData))
             {
                 offlineRetainerData.VentureBeginsAt = P.Time;
-                PluginLog.Debug($"Recorded venture start time = {offlineRetainerData.VentureBeginsAt}");
+                P.DebugLog($"Recorded venture start time = {offlineRetainerData.VentureBeginsAt}");
             }
         }
     }
@@ -133,10 +136,18 @@ public class AutoRetainer : IDalamudPlugin
                 P.config.SelectedRetainers[Svc.ClientState.LocalContentId] = new();
             }
         }
+        if (SchedulerMain.Enabled || P.TaskManager.IsBusy || Svc.Condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.OccupiedSummoningBell])
+        {
+            if (TryGetAddonByName<AddonTalk>("Talk", out var addon) && addon->AtkUnitBase.IsVisible)
+            {
+                ClickTalk.Using((IntPtr)addon).Click();
+            }
+        }
         OfflineDataManager.Tick();
         AutoGCHandin.Tick();
         MultiMode.Tick();
         NotificationHandler.Tick();
+        YesAlready.Tick();
     }
 
     private void Toasts_ErrorToast(ref Dalamud.Game.Text.SeStringHandling.SeString message, ref bool isHandled)
@@ -176,8 +187,7 @@ public class AutoRetainer : IDalamudPlugin
         Svc.Toasts.Toast -= Toasts_Toast;
         Safe(delegate
         {
-            GcHandin.YesAlready.EnableIfNeeded();
-            Multi.YesAlready.EnableIfNeeded();
+            YesAlready.EnableIfNeeded();
         });
         Safe(StatisticsManager.Dispose);
         Safe(TaskManager.Dispose);
@@ -193,6 +203,11 @@ public class AutoRetainer : IDalamudPlugin
             config.SelectedRetainers.Add(cid, new());
         }
         return config.SelectedRetainers[cid];
+    }
+
+    internal void DebugLog(string message)
+    {
+        PluginLog.Information(message);
     }
 
     private void ConditionChange(ConditionFlag flag, bool value)

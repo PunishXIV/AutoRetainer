@@ -1,4 +1,5 @@
-﻿using AutoRetainer.NewScheduler.Handlers;
+﻿using AutoRetainer.Multi;
+using AutoRetainer.NewScheduler.Handlers;
 using Dalamud.Game.ClientState.Objects.Enums;
 using ECommons.Automation;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
@@ -15,6 +16,7 @@ namespace AutoRetainer.NewScheduler.Tasks
     {
         internal static void Enqueue()
         {
+            P.TaskManager.Enqueue(YesAlready.WaitForYesAlreadyDisabledTask);
             P.TaskManager.Enqueue(PlayerWorldHandlers.SelectNearestBell);
             P.TaskManager.Enqueue(PlayerWorldHandlers.InteractWithTargetedBell);
         }

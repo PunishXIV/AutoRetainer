@@ -2,8 +2,10 @@
 using AutoRetainer.NewScheduler.Handlers;
 using AutoRetainer.NewScheduler.Tasks;
 using AutoRetainer.Offline;
+using ClickLib.Clicks;
 using ECommons.Automation;
 using ECommons.Throttlers;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Microsoft.VisualBasic;
 using System;
@@ -20,25 +22,6 @@ namespace AutoRetainer.NewScheduler
 
         internal static void Tick()
         {
-            if (!AutoLogin.Instance.IsRunning)
-            {
-                if (P.TaskManager.IsBusy)
-                {
-                    if (YesAlready.IsEnabled())
-                    {
-                        YesAlready.DisableIfNeeded();
-                    }
-                }
-                else
-                {
-                    if (YesAlready.Reenable)
-                    {
-                        YesAlready.EnableIfNeeded();
-                    }
-                }
-            }
-
-
             if (Enabled)
             {
                 if (TryGetAddonByName<AtkUnitBase>("RetainerList", out var addon) && addon->IsVisible)

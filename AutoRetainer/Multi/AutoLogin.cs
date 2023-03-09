@@ -112,16 +112,8 @@ internal unsafe class AutoLogin
     {
         if (actionQueue.Count == 0)
         {
-            if (YesAlready.Reenable)
-            {
-                YesAlready.EnableIfNeeded();
-            }
             if (sw.IsRunning) sw.Stop();
             return;
-        }
-        if (YesAlready.IsEnabled())
-        {
-            YesAlready.DisableIfNeeded();
         }
         if (!sw.IsRunning) sw.Restart();
 
