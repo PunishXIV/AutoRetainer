@@ -41,6 +41,16 @@ unsafe internal class ConfigGui : Window
         ImGui.SameLine();
         ImGui.Checkbox("Multi", ref MultiMode.Enabled);
 
+        if (P.TaskManager.IsBusy)
+        {
+            ImGui.SameLine();
+            if (ImGui.Button($"Abort {P.TaskManager.NumQueuedTasks} tasks"))
+            {
+                P.TaskManager.Abort();
+            }
+        }
+
+
         ImGuiEx.EzTabBar("tabbar",
 
                 ("Retainers", MultiModeUI.Draw, null, true),

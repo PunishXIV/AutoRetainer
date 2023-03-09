@@ -41,6 +41,7 @@ namespace AutoRetainer.NewScheduler.Handlers
                 if (addon->ReassignButton->IsEnabled && Utils.GenericThrottle)
                 {
                     ClickRetainerTaskResult.Using((IntPtr)addon).Reassign();
+                    PluginLog.Debug($"Clicked reassign");
                     return true;
                 }
             }
@@ -58,6 +59,8 @@ namespace AutoRetainer.NewScheduler.Handlers
                 if (addon->ConfirmButton->IsEnabled && Utils.GenericThrottle)
                 {
                     ClickRetainerTaskResult.Using((IntPtr)addon).Confirm();
+                    PluginLog.Debug($"Clicked confirm");
+                    return true;
                 }
             }
             else
@@ -74,7 +77,7 @@ namespace AutoRetainer.NewScheduler.Handlers
                 if (addon->AssignButton->IsEnabled && Utils.GenericThrottle)
                 {
                     ClickRetainerTaskAsk.Using((IntPtr)addon).Assign();
-                    PluginLog.Debug("Clicking assign...");
+                    PluginLog.Debug("Clicked assign");
                     return true;
                 }
             }
@@ -92,7 +95,7 @@ namespace AutoRetainer.NewScheduler.Handlers
                 if (addon->AssignButton->IsEnabled && Utils.GenericThrottle)
                 {
                     ClickRetainerTaskAsk.Using((IntPtr)addon).Return();
-                    PluginLog.Debug("Clicking return...");
+                    PluginLog.Debug("Clicked return");
                     return true;
                 }
             }
@@ -130,6 +133,7 @@ namespace AutoRetainer.NewScheduler.Handlers
                 if (addon->UldManager.NodeList[8]->IsVisible && button->IsEnabled && Utils.GenericThrottle)
                 {
                     new ClickButtonGeneric(addon, "InventoryRetainerLarge").Click(button);
+                    PluginLog.Debug($"Clicked entrust duplicates");
                     return true;
                 }
             }
@@ -148,6 +152,7 @@ namespace AutoRetainer.NewScheduler.Handlers
                 if (addon->UldManager.NodeList[3]->IsVisible && button->IsEnabled && Utils.GenericThrottle)
                 {
                     new ClickButtonGeneric(addon, "RetainerItemTransferList").Click(button);
+                    PluginLog.Debug($"Clicked duplicates confirm");
                     return true;
                 }
             }
@@ -169,6 +174,7 @@ namespace AutoRetainer.NewScheduler.Handlers
                 if (nodetext == text && addon->UldManager.NodeList[2]->IsVisible && button->IsEnabled && Utils.GenericThrottle)
                 {
                     new ClickButtonGeneric(addon, "RetainerItemTransferProgress").Click(button);
+                    PluginLog.Debug($"Clicked transfer progress close");
                     return true;
                 }
             }
@@ -186,8 +192,10 @@ namespace AutoRetainer.NewScheduler.Handlers
                 if (Utils.GenericThrottle)
                 {
                     addon->Hide(true);
+                    PluginLog.Debug($"Hiding retainer inventory");
                     if (TryGetAddonByName<AtkUnitBase>("InventoryLarge", out var iaddon) && IsAddonReady(iaddon))
                     {
+                        PluginLog.Debug($"Hiding player inventory");
                         iaddon->Hide(true);
                     }
                     return true;
@@ -216,6 +224,7 @@ namespace AutoRetainer.NewScheduler.Handlers
                             new() { Type = FFXIVClientStructs.FFXIV.Component.GUI.ValueType.UInt, UInt = gilToWithdraw }
                         };
                         addon->FireCallback(2, v);
+                        PluginLog.Debug($"Set gil to withdraw {gilToWithdraw} (total: {retainer.Gil})");
                         return true;
                     }
                 }
@@ -252,6 +261,7 @@ namespace AutoRetainer.NewScheduler.Handlers
                         };
                         addon->FireCallback(2, v);
                         addon->Hide(true);
+                        PluginLog.Debug($"Clicked withdraw");
                         //new ClickButtonGeneric(addon, "Bank").Click(withdraw);
                         return true;
                     }
@@ -270,6 +280,7 @@ namespace AutoRetainer.NewScheduler.Handlers
                             };
                             addon->FireCallback(2, v);
                             addon->Hide(true);
+                            PluginLog.Debug($"Clicked cancel");
                             //new ClickButtonGeneric(addon, "Bank").Click(cancel);
                             return true;
                         }

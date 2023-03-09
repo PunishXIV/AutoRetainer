@@ -1,6 +1,8 @@
 ﻿using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Game.Text.SeStringHandling;
 using ECommons.Events;
 using ECommons.ExcelServices;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AutoRetainer.Offline;
 
@@ -62,5 +64,16 @@ internal static class OfflineDataManager
         }
         data.Ventures = Utils.GetVenturesAmount();
         data.InventorySpace = (uint)Utils.GetInventoryFreeSlotCount();
+    }
+    internal static OfflineRetainerData GetData(SeString name, ulong? CID = null) => GetData(name.ToString(), CID);
+
+    internal static OfflineRetainerData GetData(string name, ulong? CID = null)
+    {
+        var cid = CID ?? Svc.ClientState.LocalContentId;
+        if(P.config.OfflineData.TryGetFirst(x => x.CID == cid, out var data) && data.RetainerData.TryGetFirst(x => x.Name == name, out var rdata))
+        {
+            return rdata;
+        }
+        return null;
     }
 }

@@ -8,6 +8,9 @@ public class OfflineRetainerData : IEquatable<OfflineRetainerData>
     public bool HasVenture = false;
     public int Level = 0;
     public long VentureBeginsAt = 0;
+    public bool EntrustDuplicates = false;
+    public bool WithdrawGil = false;
+    public int WithdrawGilPercent = 100;
 
     public override bool Equals(object obj)
     {

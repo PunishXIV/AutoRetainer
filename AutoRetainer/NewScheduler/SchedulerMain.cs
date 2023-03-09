@@ -1,5 +1,6 @@
 ﻿using AutoRetainer.NewScheduler.Handlers;
 using AutoRetainer.NewScheduler.Tasks;
+using AutoRetainer.Offline;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using System;
@@ -33,44 +34,43 @@ namespace AutoRetainer.NewScheduler
 
                                     //resend retainer
 
-                                    if (P.config.EnabledTasks.Contains(TaskType.ManageVenture))
+                                    if (ret.VentureID != 0)
                                     {
-                                        if (ret.VentureID != 0)
+                                        if (P.config.DontReassign)
                                         {
-                                            if (P.config.DontReassign)
-                                            {
-                                                TaskCollectVenture.Enqueue();
-                                            }
-                                            else
-                                            {
-                                                TaskReassignVenture.Enqueue();
-                                            }
+                                            TaskCollectVenture.Enqueue();
                                         }
                                         else
                                         {
-                                            if (P.config.EnableAssigningQuickExploration)
-                                            {
-                                                TaskAssignQuickVenture.Enqueue();
-                                            }
+                                            TaskReassignVenture.Enqueue();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (P.config.EnableAssigningQuickExploration)
+                                        {
+                                            TaskAssignQuickVenture.Enqueue();
                                         }
                                     }
 
                                     //entrust duplicates
-                                    if (P.config.EnabledTasks.Contains(TaskType.EntrustDuplicates))
+                                    if (OfflineDataManager.GetData(ret.Name).EntrustDuplicates)
                                     {
                                         TaskEntrustDuplicates.Enqueue();
                                     }
 
                                     //withdraw gil
-                                    if (P.config.EnabledTasks.Contains(TaskType.WithdrawGil))
+                                    if (OfflineDataManager.GetData(ret.Name).WithdrawGil)
                                     {
-                                        TaskWithdrawGil.Enqueue(100);
+                                        TaskWithdrawGil.Enqueue(OfflineDataManager.GetData(ret.Name).WithdrawGilPercent);
                                     }
+
+                                    P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
                                 }
                             }
                             else
                             {
-                                RetainerListHandlers.CloseRetainerList();
+                                P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
                                 Enabled = false;
                             }
                         }
@@ -79,7 +79,7 @@ namespace AutoRetainer.NewScheduler
                             if (EzThrottler.Throttle("CloseRetainerList", 1000))
                             {
                                 DuoLog.Warning($"Your inventory is full");
-                                RetainerListHandlers.CloseRetainerList();
+                                P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
                                 Enabled = false;
                             }
                         }

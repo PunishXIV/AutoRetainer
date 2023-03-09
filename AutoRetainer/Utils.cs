@@ -41,7 +41,7 @@ internal static unsafe class Utils
                 if (index >= 0 && Utils.IsSelectItemEnabled(addon, index) && GenericThrottle)
                 {
                     ClickSelectString.Using((nint)addon).SelectItem((ushort)index);
-                    PluginLog.Debug($"SelectAssignVenture: selecting {entry}/{index}");
+                    PluginLog.Debug($"SelectAssignVenture: selecting {entry}/{index} as requested by {text.Print()}");
                     return true;
                 }
             }

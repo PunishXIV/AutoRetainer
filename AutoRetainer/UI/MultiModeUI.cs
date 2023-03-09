@@ -204,7 +204,7 @@ internal unsafe static class MultiModeUI
                 ImGui.BeginTable("##ertainertable", 3, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Borders);
                 ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
                 ImGui.TableSetupColumn("Venture");
-                ImGui.TableSetupColumn("Interaction");
+                ImGui.TableSetupColumn("");
                 ImGui.TableHeadersRow();
                 var retainers = P.GetSelectedRetainers(data.CID);
                 for (var i = 0; i < data.RetainerData.Count; i++)
@@ -234,7 +234,20 @@ internal unsafe static class MultiModeUI
                     ImGuiEx.Text($"{(!ret.HasVenture ? "No Venture" : Utils.ToTimeString(ret.GetVentureSecondsRemaining(false)))}");
                     ImGui.TableNextColumn();
                     ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
-                    ImGuiEx.Text($"-");
+                    if (ImGuiEx.IconButton(FontAwesomeIcon.Cogs, $"{data.CID} {ret.Name}"))
+                    {
+                        var n = $"{data.CID} {ret.Name} settings";
+                        ImGui.OpenPopup(n);
+                        if (ImGui.BeginPopup(n))
+                        {
+                            ImGuiEx.Text($"Additional post-venture tasks:");
+                            ImGui.Checkbox($"Entrust duplicates", ref data.RetainerData[i].EntrustDuplicates);
+                            ImGui.Checkbox($"Withdraw gil", ref data.RetainerData[i].WithdrawGil);
+                            ImGui.SetNextItemWidth(200f);
+                            ImGui.InputInt($"Amount, %", ref data.RetainerData[i].WithdrawGilPercent.ValidateRange(1, 100), 1, 10);
+                            ImGui.EndPopup();
+                        }
+                    }
                 }
                 ImGui.EndTable();
                 ImGui.Dummy(new(2, 2));
@@ -256,13 +269,6 @@ internal unsafe static class MultiModeUI
             ImGuiEx.Text(rightText);
             ImGui.PopID();
         }
-        ImGuiEx.ImGuiLineCentered("AYSButtonClear Interaction Timeouts", delegate
-        {
-            if (ImGui.SmallButton("Clear Interaction Timeouts"))
-            {
-                Scheduler.Bans.Clear();
-            }
-        });
 
 
         if (P.config.Verbose && ImGui.CollapsingHeader("Debug"))

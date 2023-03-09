@@ -9,7 +9,7 @@ namespace AutoRetainer.NewScheduler.Handlers
 {
     internal unsafe static class RetainerListHandlers
     {
-        internal static bool SelectRetainerByName(string name)
+        internal static bool? SelectRetainerByName(string name)
         {
             if (name.IsNullOrEmpty())
             {
@@ -23,14 +23,13 @@ namespace AutoRetainer.NewScheduler.Handlers
                     var retainerEntry = (AtkComponentNode*)list->Component->UldManager.NodeList[i];
                     var text = (AtkTextNode*)retainerEntry->Component->UldManager.NodeList[13];
                     var nodeName = text->NodeText.ToString();
-                    PluginLog.Verbose($"Retainer {i} text {nodeName}");
+                    PluginLog.Debug($"Retainer {i} text {nodeName}");
                     if (name == nodeName)
                     {
                         if (Utils.GenericThrottle)
                         {
-                            PluginLog.Verbose($"Selecting {nodeName}");
+                            PluginLog.Debug($"Selecting {nodeName}");
                             ClickRetainerList.Using((IntPtr)retainerList).Select(list, retainerEntry, i - 1);
-                            if (P.config.Verbose) Notify.Success($"Selected retainer {i} {nodeName}");
                             return true;
                         }
                     }
@@ -40,7 +39,7 @@ namespace AutoRetainer.NewScheduler.Handlers
             return false;
         }
 
-        internal static bool CloseRetainerList()
+        internal static bool? CloseRetainerList()
         {
             if (TryGetAddonByName<AtkUnitBase>("RetainerList", out var retainerList) && IsAddonReady(retainerList))
             {
@@ -55,7 +54,7 @@ namespace AutoRetainer.NewScheduler.Handlers
                         }
                     };
                     retainerList->FireCallback(1, v);
-                    PluginLog.Verbose($"Closing retainer window");
+                    PluginLog.Debug($"Closing retainer window");
                     return true;
                 }
             }

@@ -1,4 +1,6 @@
-﻿using AutoRetainer.Offline;
+﻿using AutoRetainer.NewScheduler;
+using AutoRetainer.NewScheduler.Tasks;
+using AutoRetainer.Offline;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using ECommons.CircularBuffers;
@@ -112,8 +114,9 @@ internal unsafe static class MultiMode
                 else if(!IsOccupied() && AnyRetainersAvailable())
                 {
                     EnsureCharacterValidity();
-                    Clicker.InteractWithNearestBell(out var success);
-                    BlockInteraction(success?10:1);
+                    TaskInteractWithNearestBell.Enqueue();
+                    P.TaskManager.Enqueue(() => SchedulerMain.Enabled = true);
+                    BlockInteraction(10);
                     Interactions.PushBack(Environment.TickCount64);
                 }
             }

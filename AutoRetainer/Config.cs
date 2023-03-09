@@ -36,8 +36,6 @@ internal class Config : IEzConfig
     public bool DisableOnClose = false;
     public bool NoTheme = false;
 
-    public HashSet<TaskType> EnabledTasks = new();
-
 
     internal bool AutoCloseRetainerWindow
     {
