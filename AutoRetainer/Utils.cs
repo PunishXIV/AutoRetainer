@@ -1,4 +1,5 @@
-﻿using AutoRetainer.Offline;
+﻿using AutoRetainer.Multi;
+using AutoRetainer.Offline;
 using ClickLib.Clicks;
 using Dalamud;
 using Dalamud.Game.ClientState.Conditions;
@@ -22,6 +23,32 @@ namespace AutoRetainer;
 
 internal static unsafe class Utils
 {
+    internal static GameObject GetReachableRetainerBell()
+    {
+        foreach (var x in Svc.Objects)
+        {
+            if ((x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Consts.BellName, "リテイナーベル"))
+            {
+                if (Vector3.Distance(x.Position, Svc.ClientState.LocalPlayer.Position) < Utils.GetValidInteractionDistance(x) && x.IsTargetable())
+                {
+                    return x;
+                }
+            }
+        }
+        return null;
+    }
+
+
+
+    internal static bool AnyRetainersAvailableCurrentChara()
+    {
+        if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
+        {
+            return data.GetEnabledRetainers().Any(z => z.GetVentureSecondsRemaining() <= P.config.UnsyncCompensation);
+        }
+        return false;
+    }
+
     internal static AdditionalRetainerData GetAdditionalData(ulong cid, string name)
     {
         var key = $"#{cid:X16} {name}";

@@ -1,8 +1,11 @@
-﻿using AutoRetainer.NewScheduler.Handlers;
+﻿using AutoRetainer.Multi;
+using AutoRetainer.NewScheduler.Handlers;
 using AutoRetainer.NewScheduler.Tasks;
 using AutoRetainer.Offline;
+using ECommons.Automation;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,72 +20,108 @@ namespace AutoRetainer.NewScheduler
 
         internal static void Tick()
         {
+            if (!AutoLogin.Instance.IsRunning)
+            {
+                if (P.TaskManager.IsBusy)
+                {
+                    if (YesAlready.IsEnabled())
+                    {
+                        YesAlready.DisableIfNeeded();
+                    }
+                }
+                else
+                {
+                    if (YesAlready.Reenable)
+                    {
+                        YesAlready.EnableIfNeeded();
+                    }
+                }
+            }
+
+
             if (Enabled)
             {
-                if (TryGetAddonByName<AtkUnitBase>("RetainerList", out var addon) && addon->IsVisible && Utils.GenericThrottle)
+                if (TryGetAddonByName<AtkUnitBase>("RetainerList", out var addon) && addon->IsVisible)
                 {
-                    if (!P.TaskManager.IsBusy)
+                    if (Utils.GenericThrottle)
                     {
-                        if (Utils.IsInventoryFree())
+                        if (!P.TaskManager.IsBusy)
                         {
-                            var retainer = GetNextRetainerName();
-                            if (retainer != null && Utils.TryGetRetainerByName(retainer, out var ret))
+                            if (Utils.IsInventoryFree())
                             {
-                                if (EzThrottler.Throttle("ScheduleSelectRetainer", 5000))
+                                var retainer = GetNextRetainerName();
+                                if (retainer != null && Utils.TryGetRetainerByName(retainer, out var ret))
                                 {
-                                    P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(retainer));
-
-                                    //resend retainer
-
-                                    if (ret.VentureID != 0)
+                                    if (EzThrottler.Throttle("ScheduleSelectRetainer", 5000))
                                     {
-                                        if (P.config.DontReassign)
+                                        P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(retainer));
+
+                                        //resend retainer
+
+                                        if (ret.VentureID != 0)
                                         {
-                                            TaskCollectVenture.Enqueue();
+                                            if (P.config.DontReassign)
+                                            {
+                                                TaskCollectVenture.Enqueue();
+                                            }
+                                            else
+                                            {
+                                                TaskReassignVenture.Enqueue();
+                                            }
                                         }
                                         else
                                         {
-                                            TaskReassignVenture.Enqueue();
+                                            if (P.config.EnableAssigningQuickExploration)
+                                            {
+                                                TaskAssignQuickVenture.Enqueue();
+                                            }
                                         }
-                                    }
-                                    else
-                                    {
-                                        if (P.config.EnableAssigningQuickExploration)
+
+                                        var adata = Utils.GetAdditionalData(Svc.ClientState.LocalContentId, ret.Name.ToString());
+
+                                        //entrust duplicates
+                                        if (adata.EntrustDuplicates)
                                         {
-                                            TaskAssignQuickVenture.Enqueue();
+                                            TaskEntrustDuplicates.Enqueue();
                                         }
+
+                                        //withdraw gil
+                                        if (adata.WithdrawGil)
+                                        {
+                                            TaskWithdrawGil.Enqueue(adata.WithdrawGilPercent);
+                                        }
+
+                                        P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
                                     }
-
-                                    var adata = Utils.GetAdditionalData(Svc.ClientState.LocalContentId, ret.Name.ToString());
-
-                                    //entrust duplicates
-                                    if (adata.EntrustDuplicates)
-                                    {
-                                        TaskEntrustDuplicates.Enqueue();
-                                    }
-
-                                    //withdraw gil
-                                    if (adata.WithdrawGil)
-                                    {
-                                        TaskWithdrawGil.Enqueue(adata.WithdrawGilPercent);
-                                    }
-
-                                    P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
+                                }
+                                else
+                                {
+                                    if(P.config.AutoCloseRetainerWindow) P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
+                                    if(P.config.AutoEnableDisable) Enabled = false;
                                 }
                             }
                             else
                             {
-                                P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
-                                Enabled = false;
+                                if (EzThrottler.Throttle("CloseRetainerList", 1000))
+                                {
+                                    DuoLog.Warning($"Your inventory is full");
+                                    P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
+                                    Enabled = false;
+                                }
                             }
                         }
-                        else
+                    }
+                }
+                else
+                {
+                    //DuoLog.Information($"123");
+                    if(P.config.AutoUseRetainerBell)
+                    {
+                        if (!IsOccupied() && Utils.AnyRetainersAvailableCurrentChara())
                         {
-                            if (EzThrottler.Throttle("CloseRetainerList", 1000))
+                            if (EzThrottler.Throttle("InteractWithBellGeneralEnqueue", 5000))
                             {
-                                DuoLog.Warning($"Your inventory is full");
-                                P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
-                                Enabled = false;
+                                TaskInteractWithNearestBell.Enqueue();
                             }
                         }
                     }

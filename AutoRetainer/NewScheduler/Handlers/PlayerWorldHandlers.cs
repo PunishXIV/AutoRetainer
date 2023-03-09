@@ -18,19 +18,14 @@ namespace AutoRetainer.NewScheduler.Handlers
         {
             if (!IsOccupied())
             {
-                foreach (var x in Svc.Objects)
+                var x = Utils.GetReachableRetainerBell();
+                if(x != null)
                 {
-                    if ((x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Consts.BellName, "リテイナーベル"))
+                    if (Utils.GenericThrottle)
                     {
-                        if (Vector3.Distance(x.Position, Svc.ClientState.LocalPlayer.Position) < Utils.GetValidInteractionDistance(x) && x.IsTargetable())
-                        {
-                            if (Utils.GenericThrottle)
-                            {
-                                Svc.Targets.SetTarget(x);
-                                PluginLog.Debug($"Set target to {x}");
-                                return true;
-                            }
-                        }
+                        Svc.Targets.SetTarget(x);
+                        PluginLog.Debug($"Set target to {x}");
+                        return true;
                     }
                 }
             }

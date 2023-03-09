@@ -92,6 +92,9 @@
 	  <None Update="res\bell.png">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
+	  <None Update="res\bellcrossed.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	  <None Update="res\login.png">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>

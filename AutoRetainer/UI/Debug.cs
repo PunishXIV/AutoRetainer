@@ -43,6 +43,7 @@ internal unsafe static class Debug
                 }*/
                 //in next life I guess
             }
+            ImGuiEx.Text($"Utils.AnyRetainersAvailableCurrentChara(): {Utils.AnyRetainersAvailableCurrentChara()}");
             if (ImGui.Button($"SelectAssignVenture"))
             {
                 DuoLog.Information($"{RetainerHandlers.SelectAssignVenture()}");

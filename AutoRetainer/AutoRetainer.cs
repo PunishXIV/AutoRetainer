@@ -66,6 +66,7 @@ public class AutoRetainer : IDalamudPlugin
             AutoGCHandin.Init();
 
             ws.AddWindow(new MultiModeOverlay());
+            ws.AddWindow(new RetainerListOverlay());
             MultiMode.Init();
 
             Style = StyleModel.Deserialize("DS1H4sIAAAAAAAACqVYS3ObOhT+L6w9HZ4CvGuS22bRdDJNOu29OxkrNjUxFGP3kcl/75F0jiSwO3MBb4Swvu+8jyRePO4tgzf+wlt5yxfvq7fM5ORfNb4uvMJb+vLFGkeBq3xc5b9JYNUTcCy8Db7eImOJc77Ch28IZggOlYgd/lvh+IyrYlzF1Kr9AKvf1hffNvg2wreRevsd1FLGtfAAohfegR46NPuIKpxw/IHjTxx/GesTx/rfZz6R4ji/qEVRg50v3qP42RlY5kd5GDAEZ3KSpAvvPznLE5axMAV5X5RbgUJib8oDX1VibThY4ueZHyMHS7M4CmLkUJMojR2OL+V+Xf+42ljVmfqlZIGZKobAT7IsjBKX4npbVuuJDNpF93VzbFyGjLAZouSDWp7HsP6qbteitcvzOAhSRqGwUy0wVh7RjoNA+UHO/MywPGw5OGCG8u9a/iwc5QMZNZYRg5Qm/Y4MoSYkcxKtqqW5rU+idcIZpkok2Rb24hklIdgaIldsWd4WXXmyJRoZFyiSyKSSYokpzxQLQ4Eyv8quErNSAxkG6kzmua6rijcHxz3jqe7E/njFWzdgVCzGr4ELeChaELvqQcZniWF538o2OD5XgnOayblygWtyxlAPEMXujre7v/ShLJdlFyCeyS4UMleXqoRa7PlmrDWGYaYpV8euq2mXgQWhkhUi3KxX6CRM4tx3C1Cjh5GJQQEAEkkCNR+nxhuyBcRUf7lW13INzEnkWp/2CEYcWkB0TnIruNsrR3WnSJJEeWRoZnSnzJDMjM+DaHjLu3qiTbb/G6IZVtGO6tLNaL5O3D6JQ/lbvG/LZnq3sBwzW4Ulmhm8x2nND9IHW6rmmBMxWT5JrnlmhKrH83n/VBdHd2MaZVyeyj4yoJrp6Zu62JX7zX0rTqWw55tYNizQBmlSfeQ0h8xeP0tNqSDZP89N98vZBqmfhWSWI/++qrsP5V4c7I4QUNOyne8SYBjcnOKne6f2A2nMdF4kA6Lb8tDVGzgMWZZe38yk82LyHqPZZY4zhfrndHST2RLk8dOtQghqJXTr6x0TTWpc8J7C4AG1a+u9xUXkRfmA+X0Z+KHcbO3dQu4NOlgmCc9wnybfBPwByduKJKsbIBCoEZBq1AiGd5gHUYmiE+4dYkyaRnppKPO05Zubtm4eebsR3ejYw0qT8h/56RYcWPWcmMCxBUSbwEsXUJuxWWGcChz6fgW1MyT7u1/SAfKmfHY8Q1cjyjfqIdL8u3rNK437f6AoeZVXargzeEvvmndNcyyKcu/BPV9fT/nkKlyNObEE9I1h7HlJA9fjT2saaNtrxqIwN+0arEkZ1Ukegzj3RvA09cK+mdpCthMKQyNLG4aeS/tFkOk90sHRJxrJKTcy6Q0dPwkzoUhVHji43cSGWxmcqSptoNn2tIFmHzVI2+IJQxXpxmw/8WJST639xhqkdTafZEi+Rp67Ar5PTcsSeyI2XtK43tkj143b1dXu0WOCBkDYF+Gf1z+6Z+sXPRQAAA==");
@@ -124,7 +125,7 @@ public class AutoRetainer : IDalamudPlugin
 
     private void Tick(Framework framework)
     {
-        if (Svc.Condition[ConditionFlag.OccupiedSummoningBell] && P.retainerManager.Ready && Svc.ClientState.LocalPlayer != null)
+        if (SchedulerMain.Enabled && Svc.ClientState.LocalPlayer != null)
         {
             SchedulerMain.Tick();
             if (!P.config.SelectedRetainers.ContainsKey(Svc.ClientState.LocalContentId))
@@ -196,11 +197,6 @@ public class AutoRetainer : IDalamudPlugin
 
     private void ConditionChange(ConditionFlag flag, bool value)
     {
-        if (NoConditionEvent)
-        {
-            NoConditionEvent = false;
-            if(!MultiMode.Enabled) return;
-        }
         if(flag == ConditionFlag.OccupiedSummoningBell)
         {
             if (value)
@@ -209,7 +205,7 @@ public class AutoRetainer : IDalamudPlugin
                 {
                     if (!ImGui.GetIO().KeyShift || MultiMode.Enabled)
                     {
-                        //SchedulerMain.Enabled = true;
+                        SchedulerMain.Enabled = true;
                         if(P.config.OpenOnEnable) configGui.IsOpen = true;
                     }
                     else
@@ -220,10 +216,10 @@ public class AutoRetainer : IDalamudPlugin
             }
             else
             {
-                if (config.AutoEnableDisable || MultiMode.Enabled)
+                if (/*config.AutoEnableDisable ||*/ MultiMode.Enabled)
                 {
-                    //DisablePlugin();
-                    if(!MultiMode.Enabled) configGui.IsOpen = false;
+                    SchedulerMain.Enabled = false;
+                    if (P.config.OpenOnEnable) configGui.IsOpen = false;
                 }
             }
         }
