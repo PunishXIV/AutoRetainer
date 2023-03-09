@@ -75,7 +75,7 @@ internal unsafe class Clicker
 
     static void VerifyClick(ActionType type)
     {
-        if(type == lastAction)
+        /*if(type == lastAction)
         {
             P.DisablePlugin();
             var t = $"[{P.Name}] Emergency shutdown due to attempt to execute multiple actions of the same type";
@@ -86,7 +86,7 @@ internal unsafe class Clicker
         else
         {
             lastAction = type;
-        }
+        }*/
     }
 
     internal static void SelectVentureMenu()
@@ -179,7 +179,7 @@ internal unsafe class Clicker
             if (ventures < 2)
             {
                 PluginLog.Error("Not enough ventures");
-                P.DisablePlugin();
+                //P.DisablePlugin();
                 return;
             }
             if (!addon->ReassignButton->IsEnabled)
@@ -218,7 +218,7 @@ internal unsafe class Clicker
             if (ventures < 2)
             {
                 PluginLog.Error("Not enough ventures");
-                P.DisablePlugin();
+                //P.DisablePlugin();
                 return;
             }
             if (!addon->AssignButton->IsEnabled)

@@ -140,24 +140,12 @@ public class AutoRetainer : IDalamudPlugin
 
     private void Toasts_ErrorToast(ref Dalamud.Game.Text.SeStringHandling.SeString message, ref bool isHandled)
     {
-        var text = message.ExtractText();
-        //10350	60	8	0	False	You have no applicable items to entrust.
-
-        if (text == Svc.Data.GetExcelSheet<LogMessage>().GetRow(10350).Text.ToDalamudString().ExtractText())
+        if (P.TaskManager.IsBusy)
         {
-            TaskEntrustDuplicates.NoDuplicates = true;
-        }
-        if (IsEnabled())
-        {
-            if (message.ToString().Equals(Svc.Data.GetExcelSheet<LogMessage>().GetRow(1308).Text.ToString(), StringComparison.OrdinalIgnoreCase))
+            var text = message.ExtractText();
+            if (text == Svc.Data.GetExcelSheet<LogMessage>().GetRow(10350).Text.ToDalamudString().ExtractText())
             {
-                Clicker.lastAction = ActionType.None;
-                PluginLog.Warning("Detected error 1308");
-            }
-            else if (message.ToString().Equals(Svc.Data.GetExcelSheet<LogMessage>().GetRow(648).Text.ToString(), StringComparison.OrdinalIgnoreCase))
-            {
-                message = $"{message} AutoRetainer is shutting down.";
-                DisablePlugin();
+                TaskEntrustDuplicates.NoDuplicates = true;
             }
         }
         if (!Svc.ClientState.IsLoggedIn)
@@ -171,14 +159,12 @@ public class AutoRetainer : IDalamudPlugin
 
                 MultiMode.Enabled = false;
                 AutoLogin.Instance.Abort();
-
             }
         }
     }
 
     public void Dispose()
     {
-        Safe(DisablePlugin);
         Safe(this.quickSellItems.Disable);
         Safe(this.quickSellItems.Dispose);
         Svc.PluginInterface.UiBuilder.Draw -= ws.Draw;
@@ -229,7 +215,7 @@ public class AutoRetainer : IDalamudPlugin
                         {
                             Scheduler.turbo = true;
                         }
-                        EnablePlugin();
+                        SchedulerMain.Enabled = true;
                         if(P.config.OpenOnEnable) configGui.IsOpen = true;
                     }
                     else
@@ -261,10 +247,10 @@ public class AutoRetainer : IDalamudPlugin
 
     }
 
-    internal bool IsEnabled()
+    /*internal bool IsEnabled()
     {
         return this.Enabled;
-    }
+    }*/
 
     internal void EnablePlugin()
     {

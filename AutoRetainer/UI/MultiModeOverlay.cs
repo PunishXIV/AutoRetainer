@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.Multi;
+using AutoRetainer.NewScheduler;
 using Dalamud.Game.ClientState.Conditions;
 using ImGuiScene;
 using System.IO;
@@ -61,7 +62,7 @@ internal class MultiModeOverlay : Window
                 ImGuiEx.Text($"loading login.png");
             }
         }
-        else if (P.IsEnabled() && !P.configGui.IsOpen)
+        else if (false && !P.configGui.IsOpen)
         {
             if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "bell.png"), out var t))
             {
@@ -75,7 +76,7 @@ internal class MultiModeOverlay : Window
                     }
                     if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
                     {
-                        P.DisablePlugin();
+                        SchedulerMain.Enabled = false;
                     }
                     ImGui.SetTooltip("AutoRetainer enabled. \nLeft click - open AutoRetainer. \nRight click - disable AutoRetainer.");
                 }

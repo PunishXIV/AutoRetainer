@@ -19,7 +19,7 @@ internal unsafe class Scheduler
 
     internal static void Tick()
     {
-        if (P.IsEnabled())
+        /*if (P.IsEnabled())
         {
             if (Svc.ClientState.LocalPlayer != null)
             {
@@ -32,7 +32,7 @@ internal unsafe class Scheduler
         else
         {
             Clicker.lastAction = ActionType.None;
-        }
+        }*/
     }
 
     static bool EnsureInventorySpace()
@@ -41,7 +41,7 @@ internal unsafe class Scheduler
         {
             Log("Inventory is full");
             DuoLog.Warning("Your inventory is full.");
-            P.DisablePlugin();
+           //P.DisablePlugin();
             return false;
         }
         return true;
@@ -52,13 +52,13 @@ internal unsafe class Scheduler
         if(Svc.ClientState.LocalPlayer?.HomeWorld.Id != Svc.ClientState.LocalPlayer?.CurrentWorld.Id)
         {
             Notify.Error("You are visiting different world");
-            P.DisablePlugin();
+            //P.DisablePlugin();
             return;
         }
         if(ConfigModule.Instance()->GetIntValue((short)ConfigOption.IdlingCameraAFK) != 0)
         {
             DuoLog.Error("Please go to System settings - Other and disable idle afk camera.");
-            P.DisablePlugin();
+            //P.DisablePlugin();
             return;
         }
         if (P.TaskManager.IsBusy)

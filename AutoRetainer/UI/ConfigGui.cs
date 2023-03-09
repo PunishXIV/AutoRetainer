@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.Multi;
+using AutoRetainer.NewScheduler;
 using AutoRetainer.Statistics;
 using ECommons.Configuration;
 using ECommons.Reflection;
@@ -30,17 +31,9 @@ unsafe internal class ConfigGui : Window
 
     public override void Draw()
     {
-        var en = P.IsEnabled();
-        if (ImGui.Checkbox($"Enable {P.Name}", ref en))
+        if (ImGui.Checkbox($"Enable {P.Name}", ref SchedulerMain.Enabled))
         {
-            if (en)
-            {
-                P.EnablePlugin();
-            }
-            else
-            {
-                P.DisablePlugin();
-            }
+            
         }
         ImGui.SameLine();
         ImGui.Checkbox("Auto Enable", ref P.config.AutoEnableDisable);
@@ -80,7 +73,7 @@ unsafe internal class ConfigGui : Window
         EzConfig.Save();
         if (P.config.DisableOnClose) 
         {
-            P.DisablePlugin();
+            SchedulerMain.Enabled = false;
             StatisticsUI.Data.Clear();
             Notify.Success("Auto Retainer disabled");
         }
