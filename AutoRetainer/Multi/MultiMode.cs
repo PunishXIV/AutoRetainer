@@ -89,6 +89,16 @@ internal unsafe static class MultiMode
                     return;
                 }
             }
+            if(ProperOnLogin.PlayerPresent && !AutoLogin.Instance.IsRunning)
+            {
+                if (!Utils.IsInventoryFree())
+                {
+                    if(P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
+                    {
+                        data.Enabled = false;
+                    }
+                }
+            }
             if(ProperOnLogin.PlayerPresent && !AutoLogin.Instance.IsRunning && IsInteractionAllowed()
                 && (!Synchronize || P.config.OfflineData.All(x => x.GetEnabledRetainers().All(z => z.GetVentureSecondsRemaining() <= P.config.UnsyncCompensation))))
             {
@@ -113,11 +123,15 @@ internal unsafe static class MultiMode
                 }
                 else if(!IsOccupied() && AnyRetainersAvailable())
                 {
+                    DuoLog.Information($"1234");
                     EnsureCharacterValidity();
-                    TaskInteractWithNearestBell.Enqueue();
-                    P.TaskManager.Enqueue(() => SchedulerMain.Enabled = true);
-                    BlockInteraction(10);
-                    Interactions.PushBack(Environment.TickCount64);
+                    if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data) && data.Enabled)
+                    {
+                        TaskInteractWithNearestBell.Enqueue();
+                        P.TaskManager.Enqueue(() => SchedulerMain.Enabled = true);
+                        BlockInteraction(10);
+                        Interactions.PushBack(Environment.TickCount64);
+                    }
                 }
             }
         }

@@ -31,8 +31,15 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-		<OutputPath>$(DalamudDevPlugins)</OutputPath>
+      <OutputPath>bin/Debug</OutputPath>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+      <PostBuildEvent>
+          rmdir .\Debug /s /q
+          ping localhost -n 2 &gt;nul
+          powershell Compress-Archive .\* ..\$(MSBuildProjectName)-$(Version).zip
+          mkdir .\Debug
+          move ..\$(MSBuildProjectName)-$(Version).zip .\Debug\$(MSBuildProjectName).zip
+      </PostBuildEvent>
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(Configuration)' == 'Release'">
