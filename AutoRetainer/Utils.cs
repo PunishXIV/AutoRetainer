@@ -23,6 +23,31 @@ namespace AutoRetainer;
 
 internal static unsafe class Utils
 {
+    internal static string GetActivePlayerInventoryName()
+    {
+        {
+            if (TryGetAddonByName<AtkUnitBase>("InventoryLarge", out var addon) && addon->IsVisible)
+            {
+                return "InventoryLarge";
+            }
+        }
+        {
+            if (TryGetAddonByName<AtkUnitBase>("InventoryExpansion", out var addon) && addon->IsVisible)
+            {
+                return "InventoryExpansion";
+            }
+        }
+        return "Inventory";
+    }
+    internal static (string Name, int EntrustDuplicatesIndex) GetActiveRetainerInventoryName()
+    {
+        if (TryGetAddonByName<AtkUnitBase>("InventoryRetainerLarge", out var addon) && addon->IsVisible)
+        {
+            return ("InventoryRetainerLarge", 8);
+        }
+        return ("InventoryRetainer", 5);
+    }
+
     internal static GameObject GetReachableRetainerBell()
     {
         foreach (var x in Svc.Objects)

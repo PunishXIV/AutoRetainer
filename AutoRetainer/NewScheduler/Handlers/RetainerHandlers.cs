@@ -127,12 +127,13 @@ namespace AutoRetainer.NewScheduler.Handlers
 
         internal static bool? ClickEntrustDuplicates()
         {
-            if (TryGetAddonByName<AtkUnitBase>("InventoryRetainerLarge", out var addon) && IsAddonReady(addon))
+            var invName = Utils.GetActiveRetainerInventoryName();
+            if (TryGetAddonByName<AtkUnitBase>(invName.Name, out var addon) && IsAddonReady(addon))
             {
-                var button = (AtkComponentButton*)addon->UldManager.NodeList[8]->GetComponent();
-                if (addon->UldManager.NodeList[8]->IsVisible && button->IsEnabled && Utils.GenericThrottle)
+                var button = (AtkComponentButton*)addon->UldManager.NodeList[invName.EntrustDuplicatesIndex]->GetComponent();
+                if (addon->UldManager.NodeList[invName.EntrustDuplicatesIndex]->IsVisible && button->IsEnabled && Utils.GenericThrottle)
                 {
-                    new ClickButtonGeneric(addon, "InventoryRetainerLarge").Click(button);
+                    new ClickButtonGeneric(addon, invName.Name).Click(button);
                     PluginLog.Debug($"Clicked entrust duplicates");
                     return true;
                 }
@@ -187,13 +188,13 @@ namespace AutoRetainer.NewScheduler.Handlers
 
         internal static bool? CloseRetainerInventory()
         {
-            if (TryGetAddonByName<AtkUnitBase>("InventoryRetainerLarge", out var addon) && IsAddonReady(addon))
+            if (TryGetAddonByName<AtkUnitBase>(Utils.GetActiveRetainerInventoryName().Name, out var addon) && IsAddonReady(addon))
             {
                 if (Utils.GenericThrottle)
                 {
                     addon->Hide(true);
                     PluginLog.Debug($"Hiding retainer inventory");
-                    if (TryGetAddonByName<AtkUnitBase>("InventoryLarge", out var iaddon) && IsAddonReady(iaddon))
+                    if (TryGetAddonByName<AtkUnitBase>(Utils.GetActivePlayerInventoryName(), out var iaddon) && IsAddonReady(iaddon))
                     {
                         PluginLog.Debug($"Hiding player inventory");
                         iaddon->Hide(true);
