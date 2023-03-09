@@ -35,6 +35,7 @@ internal class Config : IEzConfig
     public bool UseServerTime = true;
     public bool DisableOnClose = false;
     public bool NoTheme = false;
+    public Dictionary<string, AdditionalRetainerData> AdditionalData = new();
 
 
     internal bool AutoCloseRetainerWindow

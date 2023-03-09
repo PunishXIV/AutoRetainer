@@ -22,6 +22,16 @@ namespace AutoRetainer;
 
 internal static unsafe class Utils
 {
+    internal static AdditionalRetainerData GetAdditionalData(ulong cid, string name)
+    {
+        var key = $"#{cid:X16} {name}";
+        if (!P.config.AdditionalData.ContainsKey(key))
+        {
+            P.config.AdditionalData[key] = new();
+        }
+        return P.config.AdditionalData[key];
+    }
+
     internal static bool GenericThrottle => EzThrottler.Throttle("AutoRetainerGenericThrottle", 200);
     internal static void RethrottleGeneric(int num = 200) => EzThrottler.Throttle("AutoRetainerGenericThrottle", num, true);
 

@@ -211,6 +211,7 @@ internal unsafe static class MultiModeUI
                 {
                     var ret = data.RetainerData[i];
                     if (ret.Level == 0 || ret.Name.ToString().IsNullOrEmpty()) continue;
+                    var adata = Utils.GetAdditionalData(data.CID, ret.Name);
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
                     ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
@@ -227,6 +228,20 @@ internal unsafe static class MultiModeUI
                             retainers.Remove(ret.Name.ToString());
                         }
                     }
+                    if (adata.EntrustDuplicates)
+                    {
+                        ImGui.SameLine();
+                        ImGui.PushFont(UiBuilder.IconFont);
+                        ImGuiEx.Text($"\uf24d");
+                        ImGui.PopFont();
+                    }
+                    if (adata.WithdrawGil)
+                    {
+                        ImGui.SameLine();
+                        ImGui.PushFont(UiBuilder.IconFont);
+                        ImGuiEx.Text($"\uf51e");
+                        ImGui.PopFont();
+                    }
                     var end = ImGui.GetCursorPos();
                     bars[$"{data.CID}{data.RetainerData[i].Name}"] = (start, end);
                     ImGui.TableNextColumn();
@@ -234,19 +249,19 @@ internal unsafe static class MultiModeUI
                     ImGuiEx.Text($"{(!ret.HasVenture ? "No Venture" : Utils.ToTimeString(ret.GetVentureSecondsRemaining(false)))}");
                     ImGui.TableNextColumn();
                     ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
+                    var n = $"{data.CID} {ret.Name} settings";
                     if (ImGuiEx.IconButton(FontAwesomeIcon.Cogs, $"{data.CID} {ret.Name}"))
                     {
-                        var n = $"{data.CID} {ret.Name} settings";
                         ImGui.OpenPopup(n);
-                        if (ImGui.BeginPopup(n))
-                        {
-                            ImGuiEx.Text($"Additional post-venture tasks:");
-                            ImGui.Checkbox($"Entrust duplicates", ref data.RetainerData[i].EntrustDuplicates);
-                            ImGui.Checkbox($"Withdraw gil", ref data.RetainerData[i].WithdrawGil);
-                            ImGui.SetNextItemWidth(200f);
-                            ImGui.InputInt($"Amount, %", ref data.RetainerData[i].WithdrawGilPercent.ValidateRange(1, 100), 1, 10);
-                            ImGui.EndPopup();
-                        }
+                    }
+                    if (ImGui.BeginPopup(n))
+                    {
+                        ImGuiEx.Text($"Additional post-venture tasks:");
+                        ImGui.Checkbox($"Entrust duplicates", ref adata.EntrustDuplicates);
+                        ImGui.Checkbox($"Withdraw gil", ref adata.WithdrawGil);
+                        ImGui.SetNextItemWidth(200f);
+                        ImGui.InputInt($"Amount, %", ref adata.WithdrawGilPercent.ValidateRange(1, 100), 1, 10);
+                        ImGui.EndPopup();
                     }
                 }
                 ImGui.EndTable();

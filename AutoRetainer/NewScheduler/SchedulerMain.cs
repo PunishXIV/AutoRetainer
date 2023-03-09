@@ -53,16 +53,18 @@ namespace AutoRetainer.NewScheduler
                                         }
                                     }
 
+                                    var adata = Utils.GetAdditionalData(Svc.ClientState.LocalContentId, ret.Name.ToString());
+
                                     //entrust duplicates
-                                    if (OfflineDataManager.GetData(ret.Name).EntrustDuplicates)
+                                    if (adata.EntrustDuplicates)
                                     {
                                         TaskEntrustDuplicates.Enqueue();
                                     }
 
                                     //withdraw gil
-                                    if (OfflineDataManager.GetData(ret.Name).WithdrawGil)
+                                    if (adata.WithdrawGil)
                                     {
-                                        TaskWithdrawGil.Enqueue(OfflineDataManager.GetData(ret.Name).WithdrawGilPercent);
+                                        TaskWithdrawGil.Enqueue(adata.WithdrawGilPercent);
                                     }
 
                                     P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);

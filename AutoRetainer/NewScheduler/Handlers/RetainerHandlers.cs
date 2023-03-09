@@ -291,7 +291,7 @@ namespace AutoRetainer.NewScheduler.Handlers
             {
                 Utils.RethrottleGeneric();
             }
-            return true;
+            return false;
         }
     }
 }
