@@ -234,7 +234,7 @@ internal unsafe static class MultiModeUI
                     ImGuiEx.Text($"{(!ret.HasVenture ? "No Venture" : Utils.ToTimeString(ret.GetVentureSecondsRemaining(false)))}");
                     ImGui.TableNextColumn();
                     ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
-                    ImGuiEx.Text($"{Utils.ToTimeString(Scheduler.GetRemainingBanTime(ret.Name.ToString()))}");
+                    ImGuiEx.Text($"-");
                 }
                 ImGui.EndTable();
                 ImGui.Dummy(new(2, 2));

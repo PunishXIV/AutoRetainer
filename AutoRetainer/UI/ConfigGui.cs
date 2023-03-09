@@ -41,11 +41,6 @@ unsafe internal class ConfigGui : Window
         ImGui.SameLine();
         ImGui.Checkbox("Multi", ref MultiMode.Enabled);
 
-        if (Scheduler.turbo)
-        {
-            ImGui.SameLine();
-            ImGuiEx.Text(Environment.TickCount % 1000 > 500 ? ImGuiColors.DalamudRed : ImGuiColors.DalamudYellow, "Turbo active");
-        }
         ImGuiEx.EzTabBar("tabbar",
 
                 ("Retainers", MultiModeUI.Draw, null, true),

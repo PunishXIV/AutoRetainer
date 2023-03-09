@@ -203,19 +203,13 @@ public class AutoRetainer : IDalamudPlugin
         }
         if(flag == ConditionFlag.OccupiedSummoningBell)
         {
-            Clicker.lastAction = ActionType.None;
             if (value)
             {
                 if ((config.AutoEnableDisable || MultiMode.Enabled) && Svc.Targets.Target.IsRetainerBell() && Svc.ClientState.LocalPlayer?.HomeWorld.Id == Svc.ClientState.LocalPlayer?.CurrentWorld.Id)
                 {
                     if (!ImGui.GetIO().KeyShift || MultiMode.Enabled)
                     {
-                        Scheduler.Bans.Clear();
-                        if (config.TurboMode)
-                        {
-                            Scheduler.turbo = true;
-                        }
-                        SchedulerMain.Enabled = true;
+                        //SchedulerMain.Enabled = true;
                         if(P.config.OpenOnEnable) configGui.IsOpen = true;
                     }
                     else
@@ -223,13 +217,12 @@ public class AutoRetainer : IDalamudPlugin
                         Notify.Info("Requested to suppress enabling");
                     }
                 }
-                Clicker.RecordClickTime(1500);
             }
             else
             {
                 if (config.AutoEnableDisable || MultiMode.Enabled)
                 {
-                    DisablePlugin();
+                    //DisablePlugin();
                     if(!MultiMode.Enabled) configGui.IsOpen = false;
                 }
             }
@@ -238,7 +231,7 @@ public class AutoRetainer : IDalamudPlugin
 
     void Logout(object _, object __)
     {
-        DisablePlugin();
+        SchedulerMain.Enabled = false;
 
         if (!AutoLogin.Instance.IsRunning)
         {
@@ -252,17 +245,17 @@ public class AutoRetainer : IDalamudPlugin
         return this.Enabled;
     }*/
 
-    internal void EnablePlugin()
+    /*internal void EnablePlugin()
     {
         if (P.Enabled) return;
         AddonLifeTracker.Reset();
         P.Enabled = true;
-    }
+    }*/
 
-    internal void DisablePlugin()
+    /*internal void DisablePlugin()
     {
         if (!P.Enabled) return;
         P.Enabled = false;
         Scheduler.turbo = false;
-    }
+    }*/
 }

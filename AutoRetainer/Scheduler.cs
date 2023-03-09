@@ -8,7 +8,7 @@ using static AutoRetainer.Utils;
 
 namespace AutoRetainer;
 
-internal unsafe class Scheduler
+/*internal unsafe class Scheduler
 {
     internal static Dictionary<string, long> Bans = new();
     internal static bool turbo = false;
@@ -19,7 +19,7 @@ internal unsafe class Scheduler
 
     internal static void Tick()
     {
-        /*if (P.IsEnabled())
+        if (P.IsEnabled())
         {
             if (Svc.ClientState.LocalPlayer != null)
             {
@@ -32,7 +32,7 @@ internal unsafe class Scheduler
         else
         {
             Clicker.lastAction = ActionType.None;
-        }*/
+        }
     }
 
     static bool EnsureInventorySpace()
@@ -170,27 +170,6 @@ internal unsafe class Scheduler
                         Log($"Retainer {retName} exiting");
                         Clicker.SelectQuit();
                     }
-                    /*else
-                    {
-                        if (P.config.SS)
-                        {
-                            DuoLog.Information($"Instead of exiting, injecting additional tasks");
-                            var x = () =>
-                            {
-                                if (new Random().Next(0, 50) == 0)
-                                {
-                                    DuoLog.Information($"Task simulation completed!");
-                                    return true;
-                                }
-                                return false;
-                            };
-
-                            P.TaskManager.Enqueue(x);
-                            P.TaskManager.Enqueue(x);
-                            P.TaskManager.Enqueue(x);
-                        }
-                        IsDoneConsolidating = true;
-                    }*/
                 }
             }
             else if (TryGetAddonByName<AddonRetainerTaskAsk>("RetainerTaskAsk", out var addon3) && IsAddonReady(&addon3->AtkUnitBase) && IsCurrentRetainerEnabled())
@@ -262,3 +241,4 @@ internal unsafe class Scheduler
         return null;
     }
 }
+*/

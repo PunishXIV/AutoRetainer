@@ -109,7 +109,7 @@ internal unsafe static class MultiMode
                         Interactions.PushBack(Environment.TickCount64);
                     }
                 }
-                else if(!IsOccupied() && Clicker.IsClickAllowed() && AnyRetainersAvailable())
+                else if(!IsOccupied() && AnyRetainersAvailable())
                 {
                     EnsureCharacterValidity();
                     Clicker.InteractWithNearestBell(out var success);

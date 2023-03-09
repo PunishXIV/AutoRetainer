@@ -10,7 +10,7 @@ using ObjectKind = Dalamud.Game.ClientState.Objects.Enums.ObjectKind;
 
 namespace AutoRetainer;
 
-internal unsafe class Clicker
+/*internal unsafe class Clicker
 {
     static long NextClickAt = 0;
     internal static ActionType lastAction = ActionType.None;
@@ -75,7 +75,7 @@ internal unsafe class Clicker
 
     static void VerifyClick(ActionType type)
     {
-        /*if(type == lastAction)
+        if(type == lastAction)
         {
             P.DisablePlugin();
             var t = $"[{P.Name}] Emergency shutdown due to attempt to execute multiple actions of the same type";
@@ -86,7 +86,7 @@ internal unsafe class Clicker
         else
         {
             lastAction = type;
-        }*/
+        }
     }
 
     internal static void SelectVentureMenu()
@@ -361,3 +361,4 @@ internal unsafe class Clicker
         return false;
     }
 }
+*/

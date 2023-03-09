@@ -201,44 +201,18 @@ internal unsafe static class Debug
                 ImGuiEx.Text($"Target hitbox: {Svc.Targets.Target.HitboxRadius}");
                 ImGuiEx.Text($"Distance to target's hitbox: {Vector3.Distance(Svc.ClientState.LocalPlayer.Position, Svc.Targets.Target.Position) - Svc.Targets.Target.HitboxRadius}");
             }
-            ImGuiEx.Text($"Random: {Scheduler.RandomAddition}");
             ImGuiEx.Text($"Free inventory slots: {Utils.GetInventoryFreeSlotCount()}");
-            ImGuiEx.Text($"Last action: {Clicker.lastAction}");
             for (var i = 0; i < P.retainerManager.Count; i++)
             {
                 var ret = P.retainerManager.Retainer(i);
-                ImGuiEx.Text($"{ret.Name}\n           {ret.VentureID} {ret.VentureComplete} {ret.GetVentureSecondsRemaining()}/{ret.GetVentureSecondsRemaining()} Banned: {Scheduler.IsBanned(ret.Name.ToString())}");
+                ImGuiEx.Text($"{ret.Name}\n           {ret.VentureID} {ret.VentureComplete} {ret.GetVentureSecondsRemaining()}/{ret.GetVentureSecondsRemaining()}");
                 if (SafeMemory.ReadBytes((IntPtr)(&ret), 0x48, out var buff))
                 {
                     ImGuiEx.TextCopy(buff.Select(x => $"{x:X2}").Join(" "));
                 }
             }
             ImGui.InputText("Retainer name", ref dbgRetName, 50);
-            if (ImGui.Button("SelectRetainerByName"))
-            {
-                Clicker.SelectRetainerByName(dbgRetName);
-            }
-            if (ImGui.Button("SelectVentureMenu"))
-            {
-                Clicker.SelectVentureMenu();
-            }
-            if (ImGui.Button("ClickReassign"))
-            {
-                Clicker.ClickReassign();
-            }
-            if (ImGui.Button("ClickRetainerTaskAsk"))
-            {
-                Clicker.ClickRetainerTaskAsk();
-            }
-            if (ImGui.Button("SelectQuit"))
-            {
-                Clicker.SelectQuit();
-            }
-            ImGuiEx.Text($"Next retainer: {Scheduler.GetNextRetainerName()}");
-            if (ImGui.Button("Tick manually"))
-            {
-                Scheduler.Tick();
-            }
+            
             if (ImGui.Button("AtkStage get focus"))
             {
                 var ptr = (IntPtr)AtkStage.GetSingleton()->GetFocus();
@@ -247,14 +221,6 @@ internal unsafe static class Debug
             if (ImGui.Button("AtkStage clear focus"))
             {
                 AtkStage.GetSingleton()->ClearFocus();
-            }
-            if (ImGui.Button("InteractWithNearestBell"))
-            {
-                Clicker.InteractWithNearestBell(out _);
-            }
-            if (ImGui.Button("Close retainer list"))
-            {
-                Clicker.ClickClose();
             }
             if (ImGui.Button("Try retrieve current retainer name"))
             {
