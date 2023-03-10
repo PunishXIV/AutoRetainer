@@ -17,9 +17,11 @@ namespace AutoRetainer.NewScheduler.Tasks
             P.TaskManager.Enqueue(YesAlready.WaitForYesAlreadyDisabledTask);
             P.TaskManager.Enqueue(RetainerHandlers.SelectEntrustItems);
             P.TaskManager.Enqueue(RetainerHandlers.ClickEntrustDuplicates);
-            P.TaskManager.Enqueue(() => { if (NoDuplicates) return true; return RetainerHandlers.ClickEntrustDuplicatesConfirm(); }, 600 * 60, false);
+            TaskWait.Enqueue(500);
+            P.TaskManager.Enqueue(() => { if (NoDuplicates) return true; return RetainerHandlers.ClickEntrustDuplicatesConfirm(); }, 600 * 1000, false);
+            TaskWait.Enqueue(500);
             P.TaskManager.Enqueue(() => { if (NoDuplicates) return true; return RetainerHandlers.ClickCloseEntrustWindow(); }, false);
-            P.TaskManager.Enqueue(RetainerHandlers.CloseRetainerInventory);
+            P.TaskManager.Enqueue(RetainerHandlers.CloseAgentRetainer);
         }
     }
 }

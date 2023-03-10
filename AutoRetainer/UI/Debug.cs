@@ -28,6 +28,10 @@ internal unsafe static class Debug
     {
         Safe(delegate
         {
+            if(ImGui.Button("Close retainer"))
+            {
+                DuoLog.Information($"{RetainerHandlers.CloseAgentRetainer()}");
+            }
             if (ImGui.CollapsingHeader("Agent"))
             {
                 /*var agent = Framework.Instance()->UIModule->GetAgentModule()->GetAgentByInternalId(FFXIVClientStructs.FFXIV.Client.UI.Agent.AgentId.GatheringNote);
@@ -94,11 +98,11 @@ internal unsafe static class Debug
             }
             if (ImGui.Button($"CloseRetainerInventory"))
             {
-                DuoLog.Information($"{RetainerHandlers.CloseRetainerInventory()}");
+                DuoLog.Information($"{RetainerHandlers.CloseAgentRetainer()}");
             }
             if (ImGui.Button($"CloseRetainerInventory"))
             {
-                DuoLog.Information($"{RetainerHandlers.CloseRetainerInventory()}");
+                DuoLog.Information($"{RetainerHandlers.CloseAgentRetainer()}");
             }
             if (ImGui.Button($"SetWithdrawGilAmount (1%)"))
             {

@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<Authors>Puni.sh</Authors>
-		<Version>3.0.0.6</Version>
+		<Version>3.0.1.2</Version>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -35,7 +35,7 @@
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
       <PostBuildEvent>
           rmdir .\Debug /s /q
-          ping localhost -n 2 &gt;nul
+          ping localhost -n 4 &gt;nul
           powershell Compress-Archive .\* ..\$(MSBuildProjectName)-$(Version).zip
           mkdir .\Debug
           move ..\$(MSBuildProjectName)-$(Version).zip .\Debug\latest.zip

@@ -121,7 +121,7 @@ namespace AutoRetainer.NewScheduler
                     var r = P.retainerManager.Retainer(i);
                     var rname = r.Name.ToString();
                     if (P.GetSelectedRetainers(Svc.ClientState.LocalContentId).Contains(rname)
-                        && r.GetVentureSecondsRemaining() <= P.config.UnsyncCompensation)
+                        && r.GetVentureSecondsRemaining() <= P.config.UnsyncCompensation && (r.VentureID != 0 || P.config.EnableAssigningQuickExploration))
                     {
                         return rname;
                     }

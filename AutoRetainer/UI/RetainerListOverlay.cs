@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.GcHandin;
+using AutoRetainer.Multi;
 using AutoRetainer.NewScheduler;
 using AutoRetainer.NewScheduler.Handlers;
 using AutoRetainer.NewScheduler.Tasks;
@@ -40,6 +41,19 @@ namespace AutoRetainer.UI
         public override void Draw()
         {
             ImGui.Checkbox("Enable AutoRetainer", ref SchedulerMain.Enabled);
+            ImGui.SameLine();
+            if(ImGui.Checkbox("MultiMode", ref MultiMode.Enabled))
+            {
+                if (MultiMode.Enabled)
+                {
+                    SchedulerMain.Enabled = true;
+                }
+            }
+            ImGui.SameLine();
+            if (ImGui.Button("Open plugin interface"))
+            {
+                Svc.Commands.ProcessCommand("/ays");
+            }
             if (!P.TaskManager.IsBusy)
             {
                 ImGui.SameLine();

@@ -2,7 +2,9 @@
 using Dalamud.Memory;
 using Dalamud.Utility;
 using FFXIVClientStructs.Attributes;
+using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Client.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
 using System;
@@ -23,7 +25,7 @@ namespace AutoRetainer.NewScheduler.Handlers
 
         internal static bool? SelectQuit()
         {
-            var text = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(917).Text.ToDalamudString().ExtractText();
+            var text = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(2383).Text.ToDalamudString().ExtractText();
             return Utils.TrySelectSpecificEntry(text);
         }
 
@@ -186,25 +188,13 @@ namespace AutoRetainer.NewScheduler.Handlers
             return false;
         }
 
-        internal static bool? CloseRetainerInventory()
+        internal static bool? CloseAgentRetainer()
         {
-            if (TryGetAddonByName<AtkUnitBase>(Utils.GetActiveRetainerInventoryName().Name, out var addon) && IsAddonReady(addon))
+            var a = Framework.Instance()->UIModule->GetAgentModule()->GetAgentByInternalId(AgentId.Retainer);
+            if (a->IsAgentActive())
             {
-                if (Utils.GenericThrottle)
-                {
-                    addon->Hide(true);
-                    P.DebugLog($"Hiding retainer inventory");
-                    if (TryGetAddonByName<AtkUnitBase>(Utils.GetActivePlayerInventoryName(), out var iaddon) && IsAddonReady(iaddon))
-                    {
-                        P.DebugLog($"Hiding player inventory");
-                        iaddon->Hide(true);
-                    }
-                    return true;
-                }
-            }
-            else
-            {
-                Utils.RethrottleGeneric();
+                a->Hide();
+                return true;
             }
             return false;
         }
