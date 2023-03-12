@@ -210,7 +210,7 @@ internal unsafe static class Debug
             for (var i = 0; i < P.retainerManager.Count; i++)
             {
                 var ret = P.retainerManager.Retainer(i);
-                ImGuiEx.Text($"{ret.Name}\n           {ret.VentureID} {ret.VentureComplete} {ret.GetVentureSecondsRemaining()}/{ret.GetVentureSecondsRemaining()}");
+                ImGuiEx.TextWrapped($"{ret.Name}\n           {ret.VentureID} {ret.VentureComplete} {ret.GetVentureSecondsRemaining()}/{ret.GetVentureSecondsRemaining()} | {ret.Gil} gil");
                 if (SafeMemory.ReadBytes((IntPtr)(&ret), 0x48, out var buff))
                 {
                     ImGuiEx.TextCopy(buff.Select(x => $"{x:X2}").Join(" "));

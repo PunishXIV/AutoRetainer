@@ -13,7 +13,7 @@ namespace AutoRetainer.NewScheduler.Tasks
         internal static bool NoDuplicates = false;
         internal static void Enqueue()
         {
-            NoDuplicates = false;
+            P.TaskManager.Enqueue(() => { NoDuplicates = false; return true; }) ;
             P.TaskManager.Enqueue(YesAlready.WaitForYesAlreadyDisabledTask);
             P.TaskManager.Enqueue(RetainerHandlers.SelectEntrustItems);
             P.TaskManager.Enqueue(RetainerHandlers.ClickEntrustDuplicates);
