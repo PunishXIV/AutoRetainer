@@ -2,6 +2,7 @@
 using AutoRetainer.NewScheduler.Handlers;
 using AutoRetainer.NewScheduler.Tasks;
 using AutoRetainer.Offline;
+using AutoRetainer.Serializables;
 using ClickLib.Clicks;
 using ECommons.Automation;
 using ECommons.Throttlers;
@@ -18,11 +19,26 @@ namespace AutoRetainer.NewScheduler
 {
     internal unsafe static class SchedulerMain
     {
-        internal static bool Enabled = false;
+        private static bool PluginEnabled = false;
+
+        internal static PluginEnableReason Reason { get; private set; }
+
+        internal static bool? EnablePlugin(PluginEnableReason reason)
+        {
+            Reason = reason;
+            PluginEnabled = true;
+            return true;
+        }
+
+        internal static bool? DisablePlugin() 
+        {
+            PluginEnabled = false;
+            return true;
+        }
 
         internal static void Tick()
         {
-            if (Enabled)
+            if (PluginEnabled)
             {
                 if (TryGetAddonByName<AtkUnitBase>("RetainerList", out var addon) && addon->IsVisible)
                 {
@@ -79,8 +95,42 @@ namespace AutoRetainer.NewScheduler
                                 }
                                 else
                                 {
-                                    if(P.config.AutoCloseRetainerWindow) P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
-                                    if(P.config.AutoEnableDisable) Enabled = false;
+                                    if (Reason == PluginEnableReason.MultiMode)
+                                    {
+                                        P.DebugLog($"Scheduling closing and disabling plugin as MultiMode is running");
+                                        P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
+                                        P.TaskManager.Enqueue(DisablePlugin);
+                                    }
+                                    else
+                                    {
+                                        void Process(TaskCompletedBehavior behavior)
+                                        {
+
+                                            if (behavior.EqualsAny(TaskCompletedBehavior.Stay_in_retainer_list_and_disable_plugin, TaskCompletedBehavior.Close_retainer_list_and_disable_plugin))
+                                            {
+                                                P.DebugLog($"Scheduling plugin disabling (behavior={behavior})");
+                                                P.TaskManager.Enqueue(DisablePlugin);
+                                            }
+                                            if (behavior.EqualsAny(TaskCompletedBehavior.Close_retainer_list_and_disable_plugin, TaskCompletedBehavior.Close_retainer_list_and_keep_plugin_enabled))
+                                            {
+                                                P.DebugLog($"Scheduling retainer list closing (behavior={behavior})");
+                                                P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
+                                            }
+                                        }
+
+                                        if (Reason == PluginEnableReason.Auto)
+                                        {
+                                            Process(P.config.TaskCompletedBehaviorAuto);
+                                        }
+                                        else if(Reason == PluginEnableReason.Manual)
+                                        {
+                                            Process(P.config.TaskCompletedBehaviorManual);
+                                        }
+                                        else if(Reason == PluginEnableReason.Access)
+                                        {
+                                            Process(P.config.TaskCompletedBehaviorAccess);
+                                        }
+                                    }
                                 }
                             }
                             else
@@ -89,7 +139,7 @@ namespace AutoRetainer.NewScheduler
                                 {
                                     DuoLog.Warning($"Your inventory is full");
                                     P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
-                                    Enabled = false;
+                                    DisablePlugin();
                                 }
                             }
                         }

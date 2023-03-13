@@ -1,5 +1,6 @@
 ﻿using AutoRetainer.NewScheduler;
 using AutoRetainer.Offline;
+using AutoRetainer.Serializables;
 using Dalamud.Configuration;
 using ECommons.Configuration;
 using System.Windows.Forms;
@@ -10,14 +11,8 @@ namespace AutoRetainer;
 internal class Config : IEzConfig
 {
     public Dictionary<ulong, HashSet<string>> SelectedRetainers = new();
-    public bool AutoEnableDisable = false;
-    public bool OpenOnEnable = true;
-    public bool TurboMode = false;
     public bool EnableAssigningQuickExploration = false;
     public bool Verbose = false;
-    public bool AutoUseRetainerBell = false;
-    public bool AutoUseRetainerBellFocusOnly = true;
-    public bool _autoCloseRetainerWindow = false;
     public List<OfflineCharacterData> OfflineData = new();
     public bool MultiWaitForAll = false;
     //public bool MultipleServiceAccounts = false;
@@ -33,10 +28,15 @@ internal class Config : IEzConfig
     internal bool BypassSanctuaryCheck = false;
     public bool MultiAllowHET = false;
     public bool UseServerTime = true;
-    public bool DisableOnClose = false;
     public bool NoTheme = false;
     public Dictionary<string, AdditionalRetainerData> AdditionalData = new();
 
+    public OpenBellBehavior OpenBellBehavior = OpenBellBehavior.Do_nothing;
+    public TaskCompletedBehavior TaskCompletedBehaviorAuto = TaskCompletedBehavior.Stay_in_retainer_list_and_keep_plugin_enabled;
+    public TaskCompletedBehavior TaskCompletedBehaviorManual = TaskCompletedBehavior.Stay_in_retainer_list_and_keep_plugin_enabled;
+    public TaskCompletedBehavior TaskCompletedBehaviorAccess = TaskCompletedBehavior.Stay_in_retainer_list_and_keep_plugin_enabled;
+    public bool AutoPause = true;
+    public bool Stay15 = true;
 
     internal bool AutoCloseRetainerWindow
     {

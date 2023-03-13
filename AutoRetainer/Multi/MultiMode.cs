@@ -21,7 +21,7 @@ internal unsafe static class MultiMode
 
     internal static bool Synchronize = false;
     internal static long NextInteractionAt { get; private set; } = 0;
-    internal static ulong LastLongin = 0;
+    internal static ulong LastLogin = 0;
     internal static CircularBuffer<long> Interactions = new(5);
 
     internal static void Init()
@@ -29,12 +29,12 @@ internal unsafe static class MultiMode
         ProperOnLogin.Register(delegate
         {
             WriteVentureAndInventory();
-            if(LastLongin == Svc.ClientState.LocalContentId && Enabled)
+            if(LastLogin == Svc.ClientState.LocalContentId && Enabled)
             {
                 DuoLog.Error("Multi mode disabled as it have detected duplicate login.");
                 Enabled = false;
             }
-            LastLongin = Svc.ClientState.LocalContentId;
+            LastLogin = Svc.ClientState.LocalContentId;
             Interactions.Clear();
             if (Enabled && P.config.MultiAllowHET && ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType))
             {
@@ -44,7 +44,7 @@ internal unsafe static class MultiMode
         });
         if(ProperOnLogin.PlayerPresent)
         {
-            LastLongin = Svc.ClientState.LocalContentId;
+            LastLogin = Svc.ClientState.LocalContentId;
             WriteVentureAndInventory();
         }
     }

@@ -254,7 +254,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
         if (!AutoLogin.Instance.IsRunning)
         {
-            MultiMode.LastLongin = 0;
+            MultiMode.LastLogin = 0;
         }
 
     }

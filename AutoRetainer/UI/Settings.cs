@@ -14,6 +14,34 @@ internal static class Settings
     internal static void Draw()
     {
         ImGuiHelpers.ScaledDummy(5f);
+        InfoBox.DrawBox("Behavior", delegate
+        {
+            ImGuiEx.Text($"Action on accessing retainer bell while plugin is disabled:");
+            ImGui.SetNextItemWidth(400);
+            ImGuiEx.EnumCombo("##OpenBellBehavior", ref P.config.OpenBellBehavior);
+
+            ImGui.Checkbox($"Temporarily pause MultiMode operation when manually opening retainer bell", ref P.config.AutoPause);
+
+            ImGuiEx.Text($"Task completion behavior after manual enabling:");
+            ImGui.SetNextItemWidth(400);
+            ImGuiEx.EnumCombo("##TaskCompletedBehaviorManual", ref P.config.TaskCompletedBehaviorManual);
+
+            ImGuiEx.Text($"Task completion behavior after accessing bell:");
+            ImGui.SetNextItemWidth(400);
+            ImGuiEx.EnumCombo("##TaskCompletedBehaviorAccess", ref P.config.TaskCompletedBehaviorAccess);
+
+            ImGuiEx.Text($"Task completion behavior during plugin operation:");
+            ImGui.SetNextItemWidth(400);
+            ImGuiEx.EnumCombo("##TaskCompletedBehaviorAuto", ref P.config.TaskCompletedBehaviorAuto);
+
+            ImGuiEx.TextWrapped(ImGuiColors.DalamudGrey, "\"Close retainer list and disable plugin\" option for 3 previous settings is enforced during MultiMode operation.");
+
+            ImGui.Checkbox($"Stay in retainer menu if there are retainers to finish ventures within 15 minutes or less", ref P.config.Stay15);
+
+            ImGui.Checkbox("RetainerSense", ref P.config.AutoUseRetainerBell);
+            ImGuiComponents.HelpMarker("Detect and use the closest Summoning Bell within valid distance of the player.");
+            ImGuiEx.TextWrapped(ImGuiColors.DalamudGrey, "RetainerSense is enforced to be active during MultiMode operation.");
+        });
         InfoBox.DrawBox("Settings", delegate
         {
             ImGui.Checkbox("Semi-automatic Mode", ref P.config.AutoEnableDisable);
@@ -52,13 +80,6 @@ internal static class Settings
                 P.config.DontReassign = false;
             }
             ImGuiComponents.HelpMarker("Only reassign ventures that retainers are undertaking.");
-            ImGui.Checkbox("RetainerSense", ref P.config.AutoUseRetainerBell);
-            ImGuiComponents.HelpMarker("Detect and use the closest Summoning Bell within 5 yalms of the player, requires the plugin menu to be open.");
-            if (P.config.AutoUseRetainerBell)
-            {
-                ImGui.Checkbox("Focus Mode", ref P.config.AutoUseRetainerBellFocusOnly);
-                ImGuiComponents.HelpMarker("RetainerSense will only function if there is a Summoning Bell set as the focus target.");
-            }
             ImGui.Checkbox("Close Retainer Menu on Completion", ref P.config._autoCloseRetainerWindow);
             ImGuiComponents.HelpMarker("Hold CTRL to temporarily suppress closing.");
         });
