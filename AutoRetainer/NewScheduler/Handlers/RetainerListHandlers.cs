@@ -23,7 +23,7 @@ namespace AutoRetainer.NewScheduler.Handlers
                     var retainerEntry = (AtkComponentNode*)list->Component->UldManager.NodeList[i];
                     var text = (AtkTextNode*)retainerEntry->Component->UldManager.NodeList[13];
                     var nodeName = text->NodeText.ToString();
-                    P.DebugLog($"Retainer {i} text {nodeName}");
+                    //P.DebugLog($"Retainer {i} text {nodeName}");
                     if (name == nodeName)
                     {
                         if (Utils.GenericThrottle)

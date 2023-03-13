@@ -38,7 +38,7 @@ internal unsafe static class MultiMode
             Interactions.Clear();
             if (Enabled && P.config.MultiAllowHET && ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType))
             {
-                P.DebugLog($"ProperOnLogin: {Svc.ClientState.LocalPlayer}, residental area, scheduling HET");
+                P.DebugLog($"ProperOnLogin: {Svc.ClientState.LocalPlayer}, residential area, scheduling HET");
                 HouseEnterTask.EnqueueTask();
             }
         });
@@ -72,7 +72,7 @@ internal unsafe static class MultiMode
             {
                 return;
             }
-            if(Interactions.Count() == Interactions.Capacity && Interactions.All(x => Environment.TickCount64 - x < 180000))
+            if(Interactions.Count() == Interactions.Capacity && Interactions.All(x => Environment.TickCount64 - x < 60000))
             {
                 if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data) && data.Enabled)
                 {
@@ -112,13 +112,19 @@ internal unsafe static class MultiMode
                     }
                     if(next != null)
                     {
+                        P.DebugLog($"Enqueueing relog");
                         BlockInteraction(20);
                         EnsureCharacterValidity();
                         if(!Relog(next, out var error))
                         {
                             DuoLog.Error(error);
                         }
+                        else
+                        {
+                            P.DebugLog($"Relog command success");
+                        }
                         Interactions.PushBack(Environment.TickCount64);
+                        P.DebugLog($"Added interaction because of relogging (state: {Interactions.Print()})");
                     }
                 }
                 else if(!IsOccupied() && AnyRetainersAvailable())
@@ -127,10 +133,12 @@ internal unsafe static class MultiMode
                     EnsureCharacterValidity();
                     if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data) && data.Enabled)
                     {
+                        P.DebugLog($"Enqueueing interaction with bell");
                         TaskInteractWithNearestBell.Enqueue();
                         P.TaskManager.Enqueue(() => SchedulerMain.Enabled = true);
                         BlockInteraction(10);
                         Interactions.PushBack(Environment.TickCount64);
+                        P.DebugLog($"Added interaction because of interacting (state: {Interactions.Print()})");
                     }
                 }
             }
