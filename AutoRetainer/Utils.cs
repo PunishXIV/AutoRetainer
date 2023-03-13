@@ -25,6 +25,17 @@ namespace AutoRetainer;
 
 internal static unsafe class Utils
 {
+    internal static bool IsAllCurrentCharacterRetainersHaveMoreThan5Mins()
+    {
+        if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
+        {
+            foreach (var z in data.GetEnabledRetainers())
+            {
+                if (z.GetVentureSecondsRemaining() < 5 * 60) return false;
+            }
+        }
+        return true;
+    }
 
     internal static string GetActivePlayerInventoryName()
     {

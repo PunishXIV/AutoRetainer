@@ -19,7 +19,7 @@ namespace AutoRetainer.NewScheduler
 {
     internal unsafe static class SchedulerMain
     {
-        private static bool PluginEnabled = false;
+        internal static bool PluginEnabled { get; private set; } = false;
 
         internal static PluginEnableReason Reason { get; private set; }
 
@@ -27,12 +27,14 @@ namespace AutoRetainer.NewScheduler
         {
             Reason = reason;
             PluginEnabled = true;
+            P.DebugLog($"Plugin is enabled, reason: {reason}");
             return true;
         }
 
         internal static bool? DisablePlugin() 
         {
             PluginEnabled = false;
+            P.DebugLog($"Plugin disabled");
             return true;
         }
 
@@ -95,40 +97,47 @@ namespace AutoRetainer.NewScheduler
                                 }
                                 else
                                 {
-                                    if (Reason == PluginEnableReason.MultiMode)
+                                    if ((P.config.Stay15 || MultiMode.Active) && !Utils.IsAllCurrentCharacterRetainersHaveMoreThan5Mins())
                                     {
-                                        P.DebugLog($"Scheduling closing and disabling plugin as MultiMode is running");
-                                        P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
-                                        P.TaskManager.Enqueue(DisablePlugin);
+                                        //nothing
                                     }
                                     else
                                     {
-                                        void Process(TaskCompletedBehavior behavior)
+                                        if (Reason == PluginEnableReason.MultiMode)
                                         {
-
-                                            if (behavior.EqualsAny(TaskCompletedBehavior.Stay_in_retainer_list_and_disable_plugin, TaskCompletedBehavior.Close_retainer_list_and_disable_plugin))
+                                            P.DebugLog($"Scheduling closing and disabling plugin as MultiMode is running");
+                                            P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
+                                            P.TaskManager.Enqueue(DisablePlugin);
+                                        }
+                                        else
+                                        {
+                                            void Process(TaskCompletedBehavior behavior)
                                             {
-                                                P.DebugLog($"Scheduling plugin disabling (behavior={behavior})");
-                                                P.TaskManager.Enqueue(DisablePlugin);
+                                                P.DebugLog($"Behavior: {behavior}");
+                                                if (behavior.EqualsAny(TaskCompletedBehavior.Stay_in_retainer_list_and_disable_plugin, TaskCompletedBehavior.Close_retainer_list_and_disable_plugin))
+                                                {
+                                                    P.DebugLog($"Scheduling plugin disabling (behavior={behavior})");
+                                                    P.TaskManager.Enqueue(DisablePlugin);
+                                                }
+                                                if (behavior.EqualsAny(TaskCompletedBehavior.Close_retainer_list_and_disable_plugin, TaskCompletedBehavior.Close_retainer_list_and_keep_plugin_enabled))
+                                                {
+                                                    P.DebugLog($"Scheduling retainer list closing (behavior={behavior})");
+                                                    P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
+                                                }
                                             }
-                                            if (behavior.EqualsAny(TaskCompletedBehavior.Close_retainer_list_and_disable_plugin, TaskCompletedBehavior.Close_retainer_list_and_keep_plugin_enabled))
-                                            {
-                                                P.DebugLog($"Scheduling retainer list closing (behavior={behavior})");
-                                                P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
-                                            }
-                                        }
 
-                                        if (Reason == PluginEnableReason.Auto)
-                                        {
-                                            Process(P.config.TaskCompletedBehaviorAuto);
-                                        }
-                                        else if(Reason == PluginEnableReason.Manual)
-                                        {
-                                            Process(P.config.TaskCompletedBehaviorManual);
-                                        }
-                                        else if(Reason == PluginEnableReason.Access)
-                                        {
-                                            Process(P.config.TaskCompletedBehaviorAccess);
+                                            if (Reason == PluginEnableReason.Auto)
+                                            {
+                                                Process(P.config.TaskCompletedBehaviorAuto);
+                                            }
+                                            else if (Reason == PluginEnableReason.Manual)
+                                            {
+                                                Process(P.config.TaskCompletedBehaviorManual);
+                                            }
+                                            else if (Reason == PluginEnableReason.Access)
+                                            {
+                                                Process(P.config.TaskCompletedBehaviorAccess);
+                                            }
                                         }
                                     }
                                 }

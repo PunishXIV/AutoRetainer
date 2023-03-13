@@ -1,6 +1,7 @@
 ﻿using AutoRetainer.NewScheduler;
 using AutoRetainer.NewScheduler.Tasks;
 using AutoRetainer.Offline;
+using AutoRetainer.Serializables;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using ECommons.CircularBuffers;
@@ -17,6 +18,8 @@ namespace AutoRetainer.Multi;
 
 internal unsafe static class MultiMode
 {
+    internal static bool Active => Enabled;
+
     internal static bool Enabled = false;
 
     internal static bool Synchronize = false;
@@ -29,14 +32,14 @@ internal unsafe static class MultiMode
         ProperOnLogin.Register(delegate
         {
             WriteVentureAndInventory();
-            if(LastLogin == Svc.ClientState.LocalContentId && Enabled)
+            if(LastLogin == Svc.ClientState.LocalContentId && Active)
             {
                 DuoLog.Error("Multi mode disabled as it have detected duplicate login.");
                 Enabled = false;
             }
             LastLogin = Svc.ClientState.LocalContentId;
             Interactions.Clear();
-            if (Enabled && P.config.MultiAllowHET && ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType))
+            if (Active && P.config.MultiAllowHET && ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType))
             {
                 P.DebugLog($"ProperOnLogin: {Svc.ClientState.LocalPlayer}, residential area, scheduling HET");
                 HouseEnterTask.EnqueueTask();
@@ -56,7 +59,7 @@ internal unsafe static class MultiMode
 
     internal static void Tick()
     {
-        if (Enabled)
+        if (Active)
         {
             if(GetAutoAfkOpt() != 0)
             {
@@ -135,7 +138,7 @@ internal unsafe static class MultiMode
                     {
                         P.DebugLog($"Enqueueing interaction with bell");
                         TaskInteractWithNearestBell.Enqueue();
-                        P.TaskManager.Enqueue(() => SchedulerMain.Enabled = true);
+                        P.TaskManager.Enqueue(() => { SchedulerMain.EnablePlugin(PluginEnableReason.MultiMode); return true; });
                         BlockInteraction(10);
                         Interactions.PushBack(Environment.TickCount64);
                         P.DebugLog($"Added interaction because of interacting (state: {Interactions.Print()})");

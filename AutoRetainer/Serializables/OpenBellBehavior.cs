@@ -9,6 +9,7 @@ namespace AutoRetainer.Serializables
     public enum OpenBellBehavior
     {
         Do_nothing,
-        Enable_AutoRetainer
+        Enable_AutoRetainer,
+        Disable_AutoRetainer,
     }
 }

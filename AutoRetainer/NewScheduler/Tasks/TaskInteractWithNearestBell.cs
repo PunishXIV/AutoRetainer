@@ -18,6 +18,7 @@ namespace AutoRetainer.NewScheduler.Tasks
         {
             P.TaskManager.Enqueue(YesAlready.WaitForYesAlreadyDisabledTask);
             P.TaskManager.Enqueue(PlayerWorldHandlers.SelectNearestBell);
+            P.TaskManager.Enqueue(() => { P.IsInteractionAutomatic = true; return true; });
             P.TaskManager.Enqueue(PlayerWorldHandlers.InteractWithTargetedBell);
         }
     }

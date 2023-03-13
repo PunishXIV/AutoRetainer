@@ -35,23 +35,12 @@ internal class Config : IEzConfig
     public TaskCompletedBehavior TaskCompletedBehaviorAuto = TaskCompletedBehavior.Stay_in_retainer_list_and_keep_plugin_enabled;
     public TaskCompletedBehavior TaskCompletedBehaviorManual = TaskCompletedBehavior.Stay_in_retainer_list_and_keep_plugin_enabled;
     public TaskCompletedBehavior TaskCompletedBehaviorAccess = TaskCompletedBehavior.Stay_in_retainer_list_and_keep_plugin_enabled;
-    public bool AutoPause = true;
+    //public bool AutoPause = true;
     public bool Stay15 = true;
-
-    internal bool AutoCloseRetainerWindow
-    {
-        get
-        {
-            return _autoCloseRetainerWindow && !ImGui.GetIO().KeyCtrl;
-        }
-        set
-        {
-            _autoCloseRetainerWindow = value;
-        }
-    }
 
     public bool AutoEnablePluginNearBell = false;
     public bool _dontReassign = false;
+    public bool AutoUseRetainerBell = false;
     internal bool DontReassign
     {
         get

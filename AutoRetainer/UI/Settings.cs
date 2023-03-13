@@ -20,8 +20,6 @@ internal static class Settings
             ImGui.SetNextItemWidth(400);
             ImGuiEx.EnumCombo("##OpenBellBehavior", ref P.config.OpenBellBehavior);
 
-            ImGui.Checkbox($"Temporarily pause MultiMode operation when manually opening retainer bell", ref P.config.AutoPause);
-
             ImGuiEx.Text($"Task completion behavior after manual enabling:");
             ImGui.SetNextItemWidth(400);
             ImGuiEx.EnumCombo("##TaskCompletedBehaviorManual", ref P.config.TaskCompletedBehaviorManual);
@@ -36,7 +34,9 @@ internal static class Settings
 
             ImGuiEx.TextWrapped(ImGuiColors.DalamudGrey, "\"Close retainer list and disable plugin\" option for 3 previous settings is enforced during MultiMode operation.");
 
-            ImGui.Checkbox($"Stay in retainer menu if there are retainers to finish ventures within 15 minutes or less", ref P.config.Stay15);
+            ImGui.Checkbox($"Stay in retainer menu if there are retainers to finish ventures within 5 minutes or less", ref P.config.Stay15);
+            ImGui.SameLine();
+            ImGuiEx.TextWrapped(ImGuiColors.DalamudGrey, "This option is enforced during MultiMode operation.");
 
             ImGui.Checkbox("RetainerSense", ref P.config.AutoUseRetainerBell);
             ImGuiComponents.HelpMarker("Detect and use the closest Summoning Bell within valid distance of the player.");
@@ -44,11 +44,6 @@ internal static class Settings
         });
         InfoBox.DrawBox("Settings", delegate
         {
-            ImGui.Checkbox("Semi-automatic Mode", ref P.config.AutoEnableDisable);
-            ImGuiComponents.HelpMarker("Automatically enables the plugin on Summoning Bell interaction. You can hold down the SHIFT key to disable this behavior.");
-            ImGui.Checkbox("Auto-open AutoRetainer window on enabling", ref P.config.OpenOnEnable);
-            ImGui.Checkbox("Turbo Mode", ref P.config.TurboMode);
-            ImGuiComponents.HelpMarker("Rapidly collect rewards and despatch retainers on new ventures. Only works in semi-automatic mode/with manual player interaction.");
             ImGui.SetNextItemWidth(100f);
             ImGui.SliderInt("Time Desynchronization Compensation", ref P.config.UnsyncCompensation.ValidateRange(-60, 0), -10, 0);
             ImGuiComponents.HelpMarker("Additional amount of seconds that will be subtracted from venture ending time to help mitigate possible issues of time desynchronization between the game and your PC. ");
@@ -57,7 +52,6 @@ internal static class Settings
             ImGuiComponents.HelpMarker("The higher this value is the faster plugin will operate retainers. When dealing with low FPS or high latency you may want to decrease this value. If you want the plugin to operate faster you may increase it.");
             ImGui.Checkbox("Anonymise Retainers", ref P.config.NoNames);
             ImGuiComponents.HelpMarker("Retainer names will be redacted from general UI elements. They will not be hidden in debug menus and plugin logs however. While this option is on, character and retainer numbers are not guaranteed to be equal in different sections of a plugin (for example, retainer 1 in retainers view is not guaranteed to be the same retainer as in statistics view).");
-            ImGui.Checkbox($"Auto-disable plugin when closing window", ref P.config.DisableOnClose);
             ImGui.Checkbox($"Do not use built-in theme", ref P.config.NoTheme);
         });
         InfoBox.DrawBox("Operation", delegate
@@ -80,7 +74,6 @@ internal static class Settings
                 P.config.DontReassign = false;
             }
             ImGuiComponents.HelpMarker("Only reassign ventures that retainers are undertaking.");
-            ImGui.Checkbox("Close Retainer Menu on Completion", ref P.config._autoCloseRetainerWindow);
             ImGuiComponents.HelpMarker("Hold CTRL to temporarily suppress closing.");
         });
         InfoBox.DrawBox("Quick Retainer Action", delegate

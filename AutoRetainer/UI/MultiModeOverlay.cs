@@ -87,7 +87,7 @@ internal class MultiModeOverlay : Window
                 ImGuiEx.Text($"loading login.png");
             }
         }
-        else if (SchedulerMain.Enabled)
+        else if (SchedulerMain.PluginEnabled)
         {
             if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", Utils.GetReachableRetainerBell() == null? "bellcrossed.png" : "bell.png"), out var t))
             {
@@ -101,7 +101,7 @@ internal class MultiModeOverlay : Window
                     }
                     if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
                     {
-                        SchedulerMain.Enabled = false;
+                        SchedulerMain.DisablePlugin();
                     }
                     ImGui.SetTooltip("AutoRetainer enabled. \nLeft click - open AutoRetainer. \nRight click - disable AutoRetainer.");
                 }

@@ -49,7 +49,7 @@ internal unsafe static class MultiModeUI
             ImGui.SameLine(0, 3);
             if (ImGuiEx.IconButton(FontAwesomeIcon.DoorOpen))
             {
-                if (MultiMode.Enabled)
+                if (MultiMode.Active)
                 {
                     foreach(var z in P.config.OfflineData)
                     {

@@ -19,6 +19,7 @@ using AutoRetainer.NewScheduler;
 using ClickLib.Clicks;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using ECommons.Logging;
+using AutoRetainer.Serializables;
 
 namespace AutoRetainer;
 
@@ -30,7 +31,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal WindowSystem ws;
     internal ConfigGui configGui;
     internal RetainerManager retainerManager;
-    internal bool NoConditionEvent = false;
+    internal bool IsInteractionAutomatic = false;
     internal QuickSellItems quickSellItems;
     internal TaskManager TaskManager;
     internal Memory Memory;
@@ -132,7 +133,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
     private void Tick(Framework framework)
     {
-        if (SchedulerMain.Enabled && Svc.ClientState.LocalPlayer != null)
+        if (SchedulerMain.PluginEnabled && Svc.ClientState.LocalPlayer != null)
         {
             SchedulerMain.Tick();
             if (!P.config.SelectedRetainers.ContainsKey(Svc.ClientState.LocalContentId))
@@ -140,7 +141,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 P.config.SelectedRetainers[Svc.ClientState.LocalContentId] = new();
             }
         }
-        if (SchedulerMain.Enabled || P.TaskManager.IsBusy || Svc.Condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.OccupiedSummoningBell])
+        if (SchedulerMain.PluginEnabled || P.TaskManager.IsBusy || Svc.Condition[ConditionFlag.OccupiedSummoningBell])
         {
             if (TryGetAddonByName<AddonTalk>("Talk", out var addon) && addon->AtkUnitBase.IsVisible)
             {
@@ -220,29 +221,28 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
     private void ConditionChange(ConditionFlag flag, bool value)
     {
-        if(flag == ConditionFlag.OccupiedSummoningBell)
+        if(flag == ConditionFlag.OccupiedSummoningBell && Svc.Targets.Target.IsRetainerBell())
         {
             if (value)
             {
-                if ((config.AutoEnableDisable || MultiMode.Enabled) && Svc.Targets.Target.IsRetainerBell() && Svc.ClientState.LocalPlayer?.HomeWorld.Id == Svc.ClientState.LocalPlayer?.CurrentWorld.Id)
+                if (MultiMode.Active)
                 {
-                    if (!ImGui.GetIO().KeyShift || MultiMode.Enabled)
+                    if(IsInteractionAutomatic)
                     {
-                        SchedulerMain.Enabled = true;
-                        if(P.config.OpenOnEnable) configGui.IsOpen = true;
-                    }
-                    else
-                    {
-                        Notify.Info("Requested to suppress enabling");
+                        SchedulerMain.EnablePlugin(PluginEnableReason.MultiMode);
                     }
                 }
-            }
-            else
-            {
-                if (/*config.AutoEnableDisable ||*/ MultiMode.Enabled)
+                else
                 {
-                    SchedulerMain.Enabled = false;
-                    if (P.config.OpenOnEnable) configGui.IsOpen = false;
+                    if(P.config.OpenBellBehavior == OpenBellBehavior.Enable_AutoRetainer)
+                    {
+                        SchedulerMain.EnablePlugin(IsInteractionAutomatic ? PluginEnableReason.Auto : PluginEnableReason.Access);
+                        IsInteractionAutomatic = false;
+                    }
+                    else if(P.config.OpenBellBehavior == OpenBellBehavior.Disable_AutoRetainer)
+                    {
+                        SchedulerMain.DisablePlugin();
+                    }
                 }
             }
         }
@@ -250,7 +250,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
     void Logout(object _, object __)
     {
-        SchedulerMain.Enabled = false;
+        SchedulerMain.DisablePlugin();
 
         if (!AutoLogin.Instance.IsRunning)
         {
@@ -258,23 +258,4 @@ public unsafe class AutoRetainer : IDalamudPlugin
         }
 
     }
-
-    /*internal bool IsEnabled()
-    {
-        return this.Enabled;
-    }*/
-
-    /*internal void EnablePlugin()
-    {
-        if (P.Enabled) return;
-        AddonLifeTracker.Reset();
-        P.Enabled = true;
-    }*/
-
-    /*internal void DisablePlugin()
-    {
-        if (!P.Enabled) return;
-        P.Enabled = false;
-        Scheduler.turbo = false;
-    }*/
 }

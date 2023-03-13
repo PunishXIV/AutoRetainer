@@ -40,13 +40,24 @@ namespace AutoRetainer.UI
 
         public override void Draw()
         {
-            ImGui.Checkbox("Enable AutoRetainer", ref SchedulerMain.Enabled);
+            var e = SchedulerMain.PluginEnabled;
+            if(ImGui.Checkbox("Enable AutoRetainer", ref e))
+            {
+                if (e)
+                {
+                    SchedulerMain.EnablePlugin(Serializables.PluginEnableReason.Manual);
+                }
+                else
+                {
+                    SchedulerMain.DisablePlugin();
+                }
+            }
             ImGui.SameLine();
             if(ImGui.Checkbox("MultiMode", ref MultiMode.Enabled))
             {
                 if (MultiMode.Enabled)
                 {
-                    SchedulerMain.Enabled = true;
+                    SchedulerMain.EnablePlugin(Serializables.PluginEnableReason.MultiMode);
                 }
             }
             ImGui.SameLine();
