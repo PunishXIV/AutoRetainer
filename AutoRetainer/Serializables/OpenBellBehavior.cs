@@ -11,5 +11,6 @@ namespace AutoRetainer.Serializables
         Do_nothing,
         Enable_AutoRetainer,
         Disable_AutoRetainer,
+        Pause_AutoRetainer,
     }
 }

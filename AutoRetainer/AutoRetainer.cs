@@ -35,6 +35,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal QuickSellItems quickSellItems;
     internal TaskManager TaskManager;
     internal Memory Memory;
+    internal bool WasEnabled = false;
 
     internal long Time => P.config.UseServerTime ? FFXIVClientStructs.FFXIV.Client.System.Framework.Framework.GetServerTime() : DateTimeOffset.Now.ToUnixTimeSeconds();
 
@@ -221,27 +222,46 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
     private void ConditionChange(ConditionFlag flag, bool value)
     {
-        if(flag == ConditionFlag.OccupiedSummoningBell && Svc.Targets.Target.IsRetainerBell())
+        if(flag == ConditionFlag.OccupiedSummoningBell)
         {
-            if (value)
-            {
-                if (MultiMode.Active)
+            if (Svc.Targets.Target.IsRetainerBell()) {
+                if (value)
                 {
-                    if(IsInteractionAutomatic)
+                    if (MultiMode.Active)
                     {
-                        SchedulerMain.EnablePlugin(PluginEnableReason.MultiMode);
+                        WasEnabled = false;
+                        if (IsInteractionAutomatic)
+                        {
+                            SchedulerMain.EnablePlugin(PluginEnableReason.MultiMode);
+                        }
+                    }
+                    else
+                    {
+                        if (SchedulerMain.PluginEnabled && P.config.OpenBellBehavior == OpenBellBehavior.Pause_AutoRetainer)
+                        {
+                            WasEnabled = true;
+                            SchedulerMain.DisablePlugin();
+                        }
+                        if (P.config.OpenBellBehavior == OpenBellBehavior.Enable_AutoRetainer)
+                        {
+                            SchedulerMain.EnablePlugin(IsInteractionAutomatic ? PluginEnableReason.Auto : PluginEnableReason.Access);
+                            IsInteractionAutomatic = false;
+                        }
+                        else if (P.config.OpenBellBehavior == OpenBellBehavior.Disable_AutoRetainer)
+                        {
+                            SchedulerMain.DisablePlugin();
+                        }
                     }
                 }
-                else
+            }
+            else
+            {
+                if (Svc.Targets.Target.IsRetainerBell() || Svc.Targets.PreviousTarget.IsRetainerBell())
                 {
-                    if(P.config.OpenBellBehavior == OpenBellBehavior.Enable_AutoRetainer)
+                    if (WasEnabled)
                     {
-                        SchedulerMain.EnablePlugin(IsInteractionAutomatic ? PluginEnableReason.Auto : PluginEnableReason.Access);
-                        IsInteractionAutomatic = false;
-                    }
-                    else if(P.config.OpenBellBehavior == OpenBellBehavior.Disable_AutoRetainer)
-                    {
-                        SchedulerMain.DisablePlugin();
+                        SchedulerMain.EnablePlugin(PluginEnableReason.Auto);
+                        WasEnabled = false;
                     }
                 }
             }

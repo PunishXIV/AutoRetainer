@@ -34,8 +34,7 @@ internal static class Settings
 
             ImGuiEx.TextWrapped(ImGuiColors.DalamudGrey, "\"Close retainer list and disable plugin\" option for 3 previous settings is enforced during MultiMode operation.");
 
-            ImGui.Checkbox($"Stay in retainer menu if there are retainers to finish ventures within 5 minutes or less", ref P.config.Stay15);
-            ImGui.SameLine();
+            ImGui.Checkbox($"Stay in retainer menu if there are retainers to finish ventures within 5 minutes or less", ref P.config.Stay5);
             ImGuiEx.TextWrapped(ImGuiColors.DalamudGrey, "This option is enforced during MultiMode operation.");
 
             ImGui.Checkbox("RetainerSense", ref P.config.AutoUseRetainerBell);

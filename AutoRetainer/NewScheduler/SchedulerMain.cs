@@ -97,7 +97,7 @@ namespace AutoRetainer.NewScheduler
                                 }
                                 else
                                 {
-                                    if ((P.config.Stay15 || MultiMode.Active) && !Utils.IsAllCurrentCharacterRetainersHaveMoreThan5Mins())
+                                    if ((P.config.Stay5 || MultiMode.Active) && !Utils.IsAllCurrentCharacterRetainersHaveMoreThan5Mins())
                                     {
                                         //nothing
                                     }

@@ -43,6 +43,7 @@ namespace AutoRetainer.UI
             var e = SchedulerMain.PluginEnabled;
             if(ImGui.Checkbox("Enable AutoRetainer", ref e))
             {
+                P.WasEnabled = false;
                 if (e)
                 {
                     SchedulerMain.EnablePlugin(Serializables.PluginEnableReason.Manual);
@@ -51,6 +52,11 @@ namespace AutoRetainer.UI
                 {
                     SchedulerMain.DisablePlugin();
                 }
+            }
+            if(P.WasEnabled)
+            {
+                ImGui.SameLine();
+                ImGuiEx.Text(GradientColor.Get(ImGuiColors.DalamudGrey, ImGuiColors.DalamudGrey3, 500), $"Paused");
             }
             ImGui.SameLine();
             if(ImGui.Checkbox("MultiMode", ref MultiMode.Enabled))

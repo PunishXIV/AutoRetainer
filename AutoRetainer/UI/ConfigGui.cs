@@ -35,6 +35,7 @@ unsafe internal class ConfigGui : Window
         var e = SchedulerMain.PluginEnabled;
         if (ImGui.Checkbox($"Enable {P.Name} (automatic mode)", ref e))
         {
+            P.WasEnabled = false;
             if(e)
             {
                 SchedulerMain.EnablePlugin(PluginEnableReason.Auto);
@@ -45,6 +46,11 @@ unsafe internal class ConfigGui : Window
             }
         }
 
+        if (P.WasEnabled)
+        {
+            ImGui.SameLine();
+            ImGuiEx.Text(GradientColor.Get(ImGuiColors.DalamudGrey, ImGuiColors.DalamudGrey3, 500), $"Paused");
+        }
         ImGui.SameLine();
         ImGui.Checkbox("Multi", ref MultiMode.Enabled);
 

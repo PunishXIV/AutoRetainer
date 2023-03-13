@@ -36,7 +36,7 @@ internal class Config : IEzConfig
     public TaskCompletedBehavior TaskCompletedBehaviorManual = TaskCompletedBehavior.Stay_in_retainer_list_and_keep_plugin_enabled;
     public TaskCompletedBehavior TaskCompletedBehaviorAccess = TaskCompletedBehavior.Stay_in_retainer_list_and_keep_plugin_enabled;
     //public bool AutoPause = true;
-    public bool Stay15 = true;
+    public bool Stay5 = true;
 
     public bool AutoEnablePluginNearBell = false;
     public bool _dontReassign = false;
