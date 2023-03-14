@@ -204,18 +204,26 @@ namespace AutoRetainer.NewScheduler.Handlers
             if (TryGetAddonByName<AtkUnitBase>("Bank", out var addon) && IsAddonReady(addon) && Utils.TryGetCurrentRetainer(out var name) && Utils.TryGetRetainerByName(name, out var retainer))
             {
                 if (percent < 1 || percent > 100) throw new ArgumentOutOfRangeException(nameof(percent), percent, "Percent must be between 1 and 100");
-                var gilToWithdraw = (uint)(percent == 100 ? retainer.Gil : retainer.Gil / 100f * percent);
-                if (gilToWithdraw > 0 && gilToWithdraw <= retainer.Gil)
+                if (uint.TryParse(MemoryHelper.ReadSeString(&addon->UldManager.NodeList[27]->GetAsAtkTextNode()->NodeText).ExtractText().RemoveOtherChars("0123456789"), out var numGil))
                 {
-                    if (Utils.GenericThrottle)
+                    P.DebugLog($"Gil: {numGil}");
+                    var gilToWithdraw = (uint)(percent == 100 ? numGil : numGil / 100f * percent);
+                    if (gilToWithdraw > 0 && gilToWithdraw <= numGil)
                     {
-                        var v = stackalloc AtkValue[]
+                        if (Utils.GenericThrottle)
                         {
-                            new() { Type = FFXIVClientStructs.FFXIV.Component.GUI.ValueType.Int, Int = 3 },
-                            new() { Type = FFXIVClientStructs.FFXIV.Component.GUI.ValueType.UInt, UInt = gilToWithdraw }
-                        };
-                        addon->FireCallback(2, v);
-                        P.DebugLog($"Set gil to withdraw {gilToWithdraw} (total: {retainer.Gil})");
+                            var v = stackalloc AtkValue[]
+                            {
+                                new() { Type = FFXIVClientStructs.FFXIV.Component.GUI.ValueType.Int, Int = 3 },
+                                new() { Type = FFXIVClientStructs.FFXIV.Component.GUI.ValueType.UInt, UInt = gilToWithdraw }
+                            };
+                            addon->FireCallback(2, v);
+                            P.DebugLog($"Set gil to withdraw {gilToWithdraw} (total: {numGil})");
+                            return true;
+                        }
+                    }
+                    else
+                    {
                         return true;
                     }
                 }

@@ -25,6 +25,16 @@ namespace AutoRetainer;
 
 internal static unsafe class Utils
 {
+    internal static bool IsAnyRetainersCompletedVenture()
+    {
+        if (!ProperOnLogin.PlayerPresent) return false;
+        if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
+        {
+            return MultiMode.IsAnySelectedRetainerFinishesWithin(10);
+        }
+        return false;
+    }
+
     internal static bool IsAllCurrentCharacterRetainersHaveMoreThan5Mins()
     {
         if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
@@ -98,7 +108,7 @@ internal static unsafe class Utils
         return P.config.AdditionalData[key];
     }
 
-    internal static bool GenericThrottle => EzThrottler.Throttle("AutoRetainerGenericThrottle", 200);
+    internal static bool GenericThrottle => EzThrottler.Throttle("AutoRetainerGenericThrottle", P.config.Delay);
     internal static void RethrottleGeneric(int num = 200) => EzThrottler.Throttle("AutoRetainerGenericThrottle", num, true);
 
     internal static bool TrySelectSpecificEntry(string text)

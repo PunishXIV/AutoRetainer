@@ -237,17 +237,18 @@ public unsafe class AutoRetainer : IDalamudPlugin
                     }
                     else
                     {
-                        if (SchedulerMain.PluginEnabled && P.config.OpenBellBehavior == OpenBellBehavior.Pause_AutoRetainer)
+                        var bellBehavior = Utils.IsAnyRetainersCompletedVenture() ? P.config.OpenBellBehaviorWithVentures : P.config.OpenBellBehaviorNoVentures;
+                        if (SchedulerMain.PluginEnabled && bellBehavior == OpenBellBehavior.Pause_AutoRetainer)
                         {
                             WasEnabled = true;
                             SchedulerMain.DisablePlugin();
                         }
-                        if (P.config.OpenBellBehavior == OpenBellBehavior.Enable_AutoRetainer)
+                        if (bellBehavior == OpenBellBehavior.Enable_AutoRetainer)
                         {
                             SchedulerMain.EnablePlugin(IsInteractionAutomatic ? PluginEnableReason.Auto : PluginEnableReason.Access);
                             IsInteractionAutomatic = false;
                         }
-                        else if (P.config.OpenBellBehavior == OpenBellBehavior.Disable_AutoRetainer)
+                        else if (bellBehavior == OpenBellBehavior.Disable_AutoRetainer)
                         {
                             SchedulerMain.DisablePlugin();
                         }

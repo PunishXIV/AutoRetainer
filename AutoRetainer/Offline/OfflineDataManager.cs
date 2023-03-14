@@ -43,7 +43,8 @@ internal static class OfflineDataManager
                     Name = ret.Name.ToString(),
                     VentureEndsAt = ret.VentureCompleteTimeStamp,
                     HasVenture = ret.VentureID != 0,
-                    Level = ret.Level
+                    Level = ret.Level,
+                    Job = ret.ClassJob
                 });
             }
         }

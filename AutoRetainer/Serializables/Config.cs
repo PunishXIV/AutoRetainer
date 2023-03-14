@@ -19,7 +19,6 @@ internal class Config : IEzConfig
     public bool NoNames = false;
     public int UnsyncCompensation = -5;
     public int AdvanceTimer = 60;
-    public int Speed = 100;
     public bool StatsUnifyHQ = false;
     public bool RecordStats = true;
     public bool EnableAutoGCHandin = false;
@@ -31,12 +30,15 @@ internal class Config : IEzConfig
     public bool NoTheme = false;
     public Dictionary<string, AdditionalRetainerData> AdditionalData = new();
 
-    public OpenBellBehavior OpenBellBehavior = OpenBellBehavior.Do_nothing;
+    public OpenBellBehavior OpenBellBehaviorNoVentures = OpenBellBehavior.Do_nothing;
+    public OpenBellBehavior OpenBellBehaviorWithVentures = OpenBellBehavior.Enable_AutoRetainer;
     public TaskCompletedBehavior TaskCompletedBehaviorAuto = TaskCompletedBehavior.Stay_in_retainer_list_and_keep_plugin_enabled;
     public TaskCompletedBehavior TaskCompletedBehaviorManual = TaskCompletedBehavior.Stay_in_retainer_list_and_keep_plugin_enabled;
     public TaskCompletedBehavior TaskCompletedBehaviorAccess = TaskCompletedBehavior.Stay_in_retainer_list_and_keep_plugin_enabled;
     //public bool AutoPause = true;
     public bool Stay5 = true;
+
+    public int Delay = 200;
 
     public bool AutoEnablePluginNearBell = false;
     public bool _dontReassign = false;

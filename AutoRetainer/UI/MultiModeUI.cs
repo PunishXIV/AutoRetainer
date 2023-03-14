@@ -217,7 +217,17 @@ internal unsafe static class MultiModeUI
                     ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
                     var start = ImGui.GetCursorPos();
                     var selected = retainers.Contains(ret.Name.ToString());
-                    if (ImGui.Checkbox($"Retainer {(P.config.NoNames ? (i + 1) : ret.Name)}", ref selected))
+                    if (ThreadLoadImageHandler.TryGetIconTextureWrap(ret.Job == 0 ? 62143 : (062100 + ret.Job), true, out var t))
+                    {
+                        ImGui.Image(t.ImGuiHandle, new(24, 24));
+                        ImGui.SameLine(0,2);
+                    }
+                    if (ret.Level > 0)
+                    {
+                        ImGuiEx.TextV($"{ret.Level}".ReplaceByChar("0123456789", ""));
+                        ImGui.SameLine();
+                    }
+                    if (ImGui.Checkbox($"{(P.config.NoNames ? $"Retainer {(i + 1)}" : ret.Name)}", ref selected))
                     {
                         if (selected)
                         {

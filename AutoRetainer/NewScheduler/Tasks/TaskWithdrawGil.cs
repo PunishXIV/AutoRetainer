@@ -26,6 +26,8 @@ namespace AutoRetainer.NewScheduler.Tasks
                 return false;
             });
             P.TaskManager.Enqueue(() => HasGil == false ? true : RetainerHandlers.SelectEntrustGil());
+            P.TaskManager.Enqueue(() => HasGil == false ? true : GenericHandlers.Throttle(500));
+            P.TaskManager.Enqueue(() => HasGil == false ? true : GenericHandlers.WaitFor(500));
             P.TaskManager.Enqueue(() => HasGil == false ? true : RetainerHandlers.SetWithdrawGilAmount(percent));
             P.TaskManager.Enqueue(() => HasGil == false ? true : RetainerHandlers.WithdrawGilOrCancel());
         }
