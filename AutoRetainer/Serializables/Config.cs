@@ -47,6 +47,8 @@ internal class Config : IEzConfig
     public bool AutoEnablePluginNearBell = false;
     public bool _dontReassign = false;
     public bool AutoUseRetainerBell = false;
+    public bool MultiModeUIBar = false;
+    public bool UIBar = true;
     internal bool DontReassign
     {
         get

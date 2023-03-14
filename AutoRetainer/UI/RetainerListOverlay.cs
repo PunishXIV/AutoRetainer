@@ -27,6 +27,7 @@ namespace AutoRetainer.UI
 
         public override bool DrawConditions()
         {
+            if (!P.config.UIBar) return false;
             if (Svc.Condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.OccupiedSummoningBell] && TryGetAddonByName<AtkUnitBase>("RetainerList", out var addon) && IsAddonReady(addon))
             {
                 this.Position = new(addon->X, addon->Y - height);
@@ -71,22 +72,26 @@ namespace AutoRetainer.UI
                 ImGuiEx.Text(GradientColor.Get(ImGuiColors.DalamudGrey, ImGuiColors.DalamudGrey3, 500), $"Paused");
             }
             ImGui.SameLine();
-            if(ImGui.Checkbox("MultiMode", ref MultiMode.Enabled))
+            if (P.config.MultiModeUIBar)
             {
-                if (MultiMode.Enabled)
+                if (ImGui.Checkbox("MultiMode", ref MultiMode.Enabled))
                 {
-                    SchedulerMain.EnablePlugin(Serializables.PluginEnableReason.MultiMode);
+                    if (MultiMode.Enabled)
+                    {
+                        SchedulerMain.EnablePlugin(PluginEnableReason.MultiMode);
+                    }
                 }
+                ImGui.SameLine();
             }
-            ImGui.SameLine();
-            if (ImGui.Button("Open plugin interface"))
+            if (ImGuiEx.IconButton("\uf013##Open plugin interface"))
             {
                 Svc.Commands.ProcessCommand("/ays");
             }
+            ImGuiEx.Tooltip("Open plugin configuration window");
             if (!P.TaskManager.IsBusy)
             {
                 ImGui.SameLine();
-                if (ImGui.Button("Entrust all duplicates"))
+                if (ImGuiEx.IconButton("\uf24d##Entrust all duplicates"))
                 {
                     for (var i = 0; i < P.retainerManager.Count; i++)
                     {
@@ -99,6 +104,7 @@ namespace AutoRetainer.UI
                         }
                     }
                 }
+                ImGuiEx.Tooltip("Entrust duplicates to all retainers");
             }
             height = ImGui.GetWindowSize().Y;
         }

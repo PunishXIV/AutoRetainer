@@ -155,11 +155,11 @@ internal unsafe static class MultiModeUI
                     }
                 }
                 ImGui.Separator();
-                if(ImGui.Button("Blacklist this character"))
+                if(ImGui.Button("Exclude this character"))
                 {
                     P.config.Blacklist.Add((data.CID, data.Name));
                 }
-                ImGuiComponents.HelpMarker("Blacklisting this character will immediately reset it's settings, remove it from this list and exclude all retainers from being processed. You can still run manual tasks on it's retainers. You can unblacklist character in settings.");
+                ImGuiComponents.HelpMarker("Excluding this character will immediately reset it's settings, remove it from this list and exclude all retainers from being processed. You can still run manual tasks on it's retainers. You can cancel this action in settings.");
                 ImGui.EndPopup();
             }
 
@@ -282,6 +282,7 @@ internal unsafe static class MultiModeUI
                     }
                     if (ImGui.BeginPopup(n))
                     {
+                        ImGui.CollapsingHeader($"{ret.Name} - {data.Name} configuration  ##conf", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.Bullet | ImGuiTreeNodeFlags.OpenOnArrow);
                         ImGuiEx.Text($"Additional post-venture tasks:");
                         ImGui.Checkbox($"Entrust duplicates", ref adata.EntrustDuplicates);
                         ImGui.Checkbox($"Withdraw gil", ref adata.WithdrawGil);

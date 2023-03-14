@@ -24,6 +24,7 @@ internal static class Settings
             ImGui.Checkbox("Anonymise Retainers", ref P.config.NoNames);
             ImGuiComponents.HelpMarker("Retainer names will be redacted from general UI elements. They will not be hidden in debug menus and plugin logs however. While this option is on, character and retainer numbers are not guaranteed to be equal in different sections of a plugin (for example, retainer 1 in retainers view is not guaranteed to be the same retainer as in statistics view).");
             ImGui.Checkbox($"Do not use built-in theme", ref P.config.NoTheme);
+            ImGui.Checkbox($"Display quick access overlay in retainer list", ref P.config.UIBar);
         });
         InfoBox.DrawBox("Operation", delegate
         {
@@ -101,12 +102,12 @@ internal static class Settings
         });
         if (P.config.Blacklist.Any())
         {
-            InfoBox.DrawBox("Character blacklist", delegate
+            InfoBox.DrawBox("Excluded characters", delegate
             {
                 for (int i = 0; i < P.config.Blacklist.Count; i++)
                 {
                     var d = P.config.Blacklist[i];
-                    ImGuiEx.Text($"{d.Name} ({d.CID:X16})");
+                    ImGuiEx.TextV($"{d.Name} ({d.CID:X16})");
                     ImGui.SameLine();
                     if (ImGui.Button($"Delete##bl{i}"))
                     {
