@@ -245,7 +245,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                     else
                     {
                         var bellBehavior = Utils.IsAnyRetainersCompletedVenture() ? P.config.OpenBellBehaviorWithVentures : P.config.OpenBellBehaviorNoVentures;
-                        if(bellBehavior != OpenBellBehavior.Pause_AutoRetainer)
+                        if(bellBehavior != OpenBellBehavior.Pause_AutoRetainer && ImGui.GetIO().KeyShift)
                         {
                             bellBehavior = OpenBellBehavior.Do_nothing;
                             Notify.Info($"Open bell action cancelled");

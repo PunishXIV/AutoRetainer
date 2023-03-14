@@ -99,6 +99,24 @@ internal static class Settings
         {
             ImGui.Checkbox($"Record venture statistics", ref P.config.RecordStats);
         });
+        if (P.config.Blacklist.Any())
+        {
+            InfoBox.DrawBox("Character blacklist", delegate
+            {
+                for (int i = 0; i < P.config.Blacklist.Count; i++)
+                {
+                    var d = P.config.Blacklist[i];
+                    ImGuiEx.Text($"{d.Name} ({d.CID:X16})");
+                    ImGui.SameLine();
+                    if (ImGui.Button($"Delete##bl{i}"))
+                    {
+                        P.config.Blacklist.RemoveAt(i);
+                        P.config.SelectedRetainers.Remove(d.CID);
+                        break;
+                    }
+                }
+            });
+        }
     }
 
     static void QRA(string text, ref Keys key)
