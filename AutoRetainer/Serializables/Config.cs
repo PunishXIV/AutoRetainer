@@ -31,6 +31,7 @@ internal class Config : IEzConfig
     public Dictionary<string, AdditionalRetainerData> AdditionalData = new();
     public bool AutoDisable = true;
     public bool Expert = false;
+    public List<(ulong CID, string Name)> Blacklist = new();
 
     public OpenBellBehavior OpenBellBehaviorNoVentures = OpenBellBehavior.Do_nothing;
     public OpenBellBehavior OpenBellBehaviorWithVentures = OpenBellBehavior.Enable_AutoRetainer;
@@ -39,6 +40,7 @@ internal class Config : IEzConfig
     public TaskCompletedBehavior TaskCompletedBehaviorAccess = TaskCompletedBehavior.Stay_in_retainer_list_and_keep_plugin_enabled;
     //public bool AutoPause = true;
     public bool Stay5 = true;
+    public bool NoCurrentCharaOnTop = false;
 
     public int Delay = 200;
 

@@ -2,6 +2,7 @@
 using AutoRetainer.NewScheduler.Tasks;
 using AutoRetainer.Offline;
 using AutoRetainer.Serializables;
+using AutoRetainer.UI;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using ECommons.CircularBuffers;
@@ -44,6 +45,7 @@ internal unsafe static class MultiMode
                 P.DebugLog($"ProperOnLogin: {Svc.ClientState.LocalPlayer}, residential area, scheduling HET");
                 HouseEnterTask.EnqueueTask();
             }
+            MultiModeUI.JustRelogged = true;
         });
         if(ProperOnLogin.PlayerPresent)
         {

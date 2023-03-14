@@ -5,7 +5,9 @@ using ECommons.Configuration;
 using ECommons.MathHelpers;
 using PInvoke;
 using PunishLib.ImGuiMethods;
+using System;
 using System.Windows.Forms;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AutoRetainer.UI;
 
@@ -45,6 +47,47 @@ internal static class Settings
             ImGuiComponents.HelpMarker("Only reassign ventures that retainers are undertaking.");
             ImGuiComponents.HelpMarker("Hold CTRL to temporarily suppress closing.");
         });
+        InfoBox.DrawBox("Multi Mode", delegate
+        {
+            ImGui.Checkbox("Wait for all retainers to be done before logging into character", ref P.config.MultiWaitForAll);
+            ImGui.SetNextItemWidth(60);
+            ImGui.DragInt("Relog in advance, seconds", ref P.config.AdvanceTimer.ValidateRange(0, 300), 0.1f, 0, 300);
+            ImGui.Checkbox("Synchronize retainers (one time)", ref MultiMode.Synchronize);
+            ImGuiComponents.HelpMarker("If this setting is on, plugin will wait until all enabled retainers have done their ventures. After that this setting will be disabled automatically and all characters will be processed.");
+            ImGui.Separator();
+            ImGuiEx.Text($"Character order:");
+            for (int index = 0; index < P.config.OfflineData.Count; index++)
+            {
+                if (P.config.OfflineData[index].World.IsNullOrEmpty()) continue;
+                ImGui.PushID($"c{index}");
+                if (ImGui.ArrowButton("##up", ImGuiDir.Up) && index > 0)
+                {
+                    try
+                    {
+                        (P.config.OfflineData[index - 1], P.config.OfflineData[index]) = (P.config.OfflineData[index], P.config.OfflineData[index - 1]);
+                    }
+                    catch (Exception e)
+                    {
+                        e.Log();
+                    }
+                }
+                ImGui.SameLine();
+                if (ImGui.ArrowButton("##down", ImGuiDir.Down) && index < P.config.OfflineData.Count - 1)
+                {
+                    try
+                    {
+                        (P.config.OfflineData[index + 1], P.config.OfflineData[index]) = (P.config.OfflineData[index], P.config.OfflineData[index + 1]);
+                    }
+                    catch (Exception e)
+                    {
+                        e.Log();
+                    }
+                }
+                ImGui.SameLine();
+                ImGuiEx.TextV(P.config.OfflineData[index].Name);
+                ImGui.PopID();
+            }
+        });
         InfoBox.DrawBox("Quick Retainer Action", delegate
         {
             QRA("Sell Item", ref P.config.SellKey);
@@ -55,15 +98,6 @@ internal static class Settings
         InfoBox.DrawBox("Statistics", delegate
         {
             ImGui.Checkbox($"Record venture statistics", ref P.config.RecordStats);
-        });
-        InfoBox.DrawBox("Multi Mode", delegate
-        {
-
-            ImGui.Checkbox("Wait for all retainers to be done before logging into character", ref P.config.MultiWaitForAll);
-            ImGui.SetNextItemWidth(60);
-            ImGui.DragInt("Relog in advance, seconds", ref P.config.AdvanceTimer.ValidateRange(0, 300), 0.1f, 0, 300);
-            ImGui.Checkbox("Synchronize retainers (one time)", ref MultiMode.Synchronize);
-            ImGuiComponents.HelpMarker("If this setting is on, plugin will wait until all enabled retainers have done their ventures. After that this setting will be disabled automatically and all characters will be processed.");
         });
     }
 

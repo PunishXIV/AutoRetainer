@@ -3,6 +3,8 @@ using AutoRetainer.Multi;
 using AutoRetainer.NewScheduler;
 using AutoRetainer.NewScheduler.Handlers;
 using AutoRetainer.NewScheduler.Tasks;
+using AutoRetainer.Serializables;
+using Dalamud.Interface.Components;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using System;
 using System.Collections.Generic;
@@ -41,17 +43,27 @@ namespace AutoRetainer.UI
         public override void Draw()
         {
             var e = SchedulerMain.PluginEnabled;
-            if(ImGui.Checkbox("Enable AutoRetainer", ref e))
+            var disabled = MultiMode.Enabled && !ImGui.GetIO().KeyCtrl;
+            if (disabled)
+            {
+                ImGui.BeginDisabled();
+            }
+            if (ImGui.Checkbox("Enable AutoRetainer", ref e))
             {
                 P.WasEnabled = false;
                 if (e)
                 {
-                    SchedulerMain.EnablePlugin(Serializables.PluginEnableReason.Manual);
+                    SchedulerMain.EnablePlugin(PluginEnableReason.Manual);
                 }
                 else
                 {
                     SchedulerMain.DisablePlugin();
                 }
+            }
+            if(disabled)
+            {
+                ImGui.EndDisabled();
+                ImGuiComponents.HelpMarker($"MultiMode controls this option. Hold CTRL to override.");
             }
             if(P.WasEnabled)
             {

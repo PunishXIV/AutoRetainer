@@ -22,6 +22,7 @@ internal static class OfflineDataManager
     internal static void WriteOfflineData()
     {
         if (!ProperOnLogin.PlayerPresent) return;
+        if (P.config.Blacklist.Any(x => x.CID == Svc.ClientState.LocalContentId)) return;
         if (!P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
         {
             data = new()

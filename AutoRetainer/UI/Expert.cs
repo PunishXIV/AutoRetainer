@@ -54,6 +54,7 @@ namespace AutoRetainer.UI
                 ImGui.SetNextItemWidth(100f);
                 ImGuiEx.SliderIntAsFloat("Interaction Delay, seconds", ref P.config.Delay.ValidateRange(10, 1000), 20, 1000);
                 ImGuiComponents.HelpMarker("The lower this value is the faster plugin will operate retainers. When dealing with low FPS or high latency you may want to increase this value. If you want the plugin to operate faster you may decrease it. ");
+                ImGui.Checkbox($"Disable sorting and collapsing/expanding", ref P.config.NoCurrentCharaOnTop);
             });
         }
     }

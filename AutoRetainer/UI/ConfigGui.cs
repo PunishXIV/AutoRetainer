@@ -2,6 +2,7 @@
 using AutoRetainer.NewScheduler;
 using AutoRetainer.Serializables;
 using AutoRetainer.Statistics;
+using Dalamud.Interface.Components;
 using ECommons.Configuration;
 using ECommons.Reflection;
 using PunishLib.ImGuiMethods;
@@ -33,6 +34,11 @@ unsafe internal class ConfigGui : Window
     public override void Draw()
     {
         var e = SchedulerMain.PluginEnabled;
+        var disabled = MultiMode.Enabled && !ImGui.GetIO().KeyCtrl;
+        if (disabled)
+        {
+            ImGui.BeginDisabled();
+        }
         if (ImGui.Checkbox($"Enable {P.Name} (automatic mode)", ref e))
         {
             P.WasEnabled = false;
@@ -44,6 +50,11 @@ unsafe internal class ConfigGui : Window
             {
                 SchedulerMain.DisablePlugin();
             }
+        }
+        if (disabled)
+        {
+            ImGui.EndDisabled();
+            ImGuiComponents.HelpMarker($"MultiMode controls this option. Hold CTRL to override.");
         }
 
         if (P.WasEnabled)
@@ -91,6 +102,11 @@ unsafe internal class ConfigGui : Window
     {
         EzConfig.Save();
         StatisticsUI.Data.Clear();
+        MultiModeUI.JustRelogged = false;
     }
 
+    public override void OnOpen()
+    {
+        MultiModeUI.JustRelogged = true;
+    }
 }
