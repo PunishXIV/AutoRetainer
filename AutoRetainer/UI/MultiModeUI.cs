@@ -210,88 +210,90 @@ internal unsafe static class MultiModeUI
                     }
                 }
                 ImGui.SetCursorPos(storePos);
-                ImGui.BeginTable("##retainertable", 4, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Borders);
-                ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
-                ImGui.TableSetupColumn("Job");
-                ImGui.TableSetupColumn("Venture");
-                ImGui.TableSetupColumn("");
-                ImGui.TableHeadersRow();
-                var retainers = P.GetSelectedRetainers(data.CID);
-                for (var i = 0; i < data.RetainerData.Count; i++)
+                if (ImGui.BeginTable("##retainertable", 4, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Borders))
                 {
-                    var ret = data.RetainerData[i];
-                    if (ret.Level == 0 || ret.Name.ToString().IsNullOrEmpty()) continue;
-                    var adata = Utils.GetAdditionalData(data.CID, ret.Name);
-                    ImGui.TableNextRow();
-                    ImGui.TableNextColumn();
-                    ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
-                    var start = ImGui.GetCursorPos();
-                    var selected = retainers.Contains(ret.Name.ToString());
-                    if (ImGui.Checkbox($"{(P.config.NoNames ? $"Retainer {(i + 1)}" : ret.Name)}", ref selected))
+                    ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
+                    ImGui.TableSetupColumn("Job");
+                    ImGui.TableSetupColumn("Venture");
+                    ImGui.TableSetupColumn("");
+                    ImGui.TableHeadersRow();
+                    var retainers = P.GetSelectedRetainers(data.CID);
+                    for (var i = 0; i < data.RetainerData.Count; i++)
                     {
-                        if (selected)
+                        var ret = data.RetainerData[i];
+                        if (ret.Level == 0 || ret.Name.ToString().IsNullOrEmpty()) continue;
+                        var adata = Utils.GetAdditionalData(data.CID, ret.Name);
+                        ImGui.TableNextRow();
+                        ImGui.TableNextColumn();
+                        ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
+                        var start = ImGui.GetCursorPos();
+                        var selected = retainers.Contains(ret.Name.ToString());
+                        if (ImGui.Checkbox($"{(P.config.NoNames ? $"Retainer {(i + 1)}" : ret.Name)}", ref selected))
                         {
-                            retainers.Add(ret.Name.ToString());
+                            if (selected)
+                            {
+                                retainers.Add(ret.Name.ToString());
+                            }
+                            else
+                            {
+                                retainers.Remove(ret.Name.ToString());
+                            }
+                        }
+                        if (adata.EntrustDuplicates)
+                        {
+                            ImGui.SameLine();
+                            ImGui.PushFont(UiBuilder.IconFont);
+                            ImGuiEx.Text($"\uf24d");
+                            ImGui.PopFont();
+                        }
+                        if (adata.WithdrawGil)
+                        {
+                            ImGui.SameLine();
+                            ImGui.PushFont(UiBuilder.IconFont);
+                            ImGuiEx.Text($"\uf51e");
+                            ImGui.PopFont();
+                        }
+                        var end = ImGui.GetCursorPos();
+                        bars[$"{data.CID}{data.RetainerData[i].Name}"] = (start, end);
+                        ImGui.TableNextColumn();
+                        ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
+
+                        if (ThreadLoadImageHandler.TryGetIconTextureWrap(ret.Job == 0 ? 62143 : (062100 + ret.Job), true, out var t))
+                        {
+                            ImGui.Image(t.ImGuiHandle, new(24, 24));
                         }
                         else
                         {
-                            retainers.Remove(ret.Name.ToString());
+                            ImGui.Dummy(new(24, 24));
+                        }
+                        if (ret.Level > 0)
+                        {
+                            ImGui.SameLine(0, 2);
+                            ImGuiEx.TextV($"{ret.Level}".ReplaceByChar("0123456789", ""));
+                        }
+                        ImGui.TableNextColumn();
+                        ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
+                        ImGuiEx.Text($"{(!ret.HasVenture ? "No Venture" : Utils.ToTimeString(ret.GetVentureSecondsRemaining(false)))}");
+                        ImGui.TableNextColumn();
+                        ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
+                        var n = $"{data.CID} {ret.Name} settings";
+                        if (ImGuiEx.IconButton(FontAwesomeIcon.Cogs, $"{data.CID} {ret.Name}"))
+                        {
+                            ImGui.OpenPopup(n);
+                        }
+                        if (ImGui.BeginPopup(n))
+                        {
+                            ImGui.CollapsingHeader($"{ret.Name} - {data.Name} configuration  ##conf", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.Bullet | ImGuiTreeNodeFlags.OpenOnArrow);
+                            ImGuiEx.Text($"Additional post-venture tasks:");
+                            ImGui.Checkbox($"Entrust duplicates", ref adata.EntrustDuplicates);
+                            ImGui.Checkbox($"Withdraw gil", ref adata.WithdrawGil);
+                            ImGui.SetNextItemWidth(200f);
+                            ImGui.InputInt($"Amount, %", ref adata.WithdrawGilPercent.ValidateRange(1, 100), 1, 10);
+                            ImGui.EndPopup();
                         }
                     }
-                    if (adata.EntrustDuplicates)
-                    {
-                        ImGui.SameLine();
-                        ImGui.PushFont(UiBuilder.IconFont);
-                        ImGuiEx.Text($"\uf24d");
-                        ImGui.PopFont();
-                    }
-                    if (adata.WithdrawGil)
-                    {
-                        ImGui.SameLine();
-                        ImGui.PushFont(UiBuilder.IconFont);
-                        ImGuiEx.Text($"\uf51e");
-                        ImGui.PopFont();
-                    }
-                    var end = ImGui.GetCursorPos();
-                    bars[$"{data.CID}{data.RetainerData[i].Name}"] = (start, end);
-                    ImGui.TableNextColumn();
-                    ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
-
-                    if (ThreadLoadImageHandler.TryGetIconTextureWrap(ret.Job == 0 ? 62143 : (062100 + ret.Job), true, out var t))
-                    {
-                        ImGui.Image(t.ImGuiHandle, new(24, 24));
-                    }
-                    else
-                    {
-                        ImGui.Dummy(new(24, 24));
-                    }
-                    if (ret.Level > 0)
-                    {
-                        ImGui.SameLine(0, 2);
-                        ImGuiEx.TextV($"{ret.Level}".ReplaceByChar("0123456789", ""));
-                    }
-                    ImGui.TableNextColumn();
-                    ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
-                    ImGuiEx.Text($"{(!ret.HasVenture ? "No Venture" : Utils.ToTimeString(ret.GetVentureSecondsRemaining(false)))}");
-                    ImGui.TableNextColumn();
-                    ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
-                    var n = $"{data.CID} {ret.Name} settings";
-                    if (ImGuiEx.IconButton(FontAwesomeIcon.Cogs, $"{data.CID} {ret.Name}"))
-                    {
-                        ImGui.OpenPopup(n);
-                    }
-                    if (ImGui.BeginPopup(n))
-                    {
-                        ImGui.CollapsingHeader($"{ret.Name} - {data.Name} configuration  ##conf", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.Bullet | ImGuiTreeNodeFlags.OpenOnArrow);
-                        ImGuiEx.Text($"Additional post-venture tasks:");
-                        ImGui.Checkbox($"Entrust duplicates", ref adata.EntrustDuplicates);
-                        ImGui.Checkbox($"Withdraw gil", ref adata.WithdrawGil);
-                        ImGui.SetNextItemWidth(200f);
-                        ImGui.InputInt($"Amount, %", ref adata.WithdrawGilPercent.ValidateRange(1, 100), 1, 10);
-                        ImGui.EndPopup();
-                    }
+                    ImGui.EndTable();
                 }
-                ImGui.EndTable();
                 ImGui.Dummy(new(2, 2));
                 ImGui.PopID();
             }
