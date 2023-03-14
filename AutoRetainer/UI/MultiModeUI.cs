@@ -66,7 +66,7 @@ internal unsafe static class MultiModeUI
                 if (data.Enabled && !data.Index.InRange(1, 9))
                 {
                     data.Enabled = false;
-                    Notify.Error("Set character index first");
+                    Svc.Chat.PrintError("[AutoRetainer] Error: Please set the character index and service account for this character before enabling multi mode.");
                 }
             }
             if (colen) ImGui.PopStyleColor();
