@@ -53,6 +53,7 @@ namespace AutoRetainer.NewScheduler.Handlers
                             Int = -1
                         }
                     };
+                    P.IsCloseActionAutomatic = true;
                     retainerList->FireCallback(1, v);
                     P.DebugLog($"Closing retainer window");
                     return true;

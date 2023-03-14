@@ -29,6 +29,8 @@ internal class Config : IEzConfig
     public bool UseServerTime = true;
     public bool NoTheme = false;
     public Dictionary<string, AdditionalRetainerData> AdditionalData = new();
+    public bool AutoDisable = true;
+    public bool Expert = false;
 
     public OpenBellBehavior OpenBellBehaviorNoVentures = OpenBellBehavior.Do_nothing;
     public OpenBellBehavior OpenBellBehaviorWithVentures = OpenBellBehavior.Enable_AutoRetainer;

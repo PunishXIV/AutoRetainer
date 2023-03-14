@@ -30,7 +30,8 @@ internal static unsafe class Utils
         if (!ProperOnLogin.PlayerPresent) return false;
         if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
         {
-            return MultiMode.IsAnySelectedRetainerFinishesWithin(10);
+            var selectedRetainers = data.GetEnabledRetainers().Where(z => z.HasVenture);
+            return selectedRetainers.Any(z => z.GetVentureSecondsRemaining() <= 10);
         }
         return false;
     }

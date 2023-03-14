@@ -36,6 +36,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal TaskManager TaskManager;
     internal Memory Memory;
     internal bool WasEnabled = false;
+    internal bool IsCloseActionAutomatic = false;
 
     internal long Time => P.config.UseServerTime ? FFXIVClientStructs.FFXIV.Client.System.Framework.Framework.GetServerTime() : DateTimeOffset.Now.ToUnixTimeSeconds();
 
@@ -107,6 +108,12 @@ public unsafe class AutoRetainer : IDalamudPlugin
         {
             config.Verbose = !config.Verbose;
             DuoLog.Information($"Debug mode {(config.Verbose ? "enabled" : "disabled")}");
+            return;
+        }
+        if (arguments.EqualsIgnoreCase("expert"))
+        {
+            config.Expert = !config.Expert;
+            DuoLog.Information($"Expert mode {(config.Expert ? "enabled" : "disabled")}");
             return;
         }
         else if (arguments.EqualsIgnoreCase("ss"))
@@ -238,19 +245,31 @@ public unsafe class AutoRetainer : IDalamudPlugin
                     else
                     {
                         var bellBehavior = Utils.IsAnyRetainersCompletedVenture() ? P.config.OpenBellBehaviorWithVentures : P.config.OpenBellBehaviorNoVentures;
+                        if(bellBehavior != OpenBellBehavior.Pause_AutoRetainer)
+                        {
+                            bellBehavior = OpenBellBehavior.Do_nothing;
+                            Notify.Info($"Open bell action cancelled");
+                        }
                         if (SchedulerMain.PluginEnabled && bellBehavior == OpenBellBehavior.Pause_AutoRetainer)
                         {
                             WasEnabled = true;
                             SchedulerMain.DisablePlugin();
                         }
-                        if (bellBehavior == OpenBellBehavior.Enable_AutoRetainer)
+                        if (IsInteractionAutomatic)
                         {
-                            SchedulerMain.EnablePlugin(IsInteractionAutomatic ? PluginEnableReason.Auto : PluginEnableReason.Access);
                             IsInteractionAutomatic = false;
+                            SchedulerMain.EnablePlugin(PluginEnableReason.Auto);
                         }
-                        else if (bellBehavior == OpenBellBehavior.Disable_AutoRetainer)
+                        else
                         {
-                            SchedulerMain.DisablePlugin();
+                            if (bellBehavior == OpenBellBehavior.Enable_AutoRetainer)
+                            {
+                                SchedulerMain.EnablePlugin(PluginEnableReason.Access);
+                            }
+                            else if (bellBehavior == OpenBellBehavior.Disable_AutoRetainer)
+                            {
+                                SchedulerMain.DisablePlugin();
+                            }
                         }
                     }
                 }
@@ -261,11 +280,18 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 {
                     if (WasEnabled)
                     {
+                        P.DebugLog($"Enabling plugin because WasEnabled is true");
                         SchedulerMain.EnablePlugin(PluginEnableReason.Auto);
                         WasEnabled = false;
                     }
+                    else if(!IsCloseActionAutomatic && P.config.AutoDisable && !MultiMode.Enabled)
+                    {
+                        P.DebugLog($"Disabling plugin because AutoDisable is on");
+                        SchedulerMain.DisablePlugin();
+                    }
                 }
             }
+            IsCloseActionAutomatic = false;
         }
     }
 

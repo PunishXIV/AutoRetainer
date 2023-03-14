@@ -14,45 +14,11 @@ internal static class Settings
     internal static void Draw()
     {
         ImGuiHelpers.ScaledDummy(5f);
-        InfoBox.DrawBox("Behavior", delegate
-        {
-            ImGuiEx.Text($"Action on accessing retainer bell if no ventures available:");
-            ImGui.SetNextItemWidth(400);
-            ImGuiEx.EnumCombo("##OpenBellBehaviorNoVentures", ref P.config.OpenBellBehaviorNoVentures);
-
-            ImGuiEx.Text($"Action on accessing retainer bell if any ventures available:");
-            ImGui.SetNextItemWidth(400);
-            ImGuiEx.EnumCombo("##OpenBellBehaviorWithVentures", ref P.config.OpenBellBehaviorWithVentures);
-
-            ImGuiEx.Text($"Task completion behavior after accessing bell:");
-            ImGui.SetNextItemWidth(400);
-            ImGuiEx.EnumCombo("##TaskCompletedBehaviorAccess", ref P.config.TaskCompletedBehaviorAccess);
-
-            ImGuiEx.Text($"Task completion behavior after manual enabling:");
-            ImGui.SetNextItemWidth(400);
-            ImGuiEx.EnumCombo("##TaskCompletedBehaviorManual", ref P.config.TaskCompletedBehaviorManual);
-
-            ImGuiEx.Text($"Task completion behavior during plugin operation:");
-            ImGui.SetNextItemWidth(400);
-            ImGuiEx.EnumCombo("##TaskCompletedBehaviorAuto", ref P.config.TaskCompletedBehaviorAuto);
-
-            ImGuiEx.TextWrapped(ImGuiColors.DalamudGrey, "\"Close retainer list and disable plugin\" option for 3 previous settings is enforced during MultiMode operation.");
-
-            ImGui.Checkbox($"Stay in retainer menu if there are retainers to finish ventures within 5 minutes or less", ref P.config.Stay5);
-            ImGuiEx.TextWrapped(ImGuiColors.DalamudGrey, "This option is enforced during MultiMode operation.");
-
-            ImGui.Checkbox("RetainerSense", ref P.config.AutoUseRetainerBell);
-            ImGuiComponents.HelpMarker("Detect and use the closest Summoning Bell within valid distance of the player.");
-            ImGuiEx.TextWrapped(ImGuiColors.DalamudGrey, "RetainerSense is enforced to be active during MultiMode operation.");
-        });
         InfoBox.DrawBox("Settings", delegate
         {
             ImGui.SetNextItemWidth(100f);
             ImGui.SliderInt("Time Desynchronization Compensation", ref P.config.UnsyncCompensation.ValidateRange(-60, 0), -10, 0);
             ImGuiComponents.HelpMarker("Additional amount of seconds that will be subtracted from venture ending time to help mitigate possible issues of time desynchronization between the game and your PC. ");
-            ImGui.SetNextItemWidth(100f);
-            ImGuiEx.SliderIntAsFloat("Interaction Delay, seconds", ref P.config.Delay.ValidateRange(10, 1000), 20, 1000);
-            ImGuiComponents.HelpMarker("The lower this value is the faster plugin will operate retainers. When dealing with low FPS or high latency you may want to increase this value. If you want the plugin to operate faster you may decrease it. ");
             ImGui.Checkbox("Anonymise Retainers", ref P.config.NoNames);
             ImGuiComponents.HelpMarker("Retainer names will be redacted from general UI elements. They will not be hidden in debug menus and plugin logs however. While this option is on, character and retainer numbers are not guaranteed to be equal in different sections of a plugin (for example, retainer 1 in retainers view is not guaranteed to be the same retainer as in statistics view).");
             ImGui.Checkbox($"Do not use built-in theme", ref P.config.NoTheme);

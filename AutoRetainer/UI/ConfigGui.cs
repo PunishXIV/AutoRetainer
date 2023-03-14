@@ -69,6 +69,7 @@ unsafe internal class ConfigGui : Window
                 ("Retainers", MultiModeUI.Draw, null, true),
                 (P.config.RecordStats ? "Statistics" : null, StatisticsUI.Draw, null, true),
                 ("Settings", Settings.Draw, null, true),
+                (P.config.Expert?"Expert":null, Expert.Draw, null, true),
                 ("Beta", TabBeta.Draw, null, true),
                 ("About", delegate { AboutTab.Draw(P); }, null, true),
                 (P.config.Verbose ? "Log" : null, InternalLog.PrintImgui, null, false),
