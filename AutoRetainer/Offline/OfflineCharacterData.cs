@@ -14,6 +14,7 @@ public class OfflineCharacterData
     public uint InventorySpace = 0;
     public uint VentureCoffers = 0;
     public int ServiceAccount = 0;
+    public bool EnableGCArmoryHandin = false;
 
     internal uint CharaIndex
     {

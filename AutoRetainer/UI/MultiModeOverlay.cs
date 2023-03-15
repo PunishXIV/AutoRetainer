@@ -15,6 +15,11 @@ internal class MultiModeOverlay : Window
         this.RespectCloseHotkey = false;
     }
 
+    public override bool DrawConditions()
+    {
+        return !P.config.HideOverlayIcons;
+    }
+
     public override void Draw()
     {
         CImGui.igBringWindowToDisplayBack(CImGui.igGetCurrentWindow());

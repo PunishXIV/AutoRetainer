@@ -3,12 +3,14 @@ using AutoRetainer.Offline;
 using AutoRetainer.Serializables;
 using Dalamud.Configuration;
 using ECommons.Configuration;
+using ECommons.MathHelpers;
+using PInvoke;
 using System.Windows.Forms;
 
 namespace AutoRetainer;
 
 [Serializable]
-internal class Config : IEzConfig
+internal unsafe class Config : IEzConfig
 {
     public Dictionary<ulong, HashSet<string>> SelectedRetainers = new();
     public bool EnableAssigningQuickExploration = false;
@@ -32,8 +34,9 @@ internal class Config : IEzConfig
     public bool AutoDisable = true;
     public bool Expert = false;
     public List<(ulong CID, string Name)> Blacklist = new();
+    public bool HideOverlayIcons = false;
 
-    public OpenBellBehavior OpenBellBehaviorNoVentures = OpenBellBehavior.Do_nothing;
+    public OpenBellBehavior OpenBellBehaviorNoVentures = OpenBellBehavior.Enable_AutoRetainer;
     public OpenBellBehavior OpenBellBehaviorWithVentures = OpenBellBehavior.Enable_AutoRetainer;
     public TaskCompletedBehavior TaskCompletedBehaviorAuto = TaskCompletedBehavior.Stay_in_retainer_list_and_keep_plugin_enabled;
     public TaskCompletedBehavior TaskCompletedBehaviorManual = TaskCompletedBehavior.Stay_in_retainer_list_and_keep_plugin_enabled;
@@ -44,16 +47,18 @@ internal class Config : IEzConfig
 
     public int Delay = 200;
 
-    public bool AutoEnablePluginNearBell = false;
     public bool _dontReassign = false;
     public bool AutoUseRetainerBell = false;
     public bool MultiModeUIBar = false;
     public bool UIBar = true;
+
+    public Keys Suppress = Keys.Control;
+    public Keys TempCollectB = Keys.ShiftKey;
     internal bool DontReassign
     {
         get
         {
-            return _dontReassign || ImGui.GetIO().KeyCtrl;
+            return _dontReassign || (Bitmask.IsBitSet(User32.GetKeyState((int)P.config.TempCollectB), 15) && !CSFramework.Instance()->WindowInactive);
         }
         set
         {

@@ -20,6 +20,10 @@ using ClickLib.Clicks;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using ECommons.Logging;
 using AutoRetainer.Serializables;
+using ECommons.MathHelpers;
+using PInvoke;
+using ECommons.ExcelServices.TerritoryEnumeration;
+using System.Diagnostics;
 
 namespace AutoRetainer;
 
@@ -64,7 +68,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 Svc.PluginInterface.UiBuilder.OpenConfigUi += delegate { configGui.IsOpen = true; };
                 Svc.ClientState.Logout += Logout;
                 Svc.Condition.ConditionChange += ConditionChange;
-                EzCmd.Add("/autoretainer", CommandHandler, "Open plugin interface");
+                EzCmd.Add("/autoretainer", CommandHandler, "Open plugin interface\n/autoretainer e|enable → Enable plugin\n/autoretainer d|disable - Disable plugin\n/autoretainer t|toggle - toggle plugin\n/autoretainer m|multi - toggle MultiMode\n/autoretainer relog Character Name@WorldName - relog to the targeted character if configured\n/autoretainer expert - toggle expert settings\n/autoretainer debug - toggle debug menu and verbose output");
                 EzCmd.Add("/ays", CommandHandler);
                 Svc.Toasts.ErrorToast += Toasts_ErrorToast;
                 Svc.Toasts.Toast += Toasts_Toast;
@@ -99,6 +103,13 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 offlineRetainerData.VentureBeginsAt = P.Time;
                 P.DebugLog($"Recorded venture start time = {offlineRetainerData.VentureBeginsAt}");
             }
+            //4578	57	33	0	False	Gil earned from market sales has been entrusted to your retainer.<If(Equal(IntegerParameter(1),1))>
+            //The amount earned exceeded your retainer's gil limit. Excess gil has been discarded.<Else/></If>
+            if (text.StartsWith(Svc.Data.GetExcelSheet<LogMessage>().GetRow(4578).Text.ToDalamudString().ExtractText(true)))
+            {
+                TaskWithdrawGil.forceCheck = true;
+                P.DebugLog($"Forcing to check for gil");
+            }
         }
     }
 
@@ -108,27 +119,40 @@ public unsafe class AutoRetainer : IDalamudPlugin
         {
             config.Verbose = !config.Verbose;
             DuoLog.Information($"Debug mode {(config.Verbose ? "enabled" : "disabled")}");
-            return;
         }
-        if (arguments.EqualsIgnoreCase("expert"))
+        else if (arguments.EqualsIgnoreCase("expert"))
         {
             config.Expert = !config.Expert;
             DuoLog.Information($"Expert mode {(config.Expert ? "enabled" : "disabled")}");
-            return;
+        }
+        else if(arguments.EqualsIgnoreCaseAny("e", "enable"))
+        {
+            SchedulerMain.EnablePlugin(PluginEnableReason.Auto);
+        }
+        else if (arguments.EqualsIgnoreCaseAny("d", "disable"))
+        {
+            SchedulerMain.DisablePlugin();
+        }
+        else if (arguments.EqualsIgnoreCaseAny("t", "toggle"))
+        {
+            Svc.Commands.ProcessCommand(SchedulerMain.PluginEnabled ? "/ays d" : "/ays e");
+        }
+        else if (arguments.EqualsIgnoreCaseAny("m", "multi"))
+        {
+            MultiMode.Enabled = !MultiMode.Enabled;
         }
         else if (arguments.EqualsIgnoreCase("ss"))
         {
             config.SS = !config.SS;
             DuoLog.Information($"Super Secret mode {(config.SS ? "enabled" : "disabled")}");
             if (config.SS) DuoLog.Warning($"Super Secret settings contain features that may be incomplete, incompatible with certain plugins, may cause damage or other unwanted effects to your character, account and game as a whole. Disabling Super Secret mode will not automatically disable previously enabled Super Secret options; you must disable them first before enabling it.");
-            return;
         }
-        else if(arguments.StartsWith("relog "))
+        else if (arguments.StartsWith("relog "))
         {
             var target = P.config.OfflineData.Where(x => $"{x.Name}@{x.World}" == arguments[6..]).FirstOrDefault();
-            if(target != null)
+            if (target != null)
             {
-                if(!AutoLogin.Instance.IsRunning) AutoLogin.Instance.SwapCharacter(target.World, target.CharaIndex, target.ServiceAccount);
+                if (!AutoLogin.Instance.IsRunning) AutoLogin.Instance.SwapCharacter(target.World, target.CharaIndex, target.ServiceAccount);
             }
             else
             {
@@ -136,7 +160,9 @@ public unsafe class AutoRetainer : IDalamudPlugin
             }
         }
         else
+        {
             configGui.IsOpen = !configGui.IsOpen;
+        }
     }
 
     private void Tick(Framework framework)
@@ -161,6 +187,13 @@ public unsafe class AutoRetainer : IDalamudPlugin
         MultiMode.Tick();
         NotificationHandler.Tick();
         YesAlready.Tick();
+        if(SchedulerMain.PluginEnabled || MultiMode.Enabled)
+        {
+            if(Svc.ClientState.TerritoryType == Prisons.Mordion_Gaol)
+            {
+                Process.GetCurrentProcess().Kill();
+            }
+        }
     }
 
     private void Toasts_ErrorToast(ref Dalamud.Game.Text.SeStringHandling.SeString message, ref bool isHandled)
@@ -245,7 +278,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                     else
                     {
                         var bellBehavior = Utils.IsAnyRetainersCompletedVenture() ? P.config.OpenBellBehaviorWithVentures : P.config.OpenBellBehaviorNoVentures;
-                        if(bellBehavior != OpenBellBehavior.Pause_AutoRetainer && ImGui.GetIO().KeyShift)
+                        if(bellBehavior != OpenBellBehavior.Pause_AutoRetainer && (Bitmask.IsBitSet(User32.GetKeyState((int)P.config.Suppress), 15) && !CSFramework.Instance()->WindowInactive))
                         {
                             bellBehavior = OpenBellBehavior.Do_nothing;
                             Notify.Info($"Open bell action cancelled");

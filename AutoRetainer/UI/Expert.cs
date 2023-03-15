@@ -47,6 +47,7 @@ namespace AutoRetainer.UI
 
                 ImGui.Checkbox($"Auto-disable plugin when closing retainer list", ref P.config.AutoDisable);
                 ImGuiEx.TextWrapped($"Only applies when you exit menu by yourself. Otherwise, settings above apply.");
+                ImGui.Checkbox($"Do not show plugin status icons", ref P.config.HideOverlayIcons);
             });
 
             InfoBox.DrawBox("Settings##expert", delegate

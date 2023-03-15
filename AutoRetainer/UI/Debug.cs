@@ -28,6 +28,8 @@ internal unsafe static class Debug
     {
         Safe(delegate
         {
+            ImGui.Checkbox($"TaskWithdrawGil.forceCheck", ref TaskWithdrawGil.forceCheck);
+            ImGuiEx.Text($"{Svc.Data.GetExcelSheet<LogMessage>().GetRow(4578).Text.ToDalamudString().ExtractText(true)}");
             if(ImGui.Button("Close retainer"))
             {
                 DuoLog.Information($"{RetainerHandlers.CloseAgentRetainer()}");

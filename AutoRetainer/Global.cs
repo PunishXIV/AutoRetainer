@@ -18,3 +18,4 @@ global using ECommons.ImGuiMethods;
 global using ECommons.Schedulers;
 global using static AutoRetainer.AutoRetainer;
 global using AutoRetainer.Structs;
+global using CSFramework = FFXIVClientStructs.FFXIV.Client.System.Framework.Framework;

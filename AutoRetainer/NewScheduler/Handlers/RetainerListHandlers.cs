@@ -1,4 +1,5 @@
-﻿using FFXIVClientStructs.FFXIV.Component.GUI;
+﻿using AutoRetainer.NewScheduler.Tasks;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,7 @@ namespace AutoRetainer.NewScheduler.Handlers
     {
         internal static bool? SelectRetainerByName(string name)
         {
+            TaskWithdrawGil.forceCheck = false;
             if (name.IsNullOrEmpty())
             {
                 throw new Exception($"Name can not be null or empty");

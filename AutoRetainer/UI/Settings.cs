@@ -46,9 +46,15 @@ internal static class Settings
                 P.config.DontReassign = false;
             }
             ImGuiComponents.HelpMarker("Only reassign ventures that retainers are undertaking.");
-            ImGuiComponents.HelpMarker("Hold CTRL to temporarily suppress closing.");
         });
-        InfoBox.DrawBox("Multi Mode", delegate
+
+        InfoBox.DrawBox("Keybinds", delegate
+        {
+            DrawKeybind("Temporarily suppress enabling when opening retainer bell", ref P.config.Suppress);
+            DrawKeybind("Temporarily set retainer action to collect venture rewards when enabling AutoRetainer", ref P.config.TempCollectB);
+        });
+
+            InfoBox.DrawBox("Multi Mode", delegate
         {
             ImGui.Checkbox("Wait for all retainers to be done before logging into character", ref P.config.MultiWaitForAll);
             ImGui.SetNextItemWidth(60);
@@ -126,7 +132,7 @@ internal static class Settings
         ImGuiEx.TextV($"{text}:");
         ImGui.SameLine();
         ImGui.SetNextItemWidth(200f);
-        if(ImGui.BeginCombo("##inputKey", $"{key}"))
+        if (ImGui.BeginCombo("##inputKey", $"{key}"))
         {
             var block = false;
             if (ImGui.Selectable("Cancel"))
@@ -154,9 +160,8 @@ internal static class Settings
             }
             ImGui.EndCombo();
         }
-        //if (ImGuiEx.EnumCombo($"##{text}", ref key, EnumConsts)) 
         if (key != Keys.None)
-        { 
+        {
             ImGui.SameLine();
             if (ImGuiEx.IconButton(FontAwesomeIcon.Trash))
             {
@@ -164,6 +169,51 @@ internal static class Settings
             }
             ImGui.SameLine();
             ImGuiEx.Text("+ right click");
+        }
+        ImGui.PopID();
+    }
+
+    static void DrawKeybind(string text, ref Keys key)
+    {
+        ImGui.PushID(text);
+        ImGuiEx.Text($"{text}:");
+        ImGui.Dummy(new(20, 1));
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(200f);
+        if (ImGui.BeginCombo("##inputKey", $"{key}"))
+        {
+            var block = false;
+            if (ImGui.Selectable("Cancel"))
+            {
+            }
+            if (ImGui.IsItemHovered()) block = true;
+            if (ImGui.Selectable("Clear"))
+            {
+                key = Keys.None;
+            }
+            if (ImGui.IsItemHovered()) block = true;
+            if (!block)
+            {
+                ImGuiEx.Text(GradientColor.Get(ImGuiColors.ParsedGreen, ImGuiColors.DalamudRed), "Now press new key...");
+                foreach (var x in Enum.GetValues<Keys>())
+                {
+                    if (Bitmask.IsBitSet(User32.GetKeyState((int)x), 15))
+                    {
+                        ImGui.CloseCurrentPopup();
+                        key = x;
+                        break;
+                    }
+                }
+            }
+            ImGui.EndCombo();
+        }
+        if (key != Keys.None)
+        {
+            ImGui.SameLine();
+            if (ImGuiEx.IconButton(FontAwesomeIcon.Trash))
+            {
+                key = Keys.None;
+            }
         }
         ImGui.PopID();
     }

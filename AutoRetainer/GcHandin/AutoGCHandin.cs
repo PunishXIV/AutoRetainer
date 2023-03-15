@@ -52,9 +52,10 @@ namespace AutoRetainer.GcHandin
                 {
                     if (EzThrottler.Throttle("Yesno", 200) && addonSS->YesButton->IsEnabled)
                     {
-                        var str = MemoryHelper.ReadSeString(&addonSS->PromptText->NodeText).ToString();
+                        var str = MemoryHelper.ReadSeString(&addonSS->PromptText->NodeText).ExtractText();
                         P.DebugLog($"SelectYesno encountered: {str}");
-                        if (str.EqualsAny("Do you really want to trade a high-quality item?"))
+                        //102434	Do you really want to trade a high-quality item?
+                        if (str.Equals(Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(102434).Text.ToDalamudString().ExtractText()))
                         {
                             ClickSelectYesNo.Using((IntPtr)addonSS).Yes();
                             P.DebugLog($"Selecting yes");
@@ -192,7 +193,11 @@ namespace AutoRetainer.GcHandin
             var step2 = step1->GetAsAtkComponentNode()->Component->UldManager.NodeList[1];
             var step3 = step2->GetAsAtkComponentNode()->Component->UldManager.NodeList[2];
             var text = MemoryHelper.ReadSeString(&step3->GetAsAtkTextNode()->NodeText).ExtractText();
-            var ret = text.EqualsAny("Hide Armoury Chest Items");
+            //4619	Hide Armoury Chest Items
+            //4618	Hide Gear Set Items
+            var hideArmory = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(4619).Text.ToDalamudString().ExtractText();
+            var hideGearSet = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(4618).Text.ToDalamudString().ExtractText();
+            var ret = text.Equals(hideArmory) || (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data) && data.EnableGCArmoryHandin && text.Equals(hideGearSet));
             //if (!ret) PluginLog.Verbose($"Selected filter is not valid");
             return ret;
         }

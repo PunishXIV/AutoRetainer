@@ -154,6 +154,7 @@ internal unsafe static class MultiModeUI
                         }
                     }
                 }
+                ImGui.Checkbox("Allow armory chest GC handin for this character", ref data.EnableGCArmoryHandin);
                 ImGui.Separator();
                 if(ImGui.Button("Exclude this character"))
                 {
@@ -281,7 +282,7 @@ internal unsafe static class MultiModeUI
                         {
                             ImGui.OpenPopup(n);
                         }
-                        if (ImGui.BeginPopup(n))
+                        if (ImGuiEx.BeginPopupNextToElement(n))
                         {
                             ImGui.CollapsingHeader($"{ret.Name} - {data.Name} configuration  ##conf", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.Bullet | ImGuiTreeNodeFlags.OpenOnArrow);
                             ImGuiEx.Text($"Additional post-venture tasks:");
