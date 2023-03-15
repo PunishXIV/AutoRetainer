@@ -1,0 +1,77 @@
+﻿using AutoRetainer.Helpers;
+using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Game.Text.SeStringHandling;
+using ECommons.ChatMethods;
+using System;
+using System.Collections.Generic;
+using System.DirectoryServices.ActiveDirectory;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace AutoRetainer.Modules
+{
+    internal static class NotificationHandler
+    {
+        internal static bool CurrentState = false;
+        internal static bool IsNotified = false;
+        internal static bool IsHidden = false;
+        internal static void Tick()
+        {
+            var currentState = GetNotifyState();
+            if (currentState != CurrentState)
+            {
+                CurrentState = currentState;
+                if (currentState)
+                {
+                    Svc.Chat.PrintChat(new()
+                    {
+                        Message = new SeStringBuilder().AddUiForeground("[AutoRetainer] Some of the retainers have completed their ventures!", (ushort)UIColor.Green).Build()
+                    });
+                    IsHidden = false;
+                    IsNotified = true;
+                }
+                else
+                {
+                    IsNotified = false;
+                    IsHidden = false;
+                }
+            }
+        }
+
+        internal static bool GetNotifyState()
+        {
+            if (P.config.NotifyIncludeAllChara)
+            {
+                foreach (var x in P.config.OfflineData)
+                {
+                    if (!P.config.NotifyIgnoreNoMultiMode || x.Enabled)
+                    {
+                        foreach (var r in x.RetainerData)
+                        {
+                            if (r.HasVenture && r.GetVentureSecondsRemaining() <= 0)
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+            else
+            {
+                if (Svc.ClientState.LocalContentId != 0 && P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var x))
+                {
+                    foreach (var r in x.RetainerData)
+                    {
+                        if (r.HasVenture && r.GetVentureSecondsRemaining() <= 0)
+                        {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        }
+    }
+}

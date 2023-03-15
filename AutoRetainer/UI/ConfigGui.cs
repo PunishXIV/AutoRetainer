@@ -1,12 +1,12 @@
-﻿using AutoRetainer.Multi;
-using AutoRetainer.NewScheduler;
-using AutoRetainer.Serializables;
-using AutoRetainer.Statistics;
+﻿using AutoRetainer.Scheduler;
+using AutoRetainer.Configuration;
 using Dalamud.Interface.Components;
 using ECommons.Configuration;
 using ECommons.Reflection;
 using PunishLib.ImGuiMethods;
 using System.Reflection;
+using AutoRetainer.Modules.Multi;
+using AutoRetainer.UI.Settings;
 
 namespace AutoRetainer.UI;
 
@@ -79,9 +79,9 @@ unsafe internal class ConfigGui : Window
 
                 ("Retainers", MultiModeUI.Draw, null, true),
                 (P.config.RecordStats ? "Statistics" : null, StatisticsUI.Draw, null, true),
-                ("Settings", Settings.Draw, null, true),
+                ("Settings", SettingsMain.Draw, null, true),
                 (P.config.Expert?"Expert":null, Expert.Draw, null, true),
-                ("Beta", TabBeta.Draw, null, true),
+                ("Beta", Beta.Draw, null, true),
                 ("About", delegate { AboutTab.Draw(P); }, null, true),
                 (P.config.Verbose ? "Log" : null, InternalLog.PrintImgui, null, false),
                 (P.config.Verbose?"Retainers (old)":null, Retainers.Draw, null, true),

@@ -2,22 +2,22 @@
 using Dalamud;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using AutoRetainer.QSI;
-using AutoRetainer.Statistics;
-using AutoRetainer.GcHandin;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
-using AutoRetainer.Multi;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Environment;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using Lumina.Excel.GeneratedSheets;
 using Dalamud.Utility;
 using ClickLib;
 using ClickLib.Clicks;
-using AutoRetainer.NewScheduler.Handlers;
-using AutoRetainer.NewScheduler.Tasks;
+using AutoRetainer.Scheduler.Handlers;
+using AutoRetainer.Scheduler.Tasks;
+using AutoRetainer.Helpers;
+using AutoRetainer.Modules;
+using AutoRetainer.Modules.GcHandin;
+using AutoRetainer.Modules.Multi;
 
 namespace AutoRetainer.UI;
 
