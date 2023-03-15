@@ -1,7 +1,4 @@
-﻿using AutoRetainer.Configuration;
-using AutoRetainer.Internal.SERetainer;
-using AutoRetainer.Modules.Multi;
-using ClickLib.Clicks;
+﻿using ClickLib.Clicks;
 using Dalamud;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Enums;
@@ -14,13 +11,10 @@ using ECommons.MathHelpers;
 using ECommons.Reflection;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
-using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Client.UI;
-using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
 using System.Text.RegularExpressions;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace AutoRetainer.Helpers;
 

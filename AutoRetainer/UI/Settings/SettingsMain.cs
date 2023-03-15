@@ -1,11 +1,8 @@
 ﻿using Dalamud.Interface.Components;
-using ECommons.Configuration;
 using ECommons.MathHelpers;
 using PInvoke;
 using PunishLib.ImGuiMethods;
-using System;
 using System.Windows.Forms;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AutoRetainer.UI.Settings;
 

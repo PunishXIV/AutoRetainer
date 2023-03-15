@@ -1,7 +1,4 @@
-﻿using AutoRetainer.Configuration;
-using AutoRetainer.Helpers;
-using AutoRetainer.Modules.Multi;
-using Dalamud.Interface.Components;
+﻿using Dalamud.Interface.Components;
 using ECommons.MathHelpers;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 

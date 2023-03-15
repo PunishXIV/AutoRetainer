@@ -1,21 +1,14 @@
-﻿using AutoRetainer.Helpers;
-using AutoRetainer.Scheduler.Handlers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AutoRetainer.Scheduler.Handlers;
 
-namespace AutoRetainer.Scheduler.Tasks
+namespace AutoRetainer.Scheduler.Tasks;
+
+internal static class TaskCollectVenture
 {
-    internal static class TaskCollectVenture
+    internal static void Enqueue()
     {
-        internal static void Enqueue()
-        {
-            P.TaskManager.Enqueue(YesAlready.WaitForYesAlreadyDisabledTask);
-            P.TaskManager.Enqueue(RetainerHandlers.SelectViewVentureReport);
-            P.TaskManager.Enqueue(RetainerHandlers.ClickResultReassign);
-            P.TaskManager.Enqueue(RetainerHandlers.ClickAskReturn);
-        }
+        P.TaskManager.Enqueue(YesAlready.WaitForYesAlreadyDisabledTask);
+        P.TaskManager.Enqueue(RetainerHandlers.SelectViewVentureReport);
+        P.TaskManager.Enqueue(RetainerHandlers.ClickResultReassign);
+        P.TaskManager.Enqueue(RetainerHandlers.ClickAskReturn);
     }
 }

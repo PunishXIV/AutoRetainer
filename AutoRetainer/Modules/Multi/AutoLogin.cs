@@ -2,8 +2,6 @@
 #nullable enable
 
 
-using AutoRetainer;
-using AutoRetainer.Helpers;
 using ClickLib.Clicks;
 using Dalamud.Game;
 using Dalamud.Memory;

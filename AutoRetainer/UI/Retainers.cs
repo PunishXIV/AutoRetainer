@@ -1,5 +1,4 @@
-﻿using AutoRetainer.Helpers;
-using Dalamud.Interface.Components;
+﻿using Dalamud.Interface.Components;
 using FFXIVClientStructs.FFXIV.Client.Game;
 
 namespace AutoRetainer.UI;

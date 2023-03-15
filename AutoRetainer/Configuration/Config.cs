@@ -1,6 +1,4 @@
-﻿using AutoRetainer.Scheduler;
-using Dalamud.Configuration;
-using ECommons.Configuration;
+﻿using ECommons.Configuration;
 using ECommons.MathHelpers;
 using PInvoke;
 using System.Windows.Forms;

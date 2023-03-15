@@ -1,10 +1,7 @@
-﻿using AutoRetainer.Configuration;
-using AutoRetainer.Helpers;
-using Dalamud.Game.ClientState.Conditions;
+﻿using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.Text.SeStringHandling;
 using ECommons.Events;
 using ECommons.ExcelServices;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AutoRetainer.Modules;
 

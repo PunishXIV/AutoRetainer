@@ -1,8 +1,4 @@
-﻿using AutoRetainer.Helpers;
-using AutoRetainer.Modules.Multi;
-using AutoRetainer.Scheduler;
-using Dalamud.Game.ClientState.Conditions;
-using ImGuiScene;
+﻿using Dalamud.Game.ClientState.Conditions;
 using System.IO;
 
 namespace AutoRetainer.UI.Overlays;

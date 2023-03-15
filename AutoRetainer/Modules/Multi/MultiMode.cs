@@ -1,6 +1,4 @@
-﻿using AutoRetainer.Scheduler;
-using AutoRetainer.Scheduler.Tasks;
-using AutoRetainer.Configuration;
+﻿using AutoRetainer.Scheduler.Tasks;
 using AutoRetainer.UI;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
@@ -13,7 +11,6 @@ using ECommons.MathHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using static AutoRetainer.Modules.OfflineDataManager;
-using AutoRetainer.Helpers;
 
 namespace AutoRetainer.Modules.Multi;
 

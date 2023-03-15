@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace AutoRetainer.Scheduler;
 
-namespace AutoRetainer.Scheduler
+public enum TaskType
 {
-    public enum TaskType
-    {
-        ManageVenture, EntrustDuplicates, WithdrawGil
-    }
+    ManageVenture, EntrustDuplicates, WithdrawGil
 }
