@@ -13,6 +13,15 @@ internal unsafe static class HouseEnterTask
     {
         P.TaskManager.Enqueue(YesAlready.WaitForYesAlreadyDisabledTask);
         P.TaskManager.Enqueue(WaitUntilNotBusy, 180 * 1000);
+        P.TaskManager.Enqueue(() =>
+        {
+            if(Utils.GetReachableRetainerBell() != null)
+            {
+                P.DebugLog($"Found reachable retainer bell nearby, aborting task");
+                return null;
+            }
+            return true;
+        });
         P.TaskManager.Enqueue(() => SetTarget(20f));
         P.TaskManager.Enqueue(Lockon);
         P.TaskManager.Enqueue(Approach);

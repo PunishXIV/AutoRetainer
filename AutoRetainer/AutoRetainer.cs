@@ -57,7 +57,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 retainerManager = new(Svc.SigScanner);
                 ws = new();
                 configGui = new();
-                TaskManager = new() { AbortOnTimeout = true };
+                TaskManager = new() { AbortOnTimeout = true, TimeLimitMS = 20000 };
                 Memory = new();
                 Svc.PluginInterface.UiBuilder.Draw += ws.Draw;
                 Svc.PluginInterface.UiBuilder.OpenConfigUi += delegate { configGui.IsOpen = true; };
@@ -267,6 +267,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                         WasEnabled = false;
                         if (IsInteractionAutomatic)
                         {
+                            IsInteractionAutomatic = false;
                             SchedulerMain.EnablePlugin(PluginEnableReason.MultiMode);
                         }
                     }
