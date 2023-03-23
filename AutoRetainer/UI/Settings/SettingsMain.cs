@@ -101,6 +101,7 @@ internal static class SettingsMain
         {
             ImGui.Checkbox($"Record venture statistics", ref P.config.RecordStats);
         });
+        InfoBox.DrawBox("Auto GC Expert Delivery Settings", AutoGCHandinUI.Draw);
         if (P.config.Blacklist.Any())
         {
             InfoBox.DrawBox("Excluded characters", delegate
