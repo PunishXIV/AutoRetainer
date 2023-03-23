@@ -21,7 +21,7 @@ internal unsafe class Config : IEzConfig
     public bool RecordStats = true;
     public bool EnableAutoGCHandin = false; //todo: remove
     public bool ShouldSerializeEnableAutoGCHandin() => false;
-    public bool GCHandinNotify = true;
+    public bool GCHandinNotify = false;
     internal bool BypassSanctuaryCheck = false;
     public bool MultiAllowHET = false;
     public bool UseServerTime = true;
@@ -31,6 +31,7 @@ internal unsafe class Config : IEzConfig
     public bool Expert = false;
     public List<(ulong CID, string Name)> Blacklist = new();
     public bool HideOverlayIcons = false;
+    public bool UnsafeProtection = false;
 
     public OpenBellBehavior OpenBellBehaviorNoVentures = OpenBellBehavior.Enable_AutoRetainer;
     public OpenBellBehavior OpenBellBehaviorWithVentures = OpenBellBehavior.Enable_AutoRetainer;

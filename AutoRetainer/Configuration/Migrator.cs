@@ -17,11 +17,11 @@ namespace AutoRetainer.Configuration
                 {
                     if (x.EnableGCArmoryHandin)
                     {
-                        x.GCDeliveryType = GCDeliveryType.Allow_Inventory_and_Armory_Chest;
+                        x.GCDeliveryType = GCDeliveryType.Hide_Gear_Set_Items;
                     }
                     else
                     {
-                        x.GCDeliveryType = GCDeliveryType.Allow_Inventory_Only;
+                        x.GCDeliveryType = GCDeliveryType.Hide_Armoury_Chest_Items;
                     }
                 }
                 DuoLog.Warning($"GC Handin settings migrated");

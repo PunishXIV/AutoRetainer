@@ -8,6 +8,6 @@ namespace AutoRetainer.Configuration
 {
     public enum GCDeliveryType
     {
-        Disabled,Allow_Inventory_Only,Allow_Inventory_and_Armory_Chest
+        Disabled,Hide_Armoury_Chest_Items,Hide_Gear_Set_Items,Show_All_Items
     }
 }

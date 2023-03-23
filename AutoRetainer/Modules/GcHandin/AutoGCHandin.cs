@@ -30,7 +30,17 @@ internal unsafe static class AutoGCHandin
     {
         if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var d))
         {
-            return d.GCDeliveryType == GCDeliveryType.Allow_Inventory_and_Armory_Chest;
+            return d.GCDeliveryType.EqualsAny(GCDeliveryType.Hide_Gear_Set_Items, GCDeliveryType.Show_All_Items);
+        }
+        return false;
+    }
+
+    internal static bool IsAllItemsEnabled()
+    {
+        Safety.Check();
+        if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var d))
+        {
+            return d.GCDeliveryType == GCDeliveryType.Show_All_Items;
         }
         return false;
     }
@@ -45,6 +55,7 @@ internal unsafe static class AutoGCHandin
     {
         if (Svc.Condition[ConditionFlag.OccupiedInQuestEvent] && IsEnabled())
         {
+            Safety.Check();
             if (TryGetAddonByName<AddonGrandCompanySupplyReward>("GrandCompanySupplyReward", out var addonGCSR) && IsAddonReady(&addonGCSR->AtkUnitBase) && Operation)
             {
                 if (TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon) && IsAddonReady(addon) && EzThrottler.Throttle("CloseSupplyList", 200))
@@ -205,11 +216,29 @@ internal unsafe static class AutoGCHandin
         var text = MemoryHelper.ReadSeString(&step3->GetAsAtkTextNode()->NodeText).ExtractText();
         //4619	Hide Armoury Chest Items
         //4618	Hide Gear Set Items
+        //4617	Show All Items
         var hideArmory = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(4619).Text.ToDalamudString().ExtractText();
         var hideGearSet = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(4618).Text.ToDalamudString().ExtractText();
-        var ret = text.Equals(hideArmory) || P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data) && IsArmoryChestEnabled() && text.Equals(hideGearSet);
-        //if (!ret) PluginLog.Verbose($"Selected filter is not valid");
-        return ret;
+        var showAll = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(4617).Text.ToDalamudString().ExtractText();
+        if (text.Equals(hideArmory))
+        {
+            return true;
+        }
+        else
+        {
+            if(P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
+            {
+                if(text.EqualsAny(hideGearSet))
+                {
+                    return IsArmoryChestEnabled() || IsAllItemsEnabled();
+                }
+                if(text.EqualsAny(showAll))
+                {
+                    return IsAllItemsEnabled();
+                }
+            }
+        }
+        return false;
     }
 
     internal static void InvokeHandin(AtkUnitBase* addon)

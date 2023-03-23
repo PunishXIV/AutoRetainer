@@ -169,7 +169,7 @@ internal static unsafe class Utils
             Safe(delegate
             {
                 instance.GetType().Assembly.GetType("NotificationMaster.TrayIconManager", true).GetMethod("ShowToast").Invoke(null, new object[] { s, P.Name });
-            });
+            }, true);
         }
     }
 

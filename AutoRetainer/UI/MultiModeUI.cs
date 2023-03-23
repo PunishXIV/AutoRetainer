@@ -152,6 +152,8 @@ internal unsafe static class MultiModeUI
                         }
                     }
                 }
+                ImGuiComponents.HelpMarker("When operating in multi mode, if there are no other characters with imminent ventures to collect, it will relog back to your preferred character.");
+
                 ImGuiEx.Text($"GC handin configuration:");
                 if (!AutoGCHandin.Operation)
                 {

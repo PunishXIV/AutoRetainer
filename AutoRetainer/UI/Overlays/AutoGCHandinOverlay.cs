@@ -21,6 +21,20 @@ internal class AutoGCHandinOverlay : Window
             ImGui.SameLine();
             ImGui.SetNextItemWidth(200);
             ImGuiEx.EnumCombo("##mode", ref d.GCDeliveryType, x => x != GCDeliveryType.Disabled);
+            if (d.GCDeliveryType == GCDeliveryType.Hide_Gear_Set_Items)
+            {
+                ImGui.SameLine();
+                ImGui.PushFont(UiBuilder.IconFont);
+                ImGuiEx.Text($"\uf071");
+                ImGui.PopFont();
+            }
+            if (d.GCDeliveryType == GCDeliveryType.Show_All_Items)
+            {
+                ImGui.SameLine();
+                ImGui.PushFont(UiBuilder.IconFont);
+                ImGuiEx.Text($"\uf071\uf071\uf071");
+                ImGui.PopFont();
+            }
         }
         height = ImGui.GetWindowSize().Y;
     }

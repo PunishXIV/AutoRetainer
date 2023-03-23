@@ -17,6 +17,15 @@ namespace AutoRetainer.UI.Settings
             ImGui.Checkbox("Old RetainerSense", ref P.config.OldRetainerSense);
             ImGuiComponents.HelpMarker("Detect and use the closest Summoning Bell within valid distance of the player.");
             ImGuiEx.TextWrapped(ImGuiColors.DalamudGrey, "RetainerSense is enforced to be active during MultiMode operation.");
+            ImGui.Separator();
+            ImGui.Checkbox($"Unsafe options protection", ref P.config.UnsafeProtection);
+            ImGui.SameLine();
+            if (ImGui.Button($"Write to registry"))
+            {
+                Safety.Set(P.config.UnsafeProtection);
+            }
+            var g = Safety.Get();
+            ImGuiEx.Text(g?ImGuiColors.ParsedGreen:ImGuiColors.DalamudRed, $"Safety flag: {(g ? "Present" : "Absent")}");
         }
     }
 }

@@ -95,6 +95,22 @@ internal unsafe class RetainerListOverlay : Window
                 }
             }
             ImGuiEx.Tooltip("Entrust duplicates to all retainers");
+
+            ImGui.SameLine();
+            if (ImGuiEx.IconButton("\uf51e##WithdrawGil"))
+            {
+                for (var i = 0; i < P.retainerManager.Count; i++)
+                {
+                    var ret = P.retainerManager.Retainer(i);
+                    if (ret.Available)
+                    {
+                        P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
+                        TaskWithdrawGil.Enqueue(100);
+                        P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
+                    }
+                }
+            }
+            ImGuiEx.Tooltip("Withdraw gil from all retainers");
         }
         height = ImGui.GetWindowSize().Y;
     }
