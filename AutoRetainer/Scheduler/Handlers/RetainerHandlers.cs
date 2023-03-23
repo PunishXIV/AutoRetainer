@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.Internal.Clicks;
+using AutoRetainer.Scheduler.Tasks;
 using ClickLib.Clicks;
 using Dalamud.Memory;
 using Dalamud.Utility;
@@ -233,12 +234,69 @@ internal unsafe static class RetainerHandlers
         return false;
     }
 
-    internal static bool? WithdrawGilOrCancel()
+    internal static bool? SetDepositGilAmount(int percent)
     {
-        return WithdrawGilOrCancel(false);
+        if (TryGetAddonByName<AtkUnitBase>("Bank", out var addon) && IsAddonReady(addon))
+        {
+            if (percent < 1 || percent > 100) throw new ArgumentOutOfRangeException(nameof(percent), percent, "Percent must be between 1 and 100");
+            var numGil = TaskDepositGil.Gil;
+            P.DebugLog($"Gil: {numGil}");
+            var gilToDeposit = (uint)(percent == 100 ? numGil : numGil / 100f * percent);
+            if (gilToDeposit > 0 && gilToDeposit <= numGil)
+            {
+                if (Utils.GenericThrottle)
+                {
+                    var v = stackalloc AtkValue[]
+                    {
+                        new() { Type = FFXIVClientStructs.FFXIV.Component.GUI.ValueType.Int, Int = 3 },
+                        new() { Type = FFXIVClientStructs.FFXIV.Component.GUI.ValueType.UInt, UInt = gilToDeposit }
+                    };
+                    addon->FireCallback(2, v);
+                    P.DebugLog($"Set gil to deposit {gilToDeposit} (total: {numGil})");
+                    return true;
+                }
+            }
+            else
+            {
+                return true;
+            }
+        }
+        else
+        {
+            Utils.RethrottleGeneric();
+        }
+        return false;
     }
 
-    internal static bool? WithdrawGilOrCancel(bool forceCancel = false)
+    internal static bool? SwapBankMode()
+    {
+        if (TryGetAddonByName<AtkUnitBase>("Bank", out var addon) && IsAddonReady(addon))
+        {
+            if (Utils.GenericThrottle)
+            {
+                var v = stackalloc AtkValue[]
+                {
+                    new() { Type = FFXIVClientStructs.FFXIV.Component.GUI.ValueType.Int, Int = 2 },
+                    new() { Type = 0, UInt = 0 }
+                };
+                addon->FireCallback(2, v);
+                P.DebugLog($"Swapping withdraw mode");
+                return true;
+            }
+        }
+        else
+        {
+            Utils.RethrottleGeneric();
+        }
+        return false;
+    }
+
+    internal static bool? ProcessBankOrCancel()
+    {
+        return ProcessBankOrCancel(false);
+    }
+
+    internal static bool? ProcessBankOrCancel(bool forceCancel = false)
     {
         if (TryGetAddonByName<AtkUnitBase>("Bank", out var addon) && IsAddonReady(addon))
         {

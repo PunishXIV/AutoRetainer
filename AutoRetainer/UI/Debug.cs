@@ -23,6 +23,7 @@ internal unsafe static class Debug
         ImGuiEx.TextWrapped(ImGuiColors.ParsedOrange, "Anything can happen here.");
         Safe(delegate
         {
+            ImGuiEx.Text($"Gil: {TaskDepositGil.Gil}");
             ImGui.Checkbox($"TaskWithdrawGil.forceCheck", ref TaskWithdrawGil.forceCheck);
             ImGuiEx.Text($"{Svc.Data.GetExcelSheet<LogMessage>().GetRow(4578).Text.ToDalamudString().ExtractText(true)}");
             if(ImGui.Button("Close retainer"))
@@ -119,11 +120,31 @@ internal unsafe static class Debug
             }
             if (ImGui.Button($"WithdrawGilOrCancel"))
             {
-                DuoLog.Information($"{RetainerHandlers.WithdrawGilOrCancel()}");
+                DuoLog.Information($"{RetainerHandlers.ProcessBankOrCancel()}");
             }
             if (ImGui.Button($"WithdrawGilOrCancel (force cancel)"))
             {
-                DuoLog.Information($"{RetainerHandlers.WithdrawGilOrCancel(true)}");
+                DuoLog.Information($"{RetainerHandlers.ProcessBankOrCancel(true)}");
+            }
+            if (ImGui.Button($"SwapBankMode"))
+            {
+                DuoLog.Information($"{RetainerHandlers.SwapBankMode()}");
+            }
+            if (ImGui.Button($"SetDepositGilAmount (1%)"))
+            {
+                DuoLog.Information($"{RetainerHandlers.SetDepositGilAmount(1)}");
+            }
+            if (ImGui.Button($"SetDepositGilAmount (50%)"))
+            {
+                DuoLog.Information($"{RetainerHandlers.SetDepositGilAmount(50)}");
+            }
+            if (ImGui.Button($"SetDepositGilAmount (99%)"))
+            {
+                DuoLog.Information($"{RetainerHandlers.SetDepositGilAmount(99)}");
+            }
+            if (ImGui.Button($"SetDepositGilAmount (100%)"))
+            {
+                DuoLog.Information($"{RetainerHandlers.SetDepositGilAmount(100)}");
             }
 
             ImGui.Separator();

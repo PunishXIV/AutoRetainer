@@ -6,4 +6,5 @@ public class AdditionalRetainerData
     public bool EntrustDuplicates = false;
     public bool WithdrawGil = false;
     public int WithdrawGilPercent = 100;
+    public bool Deposit = false;
 }

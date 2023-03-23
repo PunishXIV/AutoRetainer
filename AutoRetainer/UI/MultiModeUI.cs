@@ -294,9 +294,14 @@ internal unsafe static class MultiModeUI
                             ImGui.CollapsingHeader($"{ret.Name} - {data.Name} configuration  ##conf", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.Bullet | ImGuiTreeNodeFlags.OpenOnArrow);
                             ImGuiEx.Text($"Additional post-venture tasks:");
                             ImGui.Checkbox($"Entrust duplicates", ref adata.EntrustDuplicates);
-                            ImGui.Checkbox($"Withdraw gil", ref adata.WithdrawGil);
-                            ImGui.SetNextItemWidth(200f);
-                            ImGui.InputInt($"Amount, %", ref adata.WithdrawGilPercent.ValidateRange(1, 100), 1, 10);
+                            ImGui.Checkbox($"Withdraw or Deposit gil", ref adata.WithdrawGil);
+                            if (adata.WithdrawGil)
+                            {
+                                if (ImGui.RadioButton("Withdraw", !adata.Deposit)) adata.Deposit = false;
+                                if (ImGui.RadioButton("Deposit", adata.Deposit)) adata.Deposit = true;
+                                ImGui.SetNextItemWidth(200f);
+                                ImGui.InputInt($"Amount, %", ref adata.WithdrawGilPercent.ValidateRange(1, 100), 1, 10);
+                            }
                             ImGui.EndPopup();
                         }
                     }

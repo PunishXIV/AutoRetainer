@@ -77,7 +77,14 @@ internal unsafe static class SchedulerMain
                                     //withdraw gil
                                     if (adata.WithdrawGil)
                                     {
-                                        TaskWithdrawGil.Enqueue(adata.WithdrawGilPercent);
+                                        if (adata.Deposit)
+                                        {
+                                            if (TaskDepositGil.Gil > 0) TaskDepositGil.Enqueue(adata.WithdrawGilPercent);
+                                        }
+                                        else
+                                        {
+                                            TaskWithdrawGil.Enqueue(adata.WithdrawGilPercent);
+                                        }
                                     }
 
                                     P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
