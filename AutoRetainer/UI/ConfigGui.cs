@@ -71,16 +71,21 @@ unsafe internal class ConfigGui : Window
 
 
         ImGuiEx.EzTabBar("tabbar",
-
                 ("Retainers", MultiModeUI.Draw, null, true),
                 (P.config.RecordStats ? "Statistics" : null, StatisticsUI.Draw, null, true),
                 ("Settings", SettingsMain.Draw, null, true),
                 (P.config.Expert?"Expert":null, Expert.Draw, null, true),
                 ("Beta", Beta.Draw, null, true),
                 ("About", delegate { AboutTab.Draw(P); }, null, true),
-                (P.config.Verbose ? "Log" : null, InternalLog.PrintImgui, null, false),
-                (P.config.Verbose?"Retainers (old)":null, Retainers.Draw, null, true),
-                (P.config.Verbose?"Debug":null, Debug.Draw, null, true)
+                (P.config.Verbose ? "Dev" : null, delegate
+                {
+                    ImGuiEx.EzTabBar("DebugBar",
+                        ("Log", InternalLog.PrintImgui, null, false),
+                        ("Retainers (old)", Retainers.Draw, null, true),
+                        ("Debug", Debug.Draw, null, true),
+                        ("WIP", SuperSecret.Draw, null, true)
+                    );
+                }, null, true)
                 );
     }
 

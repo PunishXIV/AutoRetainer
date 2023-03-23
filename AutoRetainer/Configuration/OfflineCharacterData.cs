@@ -14,7 +14,9 @@ public class OfflineCharacterData
     public uint InventorySpace = 0;
     public uint VentureCoffers = 0;
     public int ServiceAccount = 0;
-    public bool EnableGCArmoryHandin = false;
+    public bool EnableGCArmoryHandin = false; //todo: remove
+    public bool ShouldSerializeEnableGCArmoryHandin() => false;
+    public GCDeliveryType GCDeliveryType = GCDeliveryType.Disabled;
 
     internal uint CharaIndex
     {

@@ -19,9 +19,9 @@ internal unsafe class Config : IEzConfig
     public int AdvanceTimer = 60;
     public bool StatsUnifyHQ = false;
     public bool RecordStats = true;
-    public bool EnableAutoGCHandin = false;
+    public bool EnableAutoGCHandin = false; //todo: remove
+    public bool ShouldSerializeEnableAutoGCHandin() => false;
     public bool GCHandinNotify = true;
-    public bool SS = false;
     internal bool BypassSanctuaryCheck = false;
     public bool MultiAllowHET = false;
     public bool UseServerTime = true;
@@ -44,7 +44,9 @@ internal unsafe class Config : IEzConfig
     public int Delay = 200;
 
     public bool _dontReassign = false;
-    public bool AutoUseRetainerBell = false;
+    public bool OldRetainerSense = false;
+    public bool RetainerSense = false;
+    public int RetainerSenseThreshold = 10000;
     public bool MultiModeUIBar = false;
     public bool UIBar = true;
 

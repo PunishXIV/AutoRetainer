@@ -1,4 +1,5 @@
-﻿using ClickLib.Clicks;
+﻿using AutoRetainer.UI.Overlays;
+using ClickLib.Clicks;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Memory;
 using Dalamud.Utility;
@@ -17,6 +18,23 @@ internal unsafe static class AutoGCHandin
     internal static bool Operation = false;
     internal static long AddonOpenedAt = 0;
 
+    internal static bool IsEnabled()
+    {
+        if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var d))
+        {
+            return d.GCDeliveryType != GCDeliveryType.Disabled;
+        }
+        return false;
+    }
+    internal static bool IsArmoryChestEnabled()
+    {
+        if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var d))
+        {
+            return d.GCDeliveryType == GCDeliveryType.Allow_Inventory_and_Armory_Chest;
+        }
+        return false;
+    }
+
     internal static void Init()
     {
         Overlay = new();
@@ -25,7 +43,7 @@ internal unsafe static class AutoGCHandin
 
     internal static void Tick()
     {
-        if (P.config.EnableAutoGCHandin && Svc.Condition[ConditionFlag.OccupiedInQuestEvent])
+        if (Svc.Condition[ConditionFlag.OccupiedInQuestEvent] && IsEnabled())
         {
             if (TryGetAddonByName<AddonGrandCompanySupplyReward>("GrandCompanySupplyReward", out var addonGCSR) && IsAddonReady(&addonGCSR->AtkUnitBase) && Operation)
             {
@@ -60,7 +78,7 @@ internal unsafe static class AutoGCHandin
                 {
                     AddonOpenedAt = Environment.TickCount64;
                 }
-                Overlay.Position = new(addon->X, addon->Y);
+                Overlay.Position = new(addon->X, addon->Y - Overlay.height);
                 if (Operation)
                 {
                     if (IsDone(addon))
@@ -189,7 +207,7 @@ internal unsafe static class AutoGCHandin
         //4618	Hide Gear Set Items
         var hideArmory = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(4619).Text.ToDalamudString().ExtractText();
         var hideGearSet = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(4618).Text.ToDalamudString().ExtractText();
-        var ret = text.Equals(hideArmory) || P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data) && data.EnableGCArmoryHandin && text.Equals(hideGearSet);
+        var ret = text.Equals(hideArmory) || P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data) && IsArmoryChestEnabled() && text.Equals(hideGearSet);
         //if (!ret) PluginLog.Verbose($"Selected filter is not valid");
         return ret;
     }

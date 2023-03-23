@@ -35,10 +35,6 @@ internal static class Expert
             ImGui.Checkbox($"Stay in retainer menu if there are retainers to finish ventures within 5 minutes or less", ref P.config.Stay5);
             ImGuiEx.TextWrapped(ImGuiColors.DalamudGrey, "This option is enforced during MultiMode operation.");
 
-            ImGui.Checkbox("RetainerSense", ref P.config.AutoUseRetainerBell);
-            ImGuiComponents.HelpMarker("Detect and use the closest Summoning Bell within valid distance of the player.");
-            ImGuiEx.TextWrapped(ImGuiColors.DalamudGrey, "RetainerSense is enforced to be active during MultiMode operation.");
-
             ImGui.Checkbox($"Auto-disable plugin when closing retainer list", ref P.config.AutoDisable);
             ImGuiEx.TextWrapped($"Only applies when you exit menu by yourself. Otherwise, settings above apply.");
             ImGui.Checkbox($"Do not show plugin status icons", ref P.config.HideOverlayIcons);
@@ -51,6 +47,11 @@ internal static class Expert
             ImGuiComponents.HelpMarker("The lower this value is the faster plugin will operate retainers. When dealing with low FPS or high latency you may want to increase this value. If you want the plugin to operate faster you may decrease it. ");
             ImGui.Checkbox($"Disable sorting and collapsing/expanding", ref P.config.NoCurrentCharaOnTop);
             ImGui.Checkbox($"Show MultiMode checkbox on plugin UI bar", ref P.config.MultiModeUIBar);
+        });
+
+        InfoBox.DrawBox("Server time", delegate
+        {
+            ImGui.Checkbox($"Use server time instead of PC time", ref P.config.UseServerTime);
         });
     }
 }

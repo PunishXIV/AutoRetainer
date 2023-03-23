@@ -253,7 +253,7 @@ internal unsafe static class RetainerHandlers
                         new() { Type = 0, Int = 0 }
                     };
                     addon->FireCallback(2, v);
-                    addon->Hide(true);
+                    UiHelper.Close(addon, true);
                     P.DebugLog($"Clicked withdraw");
                     //new ClickButtonGeneric(addon, "Bank").Click(withdraw);
                     return true;
@@ -272,7 +272,7 @@ internal unsafe static class RetainerHandlers
                             new() { Type = 0, Int = 0 }
                         };
                         addon->FireCallback(2, v);
-                        addon->Hide(true);
+                        UiHelper.Close(addon, true);
                         P.DebugLog($"Clicked cancel");
                         //new ClickButtonGeneric(addon, "Bank").Click(cancel);
                         return true;

@@ -20,6 +20,7 @@ internal unsafe static class Debug
     static string dbgRetName = string.Empty;
     internal static void Draw()
     {
+        ImGuiEx.TextWrapped(ImGuiColors.ParsedOrange, "Anything can happen here.");
         Safe(delegate
         {
             ImGui.Checkbox($"TaskWithdrawGil.forceCheck", ref TaskWithdrawGil.forceCheck);

@@ -152,7 +152,16 @@ internal unsafe static class MultiModeUI
                         }
                     }
                 }
-                ImGui.Checkbox("Allow armory chest GC handin for this character", ref data.EnableGCArmoryHandin);
+                ImGuiEx.Text($"GC handin configuration:");
+                if (!AutoGCHandin.Operation)
+                {
+                    ImGui.SetNextItemWidth(200f);
+                    ImGuiEx.EnumCombo("##gcHandin", ref data.GCDeliveryType);
+                }
+                else
+                {
+                    ImGuiEx.Text($"Can't change this now");
+                }
                 ImGui.Separator();
                 if(ImGui.Button("Exclude this character"))
                 {

@@ -171,7 +171,7 @@ internal unsafe class AutoLogin
     public bool SelectServiceAccount()
     {
         var dcMenu = (AtkUnitBase*)Svc.GameGui.GetAddonByName("TitleDCWorldMap", 1);
-        if (dcMenu != null) dcMenu->Hide(true);
+        if (dcMenu != null) UiHelper.Close(dcMenu, true);
         if (TryGetAddonByName<AtkUnitBase>("_CharaSelectWorldServer", out _))
         {
             return true;
@@ -208,7 +208,7 @@ internal unsafe class AutoLogin
     {
         // Select World
         var dcMenu = (AtkUnitBase*)Svc.GameGui.GetAddonByName("TitleDCWorldMap", 1);
-        if (dcMenu != null) dcMenu->Hide(true);
+        if (dcMenu != null) UiHelper.Close(dcMenu, true);
         var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("_CharaSelectWorldServer", 1);
         if (addon == null) return false;
 
@@ -251,7 +251,7 @@ internal unsafe class AutoLogin
         var addon = Utils.GetSpecificYesno(Svc.Data.GetExcelSheet<Addon>()?.GetRow(115)?.Text.ToDalamudString().ExtractText());
         if (addon == null) return false;
         GenerateCallback(addon, 0);
-        addon->Hide(true);
+        UiHelper.Close(addon, true);
         return true;
     }
 
@@ -260,7 +260,7 @@ internal unsafe class AutoLogin
         var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("SelectYesno", 1);
         if (addon == null) return false;
         GenerateCallback(addon, 0);
-        addon->Hide(true);
+        UiHelper.Close(addon, true);
         return true;
     }
 

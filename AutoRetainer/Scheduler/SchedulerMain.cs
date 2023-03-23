@@ -135,7 +135,36 @@ internal unsafe static class SchedulerMain
                             if (EzThrottler.Throttle("CloseRetainerList", 1000))
                             {
                                 DuoLog.Warning($"Your inventory is full");
-                                P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
+                                if (MultiMode.Enabled)
+                                {
+                                    P.DebugLog($"Scheduling retainer list closing (multi mode)");
+                                    P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
+                                }
+                                else
+                                {
+                                    void Process(TaskCompletedBehavior behavior)
+                                    {
+                                        P.DebugLog($"Behavior: {behavior}");
+                                        if (behavior.EqualsAny(TaskCompletedBehavior.Close_retainer_list_and_disable_plugin, TaskCompletedBehavior.Close_retainer_list_and_keep_plugin_enabled))
+                                        {
+                                            P.DebugLog($"Scheduling retainer list closing (behavior={behavior})");
+                                            P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
+                                        }
+                                    }
+
+                                    if (Reason == PluginEnableReason.Auto)
+                                    {
+                                        Process(P.config.TaskCompletedBehaviorAuto);
+                                    }
+                                    else if (Reason == PluginEnableReason.Manual)
+                                    {
+                                        Process(P.config.TaskCompletedBehaviorManual);
+                                    }
+                                    else if (Reason == PluginEnableReason.Access)
+                                    {
+                                        Process(P.config.TaskCompletedBehaviorAccess);
+                                    }
+                                }
                                 DisablePlugin();
                             }
                         }
@@ -145,7 +174,7 @@ internal unsafe static class SchedulerMain
             else
             {
                 //DuoLog.Information($"123");
-                if(P.config.AutoUseRetainerBell)
+                if(P.config.OldRetainerSense)
                 {
                     if (!IsOccupied() && Utils.AnyRetainersAvailableCurrentChara())
                     {

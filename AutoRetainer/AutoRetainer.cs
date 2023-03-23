@@ -19,6 +19,7 @@ using System.Diagnostics;
 using AutoRetainer.Modules.Statistics;
 using AutoRetainer.Internal;
 using AutoRetainer.UI.Overlays;
+using ECommons.Throttlers;
 
 namespace AutoRetainer;
 
@@ -36,6 +37,9 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal Memory Memory;
     internal bool WasEnabled = false;
     internal bool IsCloseActionAutomatic = false;
+    internal long LastMovementAt;
+    internal Vector3 LastPosition;
+    internal bool IsNextToBell;
 
     internal long Time => P.config.UseServerTime ? FFXIVClientStructs.FFXIV.Client.System.Framework.Framework.GetServerTime() : DateTimeOffset.Now.ToUnixTimeSeconds();
 
@@ -54,6 +58,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             {
                 EzConfig.Migrate<Config>();
                 config = EzConfig.Init<Config>();
+                Migrator.MigrateGC();
                 retainerManager = new(Svc.SigScanner);
                 ws = new();
                 configGui = new();
@@ -136,12 +141,6 @@ public unsafe class AutoRetainer : IDalamudPlugin
         {
             MultiMode.Enabled = !MultiMode.Enabled;
         }
-        else if (arguments.EqualsIgnoreCase("ss"))
-        {
-            config.SS = !config.SS;
-            DuoLog.Information($"Super Secret mode {(config.SS ? "enabled" : "disabled")}");
-            if (config.SS) DuoLog.Warning($"Super Secret settings contain features that may be incomplete, incompatible with certain plugins, may cause damage or other unwanted effects to your character, account and game as a whole. Disabling Super Secret mode will not automatically disable previously enabled Super Secret options; you must disable them first before enabling it.");
-        }
         else if (arguments.StartsWith("relog "))
         {
             var target = P.config.OfflineData.Where(x => $"{x.Name}@{x.World}" == arguments[6..]).FirstOrDefault();
@@ -187,6 +186,35 @@ public unsafe class AutoRetainer : IDalamudPlugin
             if(Svc.ClientState.TerritoryType == Prisons.Mordion_Gaol)
             {
                 Process.GetCurrentProcess().Kill();
+            }
+        }
+        IsNextToBell = false;
+        if (P.config.RetainerSense && Svc.ClientState.LocalPlayer != null)
+        {
+            if(!IsOccupied() && !P.config.OldRetainerSense && !TaskManager.IsBusy && !MultiMode.Active && !Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BoundByDuty] && Utils.IsAnyRetainersCompletedVenture())
+            {
+                var bell = Utils.GetReachableRetainerBell();
+                if (bell == null || LastPosition != Svc.ClientState.LocalPlayer.Position)
+                {
+                    LastPosition = Svc.ClientState.LocalPlayer.Position;
+                    LastMovementAt = Environment.TickCount64;
+                }
+                if(bell != null)
+                {
+                    IsNextToBell = true;
+                }
+                if(Environment.TickCount64 - LastMovementAt > P.config.RetainerSenseThreshold)
+                {
+                    if (bell != null)
+                    {
+                        IsNextToBell = true;
+                        if (EzThrottler.Throttle("RetainerSense", 30000))
+                        {
+                            TaskInteractWithNearestBell.Enqueue();
+                            TaskManager.Enqueue(() => { SchedulerMain.EnablePlugin(PluginEnableReason.Auto); return true; });
+                        }
+                    }
+                }
             }
         }
     }

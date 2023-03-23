@@ -45,6 +45,28 @@ internal class MultiModeOverlay : Window
                 ImGuiEx.Text($"loading multi.png");
             }
         }
+        else if (P.IsNextToBell)
+        {
+            if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "bellalert.png"), out var t))
+            {
+                ImGui.Image(t.ImGuiHandle, new(128, 128));
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+                    if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
+                    {
+                        Svc.Commands.ProcessCommand("/ays");
+                    }
+                    ImGui.SetTooltip("RetainerSense is active. \nLeft click - open AutoRetainer.");
+                }
+                var f = (float)(Environment.TickCount64 - P.LastMovementAt) / (float)P.config.RetainerSenseThreshold;
+                ImGui.ProgressBar(f, new(128, 10), "");
+            }
+            else
+            {
+                ImGuiEx.Text($"loading bellalert.png");
+            }
+        }
         else if (MultiMode.Enabled)
         {
             if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "multi.png"), out var t))
