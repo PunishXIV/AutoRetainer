@@ -7,7 +7,18 @@ namespace AutoRetainer.Scheduler;
 
 internal unsafe static class SchedulerMain
 {
-    internal static bool PluginEnabled { get; private set; } = false;
+    internal static bool PluginEnabledInternal;
+    internal static bool PluginEnabled 
+    { 
+        get 
+        {
+            return PluginEnabledInternal && !IPC.Suppressed;
+        }
+        private set 
+        {
+            PluginEnabledInternal = value;
+        } 
+    }
 
     internal static PluginEnableReason Reason { get; private set; }
 
@@ -142,7 +153,7 @@ internal unsafe static class SchedulerMain
                             if (EzThrottler.Throttle("CloseRetainerList", 1000))
                             {
                                 DuoLog.Warning($"Your inventory is full");
-                                if (MultiMode.Enabled)
+                                if (MultiMode.Active)
                                 {
                                     P.DebugLog($"Scheduling retainer list closing (multi mode)");
                                     P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);

@@ -76,6 +76,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 quickSellItems = new();
                 StatisticsManager.Init();
                 AutoGCHandin.Init();
+                IPC.Init();
 
                 ws.AddWindow(new MultiModeOverlay());
                 ws.AddWindow(new RetainerListOverlay());
@@ -163,19 +164,22 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
     private void Tick(Framework framework)
     {
-        if (SchedulerMain.PluginEnabled && Svc.ClientState.LocalPlayer != null)
+        if (!IPC.Suppressed)
         {
-            SchedulerMain.Tick();
-            if (!P.config.SelectedRetainers.ContainsKey(Svc.ClientState.LocalContentId))
+            if (SchedulerMain.PluginEnabled && Svc.ClientState.LocalPlayer != null)
             {
-                P.config.SelectedRetainers[Svc.ClientState.LocalContentId] = new();
+                SchedulerMain.Tick();
+                if (!P.config.SelectedRetainers.ContainsKey(Svc.ClientState.LocalContentId))
+                {
+                    P.config.SelectedRetainers[Svc.ClientState.LocalContentId] = new();
+                }
             }
-        }
-        if (SchedulerMain.PluginEnabled || P.TaskManager.IsBusy || Svc.Condition[ConditionFlag.OccupiedSummoningBell])
-        {
-            if (TryGetAddonByName<AddonTalk>("Talk", out var addon) && addon->AtkUnitBase.IsVisible)
+            if (SchedulerMain.PluginEnabled || P.TaskManager.IsBusy || Svc.Condition[ConditionFlag.OccupiedSummoningBell])
             {
-                ClickTalk.Using((IntPtr)addon).Click();
+                if (TryGetAddonByName<AddonTalk>("Talk", out var addon) && addon->AtkUnitBase.IsVisible)
+                {
+                    ClickTalk.Using((IntPtr)addon).Click();
+                }
             }
         }
         OfflineDataManager.Tick();
@@ -193,7 +197,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         IsNextToBell = false;
         if (P.config.RetainerSense && Svc.ClientState.LocalPlayer != null)
         {
-            if(!IsOccupied() && !P.config.OldRetainerSense && !TaskManager.IsBusy && !MultiMode.Active && !Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BoundByDuty] && Utils.IsAnyRetainersCompletedVenture())
+            if(!IPC.Suppressed && !IsOccupied() && !P.config.OldRetainerSense && !TaskManager.IsBusy && !MultiMode.Active && !Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BoundByDuty] && Utils.IsAnyRetainersCompletedVenture())
             {
                 var bell = Utils.GetReachableRetainerBell();
                 if (bell == null || LastPosition != Svc.ClientState.LocalPlayer.Position)
@@ -265,6 +269,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             Safe(StatisticsManager.Dispose);
             Safe(TaskManager.Dispose);
             Safe(Memory.Dispose);
+            Safe(IPC.Shutdown);
             PunishLibMain.Dispose();
             ECommonsMain.Dispose();
         }
@@ -343,7 +348,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                         SchedulerMain.EnablePlugin(PluginEnableReason.Auto);
                         WasEnabled = false;
                     }
-                    else if(!IsCloseActionAutomatic && P.config.AutoDisable && !MultiMode.Enabled)
+                    else if(!IsCloseActionAutomatic && P.config.AutoDisable && !MultiMode.Active)
                     {
                         P.DebugLog($"Disabling plugin because AutoDisable is on");
                         SchedulerMain.DisablePlugin();

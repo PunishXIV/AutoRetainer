@@ -23,6 +23,16 @@ internal unsafe static class Debug
         ImGuiEx.TextWrapped(ImGuiColors.ParsedOrange, "Anything can happen here.");
         Safe(delegate
         {
+            ImGuiEx.Text($"IPC suppressed: {Svc.PluginInterface.GetIpcSubscriber<bool>("AutoRetainer.GetSuppressed").InvokeFunc()}");
+            if (ImGui.Button($"Suppress = true"))
+            {
+                Svc.PluginInterface.GetIpcSubscriber<bool, object>("AutoRetainer.SetSuppressed").InvokeAction(true);
+            }
+            if (ImGui.Button($"Suppress = false"))
+            {
+                Svc.PluginInterface.GetIpcSubscriber<bool, object>("AutoRetainer.SetSuppressed").InvokeAction(false);
+            }
+
             ImGuiEx.Text($"Gil: {TaskDepositGil.Gil}");
             ImGui.Checkbox($"TaskWithdrawGil.forceCheck", ref TaskWithdrawGil.forceCheck);
             ImGuiEx.Text($"{Svc.Data.GetExcelSheet<LogMessage>().GetRow(4578).Text.ToDalamudString().ExtractText(true)}");

@@ -2,6 +2,7 @@
 using ECommons.Configuration;
 using PunishLib.ImGuiMethods;
 using AutoRetainer.UI.Settings;
+using Dalamud.Interface.Style;
 
 namespace AutoRetainer.UI;
 
@@ -28,8 +29,8 @@ unsafe internal class ConfigGui : Window
 
     public override void Draw()
     {
-        var e = SchedulerMain.PluginEnabled;
-        var disabled = MultiMode.Enabled && !ImGui.GetIO().KeyCtrl;
+        var e = SchedulerMain.PluginEnabledInternal;
+        var disabled = MultiMode.Active && !ImGui.GetIO().KeyCtrl;
         if (disabled)
         {
             ImGui.BeginDisabled();
@@ -59,6 +60,16 @@ unsafe internal class ConfigGui : Window
         }
         ImGui.SameLine();
         ImGui.Checkbox("Multi", ref MultiMode.Enabled);
+
+        if(IPC.Suppressed)
+        {
+            ImGuiEx.Text(ImGuiColors.DalamudRed, $"Plugin operation is suppressed by other plugin.");
+            ImGui.SameLine();
+            if (ImGui.SmallButton("Cancel"))
+            {
+                IPC.Suppressed = false;
+            }
+        }
 
         if (P.TaskManager.IsBusy)
         {

@@ -34,7 +34,7 @@ internal unsafe class RetainerListOverlay : Window
     public override void Draw()
     {
         var e = SchedulerMain.PluginEnabled;
-        var disabled = MultiMode.Enabled && !ImGui.GetIO().KeyCtrl;
+        var disabled = MultiMode.Active && !ImGui.GetIO().KeyCtrl;
         if (disabled)
         {
             ImGui.BeginDisabled();
@@ -66,7 +66,7 @@ internal unsafe class RetainerListOverlay : Window
         {
             if (ImGui.Checkbox("MultiMode", ref MultiMode.Enabled))
             {
-                if (MultiMode.Enabled)
+                if (MultiMode.Active)
                 {
                     SchedulerMain.EnablePlugin(PluginEnableReason.MultiMode);
                 }

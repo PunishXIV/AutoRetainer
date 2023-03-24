@@ -16,7 +16,7 @@ namespace AutoRetainer.Modules.Multi;
 
 internal unsafe static class MultiMode
 {
-    internal static bool Active => Enabled;
+    internal static bool Active => Enabled && !IPC.Suppressed;
 
     internal static bool Enabled = false;
 
