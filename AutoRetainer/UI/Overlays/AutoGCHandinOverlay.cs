@@ -1,6 +1,8 @@
-﻿namespace AutoRetainer.UI.Overlays;
+﻿using FFXIVClientStructs.FFXIV.Client.Game;
 
-internal class AutoGCHandinOverlay : Window
+namespace AutoRetainer.UI.Overlays;
+
+internal unsafe class AutoGCHandinOverlay : Window
 {
     internal float height;
     public AutoGCHandinOverlay() : base("AutoRetainer GC Handin overlay", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysUseWindowPadding | ImGuiWindowFlags.AlwaysAutoResize, true)
@@ -35,6 +37,12 @@ internal class AutoGCHandinOverlay : Window
                 ImGuiEx.Text($"\uf071\uf071\uf071");
                 ImGui.PopFont();
             }
+        }
+        //1078	Priority Seal Allowance	Company seals earned are increased.	ui/icon/016000/016518.tex	0	0	All Classes	1	dk05th_stup0t		False	False	False	False	False	False	False	False	False	0	1	False	False	15	0	False	0	False	0	False	0	0	0	False
+        if (!Svc.ClientState.LocalPlayer.StatusList.Any(x => x.StatusId == 1078) && InventoryManager.Instance()->GetInventoryItemCount(14946) > 0)
+        {
+            ImGui.SameLine();
+            ImGuiEx.Text(GradientColor.Get(ImGuiColors.DalamudRed, ImGuiColors.DalamudYellow), $"You can use Priority Seal Allowance");
         }
         height = ImGui.GetWindowSize().Y;
     }
