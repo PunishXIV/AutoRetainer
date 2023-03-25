@@ -1,4 +1,4 @@
-﻿using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Client.Game;
 
 namespace AutoRetainer.UI.Overlays;
 
@@ -17,7 +17,7 @@ internal unsafe class AutoGCHandinOverlay : Window
 
     public override void Draw()
     {
-        ImGui.Checkbox("Automatically hand in all listed items", ref AutoGCHandin.Operation);
+        ImGui.Checkbox("Enable Automatic Expert Delivery", ref AutoGCHandin.Operation);
         if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var d) && !AutoGCHandin.Operation) 
         {
             ImGui.SameLine();
