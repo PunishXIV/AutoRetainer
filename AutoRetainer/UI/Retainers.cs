@@ -77,15 +77,8 @@ internal unsafe class Retainers
             ImGuiEx.Text($"{(ret.VentureID == 0 ? "No Venture" : Utils.ToTimeString(ret.GetVentureSecondsRemaining(false)))}");
             ImGui.TableNextColumn();
             ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
-            ImGuiEx.Text($"{Utils.ToTimeString(Scheduler.GetRemainingBanTime(ret.Name.ToString()))}");
+            ImGuiEx.Text($"-");
         }
         ImGui.EndTable();
-        ImGuiEx.ImGuiLineCentered("AYSButtonClear Interaction Timeouts", delegate
-        {
-            if (ImGui.SmallButton("Clear Interaction Timeouts"))
-            {
-                Scheduler.Bans.Clear();
-            }
-        });
     }
 }

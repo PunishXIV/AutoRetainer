@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<Authors>Puni.sh</Authors>
-		<Version>2.3.0.0</Version>
+		<Version>3.0.3.4</Version>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -31,8 +31,15 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-		<OutputPath>$(DalamudDevPlugins)</OutputPath>
+      <OutputPath>bin/Debug</OutputPath>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+      <PostBuildEvent>
+          rmdir .\Debug /s /q
+          ping localhost -n 4 &gt;nul
+          powershell Compress-Archive .\* ..\$(MSBuildProjectName)-$(Version).zip
+          mkdir .\Debug
+          move ..\$(MSBuildProjectName)-$(Version).zip .\Debug\latest.zip
+      </PostBuildEvent>
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(Configuration)' == 'Release'">
@@ -86,5 +93,29 @@
 			<HintPath>$(DalamudLibPath)PInvoke.User32.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="res\bell.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="res\bellalert.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="res\bellcrossed.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="res\login.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="res\multi.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="res\notify.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="res\processing.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 </Project>
