@@ -1,4 +1,4 @@
-﻿using AutoRetainer.Scheduler.Handlers;
+using AutoRetainer.Scheduler.Handlers;
 using AutoRetainer.Scheduler.Tasks;
 using Dalamud.Interface.Components;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -77,7 +77,7 @@ internal unsafe class RetainerListOverlay : Window
         {
             Svc.Commands.ProcessCommand("/ays");
         }
-        ImGuiEx.Tooltip("Open plugin configuration window");
+        ImGuiEx.Tooltip("Open Plugin Settings");
         if (!P.TaskManager.IsBusy)
         {
             ImGui.SameLine();
@@ -94,7 +94,7 @@ internal unsafe class RetainerListOverlay : Window
                     }
                 }
             }
-            ImGuiEx.Tooltip("Entrust duplicates to all retainers");
+            ImGuiEx.Tooltip("Quick Entrust Duplicates");
 
             ImGui.SameLine();
             if (ImGuiEx.IconButton("\uf51e##WithdrawGil"))
@@ -110,7 +110,7 @@ internal unsafe class RetainerListOverlay : Window
                     }
                 }
             }
-            ImGuiEx.Tooltip("Withdraw gil from all retainers");
+            ImGuiEx.Tooltip("Quick Withdraw Gil");
         }
         height = ImGui.GetWindowSize().Y;
     }
