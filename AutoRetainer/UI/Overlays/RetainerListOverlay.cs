@@ -90,6 +90,11 @@ internal unsafe class RetainerListOverlay : Window
                     {
                         P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
                         TaskEntrustDuplicates.Enqueue();
+
+                        if (P.config.RetainerMenuDelay > 0)
+                        {
+                            TaskWaitSelectString.Enqueue(P.config.RetainerMenuDelay);
+                        }
                         P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
                     }
                 }
@@ -106,6 +111,11 @@ internal unsafe class RetainerListOverlay : Window
                     {
                         P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
                         TaskWithdrawGil.Enqueue(100);
+
+                        if (P.config.RetainerMenuDelay > 0)
+                        {
+                            TaskWaitSelectString.Enqueue(P.config.RetainerMenuDelay);
+                        }
                         P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
                     }
                 }

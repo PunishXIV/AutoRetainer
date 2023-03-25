@@ -53,6 +53,9 @@ internal unsafe class Config : IEzConfig
 
     public Keys Suppress = Keys.Control;
     public Keys TempCollectB = Keys.ShiftKey;
+
+    public int RetainerMenuDelay = 0;
+
     internal bool DontReassign
     {
         get

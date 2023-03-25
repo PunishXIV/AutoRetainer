@@ -21,6 +21,10 @@ internal static class TaskWithdrawGil
             }
             return false;
         });
+        if (P.config.RetainerMenuDelay > 0)
+        {
+            TaskWaitSelectString.Enqueue(P.config.RetainerMenuDelay);
+        }
         P.TaskManager.Enqueue(() => HasGil == false ? true : RetainerHandlers.SelectEntrustGil());
         P.TaskManager.Enqueue(() => HasGil == false ? true : GenericHandlers.Throttle(500));
         P.TaskManager.Enqueue(() => HasGil == false ? true : GenericHandlers.WaitFor(500));

@@ -113,7 +113,8 @@ internal static unsafe class Utils
     }
 
     internal static bool GenericThrottle => EzThrottler.Throttle("AutoRetainerGenericThrottle", P.config.Delay);
-    internal static void RethrottleGeneric(int num = 200) => EzThrottler.Throttle("AutoRetainerGenericThrottle", num, true);
+    internal static void RethrottleGeneric(int num) => EzThrottler.Throttle("AutoRetainerGenericThrottle", num, true);
+    internal static void RethrottleGeneric() => EzThrottler.Throttle("AutoRetainerGenericThrottle", P.config.Delay, true);
 
     internal static bool TrySelectSpecificEntry(string text)
     {

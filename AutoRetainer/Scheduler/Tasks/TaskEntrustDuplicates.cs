@@ -9,6 +9,10 @@ internal static class TaskEntrustDuplicates
     {
         P.TaskManager.Enqueue(() => { NoDuplicates = false; return true; }) ;
         P.TaskManager.Enqueue(YesAlready.WaitForYesAlreadyDisabledTask);
+        if (P.config.RetainerMenuDelay > 0)
+        {
+            TaskWaitSelectString.Enqueue(P.config.RetainerMenuDelay);
+        }
         P.TaskManager.Enqueue(RetainerHandlers.SelectEntrustItems);
         P.TaskManager.Enqueue(RetainerHandlers.ClickEntrustDuplicates);
         TaskWait.Enqueue(500);

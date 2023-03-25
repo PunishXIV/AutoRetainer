@@ -98,6 +98,10 @@ internal unsafe static class SchedulerMain
                                         }
                                     }
 
+                                    if (P.config.RetainerMenuDelay > 0)
+                                    {
+                                        TaskWaitSelectString.Enqueue(P.config.RetainerMenuDelay);
+                                    }
                                     P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
                                 }
                             }
