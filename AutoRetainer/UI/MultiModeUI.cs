@@ -99,13 +99,13 @@ internal unsafe static class MultiModeUI
             {
                 ImGui.OpenPopup($"popup{data.CID}");
             }
-            ImGuiEx.Tooltip($"Configure character");
+            ImGuiEx.Tooltip($"Configure Character");
             ImGui.SameLine(0, 3);
 
             if (ImGui.BeginPopup($"popup{data.CID}"))
             {
                 var b = true;
-                ImGui.CollapsingHeader($"{data.Name} configuration##conf", ref b, ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.Bullet | ImGuiTreeNodeFlags.OpenOnArrow);
+                ImGui.CollapsingHeader($"{data.Name} Configuration##conf", ref b, ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.Bullet | ImGuiTreeNodeFlags.OpenOnArrow);
                 if(b == false)
                 {
                     ImGui.CloseCurrentPopup();
@@ -129,11 +129,11 @@ internal unsafe static class MultiModeUI
                 {
                     ImGui.SameLine();
                     ImGui.SetNextItemWidth(150);
-                    if (ImGui.BeginCombo("##sindex", $"Service account {data.ServiceAccount + 1}"))
+                    if (ImGui.BeginCombo("##sindex", $"Service Account {data.ServiceAccount + 1}"))
                     {
                         for (var i = 1; i <= 10; i++)
                         {
-                            if (ImGui.Selectable($"Service account {i}"))
+                            if (ImGui.Selectable($"Service Account {i}"))
                             {
                                 data.ServiceAccount = i - 1;
                             }
@@ -142,7 +142,7 @@ internal unsafe static class MultiModeUI
                     }
                 }
 
-                if (ImGui.Checkbox("Preferred character", ref data.Preferred))
+                if (ImGui.Checkbox("Preferred Character", ref data.Preferred))
                 {
                     foreach (var z in P.config.OfflineData)
                     {
@@ -165,7 +165,7 @@ internal unsafe static class MultiModeUI
                     ImGuiEx.Text($"Can't change this now");
                 }
                 ImGui.Separator();
-                if(ImGui.Button("Exclude this character"))
+                if(ImGui.Button("Exclude Character"))
                 {
                     P.config.Blacklist.Add((data.CID, data.Name));
                 }
