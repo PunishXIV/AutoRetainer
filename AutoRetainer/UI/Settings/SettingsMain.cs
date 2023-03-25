@@ -18,8 +18,8 @@ internal static class SettingsMain
             ImGuiComponents.HelpMarker("Additional amount of seconds that will be subtracted from venture ending time to help mitigate possible issues of time desynchronization between the game and your PC. ");
             ImGui.Checkbox("Anonymise Retainers", ref P.config.NoNames);
             ImGuiComponents.HelpMarker("Retainer names will be redacted from general UI elements. They will not be hidden in debug menus and plugin logs however. While this option is on, character and retainer numbers are not guaranteed to be equal in different sections of a plugin (for example, retainer 1 in retainers view is not guaranteed to be the same retainer as in statistics view).");
-            ImGui.Checkbox($"Do not use built-in theme", ref P.config.NoTheme);
-            ImGui.Checkbox($"Display quick access overlay in retainer list", ref P.config.UIBar);
+            ImGui.Checkbox($"Display Quick Menu in Retainer UI", ref P.config.UIBar);
+            ImGui.Checkbox($"Opt out of custom Dalamud theme", ref P.config.NoTheme);
         });
         InfoBox.DrawBox("Operation", delegate
         {
@@ -45,19 +45,20 @@ internal static class SettingsMain
 
         InfoBox.DrawBox("Keybinds", delegate
         {
-            DrawKeybind("Temporarily suppress enabling when opening retainer bell", ref P.config.Suppress);
-            DrawKeybind("Temporarily set retainer action to collect venture rewards when enabling AutoRetainer", ref P.config.TempCollectB);
+            DrawKeybind("Temporarily prevents AutoRetainer from being automatically enabled when using a Summoning Bell", ref P.config.Suppress);
+            DrawKeybind("Temporarily set the Collect Operation mode, preventing ventures from being assigned for the current cycle", ref P.config.TempCollectB);
         });
 
         InfoBox.DrawBox("Multi Mode", delegate
     {
-        ImGui.Checkbox("Wait for all retainers to be done before logging into character", ref P.config.MultiWaitForAll);
+        ImGui.Checkbox("Wait For Venture Completion", ref P.config.MultiWaitForAll);
+        ImGuiComponents.HelpMarker("AutoRetainer will wait for all ventures to return before cycling to the next character in multi mode operation.");
         ImGui.SetNextItemWidth(60);
-        ImGui.DragInt("Relog in advance, seconds", ref P.config.AdvanceTimer.ValidateRange(0, 300), 0.1f, 0, 300);
-        ImGui.Checkbox("Synchronize retainers (one time)", ref MultiMode.Synchronize);
-        ImGuiComponents.HelpMarker("If this setting is on, plugin will wait until all enabled retainers have done their ventures. After that this setting will be disabled automatically and all characters will be processed.");
+        ImGui.DragInt("Advance Relog Threshold", ref P.config.AdvanceTimer.ValidateRange(0, 300), 0.1f, 0, 300);
+        ImGui.Checkbox("Synchronise Retainers (one time)", ref MultiMode.Synchronize);
+        ImGuiComponents.HelpMarker("AutoRetainer will wait until all enabled retainers have completed their ventures. After that this setting will be disabled automatically and all characters will be processed.");
         ImGui.Separator();
-        ImGuiEx.Text($"Character order:");
+        ImGuiEx.Text($"Character Order:");
         for (int index = 0; index < P.config.OfflineData.Count; index++)
         {
             if (P.config.OfflineData[index].World.IsNullOrEmpty()) continue;
@@ -99,12 +100,12 @@ internal static class SettingsMain
         });
         InfoBox.DrawBox("Statistics", delegate
         {
-            ImGui.Checkbox($"Record venture statistics", ref P.config.RecordStats);
+            ImGui.Checkbox($"Record Venture Statistics", ref P.config.RecordStats);
         });
-        InfoBox.DrawBox("Auto GC Expert Delivery Settings", AutoGCHandinUI.Draw);
+        InfoBox.DrawBox("Automatic Grand Company Expert Delivery", AutoGCHandinUI.Draw);
         if (P.config.Blacklist.Any())
         {
-            InfoBox.DrawBox("Excluded characters", delegate
+            InfoBox.DrawBox("Excluded Characters", delegate
             {
                 for (int i = 0; i < P.config.Blacklist.Count; i++)
                 {
