@@ -154,7 +154,7 @@ internal unsafe static class MultiModeUI
                 }
                 ImGuiComponents.HelpMarker("When operating in multi mode, if there are no other characters with imminent ventures to collect, it will relog back to your preferred character.");
 
-                ImGuiEx.Text($"GC handin configuration:");
+                ImGuiEx.Text($"Automatic Grand Company Expert Delivery:");
                 if (!AutoGCHandin.Operation)
                 {
                     ImGui.SetNextItemWidth(200f);
@@ -293,10 +293,10 @@ internal unsafe static class MultiModeUI
                         }
                         if (ImGuiEx.BeginPopupNextToElement(n))
                         {
-                            ImGui.CollapsingHeader($"{ret.Name} - {data.Name} configuration  ##conf", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.Bullet | ImGuiTreeNodeFlags.OpenOnArrow);
-                            ImGuiEx.Text($"Additional post-venture tasks:");
-                            ImGui.Checkbox($"Entrust duplicates", ref adata.EntrustDuplicates);
-                            ImGui.Checkbox($"Withdraw or Deposit gil", ref adata.WithdrawGil);
+                            ImGui.CollapsingHeader($"{ret.Name} - {data.Name} Configuration  ##conf", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.Bullet | ImGuiTreeNodeFlags.OpenOnArrow);
+                            ImGuiEx.Text($"Additional Post-venture Tasks:");
+                            ImGui.Checkbox($"Entrust Duplicates", ref adata.EntrustDuplicates);
+                            ImGui.Checkbox($"Withdraw/Deposit Gil", ref adata.WithdrawGil);
                             if (adata.WithdrawGil)
                             {
                                 if (ImGui.RadioButton("Withdraw", !adata.Deposit)) adata.Deposit = false;
