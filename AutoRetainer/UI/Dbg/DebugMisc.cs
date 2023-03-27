@@ -6,6 +6,7 @@ internal static unsafe class DebugMisc
 {
     internal static void Draw()
     {
+        ImGuiEx.Text($"ConditionWasEnabled={P.ConditionWasEnabled}");
         if (ImGui.CollapsingHeader("Task debug"))
         {
             ImGuiEx.Text($"Busy: {P.TaskManager.IsBusy}, abort in {P.TaskManager.AbortAt - Environment.TickCount64}");

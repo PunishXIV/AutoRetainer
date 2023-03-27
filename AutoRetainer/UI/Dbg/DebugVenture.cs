@@ -26,5 +26,13 @@ internal static unsafe class DebugVenture
                 }
             }
         }
+
+        if (ImGui.CollapsingHeader("GetAvailableVentureNames"))
+        {
+            foreach(var x in VentureUtils.GetAvailableVentureNames())
+            {
+                ImGuiEx.Text($"{x}");
+            }
+        }
     }
 }

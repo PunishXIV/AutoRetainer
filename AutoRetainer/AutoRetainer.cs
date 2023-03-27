@@ -40,6 +40,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal long LastMovementAt;
     internal Vector3 LastPosition;
     internal bool IsNextToBell;
+    internal bool ConditionWasEnabled = false;
 
     internal long Time => P.config.UseServerTime ? FFXIVClientStructs.FFXIV.Client.System.Framework.Framework.GetServerTime() : DateTimeOffset.Now.ToUnixTimeSeconds();
 
@@ -174,7 +175,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                     P.config.SelectedRetainers[Svc.ClientState.LocalContentId] = new();
                 }
             }
-            if (SchedulerMain.PluginEnabled || P.TaskManager.IsBusy || Svc.Condition[ConditionFlag.OccupiedSummoningBell])
+            if (Svc.Condition[ConditionFlag.OccupiedSummoningBell] && (SchedulerMain.PluginEnabled || P.TaskManager.IsBusy || ConditionWasEnabled))
             {
                 if (TryGetAddonByName<AddonTalk>("Talk", out var addon) && addon->AtkUnitBase.IsVisible)
                 {
@@ -187,11 +188,19 @@ public unsafe class AutoRetainer : IDalamudPlugin
         MultiMode.Tick();
         NotificationHandler.Tick();
         YesAlready.Tick();
-        if(SchedulerMain.PluginEnabled || MultiMode.Enabled)
+        if(SchedulerMain.PluginEnabled || MultiMode.Enabled || TaskManager.IsBusy)
         {
             if(Svc.ClientState.TerritoryType == Prisons.Mordion_Gaol)
             {
                 Process.GetCurrentProcess().Kill();
+            }
+            if (Svc.Condition[ConditionFlag.OccupiedSummoningBell])
+            {
+                if (!ConditionWasEnabled)
+                {
+                    ConditionWasEnabled = true;
+                    P.DebugLog($"ConditionWasEnabled = true");
+                }
             }
         }
         IsNextToBell = false;
@@ -287,13 +296,18 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
     internal void DebugLog(string message)
     {
-        PluginLog.Information(message);
+        PluginLog.Debug(message);
     }
 
     private void ConditionChange(ConditionFlag flag, bool value)
     {
         if(flag == ConditionFlag.OccupiedSummoningBell)
         {
+            if (!value)
+            {
+                ConditionWasEnabled = false;
+                P.DebugLog("ConditionWasEnabled = false;");
+            }
             if (Svc.Targets.Target.IsRetainerBell()) {
                 if (value)
                 {
