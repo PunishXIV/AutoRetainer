@@ -101,9 +101,13 @@ internal class MultiModeOverlay : Window
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
                     if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
                     {
+                        Svc.Commands.ProcessCommand("/ays");
+                    }
+                    if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                    {
                         AutoLogin.Instance.Abort();
                     }
-                    ImGui.SetTooltip("Autologin is running, click to abort");
+                    ImGui.SetTooltip("Autologin is running.\nLeft click - open AutoRetainer. \nRight click - disable Multi Mode.");
                 }
             }
             else

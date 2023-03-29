@@ -6,6 +6,8 @@ internal static unsafe class DebugMisc
 {
     internal static void Draw()
     {
+        var inv = Utils.GetActiveRetainerInventoryName();
+        ImGuiEx.Text($"Utils.GetActiveRetainerInventoryName(): {inv.Name} {inv.EntrustDuplicatesIndex}");
         ImGuiEx.Text($"ConditionWasEnabled={P.ConditionWasEnabled}");
         if (ImGui.CollapsingHeader("Task debug"))
         {

@@ -33,6 +33,9 @@ internal unsafe class Config : IEzConfig
     public bool HideOverlayIcons = false;
     public bool UnsafeProtection = false;
 
+    public bool LoginOverlay = false;
+    public float LoginOverlayScale = 1f;
+
     public OpenBellBehavior OpenBellBehaviorNoVentures = OpenBellBehavior.Enable_AutoRetainer;
     public OpenBellBehavior OpenBellBehaviorWithVentures = OpenBellBehavior.Enable_AutoRetainer;
     public TaskCompletedBehavior TaskCompletedBehaviorAuto = TaskCompletedBehavior.Stay_in_retainer_list_and_keep_plugin_enabled;

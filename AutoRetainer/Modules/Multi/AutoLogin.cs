@@ -48,6 +48,46 @@ internal unsafe class AutoLogin
         PluginLog.Information("Autologin module initialized");
     }
 
+
+    internal void Login(string WorldName, uint characterIndex, int serviceAccount)
+    {
+
+        var world = Svc.Data.Excel.GetSheet<World>()?.FirstOrDefault(w => w.Name.ToDalamudString().TextValue.Equals(WorldName, StringComparison.InvariantCultureIgnoreCase));
+
+        if (world == null)
+        {
+            PluginLog.Error($"'{WorldName}' is not a valid world name.");
+            return;
+        }
+
+        if (characterIndex >= 8)
+        {
+            PluginLog.Error("Invalid Character Index. Must be between 0 and 7.");
+            return;
+        }
+
+        if (serviceAccount < 0 || serviceAccount >= 10)
+        {
+            PluginLog.Error("Invalid Service account Index. Must be between 0 and 9.");
+            return;
+        }
+
+        tempDc = world.DataCenter.Row;
+        tempWorld = world.RowId;
+        tempCharacter = characterIndex;
+        tempServiceAccount = serviceAccount;
+        actionQueue.Clear();
+        actionQueue.Enqueue(OpenDataCenterMenu);
+        actionQueue.Enqueue(SelectDataCentre);
+        actionQueue.Enqueue(SelectServiceAccount);
+        actionQueue.Enqueue(SelectWorld);
+        actionQueue.Enqueue(VariableDelay(10));
+        actionQueue.Enqueue(SelectCharacter);
+        actionQueue.Enqueue(SelectYes);
+        actionQueue.Enqueue(Delay5s);
+        actionQueue.Enqueue(ClearTemp);
+    }
+
     internal void SwapCharacter(string WorldName, uint characterIndex, int serviceAccount)
     {
 

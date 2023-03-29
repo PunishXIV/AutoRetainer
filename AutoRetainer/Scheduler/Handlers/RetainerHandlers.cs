@@ -130,8 +130,9 @@ internal unsafe static class RetainerHandlers
             var button = (AtkComponentButton*)addon->UldManager.NodeList[invName.EntrustDuplicatesIndex]->GetComponent();
             if (addon->UldManager.NodeList[invName.EntrustDuplicatesIndex]->IsVisible && button->IsEnabled && Utils.GenericThrottle)
             {
-                new ClickButtonGeneric(addon, invName.Name).Click(button);
-                P.DebugLog($"Clicked entrust duplicates");
+                //new ClickButtonGeneric(addon, invName.Name).Click(button);
+                Callback(addon, (int)0);
+                P.DebugLog($"Clicked entrust duplicates {invName.Name} {invName.EntrustDuplicatesIndex}");
                 return true;
             }
         }

@@ -20,5 +20,6 @@ internal static class Beta
             ImGui.Checkbox($"Multi Mode: Housing Bell Support", ref P.config.MultiAllowHET);
             ImGuiEx.TextWrapped(ImGuiColors.DalamudOrange, $"A Summoning Bell must be within range of the spawn point once the home is entered.");
         });
+        ImGui.Checkbox($"Login overlay", ref P.config.LoginOverlay);
     }
 }

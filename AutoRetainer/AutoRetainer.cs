@@ -81,6 +81,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
                 ws.AddWindow(new MultiModeOverlay());
                 ws.AddWindow(new RetainerListOverlay());
+                ws.AddWindow(new LoginOverlay());
                 MultiMode.Init();
 
                 Safety.Check();
