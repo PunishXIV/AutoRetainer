@@ -109,7 +109,7 @@ internal unsafe static class AutoGCHandin
                         {
                             try
                             {
-                                var sealsCnt = MemoryHelper.ReadSeString(&addon->UldManager.NodeList[23]->GetAsAtkTextNode()->NodeText).ExtractText().Replace(",", "").Replace(".", "").Split("/");
+                                var sealsCnt = MemoryHelper.ReadSeString(&addon->UldManager.NodeList[23]->GetAsAtkTextNode()->NodeText).ExtractText().ReplaceByChar(",. ", "", true).Split("/");
                                 if (sealsCnt.Length != 2)
                                 {
                                     throw new FormatException();
@@ -260,8 +260,9 @@ internal unsafe static class AutoGCHandin
 
     internal static bool HasInInventory(string item)
     {
+        if (item.EndsWith("...")) return true;
         var id = Svc.Data.GetExcelSheet<Item>().FirstOrDefault(x => x.Name.ExtractText() == item);
-        //InternalLog.Information($"{id}");
+        InternalLog.Information($"{item}, {id}");
         return id != null && InventoryManager.Instance()->GetInventoryItemCount(id.RowId) + InventoryManager.Instance()->GetInventoryItemCount(id.RowId, true) > 0;
     }
 }
