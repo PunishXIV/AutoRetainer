@@ -56,28 +56,67 @@ internal unsafe static class SchedulerMain
                                 {
                                     P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(retainer));
 
-                                    //resend retainer
 
-                                    if (ret.VentureID != 0)
+                                    var adata = Utils.GetAdditionalData(Svc.ClientState.LocalContentId, ret.Name.ToString());
+
+                                    if (adata.VenturePlanner.Count == 0)
                                     {
-                                        if (P.config.DontReassign)
+                                        //resend retainer
+
+                                        if (ret.VentureID != 0)
                                         {
-                                            TaskCollectVenture.Enqueue();
+                                            if (P.config.DontReassign)
+                                            {
+                                                TaskCollectVenture.Enqueue();
+                                            }
+                                            else
+                                            {
+                                                TaskReassignVenture.Enqueue();
+                                            }
                                         }
                                         else
                                         {
-                                            TaskReassignVenture.Enqueue();
+                                            if (P.config.EnableAssigningQuickExploration)
+                                            {
+                                                TaskAssignQuickVenture.Enqueue();
+                                            }
                                         }
                                     }
                                     else
                                     {
-                                        if (P.config.EnableAssigningQuickExploration)
+                                        var next = adata.GetNextPlannedVenture();
+                                        if (ret.VentureID != 0)
                                         {
-                                            TaskAssignQuickVenture.Enqueue();
+                                            if (next == ret.VentureID)
+                                            {
+                                                TaskReassignVenture.Enqueue();
+                                            }
+                                            else
+                                            {
+                                                TaskCollectVenture.Enqueue();
+                                                if(VentureUtils.GetVentureById(next).IsFieldExploration())
+                                                {
+                                                    TaskAssignFieldExploration.Enqueue(next);
+                                                }
+                                                else
+                                                {
+                                                    TaskAssignHuntingVenture.Enqueue(next);
+                                                }
+                                            }
                                         }
+                                        else
+                                        {
+                                            if (VentureUtils.GetVentureById(next).IsFieldExploration())
+                                            {
+                                                TaskAssignFieldExploration.Enqueue(next);
+                                            }
+                                            else
+                                            {
+                                                TaskAssignHuntingVenture.Enqueue(next);
+                                            }
+                                        }
+                                        adata.LastVenture = next;
                                     }
-
-                                    var adata = Utils.GetAdditionalData(Svc.ClientState.LocalContentId, ret.Name.ToString());
 
                                     //entrust duplicates
                                     if (adata.EntrustDuplicates)
@@ -219,7 +258,7 @@ internal unsafe static class SchedulerMain
                 var r = P.retainerManager.Retainer(i);
                 var rname = r.Name.ToString();
                 if (P.GetSelectedRetainers(Svc.ClientState.LocalContentId).Contains(rname)
-                    && r.GetVentureSecondsRemaining() <= P.config.UnsyncCompensation && (r.VentureID != 0 || P.config.EnableAssigningQuickExploration))
+                    && r.GetVentureSecondsRemaining() <= P.config.UnsyncCompensation && (r.VentureID != 0 || P.config.EnableAssigningQuickExploration || Utils.GetAdditionalData(Svc.ClientState.LocalContentId, rname).VenturePlanner.Count > 0))
                 {
                     return rname;
                 }

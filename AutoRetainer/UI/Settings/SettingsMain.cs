@@ -20,6 +20,9 @@ internal static class SettingsMain
             ImGuiComponents.HelpMarker("Retainer names will be redacted from general UI elements. They will not be hidden in debug menus and plugin logs however. While this option is on, character and retainer numbers are not guaranteed to be equal in different sections of a plugin (for example, retainer 1 in retainers view is not guaranteed to be the same retainer as in statistics view).");
             ImGui.Checkbox($"Display Quick Menu in Retainer UI", ref P.config.UIBar);
             ImGui.Checkbox($"Opt out of custom Dalamud theme", ref P.config.NoTheme);
+            ImGui.SetNextItemWidth(100f);
+            ImGuiEx.SliderIntAsFloat("Interaction Delay, seconds", ref P.config.Delay.ValidateRange(10, 1000), 20, 1000);
+            ImGuiComponents.HelpMarker("The lower this value is the faster plugin will use actions. When dealing with low FPS or high latency you may want to increase this value. If you want the plugin to operate faster you may decrease it. ");
         });
         InfoBox.DrawBox("Operation", delegate
         {

@@ -41,6 +41,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal Vector3 LastPosition;
     internal bool IsNextToBell;
     internal bool ConditionWasEnabled = false;
+    internal VenturePlanner VenturePlanner;
 
     internal long Time => P.config.UseServerTime ? FFXIVClientStructs.FFXIV.Client.System.Framework.Framework.GetServerTime() : DateTimeOffset.Now.ToUnixTimeSeconds();
 
@@ -62,6 +63,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 Migrator.MigrateGC();
                 retainerManager = new(Svc.SigScanner);
                 ws = new();
+                VenturePlanner = new();
+                ws.AddWindow(VenturePlanner);
                 configGui = new();
                 TaskManager = new() { AbortOnTimeout = true, TimeLimitMS = 20000 };
                 Memory = new();

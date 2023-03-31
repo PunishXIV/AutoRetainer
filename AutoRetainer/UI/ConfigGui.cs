@@ -60,6 +60,14 @@ unsafe internal class ConfigGui : Window
         }
         ImGui.SameLine();
         ImGui.Checkbox("Multi", ref MultiMode.Enabled);
+        if(P.config.CharEqualize && MultiMode.Enabled)
+        {
+            ImGui.SameLine();
+            if(ImGui.Button("Reset counters"))
+            {
+                MultiMode.CharaCnt.Clear();
+            }
+        }
 
         if(IPC.Suppressed)
         {

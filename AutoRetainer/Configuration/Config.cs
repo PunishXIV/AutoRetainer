@@ -32,6 +32,7 @@ internal unsafe class Config : IEzConfig
     public List<(ulong CID, string Name)> Blacklist = new();
     public bool HideOverlayIcons = false;
     public bool UnsafeProtection = false;
+    public bool CharEqualize = false;
 
     public bool LoginOverlay = false;
     public float LoginOverlayScale = 1f;

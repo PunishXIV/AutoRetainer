@@ -25,6 +25,8 @@ internal unsafe static class MultiMode
     internal static ulong LastLogin = 0;
     internal static CircularBuffer<long> Interactions = new(5);
 
+    internal static Dictionary<ulong, int> CharaCnt = new();
+
     internal static void Init()
     {
         ProperOnLogin.Register(delegate
@@ -226,6 +228,14 @@ internal unsafe static class MultiMode
         }
         else
         {
+            if (MultiMode.Enabled)
+            {
+                CharaCnt.IncrementOrSet(Svc.ClientState.LocalContentId);
+            }
+            else
+            {
+                CharaCnt.Clear();
+            }
             AutoLogin.Instance.SwapCharacter(data.World, data.CharaIndex, data.ServiceAccount);
             return true;
         }
@@ -234,7 +244,12 @@ internal unsafe static class MultiMode
 
     internal static OfflineCharacterData GetCurrentTargetCharacter()
     {
-        foreach (var x in P.config.OfflineData)
+        var data = P.config.OfflineData;
+        if (P.config.CharEqualize)
+        {
+            data = data.OrderBy(x => CharaCnt.GetOrDefault(x.CID)).ToList();
+        }
+        foreach (var x in data)
         {
             if (x.CID == Svc.ClientState.LocalContentId) continue;
             if (x.Enabled && P.config.SelectedRetainers.TryGetValue(x.CID, out var enabledRetainers))

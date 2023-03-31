@@ -1,4 +1,8 @@
-﻿using Dalamud.Memory;
+﻿using AutoRetainer.Modules.Statistics;
+using Dalamud.Memory;
+using Dalamud.Utility;
+using ECommons.ExcelServices;
+using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +13,51 @@ namespace AutoRetainer.Helpers
 {
     internal static unsafe class VentureUtils
     {
-        internal static void SelectVentureByID()
+        internal static int GetCategory(uint ClassJob)
         {
+            if (ClassJob == (int)Job.BTN) return 18;
+            if (ClassJob == (int)Job.MIN) return 17;
+            if (ClassJob == (int)Job.FSH) return 19;
+            return 34;
+        }
 
+        internal static RetainerTask GetVentureById(uint id)
+        {
+            return Svc.Data.GetExcelSheet<RetainerTask>().GetRow(id);
+        }
+
+        internal static IEnumerable<RetainerTask> GetFieldExplorations(uint ClassJob)
+        {
+            var cat = GetCategory(ClassJob);
+            return Svc.Data.GetExcelSheet<RetainerTask>().Where(x => x.ClassJobCategory.Value.RowId == cat).Where(x => x.MaxTimemin == 1080);
+        }
+
+        internal static IEnumerable<RetainerTask> GetHunts(uint ClassJob)
+        {
+            var cat = GetCategory(ClassJob);
+            return Svc.Data.GetExcelSheet<RetainerTask>().Where(x => x.ClassJobCategory.Value.RowId == cat).Where(x => x.MaxTimemin == 60);
+        }
+
+        internal static bool IsFieldExploration(this RetainerTask task) => task.MaxTimemin == 1080;
+
+        internal static IEnumerable<RetainerTask> GetAvailableVentures(this IEnumerable<RetainerTask> tasks, OfflineRetainerData data)
+        {
+            return tasks.Where(x => x.RetainerLevel <= data.Level);
+        }
+
+        internal static string GetVentureName(uint id) => GetVentureName(Svc.Data.GetExcelSheet<RetainerTask>().GetRow(id));
+
+        internal static string GetVentureName(this RetainerTask Task)
+        {
+            if (Task == null) return null;
+            if (Task.IsRandom)
+            {
+                return Svc.Data.GetExcelSheet<RetainerTaskRandom>().GetRow(Task.Task).Name.ToDalamudString().ExtractText();
+            }
+            else
+            {
+                return Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRow(Task.Task).Item.Value.Name.ToDalamudString().ExtractText();
+            }
         }
 
         internal static List<string> GetAvailableVentureNames()
@@ -22,6 +68,7 @@ namespace AutoRetainer.Helpers
             {
                 for (int i = 0; i < data->AtkArrayData.Size; i++)
                 {
+                    if (data->StringArray[i] == null) break;
                     if (i % 4 != 1) continue;
                     var item = data->StringArray[i];
                     if (item != null)
@@ -32,6 +79,23 @@ namespace AutoRetainer.Helpers
                 }
             }
             return ret;
+        }
+
+        internal static string GetVentureLevelCategory(uint id)
+        {
+            return Svc.Data.GetExcelSheet<RetainerTask>().GetRow(id).GetVentureLevelCategory();
+        }
+
+        internal static string GetVentureLevelCategory(this RetainerTask Task)
+        {
+            foreach(var x in Svc.Data.GetExcelSheet<RetainerTaskLvRange>())
+            {
+                if(Task.RetainerLevel >= x.Min && Task.RetainerLevel <= x.Max)
+                {
+                    return $" {x.Min}-{x.Max}.";
+                }
+            }
+            return null;
         }
     }
 }

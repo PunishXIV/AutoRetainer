@@ -20,6 +20,23 @@ namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
+    internal static uint GetNextPlannedVenture(this AdditionalRetainerData data)
+    {
+        if(data.VenturePlanner.Count == 0)
+        {
+            return 0;
+        }
+        var index = Array.IndexOf(data.VenturePlanner.ToArray(), data.LastVenture);
+        try
+        {
+            return data.VenturePlanner[index + 1];
+        }
+        catch(Exception)
+        {
+            return data.VenturePlanner[0];
+        }
+    }
+
     internal static DateTime DateFromTimeStamp(uint timeStamp)
     {
         const long timeFromEpoch = 62135596800;

@@ -15,11 +15,14 @@ internal static class Beta
             ImGui.SetNextItemWidth(200f);
             ImGuiEx.SliderIntAsFloat("Activation Time", ref P.config.RetainerSenseThreshold, 1000, 100000);
         });
-        InfoBox.DrawBox("House Enter Task", delegate
+        InfoBox.DrawBox("Multi Mode##beta", delegate
         {
             ImGui.Checkbox($"Multi Mode: Housing Bell Support", ref P.config.MultiAllowHET);
             ImGuiEx.TextWrapped(ImGuiColors.DalamudOrange, $"A Summoning Bell must be within range of the spawn point once the home is entered.");
+            ImGui.Checkbox($"Login overlay", ref P.config.LoginOverlay);
+            ImGui.Checkbox($"Enforce Full Character Rotation", ref P.config.CharEqualize);
+            ImGuiComponents.HelpMarker("Recommended for users with > 15 characters, forces multi mode to make sure ventures are processed on all characters in order before returning to the beginning of the cycle.");
         });
-        ImGui.Checkbox($"Login overlay", ref P.config.LoginOverlay);
+        
     }
 }

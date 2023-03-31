@@ -192,7 +192,7 @@ internal unsafe static class MultiModeUI
             {
                 ImGui.SetNextItemOpen(index == 0);
             }
-            if (ImGui.CollapsingHeader((P.config.NoNames?$"Character {index+1}":$"{data}")+$"###chara{data.CID}"))
+            if (ImGui.CollapsingHeader((P.config.NoNames?$"Character {index+1}":$"{data}") +$"###chara{data.CID}"))
             {
                 SetAsPreferred(data);
                 if (col)
@@ -263,6 +263,13 @@ internal unsafe static class MultiModeUI
                             ImGuiEx.Text($"\uf51e");
                             ImGui.PopFont();
                         }
+                        if (adata.VenturePlanner.Count > 0)
+                        {
+                            ImGui.SameLine();
+                            ImGui.PushFont(UiBuilder.IconFont);
+                            ImGuiEx.Text($"\uf0ae");
+                            ImGui.PopFont();
+                        }
                         var end = ImGui.GetCursorPos();
                         bars[$"{data.CID}{data.RetainerData[i].Name}"] = (start, end);
                         ImGui.TableNextColumn();
@@ -306,6 +313,11 @@ internal unsafe static class MultiModeUI
                             }
                             ImGui.EndPopup();
                         }
+                        ImGui.SameLine();
+                        if(ImGuiEx.IconButton("\uf0ae", $"{data.CID} {ret.Name} planner"))
+                        {
+                            P.VenturePlanner.Open(data, ret);
+                        }
                     }
                     ImGui.EndTable();
                 }
@@ -321,7 +333,7 @@ internal unsafe static class MultiModeUI
                     col = false;
                 }
             }
-            var rightText = $"V: {data.Ventures} | I: {data.InventorySpace}";
+            var rightText = ((P.config.CharEqualize && MultiMode.Enabled) ? $"C: {MultiMode.CharaCnt.GetOrDefault(data.CID)} | " : "") + $"V: {data.Ventures} | I: {data.InventorySpace}";
             var cur = ImGui.GetCursorPos();
             ImGui.SameLine();
             ImGui.SetCursorPos(new(ImGui.GetContentRegionMax().X - ImGui.CalcTextSize(rightText).X - ImGui.GetStyle().FramePadding.X, rCurPos.Y + pad));
