@@ -7,6 +7,7 @@ public class AdditionalRetainerData
     public bool WithdrawGil = false;
     public int WithdrawGilPercent = 100;
     public bool Deposit = false;
-    public List<uint> VenturePlanner = new();
-    public uint LastVenture = 0;
+    public VenturePlan VenturePlan = new();
+    public uint VenturePlanIndex = 0;
+    public bool EnablePlanner = false;
 }

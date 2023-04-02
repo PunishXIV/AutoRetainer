@@ -14,7 +14,7 @@ internal static unsafe class DebugVenture
             foreach(var r in x.RetainerData)
             {
                 var adata = Utils.GetAdditionalData(x.CID, r.Name);
-                ImGuiEx.Text($"{x.Name}@{x.World} - {r.Name} last venture: {adata.LastVenture}/{VentureUtils.GetVentureName(adata.LastVenture)}, next venture: {adata.GetNextPlannedVenture()}/{VentureUtils.GetVentureName(adata.GetNextPlannedVenture())}");
+                ImGuiEx.Text($"{x.Name}@{x.World} - {r.Name} last venture index: {adata.VenturePlanIndex}, next venture: {adata.GetNextPlannedVenture()}/{VentureUtils.GetVentureName(adata.GetNextPlannedVenture())}");
             }
         }
         ImGui.InputInt("Venture id", ref VentureID);

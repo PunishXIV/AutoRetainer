@@ -22,19 +22,28 @@ internal static unsafe class Utils
 {
     internal static uint GetNextPlannedVenture(this AdditionalRetainerData data)
     {
-        if(data.VenturePlanner.Count == 0)
+        if(data.VenturePlan.ListUnwrapped.Count == 0)
         {
             return 0;
         }
-        var index = Array.IndexOf(data.VenturePlanner.ToArray(), data.LastVenture);
         try
         {
-            return data.VenturePlanner[index + 1];
+            return data.VenturePlan.ListUnwrapped[(int)data.VenturePlanIndex];
         }
         catch(Exception)
         {
-            return data.VenturePlanner[0];
+            return data.VenturePlan.ListUnwrapped[0];
         }
+    }
+
+    internal static bool IsLastPlannedVenture(this AdditionalRetainerData data)
+    {
+        return data.VenturePlanIndex >= data.VenturePlan.ListUnwrapped.Count;
+    }
+
+    internal static bool IsVenturePlannerActive(this AdditionalRetainerData data)
+    {
+        return data.EnablePlanner && data.VenturePlan.ListUnwrapped.Count > 0;
     }
 
     internal static DateTime DateFromTimeStamp(uint timeStamp)

@@ -59,6 +59,7 @@ internal unsafe class Config : IEzConfig
     public Keys TempCollectB = Keys.ShiftKey;
 
     public int RetainerMenuDelay = 0;
+    public List<VenturePlan> SavedPlans = new();
 
     internal bool DontReassign
     {

@@ -263,7 +263,7 @@ internal unsafe static class MultiModeUI
                             ImGuiEx.Text($"\uf51e");
                             ImGui.PopFont();
                         }
-                        if (adata.VenturePlanner.Count > 0)
+                        if (adata.IsVenturePlannerActive())
                         {
                             ImGui.SameLine();
                             ImGui.PushFont(UiBuilder.IconFont);

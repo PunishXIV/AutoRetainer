@@ -13,6 +13,8 @@ namespace AutoRetainer.Helpers
 {
     internal static unsafe class VentureUtils
     {
+        private static bool IsNullOrEmpty(this string s) => GenericHelpers.IsNullOrEmpty(s);
+
         internal static int GetCategory(uint ClassJob)
         {
             if (ClassJob == (int)Job.BTN) return 18;
@@ -26,16 +28,16 @@ namespace AutoRetainer.Helpers
             return Svc.Data.GetExcelSheet<RetainerTask>().GetRow(id);
         }
 
-        internal static IEnumerable<RetainerTask> GetFieldExplorations(uint ClassJob)
+        internal static IEnumerable<RetainerTask> GetFieldExplorations(uint ClassJob, int level)
         {
             var cat = GetCategory(ClassJob);
-            return Svc.Data.GetExcelSheet<RetainerTask>().Where(x => x.ClassJobCategory.Value.RowId == cat).Where(x => x.MaxTimemin == 1080);
+            return Svc.Data.GetExcelSheet<RetainerTask>().Where(x => x.ClassJobCategory.Value.RowId == cat).Where(x => x.MaxTimemin == 1080 && x.RetainerLevel <= level && !x.GetVentureName().IsNullOrEmpty()).OrderBy(x => x.RetainerLevel);
         }
 
-        internal static IEnumerable<RetainerTask> GetHunts(uint ClassJob)
+        internal static IEnumerable<RetainerTask> GetHunts(uint ClassJob, int level)
         {
             var cat = GetCategory(ClassJob);
-            return Svc.Data.GetExcelSheet<RetainerTask>().Where(x => x.ClassJobCategory.Value.RowId == cat).Where(x => x.MaxTimemin == 60);
+            return Svc.Data.GetExcelSheet<RetainerTask>().Where(x => x.ClassJobCategory.Value.RowId == cat).Where(x => x.MaxTimemin == 60 && x.RetainerLevel <= level && !x.GetVentureName().IsNullOrEmpty()).OrderBy(x => x.RetainerLevel);
         }
 
         internal static bool IsFieldExploration(this RetainerTask task) => task.MaxTimemin == 1080;
@@ -52,11 +54,11 @@ namespace AutoRetainer.Helpers
             if (Task == null) return null;
             if (Task.IsRandom)
             {
-                return Svc.Data.GetExcelSheet<RetainerTaskRandom>().GetRow(Task.Task).Name.ToDalamudString().ExtractText();
+                return $"{Task.RetainerLevel} {Svc.Data.GetExcelSheet<RetainerTaskRandom>().GetRow(Task.Task).Name.ToDalamudString().ExtractText()}";
             }
             else
             {
-                return Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRow(Task.Task).Item.Value.Name.ToDalamudString().ExtractText();
+                return $"{Task.RetainerLevel} {Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRow(Task.Task).Item.Value.Name.ToDalamudString().ExtractText()}";
             }
         }
 

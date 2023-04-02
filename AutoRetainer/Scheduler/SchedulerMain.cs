@@ -59,7 +59,7 @@ internal unsafe static class SchedulerMain
 
                                     var adata = Utils.GetAdditionalData(Svc.ClientState.LocalContentId, ret.Name.ToString());
 
-                                    if (adata.VenturePlanner.Count == 0)
+                                    if (!adata.IsVenturePlannerActive())
                                     {
                                         //resend retainer
 
@@ -85,37 +85,64 @@ internal unsafe static class SchedulerMain
                                     else
                                     {
                                         var next = adata.GetNextPlannedVenture();
-                                        if (ret.VentureID != 0)
+                                        P.DebugLog($"Next planned venture: {next}");
+                                        var completed = adata.IsLastPlannedVenture();
+                                        P.DebugLog($"Is last planned venture: {completed}");
+                                        if (completed && adata.VenturePlan.PlanCompleteBehavior != PlanCompleteBehavior.Restart_plan)
                                         {
-                                            if (next == ret.VentureID)
+                                            P.DebugLog($"Completed and behavior is {adata.VenturePlan.PlanCompleteBehavior}");
+                                            TaskCollectVenture.Enqueue();
+                                            if (adata.VenturePlan.PlanCompleteBehavior == PlanCompleteBehavior.Assign_Quick_Venture)
                                             {
-                                                TaskReassignVenture.Enqueue();
+                                                P.DebugLog($"Assigning quick venture");
+                                                TaskAssignQuickVenture.Enqueue();
+                                            }
+                                            adata.EnablePlanner = false;
+                                            P.DebugLog($"Now disabling planner");
+                                        }
+                                        else
+                                        {
+                                            P.DebugLog($"Not completed or restarting");
+                                            if (ret.VentureID != 0)
+                                            {
+                                                P.DebugLog($"Venture id is not zero, next={next}, ventureID={ret.VentureID}");
+                                                if (next == ret.VentureID)
+                                                {
+                                                    P.DebugLog($"Reassigning");
+                                                    TaskReassignVenture.Enqueue();
+                                                }
+                                                else
+                                                {
+                                                    P.DebugLog($"Collecting");
+                                                    TaskCollectVenture.Enqueue();
+                                                    if (VentureUtils.GetVentureById(next).IsFieldExploration())
+                                                    {
+                                                        P.DebugLog($"Assigning field exploration: {next}");
+                                                        TaskAssignFieldExploration.Enqueue(next);
+                                                    }
+                                                    else
+                                                    {
+                                                        P.DebugLog($"Assigning hunt: {next}");
+                                                        TaskAssignHuntingVenture.Enqueue(next);
+                                                    }
+                                                }
                                             }
                                             else
                                             {
-                                                TaskCollectVenture.Enqueue();
-                                                if(VentureUtils.GetVentureById(next).IsFieldExploration())
+                                                P.DebugLog($"Venture not assigned");
+                                                if (VentureUtils.GetVentureById(next).IsFieldExploration())
                                                 {
+                                                    P.DebugLog($"Assigning field exploration: {next}");
                                                     TaskAssignFieldExploration.Enqueue(next);
                                                 }
                                                 else
                                                 {
+                                                    P.DebugLog($"Assigning hunt: {next}");
                                                     TaskAssignHuntingVenture.Enqueue(next);
                                                 }
                                             }
                                         }
-                                        else
-                                        {
-                                            if (VentureUtils.GetVentureById(next).IsFieldExploration())
-                                            {
-                                                TaskAssignFieldExploration.Enqueue(next);
-                                            }
-                                            else
-                                            {
-                                                TaskAssignHuntingVenture.Enqueue(next);
-                                            }
-                                        }
-                                        adata.LastVenture = next;
+                                        adata.VenturePlanIndex++;
                                     }
 
                                     //entrust duplicates
@@ -258,7 +285,7 @@ internal unsafe static class SchedulerMain
                 var r = P.retainerManager.Retainer(i);
                 var rname = r.Name.ToString();
                 if (P.GetSelectedRetainers(Svc.ClientState.LocalContentId).Contains(rname)
-                    && r.GetVentureSecondsRemaining() <= P.config.UnsyncCompensation && (r.VentureID != 0 || P.config.EnableAssigningQuickExploration || Utils.GetAdditionalData(Svc.ClientState.LocalContentId, rname).VenturePlanner.Count > 0))
+                    && r.GetVentureSecondsRemaining() <= P.config.UnsyncCompensation && (r.VentureID != 0 || P.config.EnableAssigningQuickExploration || Utils.GetAdditionalData(Svc.ClientState.LocalContentId, rname).VenturePlan.ListUnwrapped.Count > 0))
                 {
                     return rname;
                 }
