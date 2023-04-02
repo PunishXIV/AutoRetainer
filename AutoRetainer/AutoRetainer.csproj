@@ -48,12 +48,6 @@
                 <PackageReference Include="ClickLib" Version="1.2.0.1" />
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(Configuration)' == 'Debug'">
-		<ProjectReference Include="..\PunishLib\PunishLib\PunishLib.csproj" />
-		<ProjectReference Include="..\ECommons\ECommons\ECommons.csproj" />
-		<ProjectReference Include="..\ClickLib\ClickLib\ClickLib.csproj" />
-	</ItemGroup>
-
 	<PropertyGroup Condition="'$(OS)' != 'Windows_NT' OR '$(CI)' == 'true'">
 		<DalamudLibPath>$(DALAMUD_HOME)/</DalamudLibPath>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -61,6 +55,9 @@
 
 	<ItemGroup>
 		<PackageReference Include="DalamudPackager" Version="2.1.10" />
+		<ProjectReference Include="..\ClickLib\ClickLib\ClickLib.csproj" />
+		<ProjectReference Include="..\ECommons\ECommons\ECommons.csproj" />
+		<ProjectReference Include="..\PunishLib\PunishLib\PunishLib.csproj" />
 		<Reference Include="Newtonsoft.Json">
 			<HintPath>$(DalamudLibPath)Newtonsoft.Json.dll</HintPath>
 			<Private>False</Private>
