@@ -6,6 +6,7 @@ using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,6 +14,8 @@ namespace AutoRetainer.Helpers
 {
     internal static unsafe class VentureUtils
     {
+        internal const uint QuickExplorationID = 395;
+
         private static bool IsNullOrEmpty(this string s) => GenericHelpers.IsNullOrEmpty(s);
 
         internal static int GetCategory(uint ClassJob)
@@ -40,7 +43,11 @@ namespace AutoRetainer.Helpers
             return Svc.Data.GetExcelSheet<RetainerTask>().Where(x => x.ClassJobCategory.Value.RowId == cat).Where(x => x.MaxTimemin == 60 && x.RetainerLevel <= level && !x.GetVentureName().IsNullOrEmpty()).OrderBy(x => x.RetainerLevel);
         }
 
+        internal static RetainerTask QuickExploration => Svc.Data.GetExcelSheet<RetainerTask>().GetRow(QuickExplorationID);
+
         internal static bool IsFieldExploration(this RetainerTask task) => task.MaxTimemin == 1080;
+
+        internal static bool IsQuickExploration(this RetainerTask task) => task.RowId == QuickExplorationID;
 
         internal static IEnumerable<RetainerTask> GetAvailableVentures(this IEnumerable<RetainerTask> tasks, OfflineRetainerData data)
         {
@@ -54,11 +61,11 @@ namespace AutoRetainer.Helpers
             if (Task == null) return null;
             if (Task.IsRandom)
             {
-                return $"{Task.RetainerLevel} {Svc.Data.GetExcelSheet<RetainerTaskRandom>().GetRow(Task.Task).Name.ToDalamudString().ExtractText()}";
+                return $"{Svc.Data.GetExcelSheet<RetainerTaskRandom>().GetRow(Task.Task).Name.ToDalamudString().ExtractText()}";
             }
             else
             {
-                return $"{Task.RetainerLevel} {Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRow(Task.Task).Item.Value.Name.ToDalamudString().ExtractText()}";
+                return $"{Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRow(Task.Task).Item.Value.Name.ToDalamudString().ExtractText()}";
             }
         }
 

@@ -120,6 +120,11 @@ internal unsafe static class SchedulerMain
                                                         P.DebugLog($"Assigning field exploration: {next}");
                                                         TaskAssignFieldExploration.Enqueue(next);
                                                     }
+                                                    else if (VentureUtils.GetVentureById(next).IsQuickExploration())
+                                                    {
+                                                        P.DebugLog($"Assigning quick: {next}");
+                                                        TaskAssignQuickVenture.Enqueue();
+                                                    }
                                                     else
                                                     {
                                                         P.DebugLog($"Assigning hunt: {next}");
@@ -134,6 +139,11 @@ internal unsafe static class SchedulerMain
                                                 {
                                                     P.DebugLog($"Assigning field exploration: {next}");
                                                     TaskAssignFieldExploration.Enqueue(next);
+                                                }
+                                                else if(VentureUtils.GetVentureById(next).IsQuickExploration())
+                                                {
+                                                    P.DebugLog($"Assigning quick: {next}");
+                                                    TaskAssignQuickVenture.Enqueue();
                                                 }
                                                 else
                                                 {

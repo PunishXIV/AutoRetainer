@@ -105,7 +105,7 @@ internal unsafe static class MultiModeUI
             if (ImGui.BeginPopup($"popup{data.CID}"))
             {
                 var b = true;
-                ImGui.CollapsingHeader($"{data.Name} Configuration##conf", ref b, ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.Bullet | ImGuiTreeNodeFlags.OpenOnArrow);
+                ImGui.CollapsingHeader($"{Censor.Character(data.Name)} Configuration##conf", ref b, ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.Bullet | ImGuiTreeNodeFlags.OpenOnArrow);
                 if(b == false)
                 {
                     ImGui.CloseCurrentPopup();
@@ -192,7 +192,7 @@ internal unsafe static class MultiModeUI
             {
                 ImGui.SetNextItemOpen(index == 0);
             }
-            if (ImGui.CollapsingHeader((P.config.NoNames?$"Character {index+1}":$"{data}") +$"###chara{data.CID}"))
+            if (ImGui.CollapsingHeader(Censor.Character(data.Name, data.World) +$"###chara{data.CID}"))
             {
                 SetAsPreferred(data);
                 if (col)
@@ -238,7 +238,7 @@ internal unsafe static class MultiModeUI
                         ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
                         var start = ImGui.GetCursorPos();
                         var selected = retainers.Contains(ret.Name.ToString());
-                        if (ImGui.Checkbox($"{(P.config.NoNames ? $"Retainer {(i + 1)}" : ret.Name)}", ref selected))
+                        if (ImGui.Checkbox($"{Censor.Retainer(ret.Name)}", ref selected))
                         {
                             if (selected)
                             {
@@ -300,7 +300,7 @@ internal unsafe static class MultiModeUI
                         }
                         if (ImGuiEx.BeginPopupNextToElement(n))
                         {
-                            ImGui.CollapsingHeader($"{ret.Name} - {data.Name} Configuration  ##conf", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.Bullet | ImGuiTreeNodeFlags.OpenOnArrow);
+                            ImGui.CollapsingHeader($"{Censor.Retainer(ret.Name)} - {Censor.Character(data.Name)} Configuration  ##conf", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.Bullet | ImGuiTreeNodeFlags.OpenOnArrow);
                             ImGuiEx.Text($"Additional Post-venture Tasks:");
                             ImGui.Checkbox($"Entrust Duplicates", ref adata.EntrustDuplicates);
                             ImGui.Checkbox($"Withdraw/Deposit Gil", ref adata.WithdrawGil);

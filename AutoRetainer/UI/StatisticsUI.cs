@@ -35,7 +35,7 @@ internal static class StatisticsUI
             var display = false;
             if (CharTotal[cData.Key] != 0)
             {
-                if (ImGui.CollapsingHeader($"{(P.config.NoNames ? "Character " + ++cindex : cData.Key)} | Total Ventures: {CharTotal.GetSafe(cData.Key)}###chara{cData.Key}"))
+                if (ImGui.CollapsingHeader($"{Censor.Character(cData.Key)} | Total Ventures: {CharTotal.GetSafe(cData.Key)}###chara{cData.Key}"))
                 {
                     display = true;
                 }
@@ -50,7 +50,7 @@ internal static class StatisticsUI
                 {
                     ImGui.Dummy(new(10, 1));
                     ImGui.SameLine();
-                    if (ImGui.CollapsingHeader($"{(P.config.NoNames ? "Retainer " + ++rindex : x.Key)} | Ventures: {num}###{cData.Key}ret{x.Key}"))
+                    if (ImGui.CollapsingHeader($"{Censor.Retainer(x.Key)} | Ventures: {num}###{cData.Key}ret{x.Key}"))
                     {
                         foreach (var c in array)
                         {

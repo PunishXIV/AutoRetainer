@@ -90,7 +90,7 @@ internal static class SettingsMain
                 }
             }
             ImGui.SameLine();
-            ImGuiEx.TextV(P.config.OfflineData[index].Name);
+            ImGuiEx.TextV(Censor.Character(P.config.OfflineData[index].Name));
             ImGui.PopID();
         }
     });

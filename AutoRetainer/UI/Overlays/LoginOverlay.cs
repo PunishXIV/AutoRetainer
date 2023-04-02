@@ -29,7 +29,7 @@ namespace AutoRetainer.UI.Overlays
             ImGui.PushFont(Svc.PluginInterface.UiBuilder.GetGameFontHandle(new GameFontStyle(GameFontFamilyAndSize.MiedingerMid18)).ImFont);
             foreach(var x in P.config.OfflineData.Where(x => !x.Name.IsNullOrEmpty() && x.Index != 0))
             {
-                var n = P.config.NoNames?$"Character {num++}":$"{x.Name} # {x.World}";
+                var n = Censor.Character(x.Name, x.World);
                 var dim = ImGuiHelpers.GetButtonSize(n);
                 if(dim.X > bWidth)
                 {

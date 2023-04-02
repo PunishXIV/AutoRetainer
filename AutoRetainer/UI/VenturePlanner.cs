@@ -27,13 +27,13 @@ namespace AutoRetainer.UI
         public override void Draw()
         {
             ImGuiEx.SetNextItemFullWidth();
-            if(ImGui.BeginCombo("##selectRet", $"{SelectedCharacter.Name}@{SelectedCharacter.World} - {SelectedRetainer.Name} - {SelectedRetainer.Level} {ExcelJobHelper.GetJobNameById(SelectedRetainer.Job)}" ?? "Select a retainer..."))
+            if(ImGui.BeginCombo("##selectRet", $"{Censor.Character(SelectedCharacter.Name, SelectedCharacter.World)} - {Censor.Retainer(SelectedRetainer.Name)} - {SelectedRetainer.Level} {ExcelJobHelper.GetJobNameById(SelectedRetainer.Job)}" ?? "Select a retainer..."))
             {
                 foreach(var x in P.config.OfflineData)
                 {
                     foreach(var r in x.RetainerData)
                     {
-                        if(ImGui.Selectable($"{x.Name}@{x.World} - {r.Name} - Lv{r.Level} {ExcelJobHelper.GetJobNameById(r.Job)}"))
+                        if(ImGui.Selectable($"{Censor.Character(x.Name, x.World)} - {Censor.Retainer(r.Name)} - Lv{r.Level} {ExcelJobHelper.GetJobNameById(r.Job)}"))
                         {
                             SelectedRetainer = r;
                             SelectedCharacter = x;
@@ -49,51 +49,6 @@ namespace AutoRetainer.UI
                 var ww = ImGui.GetContentRegionAvail().X;
                 ImGui.Columns(2);
                 ImGui.SetColumnWidth(0, ww / 2);
-
-                if(P.config.SavedPlans.Count > 0)
-                {
-                    if(ImGui.Checkbox("Enable planner", ref adata.EnablePlanner))
-                    {
-                        if (adata.EnablePlanner)
-                        {
-                            adata.VenturePlanIndex = 0;
-                        }
-                    }
-                    ImGuiEx.SetNextItemFullWidth();
-                    if(ImGui.BeginCombo("##load", "Load saved plan..."))
-                    {
-                        int? toRem = null;
-                        for (int i = 0; i < P.config.SavedPlans.Count; i++)
-                        {
-                            var p = P.config.SavedPlans[i];
-                            ImGui.PushID(p.GUID);
-                            if(ImGui.Selectable(p.Name))
-                            {
-                                adata.VenturePlan = p.JSONClone();
-                                adata.VenturePlanIndex = 0;
-                            }
-                            if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
-                            {
-                                ImGui.OpenPopup($"Context");
-                            }
-                            if (ImGui.BeginPopup($"Context"))
-                            {
-                                if(ImGui.Selectable("Delete plan"))
-                                {
-                                    toRem = i;
-                                }
-                                ImGui.EndPopup();
-                            }
-                            ImGui.PopID();
-                        }
-                        if(toRem != null)
-                        {
-                            P.config.SavedPlans.RemoveAt(toRem.Value);
-                        }
-                        ImGui.EndCombo();
-                    }
-                    //ImGui.Separator();
-                }
 
                 {
                     int? toRem = null;
@@ -142,7 +97,58 @@ namespace AutoRetainer.UI
                     }
                 }
 
-                if(adata.VenturePlan.List.Count > 0)
+
+                ImGui.NextColumn();
+
+
+                if (ImGui.Checkbox("Enable planner", ref adata.EnablePlanner))
+                {
+                    if (adata.EnablePlanner)
+                    {
+                        adata.VenturePlanIndex = 0;
+                    }
+                }
+
+                if (P.config.SavedPlans.Count > 0)
+                {
+                    ImGuiEx.SetNextItemFullWidth();
+                    if (ImGui.BeginCombo("##load", "Load saved plan..."))
+                    {
+                        int? toRem = null;
+                        for (int i = 0; i < P.config.SavedPlans.Count; i++)
+                        {
+                            var p = P.config.SavedPlans[i];
+                            ImGui.PushID(p.GUID);
+                            if (ImGui.Selectable(p.Name))
+                            {
+                                adata.VenturePlan = p.JSONClone();
+                                adata.VenturePlanIndex = 0;
+                            }
+                            if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                            {
+                                ImGui.OpenPopup($"Context");
+                            }
+                            if (ImGui.BeginPopup($"Context"))
+                            {
+                                if (ImGui.Selectable("Delete plan"))
+                                {
+                                    toRem = i;
+                                }
+                                ImGui.EndPopup();
+                            }
+                            ImGui.PopID();
+                        }
+                        if (toRem != null)
+                        {
+                            P.config.SavedPlans.RemoveAt(toRem.Value);
+                        }
+                        ImGui.EndCombo();
+                    }
+                    //ImGui.Separator();
+                }
+
+
+                if (adata.VenturePlan.List.Count > 0)
                 {
                     //ImGui.Separator();
                     ImGuiEx.TextV("On plan completion:");
@@ -155,15 +161,13 @@ namespace AutoRetainer.UI
                         ImGui.InputTextWithHint("##name", "Enter plan name...", ref adata.VenturePlan.Name, 50);
                     }, delegate
                     {
-                        if(ImGui.Button("Save plan"))
+                        if (ImGui.Button("Save plan"))
                         {
                             P.config.SavedPlans.Add(adata.VenturePlan.JSONClone());
                             Notify.Success($"Plan {adata.VenturePlan.Name} saved!");
                         }
                     });
                 }
-
-                ImGui.NextColumn();
 
                 ImGuiEx.SetNextItemFullWidth();
                 if(ImGui.BeginCombo("##addVenture", "Add venture...", ImGuiComboFlags.HeightLargest))
@@ -193,6 +197,11 @@ namespace AutoRetainer.UI
                                     adata.VenturePlanIndex = 0;
                                 }
                             }
+                        }
+                        if(ImGui.Selectable("Quick Exploration", adata.VenturePlan.List.Any(x => x.ID == VentureUtils.QuickExplorationID), ImGuiSelectableFlags.DontClosePopups))
+                        {
+                            adata.VenturePlan.List.Add(new(VentureUtils.QuickExplorationID));
+                            adata.VenturePlanIndex = 0;
                         }
                         ImGui.EndChild();
                     }

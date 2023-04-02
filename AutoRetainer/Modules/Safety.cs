@@ -40,7 +40,7 @@ namespace AutoRetainer.Modules
                     if(x.GCDeliveryType == GCDeliveryType.Show_All_Items)
                     {
                         x.GCDeliveryType = GCDeliveryType.Hide_Armoury_Chest_Items;
-                        Notify.Info($"Unsafe option removed: character {x.Name} - {nameof(GCDeliveryType.Show_All_Items)}");
+                        Notify.Info($"Unsafe option removed: character {Censor.Character(x.Name)} - {nameof(GCDeliveryType.Show_All_Items)}");
                     }
                 }
             }
