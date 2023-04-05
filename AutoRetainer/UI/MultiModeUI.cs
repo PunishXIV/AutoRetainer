@@ -170,6 +170,13 @@ internal unsafe static class MultiModeUI
                     P.config.Blacklist.Add((data.CID, data.Name));
                 }
                 ImGuiComponents.HelpMarker("Excluding this character will immediately reset it's settings, remove it from this list and exclude all retainers from being processed. You can still run manual tasks on it's retainers. You can cancel this action in settings.");
+                ImGui.SameLine();
+                if(ImGui.Button("World/Name change"))
+                {
+                    data.Name = "Unknown";
+                    data.World = "";
+                    Notify.Info("Log into this character again");
+                }
                 ImGui.EndPopup();
             }
 

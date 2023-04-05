@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.Modules.Statistics;
+using AutoRetainer.Scheduler.Tasks;
 using Dalamud.Memory;
 using Dalamud.Utility;
 using ECommons.ExcelServices;
@@ -9,6 +10,7 @@ using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace AutoRetainer.Helpers
 {
@@ -17,6 +19,59 @@ namespace AutoRetainer.Helpers
         internal const uint QuickExplorationID = 395;
 
         private static bool IsNullOrEmpty(this string s) => GenericHelpers.IsNullOrEmpty(s);
+
+        internal static void ProcessVenturePlanner(this SeRetainer ret, uint next)
+        {
+            P.DebugLog($"Not completed or restarting");
+            if (ret.VentureID != 0)
+            {
+                P.DebugLog($"Venture id is not zero, next={next}, ventureID={ret.VentureID}");
+                if (next == ret.VentureID)
+                {
+                    P.DebugLog($"Reassigning");
+                    TaskReassignVenture.Enqueue();
+                }
+                else
+                {
+                    P.DebugLog($"Collecting");
+                    TaskCollectVenture.Enqueue();
+                    if (VentureUtils.GetVentureById(next).IsFieldExploration())
+                    {
+                        P.DebugLog($"Assigning field exploration: {next}");
+                        TaskAssignFieldExploration.Enqueue(next);
+                    }
+                    else if (VentureUtils.GetVentureById(next).IsQuickExploration())
+                    {
+                        P.DebugLog($"Assigning quick: {next}");
+                        TaskAssignQuickVenture.Enqueue();
+                    }
+                    else
+                    {
+                        P.DebugLog($"Assigning hunt: {next}");
+                        TaskAssignHuntingVenture.Enqueue(next);
+                    }
+                }
+            }
+            else
+            {
+                P.DebugLog($"Venture not assigned");
+                if (VentureUtils.GetVentureById(next).IsFieldExploration())
+                {
+                    P.DebugLog($"Assigning field exploration: {next}");
+                    TaskAssignFieldExploration.Enqueue(next);
+                }
+                else if (VentureUtils.GetVentureById(next).IsQuickExploration())
+                {
+                    P.DebugLog($"Assigning quick: {next}");
+                    TaskAssignQuickVenture.Enqueue();
+                }
+                else
+                {
+                    P.DebugLog($"Assigning hunt: {next}");
+                    TaskAssignHuntingVenture.Enqueue(next);
+                }
+            }
+        }
 
         internal static int GetCategory(uint ClassJob)
         {
@@ -61,11 +116,11 @@ namespace AutoRetainer.Helpers
             if (Task == null) return null;
             if (Task.IsRandom)
             {
-                return $"{Svc.Data.GetExcelSheet<RetainerTaskRandom>().GetRow(Task.Task).Name.ToDalamudString().ExtractText()}";
+                return $"{Svc.Data.GetExcelSheet<RetainerTaskRandom>().GetRow(Task.Task)?.Name.ToDalamudString().ExtractText()}";
             }
             else
             {
-                return $"{Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRow(Task.Task).Item.Value.Name.ToDalamudString().ExtractText()}";
+                return $"{Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRow(Task.Task)?.Item.Value?.Name.ToDalamudString().ExtractText()}";
             }
         }
 

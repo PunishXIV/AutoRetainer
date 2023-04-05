@@ -15,6 +15,7 @@ namespace AutoRetainer.Modules
             P.DebugLog("IPC init");
             Svc.PluginInterface.GetIpcProvider<bool>("AutoRetainer.GetSuppressed").RegisterFunc(GetSuppressed);
             Svc.PluginInterface.GetIpcProvider<bool, object>("AutoRetainer.SetSuppressed").RegisterAction(SetSuppressed);
+            Svc.PluginInterface.GetIpcProvider<uint, object>("AutoRetainer.SetVenture").RegisterAction(SetVenture);
         }
 
         internal static void Shutdown()
@@ -22,6 +23,13 @@ namespace AutoRetainer.Modules
             P.DebugLog("IPC Shutdown");
             Svc.PluginInterface.GetIpcProvider<bool>("AutoRetainer.GetSuppressed").UnregisterFunc();
             Svc.PluginInterface.GetIpcProvider<bool, object>("AutoRetainer.SetSuppressed").UnregisterAction();
+            Svc.PluginInterface.GetIpcProvider<uint, object>("AutoRetainer.SetVenture").UnregisterAction();
+        }
+
+        static void SetVenture(uint VentureID)
+        {
+            SchedulerMain.VentureOverride = VentureID;
+            P.DebugLog($"Received venture override to {VentureID} / {VentureUtils.GetVentureName(VentureID)} via IPC");
         }
 
         static bool GetSuppressed()

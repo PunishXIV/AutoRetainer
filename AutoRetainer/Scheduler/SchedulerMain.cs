@@ -2,6 +2,7 @@
 using AutoRetainer.Scheduler.Tasks;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace AutoRetainer.Scheduler;
 
@@ -19,6 +20,8 @@ internal unsafe static class SchedulerMain
             PluginEnabledInternal = value;
         } 
     }
+
+    internal static volatile uint VentureOverride = 0;
 
     internal static PluginEnableReason Reason { get; private set; }
 
@@ -56,10 +59,16 @@ internal unsafe static class SchedulerMain
                                 {
                                     P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(retainer));
 
-
                                     var adata = Utils.GetAdditionalData(Svc.ClientState.LocalContentId, ret.Name.ToString());
+                                    VentureOverride = 0;
+                                    Svc.PluginInterface.GetIpcProvider<string, object>("AutoRetainer.OnSendRetainerToVenture").SendMessage(retainer);
 
-                                    if (!adata.IsVenturePlannerActive())
+                                    if(VentureOverride > 0)
+                                    {
+                                        P.DebugLog($"Using VentureOverride = {VentureOverride}");
+                                        ret.ProcessVenturePlanner(VentureOverride);
+                                    }
+                                    else if (!adata.IsVenturePlannerActive())
                                     {
                                         //resend retainer
 
@@ -102,55 +111,7 @@ internal unsafe static class SchedulerMain
                                         }
                                         else
                                         {
-                                            P.DebugLog($"Not completed or restarting");
-                                            if (ret.VentureID != 0)
-                                            {
-                                                P.DebugLog($"Venture id is not zero, next={next}, ventureID={ret.VentureID}");
-                                                if (next == ret.VentureID)
-                                                {
-                                                    P.DebugLog($"Reassigning");
-                                                    TaskReassignVenture.Enqueue();
-                                                }
-                                                else
-                                                {
-                                                    P.DebugLog($"Collecting");
-                                                    TaskCollectVenture.Enqueue();
-                                                    if (VentureUtils.GetVentureById(next).IsFieldExploration())
-                                                    {
-                                                        P.DebugLog($"Assigning field exploration: {next}");
-                                                        TaskAssignFieldExploration.Enqueue(next);
-                                                    }
-                                                    else if (VentureUtils.GetVentureById(next).IsQuickExploration())
-                                                    {
-                                                        P.DebugLog($"Assigning quick: {next}");
-                                                        TaskAssignQuickVenture.Enqueue();
-                                                    }
-                                                    else
-                                                    {
-                                                        P.DebugLog($"Assigning hunt: {next}");
-                                                        TaskAssignHuntingVenture.Enqueue(next);
-                                                    }
-                                                }
-                                            }
-                                            else
-                                            {
-                                                P.DebugLog($"Venture not assigned");
-                                                if (VentureUtils.GetVentureById(next).IsFieldExploration())
-                                                {
-                                                    P.DebugLog($"Assigning field exploration: {next}");
-                                                    TaskAssignFieldExploration.Enqueue(next);
-                                                }
-                                                else if(VentureUtils.GetVentureById(next).IsQuickExploration())
-                                                {
-                                                    P.DebugLog($"Assigning quick: {next}");
-                                                    TaskAssignQuickVenture.Enqueue();
-                                                }
-                                                else
-                                                {
-                                                    P.DebugLog($"Assigning hunt: {next}");
-                                                    TaskAssignHuntingVenture.Enqueue(next);
-                                                }
-                                            }
+                                            ret.ProcessVenturePlanner(next);
                                         }
                                         adata.VenturePlanIndex++;
                                     }
