@@ -55,7 +55,7 @@ internal unsafe static class SchedulerMain
                             var retainer = GetNextRetainerName();
                             if (retainer != null && Utils.TryGetRetainerByName(retainer, out var ret))
                             {
-                                if (EzThrottler.Throttle("ScheduleSelectRetainer", 5000))
+                                if (EzThrottler.Throttle("ScheduleSelectRetainer", 2000))
                                 {
                                     P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(retainer));
 
