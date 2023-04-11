@@ -6,6 +6,10 @@ internal static unsafe class DebugMisc
 {
     internal static void Draw()
     {
+        if(ImGui.Button("Regenerate censor seed"))
+        {
+            P.config.CensorSeed = Guid.NewGuid().ToString();
+        }
         var inv = Utils.GetActiveRetainerInventoryName();
         ImGuiEx.Text($"Utils.GetActiveRetainerInventoryName(): {inv.Name} {inv.EntrustDuplicatesIndex}");
         ImGuiEx.Text($"ConditionWasEnabled={P.ConditionWasEnabled}");

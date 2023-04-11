@@ -5,15 +5,69 @@ namespace AutoRetainer;
 
 internal static class Consts
 {
-    internal static string QuickExploration => Svc.ClientState.ClientLanguage switch
+    internal static readonly string[] FieldExplorationNames = new string[]
     {
-        //402	TEXT_CMNDEFRETAINERCALL_00010_TASK_CATEGORY_FORTUNE	Quick Exploration.s
-        ClientLanguage.Japanese => "",
-        ClientLanguage.German => "",
-        ClientLanguage.French => "",
-        _ => "Quick Exploration."
+        "Field Exploration.",
+        "Highland Exploration.",
+        "Woodland Exploration.",
+        "Waterside Exploration.",
+        "探索依頼：平地　　（必要ベンチャースクリップ：2枚）",
+        "探索依頼：山岳　　（必要ベンチャースクリップ：2枚）",
+        "探索依頼：森林　　（必要ベンチャースクリップ：2枚）",
+        "探索依頼：水辺　　（必要ベンチャースクリップ：2枚）",
+        "Felderkundung (2 Wertmarken)",
+        "Hochlanderkundung (2 Wertmarken)",
+        "Forsterkundung (2 Wertmarken)",
+        "Gewässererkundung (2 Wertmarken)",
+        "Exploration en plaine (2 jetons)",
+        "Exploration en montagne (2 jetons)",
+        "Exploration en forêt (2 jetons)",
+        "Exploration en rivage (2 jetons)"
     };
 
+    internal static readonly string[] HuntingVentureNames = new string[]
+    {
+        "Hunting.",
+        "Mining.",
+        "Botany.",
+        "Fishing.",
+        "調達依頼：渉猟　　（必要ベンチャースクリップ：1枚）",
+        "調達依頼：採掘　　（必要ベンチャースクリップ：1枚）",
+        "調達依頼：園芸　　（必要ベンチャースクリップ：1枚）",
+        "調達依頼：漁猟　　（必要ベンチャースクリップ：1枚）",
+        "Beutezug (1 Wertmarke)",
+        "Mineraliensuche (1 Wertmarke)",
+        "Ernteausflug (1 Wertmarke)",
+        "Fischzug (1 Wertmarke)",
+        "Travail de chasse (1 jeton)",
+        "Travail de mineur (1 jeton)",
+        "Travail de botaniste (1 jeton)",
+        "Travail de pêche (1 jeton)"
+    };
+
+    internal static readonly string[] QuickExploration = new string[]
+    {
+        "Quick Exploration.",
+        "ほりだしもの依頼　（必要ベンチャースクリップ：2枚）",
+        "Schneller Streifzug (2 Wertmarken)",
+        "Tâche improvisée (2 jetons)"
+    };
+
+    internal static readonly string[] Entrance = new string[]
+    {
+        "ハウスへ入る",
+        "Eingang",
+        "Entrée",
+        "Entrance"
+    };
+
+    internal static readonly string[] ConfirmHouseEntrance = new string[]
+    {
+        "「ハウス」へ入りますか？",
+        "Das Gebäude betreten?",
+        "Entrer dans la maison ?",
+        "Enter the estate hall?"
+    };
 
     internal static string RetainerAskCategoryText => Svc.ClientState.ClientLanguage switch
     {
@@ -21,14 +75,6 @@ internal static class Consts
         ClientLanguage.German => "Wähle eine Unternehmung, auf die du den Gehilfen schicken möchtest.",
         ClientLanguage.French => "Choisissez un type de tâche :",
         _ => "Select a category."
-    };
-
-    internal static string RetainerQuickExplorationText => Svc.ClientState.ClientLanguage switch
-    {
-        ClientLanguage.Japanese => "ほりだしもの依頼　（必要ベンチャースクリップ：2枚）",
-        ClientLanguage.German => "Schneller Streifzug (2 Wertmarken)",
-        ClientLanguage.French => "Tâche improvisée (2 jetons)",
-        _ => "Quick Exploration."
     };
 
     internal static string BellName

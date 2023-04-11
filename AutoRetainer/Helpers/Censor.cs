@@ -17,13 +17,15 @@ namespace AutoRetainer.Helpers
 
         internal static readonly string[] Worlds = new string[] { "Albion", "Asgard", "Avalon", "Averoigne", "Azeroth", "Barsoom", "Darkover", "Deltora", "Dinotopia", "Discworld", "Dreamlands", "Earthsea", "Encantadia", "Equestria", "Eternia", "Etheria", "Filgaia", "Gielinor", "Glorantha", "Gor", "Greyhawk", "Halkeginia", "Hyrule", "Ivalice", "Lankhmar", "Melnibone", "Narnia", "Neverland", "Nirn", "Pellucidar", "Pern", "Prydain", "Spira", "Thedas", "Tyria", "Westeros", "Wonderland", "Xanth" };
 
+        static string Seed => P.config.CensorSeed;
+
         internal static string Character(string name, string world)
         {
             if (P.config.NoNames)
             {
-                var n1 = Crc32.Get(name) % Adjectives.Length;
-                var n2 = Crc32.Get(name) % Animals.Length;
-                var w = Crc32.Get(world) % Worlds.Length;
+                var n1 = Crc32.Get(Seed + name) % Adjectives.Length;
+                var n2 = Crc32.Get(Seed + name) % Animals.Length;
+                var w = Crc32.Get(Seed + world) % Worlds.Length;
                 return $"{Adjectives[n1]} {Animals[n2]}@{Worlds[w]}";
             }
             else
@@ -41,8 +43,8 @@ namespace AutoRetainer.Helpers
                     var x = name.Split("@");
                     return Character(x[0], x[1]);
                 }
-                var n1 = Crc32.Get(name) % Adjectives.Length;
-                var n2 = Crc32.Get(name) % Animals.Length;
+                var n1 = Crc32.Get(Seed + name) % Adjectives.Length;
+                var n2 = Crc32.Get(Seed + name) % Animals.Length;
                 return $"{Adjectives[n1]} {Animals[n2]}";
             }
             else
@@ -55,7 +57,7 @@ namespace AutoRetainer.Helpers
         {
             if (P.config.NoNames)
             {
-                var w = Crc32.Get(world) % Worlds.Length;
+                var w = Crc32.Get(Seed + world) % Worlds.Length;
                 return $"{Worlds[w]}";
             }
             else
@@ -68,7 +70,7 @@ namespace AutoRetainer.Helpers
         {
             if (P.config.NoNames)
             {
-                var w = Crc32.Get(name) % Fishes.Length;
+                var w = Crc32.Get(Seed + name) % Fishes.Length;
                 return $"{Fishes[w]}";
             }
             else

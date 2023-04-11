@@ -20,6 +20,20 @@ namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
+    internal static bool CanAutoLogin()
+    {
+        return !Svc.ClientState.IsLoggedIn 
+            && !Svc.Condition.Any() 
+            && !P.TaskManager.IsBusy 
+            && !AutoLogin.Instance.IsRunning 
+            && TryGetAddonByName<AtkUnitBase>("_TitleMenu", out var title) 
+            && IsAddonReady(title) 
+            && title->UldManager.NodeListCount > 3 
+            && title->UldManager.NodeList[3]->Color.A == 0xFF 
+            && !TryGetAddonByName<AtkUnitBase>("TitleDCWorldMap", out _) 
+            && !TryGetAddonByName<AtkUnitBase>("TitleConnect", out _);
+    }
+
     internal static uint GetNextPlannedVenture(this AdditionalRetainerData data)
     {
         if(data.VenturePlan.ListUnwrapped.Count == 0)
@@ -227,7 +241,7 @@ internal static unsafe class Utils
         GameObject currentObject = null;
         foreach (var x in Svc.Objects)
         {
-            if (x.IsTargetable() && x.Name.ToString() == "Entrance")
+            if (x.IsTargetable() && x.Name.ToString().EqualsAny(Consts.Entrance))
             {
                 var distance = Vector3.Distance(Svc.ClientState.LocalPlayer.Position, x.Position);
                 if (distance < currentDistance)

@@ -1,5 +1,6 @@
 ﻿using AutoRetainer.Scheduler.Tasks;
 using AutoRetainer.UI;
+using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using ECommons.CircularBuffers;
@@ -7,8 +8,11 @@ using ECommons.Events;
 using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameFunctions;
+using ECommons.GameHelpers;
 using ECommons.MathHelpers;
+using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using static AutoRetainer.Modules.OfflineDataManager;
 
@@ -76,6 +80,25 @@ internal unsafe static class MultiMode
             {
                 return;
             }
+            if(P.config.MultiWaitOnLoginScreen)
+            {
+                if(!Player.Available && Utils.CanAutoLogin())
+                {
+                    AgentLobby.Instance()->IdleTime = 0;
+                    var next = GetCurrentTargetCharacter();
+                    if(next != null)
+                    {
+                        if(EzThrottler.Throttle("MultiModeAfkOnTitleLogin", 20000))
+                        {
+                            if(!Relog(next, out var error))
+                            {
+                                PluginLog.Error($"Error while automatically logging in: {error}");
+                                Notify.Error($"{error}");
+                            }
+                        }
+                    }
+                }
+            }
             if (Interactions.Count() == Interactions.Capacity && Interactions.All(x => Environment.TickCount64 - x < 60000))
             {
                 if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data) && data.Enabled)
@@ -129,6 +152,25 @@ internal unsafe static class MultiMode
                         }
                         Interactions.PushBack(Environment.TickCount64);
                         P.DebugLog($"Added interaction because of relogging (state: {Interactions.Print()})");
+                    }
+                    else
+                    {
+                        if(P.config.MultiWaitOnLoginScreen)
+                        {
+                            P.DebugLog($"Enqueueing logoff");
+                            BlockInteraction(20);
+                            EnsureCharacterValidity();
+                            if (!Relog(null, out var error))
+                            {
+                                DuoLog.Error(error);
+                            }
+                            else
+                            {
+                                P.DebugLog($"Logoff command success");
+                            }
+                            Interactions.PushBack(Environment.TickCount64);
+                            P.DebugLog($"Added interaction because of logging off (state: {Interactions.Print()})");
+                        }
                     }
                 }
                 else if (!IsOccupied() && AnyRetainersAvailable())
@@ -202,42 +244,63 @@ internal unsafe static class MultiMode
     internal static bool Relog(OfflineCharacterData data, out string ErrorMessage)
     {
         ErrorMessage = string.Empty;
-        if (!ProperOnLogin.PlayerPresent)
-        {
-            ErrorMessage = "Local player is not present";
-        }
-        else if (IsOccupied())
-        {
-            ErrorMessage = "Player is occupied";
-        }
-        else if (data.CID == Svc.ClientState.LocalContentId)
-        {
-            ErrorMessage = "Targeted player is logged in";
-        }
-        else if (AutoLogin.Instance.IsRunning)
+        if (AutoLogin.Instance.IsRunning)
         {
             ErrorMessage = "AutoLogin is already running";
         }
-        else if (!data.Index.InRange(1, 9))
+        else if (data != null && !data.Index.InRange(1, 9))
         {
             ErrorMessage = "Invalid character index";
         }
-        else if (!GameMain.IsInSanctuary() && !ExcelTerritoryHelper.IsSanctuary(Svc.ClientState.TerritoryType) && !P.config.BypassSanctuaryCheck)
+        else 
         {
-            ErrorMessage = "You are not in the sanctuary";
-        }
-        else
-        {
-            if (MultiMode.Enabled)
+            if (Player.Available)
             {
-                CharaCnt.IncrementOrSet(Svc.ClientState.LocalContentId);
+                if (IsOccupied())
+                {
+                    ErrorMessage = "Player is occupied";
+                }
+                else if (data != null && data.CID == Svc.ClientState.LocalContentId)
+                {
+                    ErrorMessage = "Targeted player is logged in";
+                }
+                else if (!GameMain.IsInSanctuary() && !ExcelTerritoryHelper.IsSanctuary(Svc.ClientState.TerritoryType) && !P.config.BypassSanctuaryCheck)
+                {
+                    ErrorMessage = "You are not in the sanctuary";
+                }
+                else
+                {
+                    if (MultiMode.Enabled)
+                    {
+                        CharaCnt.IncrementOrSet(Svc.ClientState.LocalContentId);
+                    }
+                    else
+                    {
+                        CharaCnt.Clear();
+                    }
+                    if (data != null)
+                    {
+                        AutoLogin.Instance.SwapCharacter(data.World, data.CharaIndex, data.ServiceAccount);
+                    }
+                    else
+                    {
+                        AutoLogin.Instance.Logoff();
+                    }
+                    return true;
+                }
             }
             else
             {
-                CharaCnt.Clear();
+                if (Utils.CanAutoLogin())
+                {
+                    AutoLogin.Instance.Login(data.World, data.CharaIndex, data.ServiceAccount);
+                    return true;
+                }
+                else
+                {
+                    ErrorMessage = "Can not log in now";
+                }
             }
-            AutoLogin.Instance.SwapCharacter(data.World, data.CharaIndex, data.ServiceAccount);
-            return true;
         }
         return false;
     }
@@ -251,7 +314,7 @@ internal unsafe static class MultiMode
         }
         foreach (var x in data)
         {
-            if (x.CID == Svc.ClientState.LocalContentId) continue;
+            if (x.CID == Player.CID) continue;
             if (x.Enabled && P.config.SelectedRetainers.TryGetValue(x.CID, out var enabledRetainers))
             {
                 var selectedRetainers = x.GetEnabledRetainers().Where(z => z.HasVenture);
@@ -293,8 +356,7 @@ internal unsafe static class MultiMode
         if (!ProperOnLogin.PlayerPresent) return false;
         if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
         {
-            if (Svc.ClientState.LocalPlayer.HomeWorld.Id != Svc.ClientState.LocalPlayer.CurrentWorld.Id) return false;
-            if (Utils.GetVenturesAmount() >= data.GetNeededVentureAmount() && Utils.IsInventoryFree() && GetNearbyBell() != null)
+            if (Svc.ClientState.LocalPlayer.HomeWorld.Id == Svc.ClientState.LocalPlayer.CurrentWorld.Id && Utils.GetVenturesAmount() >= data.GetNeededVentureAmount() && Utils.IsInventoryFree() && GetNearbyBell() != null)
             {
                 return true;
             }

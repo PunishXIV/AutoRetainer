@@ -22,6 +22,8 @@ internal static class Beta
             ImGui.Checkbox($"Login overlay", ref P.config.LoginOverlay);
             ImGui.Checkbox($"Enforce Full Character Rotation", ref P.config.CharEqualize);
             ImGuiComponents.HelpMarker("Recommended for users with > 15 characters, forces multi mode to make sure ventures are processed on all characters in order before returning to the beginning of the cycle.");
+            ImGui.Checkbox($"Wait on login screen", ref P.config.MultiWaitOnLoginScreen);
+            ImGuiComponents.HelpMarker($"If no character is available for ventures, you will be logged off until any character is available again. Title screen movie will be disabled while this option and MultiMode are enabled.");
         });
         
     }

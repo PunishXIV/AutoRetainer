@@ -12,7 +12,6 @@ internal static class TaskCollectVenture
             TaskWaitSelectString.Enqueue(P.config.RetainerMenuDelay);
         }
         P.TaskManager.Enqueue(RetainerHandlers.SelectViewVentureReport);
-        P.TaskManager.Enqueue(RetainerHandlers.ClickResultReassign);
-        P.TaskManager.Enqueue(RetainerHandlers.ClickAskReturn);
+        P.TaskManager.Enqueue(RetainerHandlers.ClickResultConfirm);
     }
 }

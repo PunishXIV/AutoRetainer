@@ -115,7 +115,7 @@ internal unsafe static class HouseEnterTask
         {
             return null;
         }
-        var addon = Utils.GetSpecificYesno("Enter the estate hall?");
+        var addon = Utils.GetSpecificYesno(Consts.ConfirmHouseEntrance);
         if (addon != null && IsAddonReady(addon) && EzThrottler.Throttle("HET.SelectYesno"))
         {
             P.DebugLog("Select yes");

@@ -48,7 +48,12 @@ internal unsafe class AutoLogin
         PluginLog.Information("Autologin module initialized");
     }
 
-
+    internal void Logoff()
+    {
+        actionQueue.Clear();
+        actionQueue.Enqueue(Logout);
+        actionQueue.Enqueue(SelectYesLogout);
+    }
 
     internal void Login(string WorldName, uint characterIndex, int serviceAccount)
     {
@@ -199,7 +204,7 @@ internal unsafe class AutoLogin
     private readonly Queue<Func<bool>> actionQueue = new();
     internal bool IsRunning => actionQueue.Count != 0;
 
-    public bool OpenDataCenterMenu()
+    bool OpenDataCenterMenu()
     {
         var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("_TitleMenu", 1);
         if (addon == null || addon->IsVisible == false) return false;
@@ -209,7 +214,7 @@ internal unsafe class AutoLogin
         return true;
     }
 
-    public bool SelectServiceAccount()
+    bool SelectServiceAccount()
     {
         var dcMenu = (AtkUnitBase*)Svc.GameGui.GetAddonByName("TitleDCWorldMap", 1);
         if (dcMenu != null) UiHelper.Close(dcMenu, true);
@@ -237,7 +242,7 @@ internal unsafe class AutoLogin
         return false;
     }
 
-    public bool SelectDataCentre()
+    bool SelectDataCentre()
     {
         var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("TitleDCWorldMap", 1);
         if (addon == null || tempDc == null) return false;
@@ -245,7 +250,7 @@ internal unsafe class AutoLogin
         return true;
     }
 
-    public bool SelectWorld()
+    bool SelectWorld()
     {
         // Select World
         var dcMenu = (AtkUnitBase*)Svc.GameGui.GetAddonByName("TitleDCWorldMap", 1);
@@ -277,7 +282,7 @@ internal unsafe class AutoLogin
         return false;
     }
 
-    public bool SelectCharacter()
+    bool SelectCharacter()
     {
         // Select Character
         var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("_CharaSelectListMenu", 1);
@@ -287,7 +292,7 @@ internal unsafe class AutoLogin
         return nextAddon != null;
     }
 
-    public bool SelectYesLogout()
+    bool SelectYesLogout()
     {
         var addon = Utils.GetSpecificYesno(Svc.Data.GetExcelSheet<Addon>()?.GetRow(115)?.Text.ToDalamudString().ExtractText());
         if (addon == null) return false;
@@ -296,7 +301,7 @@ internal unsafe class AutoLogin
         return true;
     }
 
-    public bool SelectYes()
+    bool SelectYes()
     {
         var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("SelectYesno", 1);
         if (addon == null) return false;
@@ -306,20 +311,20 @@ internal unsafe class AutoLogin
     }
 
 
-    public bool Delay5s()
+    bool Delay5s()
     {
         Delay = 300;
         return true;
     }
 
 
-    public bool Delay1s()
+    bool Delay1s()
     {
         Delay = 60;
         return true;
     }
 
-    public bool Logout()
+    bool Logout()
     {
         var isLoggedIn = Svc.Condition.Any();
         if (!isLoggedIn) return true;
@@ -328,7 +333,7 @@ internal unsafe class AutoLogin
         return true;
     }
 
-    public bool ClearTemp()
+    bool ClearTemp()
     {
         tempWorld = null;
         tempDc = null;
@@ -416,7 +421,7 @@ internal unsafe class AutoLogin
     }
 
 
-    public static void GenerateCallback(AtkUnitBase* unitBase, params object[] values)
+    static void GenerateCallback(AtkUnitBase* unitBase, params object[] values)
     {
         if (unitBase == null) throw new Exception("Null UnitBase");
         var atkValues = (AtkValue*)Marshal.AllocHGlobal(values.Length * sizeof(AtkValue));

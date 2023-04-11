@@ -2,7 +2,6 @@
 using AutoRetainer.Scheduler.Tasks;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace AutoRetainer.Scheduler;
 
@@ -255,8 +254,9 @@ internal unsafe static class SchedulerMain
             {
                 var r = P.retainerManager.Retainer(i);
                 var rname = r.Name.ToString();
+                var adata = Utils.GetAdditionalData(Svc.ClientState.LocalContentId, rname);
                 if (P.GetSelectedRetainers(Svc.ClientState.LocalContentId).Contains(rname)
-                    && r.GetVentureSecondsRemaining() <= P.config.UnsyncCompensation && (r.VentureID != 0 || P.config.EnableAssigningQuickExploration || Utils.GetAdditionalData(Svc.ClientState.LocalContentId, rname).VenturePlan.ListUnwrapped.Count > 0))
+                    && r.GetVentureSecondsRemaining() <= P.config.UnsyncCompensation && (r.VentureID != 0 || P.config.EnableAssigningQuickExploration || (adata.EnablePlanner && adata.VenturePlan.ListUnwrapped.Count > 0)))
                 {
                     return rname;
                 }

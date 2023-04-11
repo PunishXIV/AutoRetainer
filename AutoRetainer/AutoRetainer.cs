@@ -280,7 +280,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 YesAlready.EnableIfNeeded();
             });
             Safe(StatisticsManager.Dispose);
-            Safe(TaskManager.Dispose);
+            Safe(AutoLogin.Dispose);
             Safe(Memory.Dispose);
             Safe(IPC.Shutdown);
             PunishLibMain.Dispose();

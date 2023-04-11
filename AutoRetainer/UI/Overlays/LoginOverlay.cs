@@ -19,7 +19,7 @@ namespace AutoRetainer.UI.Overlays
 
         public override bool DrawConditions()
         {
-            return !Svc.ClientState.IsLoggedIn && P.config.LoginOverlay && !P.TaskManager.IsBusy && !AutoLogin.Instance.IsRunning && TryGetAddonByName<AtkUnitBase>("_TitleMenu", out var title) && title->IsVisible && !TryGetAddonByName<AtkUnitBase>("TitleDCWorldMap", out _) && !TryGetAddonByName<AtkUnitBase>("TitleConnect", out _);
+            return  P.config.LoginOverlay && Utils.CanAutoLogin();
         }
 
         public override void Draw()

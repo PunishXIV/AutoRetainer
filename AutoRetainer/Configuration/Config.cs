@@ -8,6 +8,7 @@ namespace AutoRetainer.Configuration;
 [Serializable]
 internal unsafe class Config : IEzConfig
 {
+    public string CensorSeed = Guid.NewGuid().ToString();
     public Dictionary<ulong, HashSet<string>> SelectedRetainers = new();
     public bool EnableAssigningQuickExploration = false;
     public bool Verbose = false;
@@ -60,6 +61,7 @@ internal unsafe class Config : IEzConfig
 
     public int RetainerMenuDelay = 0;
     public List<VenturePlan> SavedPlans = new();
+    public bool MultiWaitOnLoginScreen = false;
 
     internal bool DontReassign
     {
