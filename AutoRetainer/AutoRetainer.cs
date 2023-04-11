@@ -208,7 +208,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             }
         }
         IsNextToBell = false;
-        if (P.config.RetainerSense && Svc.ClientState.LocalPlayer != null)
+        if (P.config.RetainerSense && Svc.ClientState.LocalPlayer != null && Svc.ClientState.LocalPlayer.HomeWorld.Id == Svc.ClientState.LocalPlayer.CurrentWorld.Id)
         {
             if(!IPC.Suppressed && !IsOccupied() && !P.config.OldRetainerSense && !TaskManager.IsBusy && !MultiMode.Active && !Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BoundByDuty] && Utils.IsAnyRetainersCompletedVenture())
             {
