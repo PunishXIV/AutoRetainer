@@ -145,18 +145,18 @@ namespace AutoRetainer.Helpers
             return ret;
         }
 
-        internal static string GetVentureLevelCategory(uint id)
+        internal static string[] GetVentureLevelCategory(uint id)
         {
             return Svc.Data.GetExcelSheet<RetainerTask>().GetRow(id).GetVentureLevelCategory();
         }
 
-        internal static string GetVentureLevelCategory(this RetainerTask Task)
+        internal static string[] GetVentureLevelCategory(this RetainerTask Task)
         {
             foreach(var x in Svc.Data.GetExcelSheet<RetainerTaskLvRange>())
             {
                 if(Task.RetainerLevel >= x.Min && Task.RetainerLevel <= x.Max)
                 {
-                    return $" {x.Min}-{x.Max}.";
+                    return new string[] { $" {x.Min}-{x.Max}.", $"  {x.Min}～{x.Max}", $" {x.Min} - {x.Max}", $" {x.Min} à {x.Max}" };
                 }
             }
             return null;
