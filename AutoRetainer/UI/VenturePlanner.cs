@@ -191,11 +191,19 @@ namespace AutoRetainer.UI
                         {
                             foreach (var item in VentureUtils.GetHunts(SelectedRetainer.Job, SelectedRetainer.Level).Where(x => search.IsNullOrEmpty() || x.GetVentureName().Contains(search, StringComparison.OrdinalIgnoreCase)))
                             {
-                                if (ImGui.Selectable(VentureUtils.GetVentureName(item), adata.VenturePlan.List.Any(x => x.ID == item.RowId), ImGuiSelectableFlags.DontClosePopups))
+                                var name = VentureUtils.GetVentureName(item);
+                                var notAvail = !P.Memory.IsGatherableUnlocked(VentureUtils.GetGatheringItemByItemID(item.GetVentureItemId()));
+                                if(notAvail)
+                                {
+                                    name = "n/a " + name;
+                                }
+                                if (notAvail) ImGui.BeginDisabled();
+                                if (ImGui.Selectable(name, adata.VenturePlan.List.Any(x => x.ID == item.RowId), ImGuiSelectableFlags.DontClosePopups))
                                 {
                                     adata.VenturePlan.List.Add(new(item));
                                     adata.VenturePlanIndex = 0;
                                 }
+                                if (notAvail) ImGui.EndDisabled();
                             }
                         }
                         if(ImGui.Selectable("Quick Exploration", adata.VenturePlan.List.Any(x => x.ID == VentureUtils.QuickExplorationID), ImGuiSelectableFlags.DontClosePopups))

@@ -3,6 +3,7 @@ using AutoRetainer.Scheduler.Tasks;
 using Dalamud.Memory;
 using Dalamud.Utility;
 using ECommons.ExcelServices;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
@@ -81,6 +82,19 @@ namespace AutoRetainer.Helpers
             return 34;
         }
 
+        internal static bool IsDoL(uint ClassJob)
+        {
+            if (ClassJob == (int)Job.BTN) return true;
+            if (ClassJob == (int)Job.MIN) return true;
+            if (ClassJob == (int)Job.FSH) return true;
+            return false;
+        }
+
+        internal static uint GetGatheringItemByItemID(uint itemID)
+        {
+            return Svc.Data.GetExcelSheet<GatheringItem>().FirstOrDefault(x => x.Item == itemID)?.RowId ?? 0;
+        }
+
         internal static RetainerTask GetVentureById(uint id)
         {
             return Svc.Data.GetExcelSheet<RetainerTask>().GetRow(id);
@@ -122,6 +136,11 @@ namespace AutoRetainer.Helpers
             {
                 return $"{Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRow(Task.Task)?.Item.Value?.Name.ToDalamudString().ExtractText()}";
             }
+        }
+
+        internal static uint GetVentureItemId(this RetainerTask Task)
+        {
+            return Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRow(Task.Task)?.Item.Value.RowId ?? 0;
         }
 
         internal static List<string> GetAvailableVentureNames()
