@@ -27,4 +27,8 @@ public unsafe class RetainerManager
         => which < Count
             ? ((SeRetainer*)_container->Retainers)[which]
             : throw new ArgumentOutOfRangeException($"Invalid retainer {which} requested, only {Count} available.");
+    public void* RetainerAddress(int which)
+        => which < Count
+            ? &((SeRetainer*)_container->Retainers)[which]
+            : throw new ArgumentOutOfRangeException($"Invalid retainer {which} requested, only {Count} available.");
 }

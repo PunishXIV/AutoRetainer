@@ -5,6 +5,13 @@ namespace AutoRetainer;
 
 internal static class Consts
 {
+    internal const string CharPlant = "";
+    internal const string CharLevel = "";
+    internal const string CharItemLevel = "";
+    internal const string CharDice = "";
+    internal const string CharDeny = "";
+    internal const string CharQuestion = "";
+
     internal const string Level = "";
 
     internal static readonly string[] FieldExplorationNames = new string[]

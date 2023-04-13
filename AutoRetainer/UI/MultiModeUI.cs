@@ -276,6 +276,27 @@ internal unsafe static class MultiModeUI
                             ImGui.PushFont(UiBuilder.IconFont);
                             ImGuiEx.Text($"\uf0ae");
                             ImGui.PopFont();
+                            if (ImGui.IsItemHovered())
+                            {
+                                ImGui.BeginTooltip();
+                                for (int j = 0; j < adata.VenturePlan.ListUnwrapped.Count; j++)
+                                {
+                                    var v = adata.VenturePlan.ListUnwrapped[j];
+                                    if (j == adata.VenturePlanIndex - 1)
+                                    {
+                                        ImGuiEx.Text(ImGuiColors.ParsedGreen, $"{VentureUtils.GetFancyVentureName(v, data, ret, out _)}");
+                                    }
+                                    else if (j == adata.VenturePlanIndex)
+                                    {
+                                        ImGuiEx.Text(ImGuiColors.DalamudYellow, $"{VentureUtils.GetFancyVentureName(v, data, ret, out _)}");
+                                    }
+                                    else
+                                    {
+                                        ImGuiEx.Text($"{VentureUtils.GetFancyVentureName(v, data, ret, out _)}");
+                                    }
+                                }
+                                ImGui.EndTooltip();
+                            }
                         }
                         var end = ImGui.GetCursorPos();
                         bars[$"{data.CID}{data.RetainerData[i].Name}"] = (start, end);
@@ -293,7 +314,16 @@ internal unsafe static class MultiModeUI
                         if (ret.Level > 0)
                         {
                             ImGui.SameLine(0, 2);
-                            ImGuiEx.TextV($"{ret.Level}".ReplaceByChar("0123456789", ""));
+                            var level = $"{Consts.CharLevel}{ret.Level}";
+                            if (adata.Ilvl > 0 && !VentureUtils.IsDoL(ret.Job))
+                            {
+                                level += $"  {Consts.CharItemLevel}{adata.Ilvl}";
+                            }
+                            if (adata.Gathering > 0 && VentureUtils.IsDoL(ret.Job))
+                            {
+                                level += $"  {Consts.CharPlant}{adata.Gathering}";
+                            }
+                            ImGuiEx.TextV($"{level}".ReplaceByChar("0123456789", ""));
                         }
                         ImGui.TableNextColumn();
                         ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);

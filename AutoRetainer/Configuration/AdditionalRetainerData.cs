@@ -10,4 +10,6 @@ public class AdditionalRetainerData
     public VenturePlan VenturePlan = new();
     public uint VenturePlanIndex = 0;
     public bool EnablePlanner = false;
+    public int Ilvl = 0;
+    public int Gathering = 0;
 }

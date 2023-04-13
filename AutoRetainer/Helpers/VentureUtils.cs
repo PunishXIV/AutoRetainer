@@ -74,20 +74,61 @@ namespace AutoRetainer.Helpers
             }
         }
 
-        internal static string GetFancyVentureName(uint Task, OfflineCharacterData data, out bool Available)
+        internal static string GetFancyVentureName(uint Task, OfflineCharacterData data, OfflineRetainerData retainer, out bool Available)
         {
-            return GetVentureById(Task).GetFancyVentureName(data, out Available);
+            return GetVentureById(Task).GetFancyVentureName(data, retainer, out Available);
         }
 
-        internal static string GetFancyVentureName(this RetainerTask Task, OfflineCharacterData data, out bool Available)
+        internal static string GetFancyVentureName(this RetainerTask Task, OfflineCharacterData data, OfflineRetainerData retainer, out bool Available)
         {
-            if (IsDoL(Task.ClassJobCategory.Row) && !Task.IsFieldExploration())
+            var adata = Utils.GetAdditionalData(data.CID, retainer.Name);
+            var UnavailabilitySymbol = "";
+            var canNotGather = Task.RequiredGathering > 0 && adata.Gathering < Task.RequiredGathering && adata.Gathering > 0;
+            if (!Task.IsFieldExploration() && IsDoL(Task.ClassJobCategory.Row))
             {
-                Available = data.UnlockedGatheringItems.Count == 0 || data.UnlockedGatheringItems.Contains(VentureUtils.GetGatheringItemByItemID(Task.GetVentureItemId()));
+                var gathered = data.UnlockedGatheringItems.Count == 0 || data.UnlockedGatheringItems.Contains(VentureUtils.GetGatheringItemByItemID(Task.GetVentureItemId()));
+                if (gathered)
+                {
+                    if (canNotGather)
+                    {
+                        Available = false;
+                        UnavailabilitySymbol = Consts.CharPlant;
+                    }
+                    else
+                    {
+                        Available = true;
+                    }
+                }
+                else
+                {
+                    Available = false;
+                    if(canNotGather)
+                    {
+                        UnavailabilitySymbol = Consts.CharQuestion + Consts.CharPlant;
+                    }
+                    else
+                    {
+                        UnavailabilitySymbol = Consts.CharQuestion;
+                    }
+                }
             }
             else
             {
-                Available = true;
+                //PluginLog.Information($"{Task.GetVentureName()}, {Task.RequiredItemLevel} > {adata.Ilvl}, {Task.RequiredGathering} > {adata.Gathering}");
+                if (Task.RequiredItemLevel > 0 && adata.Ilvl > 0)
+                {
+                    Available = Task.RequiredItemLevel <= adata.Ilvl;
+                    UnavailabilitySymbol = Consts.CharItemLevel;
+                }
+                else if(Task.RequiredGathering > 0 && adata.Gathering > 0)
+                {
+                    Available = !canNotGather;
+                    UnavailabilitySymbol = Consts.CharPlant;
+                }
+                else
+                {
+                    Available = true;
+                }
             }
             string ret = "";
             if(Task.RetainerLevel == 0)
@@ -98,7 +139,7 @@ namespace AutoRetainer.Helpers
             {
                 ret = $"{Task.RetainerLevel} {Task.GetVentureName()}";
             }
-            if (!Available) ret = $"{ret}";
+            if (!Available) ret = $"{UnavailabilitySymbol}{ret}";
             return ret;
         }
 

@@ -15,6 +15,8 @@ using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
 
 namespace AutoRetainer.Modules.Multi;
 
+//Part of code is authored by Caraxi https://github.com/Caraxi/AutoLogin
+
 internal unsafe class AutoLogin
 {
     static AutoLogin? instance = null;

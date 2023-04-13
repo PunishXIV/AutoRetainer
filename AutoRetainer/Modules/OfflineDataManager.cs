@@ -3,6 +3,8 @@ using Dalamud.Game.Text.SeStringHandling;
 using ECommons.Configuration;
 using ECommons.Events;
 using ECommons.ExcelServices;
+using ECommons.GameHelpers;
+using ECommons.Throttlers;
 using Lumina.Excel.GeneratedSheets;
 
 namespace AutoRetainer.Modules;
@@ -16,6 +18,16 @@ internal static class OfflineDataManager
             if (P.retainerManager.Ready)
             {
                 WriteOfflineData(false, false);
+            }
+            if(EzThrottler.Throttle("CalculateItemLevel") && Utils.TryGetCurrentRetainer(out var ret))
+            {
+                var adata = Utils.GetAdditionalData(Player.CID, ret);
+                var result = Helpers.ItemLevel.Calculate(out var g);
+                if(result != null)
+                {
+                    adata.Ilvl = result.Value;
+                    adata.Gathering = g;
+                }
             }
         }
     }

@@ -87,7 +87,7 @@ namespace AutoRetainer.UI
                             toRem = i;
                         }
                         ImGui.SameLine();
-                        ImGuiEx.Text($"{VentureUtils.GetFancyVentureName(v.ID, SelectedCharacter, out _)}");
+                        ImGuiEx.Text($"{VentureUtils.GetFancyVentureName(v.ID, SelectedCharacter, SelectedRetainer, out _)}");
 
                         ImGui.PopID();
                     }
@@ -195,7 +195,7 @@ namespace AutoRetainer.UI
                         {
                             foreach (var item in VentureUtils.GetHunts(SelectedRetainer.Job, SelectedRetainer.Level).Where(x => search.IsNullOrEmpty() || x.GetVentureName().Contains(search, StringComparison.OrdinalIgnoreCase)).Where(x => x.RetainerLevel >= minLevel && x.RetainerLevel <= maxLevel))
                             {
-                                var name = item.GetFancyVentureName(SelectedCharacter, out var Avail);
+                                var name = item.GetFancyVentureName(SelectedCharacter, SelectedRetainer, out var Avail);
                                 if (Avail || P.config.UnavailableVentureDisplay != UnavailableVentureDisplay.Hide)
                                 {
                                     var d = !Avail && P.config.UnavailableVentureDisplay != UnavailableVentureDisplay.Allow_selection;
@@ -213,11 +213,15 @@ namespace AutoRetainer.UI
                         {
                             foreach (var item in VentureUtils.GetFieldExplorations(SelectedRetainer.Job, SelectedRetainer.Level).Where(x => search.IsNullOrEmpty() || x.GetVentureName().Contains(search, StringComparison.OrdinalIgnoreCase)).Where(x => x.RetainerLevel >= minLevel && x.RetainerLevel <= maxLevel))
                             {
-                                if (ImGui.Selectable(VentureUtils.GetFancyVentureName(item, SelectedCharacter, out _), adata.VenturePlan.List.Any(x => x.ID == item.RowId), ImGuiSelectableFlags.DontClosePopups))
+                                var name = VentureUtils.GetFancyVentureName(item, SelectedCharacter, SelectedRetainer, out var Avail);
+                                var d = !Avail && P.config.UnavailableVentureDisplay != UnavailableVentureDisplay.Allow_selection;
+                                if (d) ImGui.BeginDisabled();
+                                if (ImGui.Selectable(name, adata.VenturePlan.List.Any(x => x.ID == item.RowId), ImGuiSelectableFlags.DontClosePopups))
                                 {
                                     adata.VenturePlan.List.Add(new(item));
                                     adata.VenturePlanIndex = 0;
                                 }
+                                if (d) ImGui.EndDisabled();
                             }
                         }
                         ImGui.PushStyleVar(ImGuiStyleVar.ButtonTextAlign, Vector2.Zero);

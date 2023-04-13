@@ -1,4 +1,5 @@
-﻿using FFXIVClientStructs.FFXIV.Component.GUI;
+﻿using AutoRetainer.Helpers;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace AutoRetainer.UI.Dbg;
 
@@ -6,7 +7,9 @@ internal static unsafe class DebugMisc
 {
     internal static void Draw()
     {
-        if(ImGui.Button("Regenerate censor seed"))
+        ImGuiEx.Text($"{Utils.TryGetCurrentRetainer(out var n)}/{n}");
+        ImGuiEx.Text($"{ItemLevel.Calculate(out var g)}/{g}");
+        if (ImGui.Button("Regenerate censor seed"))
         {
             P.config.CensorSeed = Guid.NewGuid().ToString();
         }

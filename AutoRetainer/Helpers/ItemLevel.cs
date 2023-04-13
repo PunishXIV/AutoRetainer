@@ -1,0 +1,89 @@
+﻿using FFXIVClientStructs.FFXIV.Client.Game;
+using Lumina.Excel.GeneratedSheets;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace AutoRetainer.Helpers
+{
+    internal unsafe static class ItemLevel
+    {
+        //This code is authored by Caraxi https://github.com/Caraxi/SimpleTweaksPlugin/blob/main/Tweaks/UiAdjustment/ExamineItemLevel.cs
+
+        private static readonly uint[] canHaveOffhand = { 2, 6, 8, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32 };
+        private static readonly uint[] ignoreCategory = { 105 };
+
+        internal static int? Calculate(out int gathering)
+        {
+            gathering = 0;
+            var container = InventoryManager.Instance()->GetInventoryContainer(InventoryType.RetainerEquippedItems);
+            if (container == null) return null;
+            var sum = 0U;
+            var c = 12;
+            for (var i = 0; i < 13; i++)
+            {
+                if (i == 5) continue;
+                var slot = container->GetInventorySlot(i);
+                if (slot == null) continue;
+                var id = slot->ItemID;
+                var item = Svc.Data.Excel.GetSheet<Sheets.ExtendedItem>()?.GetRow(id);
+                if (item == null) continue;
+                if (ignoreCategory.Contains(item.ItemUICategory.Row))
+                {
+                    if (i == 0) c -= 1;
+                    c -= 1;
+                    continue;
+                }
+
+                if (i == 0 && !canHaveOffhand.Contains(item.ItemUICategory.Row))
+                {
+                    sum += item.LevelItem.Row;
+                    i++;
+                }
+
+                var bonus = 0;
+
+                for (var j = 0; j < item.BaseParam.Length; j++)
+                {
+                    var baseParam = item.BaseParam[j];
+                    if(baseParam.BaseParam.Value?.RowId == 72)
+                    {
+                        bonus += baseParam.Value;
+                    }
+                }
+                if (slot->Flags.HasFlag(InventoryItem.ItemFlags.HQ))
+                {
+                    for (var j = 0; j < item.BaseParamSpecial.Length; j++)
+                    {
+                        var baseParam = item.BaseParamSpecial[j];
+                        if (baseParam.BaseParam.Value?.RowId == 72)
+                        {
+                            bonus += baseParam.Value;
+                        }
+                    }
+                }
+                for (int j = 0; j < 5; j++)
+                {
+                    var materia = slot->Materia[j];
+                    var materiag = slot->MateriaGrade[j];
+                    if (materia != 0)
+                    {
+                        var m = Svc.Data.GetExcelSheet<Materia>().GetRow(materia);
+                        if (m != null && m.BaseParam.Value?.RowId == 72)
+                        {
+                            bonus += m.Value[materiag];
+                        }
+                    }
+                }
+                gathering += bonus;
+
+                sum += item.LevelItem.Row;
+            }
+
+            var avgItemLevel = sum / c;
+            return (int)avgItemLevel;
+        }
+    }
+}
