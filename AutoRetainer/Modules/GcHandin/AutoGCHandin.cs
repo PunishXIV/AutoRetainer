@@ -104,7 +104,7 @@ internal unsafe static class AutoGCHandin
                     }
                     else
                     {
-                        Overlay.IsOpen = true;
+                        Overlay.Allowed = true;
                         if (EzThrottler.Check("AutoGCHandin"))
                         {
                             try
@@ -163,20 +163,20 @@ internal unsafe static class AutoGCHandin
                 }
                 else
                 {
-                    Overlay.IsOpen = IsReadyToOperate(addon);
+                    Overlay.Allowed = IsReadyToOperate(addon);
                 }
             }
             else
             {
-                Overlay.IsOpen = Operation || IsReadyToOperate(addon);
+                Overlay.Allowed = Operation || IsReadyToOperate(addon);
                 AddonOpenedAt = 0;
             }
         }
         else
         {
-            if (Overlay.IsOpen)
+            if (Overlay.Allowed)
             {
-                Overlay.IsOpen = false;
+                Overlay.Allowed = false;
             }
             if (Operation)
             {
