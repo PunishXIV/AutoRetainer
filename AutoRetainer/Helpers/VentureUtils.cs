@@ -74,12 +74,56 @@ namespace AutoRetainer.Helpers
             }
         }
 
+        internal static string GetFancyVentureName(uint Task, OfflineCharacterData data, out bool Available)
+        {
+            return GetVentureById(Task).GetFancyVentureName(data, out Available);
+        }
+
+        internal static string GetFancyVentureName(this RetainerTask Task, OfflineCharacterData data, out bool Available)
+        {
+            if (IsDoL(Task.ClassJobCategory.Row) && !Task.IsFieldExploration())
+            {
+                Available = data.UnlockedGatheringItems.Count == 0 || data.UnlockedGatheringItems.Contains(VentureUtils.GetGatheringItemByItemID(Task.GetVentureItemId()));
+            }
+            else
+            {
+                Available = true;
+            }
+            string ret = "";
+            if(Task.RetainerLevel == 0)
+            {
+                ret = $"{Task.GetVentureName()}";
+            }
+            else
+            {
+                ret = $"{Task.RetainerLevel} {Task.GetVentureName()}";
+            }
+            if (!Available) ret = $"{ret}";
+            return ret;
+        }
+
         internal static int GetCategory(uint ClassJob)
         {
             if (ClassJob == (int)Job.BTN) return 18;
             if (ClassJob == (int)Job.MIN) return 17;
             if (ClassJob == (int)Job.FSH) return 19;
             return 34;
+        }
+
+        internal static string GetHuntingVentureName(uint ClassJob)
+        {
+            if (ClassJob == (int)Job.BTN) return Consts.HuntingVentureNames[2];
+            if (ClassJob == (int)Job.MIN) return Consts.HuntingVentureNames[1];
+            if (ClassJob == (int)Job.FSH) return Consts.HuntingVentureNames[3];
+            return Consts.HuntingVentureNames[0];
+        }
+
+        internal static string GetFieldExVentureName(uint ClassJob)
+        {
+            if (ClassJob == (int)Job.BTN) return Consts.FieldExplorationNames[2];
+            if (ClassJob == (int)Job.MIN) return Consts.FieldExplorationNames[1];
+            if (ClassJob == (int)Job.FSH) return Consts.FieldExplorationNames[3];
+            return Consts.FieldExplorationNames[0];
         }
 
         internal static bool IsDoL(uint ClassJob)

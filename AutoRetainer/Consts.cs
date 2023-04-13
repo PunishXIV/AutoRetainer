@@ -5,6 +5,8 @@ namespace AutoRetainer;
 
 internal static class Consts
 {
+    internal const string Level = "";
+
     internal static readonly string[] FieldExplorationNames = new string[]
     {
         "Field Exploration.",

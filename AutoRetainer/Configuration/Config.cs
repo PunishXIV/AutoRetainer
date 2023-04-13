@@ -62,6 +62,7 @@ internal unsafe class Config : IEzConfig
     public int RetainerMenuDelay = 0;
     public List<VenturePlan> SavedPlans = new();
     public bool MultiWaitOnLoginScreen = false;
+    public UnavailableVentureDisplay UnavailableVentureDisplay = UnavailableVentureDisplay.Display;
 
     internal bool DontReassign
     {

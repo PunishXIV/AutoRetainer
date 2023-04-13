@@ -12,6 +12,8 @@ namespace AutoRetainer.UI
         OfflineRetainerData SelectedRetainer = null;
         OfflineCharacterData SelectedCharacter = null;
         string search = "";
+        int minLevel = 1;
+        int maxLevel = 90;
 
         public VenturePlanner() : base("Venture Planner")
         {
@@ -85,7 +87,7 @@ namespace AutoRetainer.UI
                             toRem = i;
                         }
                         ImGui.SameLine();
-                        ImGuiEx.Text($"{VentureUtils.GetVentureName(v.ID)}");
+                        ImGuiEx.Text($"{VentureUtils.GetFancyVentureName(v.ID, SelectedCharacter, out _)}");
 
                         ImGui.PopID();
                     }
@@ -174,39 +176,51 @@ namespace AutoRetainer.UI
                 {
                     ImGuiEx.SetNextItemFullWidth();
                     ImGui.InputTextWithHint("##search", "Filter...", ref search, 100);
-                    if(ImGui.BeginChild("##ventureCh", new(ImGui.GetContentRegionAvail().X, ImGuiHelpers.MainViewport.Size.Y / 3)))
+                    ImGuiEx.TextV($"Level range:");
+                    ImGui.SameLine();
+                    ImGui.SetNextItemWidth(50f);
+                    ImGui.DragInt("##minL", ref minLevel, 1, 1, 90);
+                    ImGui.SameLine();
+                    ImGuiEx.Text($"-");
+                    ImGui.SameLine();
+                    ImGui.SetNextItemWidth(50f);
+                    ImGui.DragInt("##maxL", ref maxLevel, 1, 1, 90);
+                    ImGuiEx.TextV($"Unavailable ventures:");
+                    ImGui.SameLine();
+                    ImGuiEx.SetNextItemFullWidth();
+                    ImGuiEx.EnumCombo("##unavail", ref P.config.UnavailableVentureDisplay);
+                    if (ImGui.BeginChild("##ventureCh", new(ImGui.GetContentRegionAvail().X, ImGuiHelpers.MainViewport.Size.Y / 3)))
                     {
-                        if (ImGui.CollapsingHeader("Field explorations"))
+                        if (ImGui.CollapsingHeader(VentureUtils.GetFieldExVentureName(SelectedRetainer.Job)))
                         {
-                            foreach (var item in VentureUtils.GetFieldExplorations(SelectedRetainer.Job, SelectedRetainer.Level).Where(x => search.IsNullOrEmpty() || x.GetVentureName().Contains(search, StringComparison.OrdinalIgnoreCase)))
+                            foreach (var item in VentureUtils.GetFieldExplorations(SelectedRetainer.Job, SelectedRetainer.Level).Where(x => search.IsNullOrEmpty() || x.GetVentureName().Contains(search, StringComparison.OrdinalIgnoreCase)).Where(x => x.RetainerLevel >= minLevel && x.RetainerLevel <= maxLevel))
                             {
-                                if (ImGui.Selectable(VentureUtils.GetVentureName(item), adata.VenturePlan.List.Any(x => x.ID == item.RowId), ImGuiSelectableFlags.DontClosePopups))
+                                if (ImGui.Selectable(VentureUtils.GetFancyVentureName(item, SelectedCharacter, out _), adata.VenturePlan.List.Any(x => x.ID == item.RowId), ImGuiSelectableFlags.DontClosePopups))
                                 {
                                     adata.VenturePlan.List.Add(new(item));
                                     adata.VenturePlanIndex = 0;
                                 }
                             }
                         }
-                        if (ImGui.CollapsingHeader("Hunts"))
+                        if (ImGui.CollapsingHeader(VentureUtils.GetHuntingVentureName(SelectedRetainer.Job)))
                         {
-                            foreach (var item in VentureUtils.GetHunts(SelectedRetainer.Job, SelectedRetainer.Level).Where(x => search.IsNullOrEmpty() || x.GetVentureName().Contains(search, StringComparison.OrdinalIgnoreCase)))
+                            foreach (var item in VentureUtils.GetHunts(SelectedRetainer.Job, SelectedRetainer.Level).Where(x => search.IsNullOrEmpty() || x.GetVentureName().Contains(search, StringComparison.OrdinalIgnoreCase)).Where(x => x.RetainerLevel >= minLevel && x.RetainerLevel <= maxLevel))
                             {
-                                var name = VentureUtils.GetVentureName(item);
-                                var notAvail = SelectedCharacter.UnlockedGatheringItems.Count > 0 && !SelectedCharacter.UnlockedGatheringItems.Contains(VentureUtils.GetGatheringItemByItemID(item.GetVentureItemId()));
-                                if(notAvail)
+                                var name = item.GetFancyVentureName(SelectedCharacter, out var Avail);
+                                if (Avail || P.config.UnavailableVentureDisplay != UnavailableVentureDisplay.Hide)
                                 {
-                                    name = "n/a " + name;
+                                    var d = !Avail && P.config.UnavailableVentureDisplay != UnavailableVentureDisplay.Allow_selection;
+                                    if (d) ImGui.BeginDisabled();
+                                    if (ImGui.Selectable(name, adata.VenturePlan.List.Any(x => x.ID == item.RowId), ImGuiSelectableFlags.DontClosePopups))
+                                    {
+                                        adata.VenturePlan.List.Add(new(item));
+                                        adata.VenturePlanIndex = 0;
+                                    }
+                                    if (d) ImGui.EndDisabled();
                                 }
-                                if (notAvail) ImGui.BeginDisabled();
-                                if (ImGui.Selectable(name, adata.VenturePlan.List.Any(x => x.ID == item.RowId), ImGuiSelectableFlags.DontClosePopups))
-                                {
-                                    adata.VenturePlan.List.Add(new(item));
-                                    adata.VenturePlanIndex = 0;
-                                }
-                                if (notAvail) ImGui.EndDisabled();
                             }
                         }
-                        if(ImGui.Selectable("Quick Exploration", adata.VenturePlan.List.Any(x => x.ID == VentureUtils.QuickExplorationID), ImGuiSelectableFlags.DontClosePopups))
+                        if(ImGui.Selectable(" Quick Exploration", adata.VenturePlan.List.Any(x => x.ID == VentureUtils.QuickExplorationID), ImGuiSelectableFlags.DontClosePopups))
                         {
                             adata.VenturePlan.List.Add(new(VentureUtils.QuickExplorationID));
                             adata.VenturePlanIndex = 0;
