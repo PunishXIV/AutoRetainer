@@ -11,11 +11,11 @@ internal unsafe class Memory : IDisposable
     delegate ulong InteractWithObjectDelegate(TargetSystem* system, GameObject* obj, bool los);
     Hook<InteractWithObjectDelegate> InteractWithObjectHook;
 
-    delegate byte GetIsGatherableUnlockedDelegate(ushort item);
+    delegate byte GetIsGatheringItemGatheredDelegate(ushort item);
     [Signature("48 89 5C 24 ?? 57 48 83 EC 20 8B D9 8B F9")]
-    GetIsGatherableUnlockedDelegate GetIsGatherableUnlocked;
+    GetIsGatheringItemGatheredDelegate GetIsGatheringItemGathered;
 
-    internal bool IsGatherableUnlocked(uint item) => GetIsGatherableUnlocked((ushort)item) != 0;
+    internal bool IsGatheringItemGathered(uint item) => GetIsGatheringItemGathered((ushort)item) != 0;
 
     internal Memory()
     {

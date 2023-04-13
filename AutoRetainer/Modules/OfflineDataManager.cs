@@ -41,7 +41,7 @@ internal static class OfflineDataManager
                 data.UnlockedGatheringItems.Clear();
                 foreach (var x in Svc.Data.GetExcelSheet<GatheringItem>())
                 {
-                    if (P.Memory.IsGatherableUnlocked(x.RowId))
+                    if (P.Memory.IsGatheringItemGathered(x.RowId))
                     {
                         data.UnlockedGatheringItems.Add(x.RowId);
                     }
