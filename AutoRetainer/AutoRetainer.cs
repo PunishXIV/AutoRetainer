@@ -307,6 +307,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     {
         if(flag == ConditionFlag.OccupiedSummoningBell)
         {
+            OfflineDataManager.WriteOfflineData(true, true);
             if (!value)
             {
                 ConditionWasEnabled = false;
@@ -374,6 +375,10 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 }
             }
             IsCloseActionAutomatic = false;
+        }
+        if(flag == ConditionFlag.Gathering)
+        {
+            OfflineDataManager.WriteOfflineData(true, true);
         }
     }
 

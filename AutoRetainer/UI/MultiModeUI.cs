@@ -1,4 +1,5 @@
 ﻿using Dalamud.Interface.Components;
+using ECommons.GameHelpers;
 using ECommons.MathHelpers;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 
@@ -46,7 +47,8 @@ internal unsafe static class MultiModeUI
                 }
             }
         }
-        for(var index = 0; index < sortedData.Count; index++)
+        ulong deleteData = 0;
+        for (var index = 0; index < sortedData.Count; index++)
         {
             var data = sortedData[index];
             if (data.World.IsNullOrEmpty()) continue;
@@ -165,18 +167,16 @@ internal unsafe static class MultiModeUI
                     ImGuiEx.Text($"Can't change this now");
                 }
                 ImGui.Separator();
-                if(ImGui.Button("Exclude Character"))
+                if (ImGui.Button("Exclude Character"))
                 {
                     P.config.Blacklist.Add((data.CID, data.Name));
                 }
                 ImGuiComponents.HelpMarker("Excluding this character will immediately reset it's settings, remove it from this list and exclude all retainers from being processed. You can still run manual tasks on it's retainers. You can cancel this action in settings.");
-                ImGui.SameLine();
-                if(ImGui.Button("World/Name change"))
+                if (ImGui.Button("Reset character data"))
                 {
-                    data.Name = "Unknown";
-                    data.World = "";
-                    Notify.Info("Log into this character again");
+                    deleteData = data.CID;
                 }
+                ImGuiComponents.HelpMarker("Character's saved data will be removed without excluding it. Character data will be regenerated once you log back into this character.");
                 ImGui.EndPopup();
             }
 
@@ -348,6 +348,10 @@ internal unsafe static class MultiModeUI
             ImGui.PopID();
         }
 
+        if(deleteData > 0)
+        {
+            P.config.OfflineData.RemoveAll(x => x.CID == deleteData);
+        }
 
         if (P.config.Verbose && ImGui.CollapsingHeader("Debug"))
         {

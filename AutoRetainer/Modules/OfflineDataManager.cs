@@ -1,7 +1,9 @@
 ﻿using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.Text.SeStringHandling;
+using ECommons.Configuration;
 using ECommons.Events;
 using ECommons.ExcelServices;
+using Lumina.Excel.GeneratedSheets;
 
 namespace AutoRetainer.Modules;
 
@@ -13,12 +15,12 @@ internal static class OfflineDataManager
         {
             if (P.retainerManager.Ready)
             {
-                WriteOfflineData();
+                WriteOfflineData(false, false);
             }
         }
     }
 
-    internal static void WriteOfflineData()
+    internal static void WriteOfflineData(bool writeGatherables, bool saveConfig)
     {
         if (!ProperOnLogin.PlayerPresent) return;
         if (P.config.Blacklist.Any(x => x.CID == Svc.ClientState.LocalContentId)) return;
@@ -32,6 +34,24 @@ internal static class OfflineDataManager
         }
         data.World = ExcelWorldHelper.GetWorldNameById(Svc.ClientState.LocalPlayer.HomeWorld.Id);
         data.Name = Svc.ClientState.LocalPlayer.Name.ToString();
+        if (writeGatherables)
+        {
+            try
+            {
+                data.UnlockedGatheringItems.Clear();
+                foreach (var x in Svc.Data.GetExcelSheet<GatheringItem>())
+                {
+                    if (P.Memory.IsGatherableUnlocked(x.RowId))
+                    {
+                        data.UnlockedGatheringItems.Add(x.RowId);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.Log();
+            }
+        }
         if (P.retainerManager.Ready && P.retainerManager.Count > 0)
         {
             data.RetainerData.Clear();
@@ -48,24 +68,12 @@ internal static class OfflineDataManager
                 });
             }
         }
-        WriteVentureAndInventory();
-    }
-
-    internal static void WriteVentureAndInventory()
-    {
-        if (!ProperOnLogin.PlayerPresent) return;
-        OfflineCharacterData data = null;
-        if (!P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out data))
-        {
-            data = new()
-            {
-                CID = Svc.ClientState.LocalContentId,
-            };
-            P.config.OfflineData.Add(data);
-        }
         data.Ventures = Utils.GetVenturesAmount();
         data.InventorySpace = (uint)Utils.GetInventoryFreeSlotCount();
+        P.config.OfflineData.RemoveAll(x => x.World == "" && x.Name == "Unknown");
+        if (saveConfig) EzConfig.Save();
     }
+
     internal static OfflineRetainerData GetData(SeString name, ulong? CID = null) => GetData(name.ToString(), CID);
 
     internal static OfflineRetainerData GetData(string name, ulong? CID = null)

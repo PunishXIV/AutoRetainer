@@ -17,6 +17,7 @@ public class OfflineCharacterData
     public bool EnableGCArmoryHandin = false; //todo: remove
     public bool ShouldSerializeEnableGCArmoryHandin() => false;
     public GCDeliveryType GCDeliveryType = GCDeliveryType.Disabled;
+    public HashSet<uint> UnlockedGatheringItems = new();
 
     internal uint CharaIndex
     {

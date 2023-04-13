@@ -35,7 +35,7 @@ internal unsafe static class MultiMode
     {
         ProperOnLogin.Register(delegate
         {
-            WriteVentureAndInventory();
+            WriteOfflineData(true, true);
             if (LastLogin == Svc.ClientState.LocalContentId && Active)
             {
                 DuoLog.Error("Multi mode disabled as it have detected duplicate login.");
@@ -53,7 +53,7 @@ internal unsafe static class MultiMode
         if (ProperOnLogin.PlayerPresent)
         {
             LastLogin = Svc.ClientState.LocalContentId;
-            WriteVentureAndInventory();
+            WriteOfflineData(true, true);
         }
     }
 

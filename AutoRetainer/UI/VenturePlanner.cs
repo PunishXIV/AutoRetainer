@@ -192,7 +192,7 @@ namespace AutoRetainer.UI
                             foreach (var item in VentureUtils.GetHunts(SelectedRetainer.Job, SelectedRetainer.Level).Where(x => search.IsNullOrEmpty() || x.GetVentureName().Contains(search, StringComparison.OrdinalIgnoreCase)))
                             {
                                 var name = VentureUtils.GetVentureName(item);
-                                var notAvail = !P.Memory.IsGatherableUnlocked(VentureUtils.GetGatheringItemByItemID(item.GetVentureItemId()));
+                                var notAvail = SelectedCharacter.UnlockedGatheringItems.Count > 0 && !SelectedCharacter.UnlockedGatheringItems.Contains(VentureUtils.GetGatheringItemByItemID(item.GetVentureItemId()));
                                 if(notAvail)
                                 {
                                     name = "n/a " + name;
