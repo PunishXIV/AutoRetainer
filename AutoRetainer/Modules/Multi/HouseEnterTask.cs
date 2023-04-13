@@ -15,22 +15,20 @@ internal unsafe static class HouseEnterTask
         P.TaskManager.Enqueue(WaitUntilNotBusy, 180 * 1000);
         P.TaskManager.Enqueue(() =>
         {
-            if(Utils.GetReachableRetainerBell() != null)
+            if(Utils.GetReachableRetainerBell() == null)
             {
-                P.DebugLog($"Found reachable retainer bell nearby, aborting task");
-                return null;
+                P.TaskManager.EnqueueImmediate(() => SetTarget(20f));
+                P.TaskManager.EnqueueImmediate(Lockon);
+                P.TaskManager.EnqueueImmediate(Approach);
+                P.TaskManager.EnqueueImmediate(AutorunOff);
+                P.TaskManager.EnqueueImmediate(() => { Chat.Instance.SendMessage("/automove off"); });
+                P.TaskManager.EnqueueImmediate(() => SetTarget(5f));
+                P.TaskManager.EnqueueImmediate(Interact);
+                P.TaskManager.EnqueueImmediate(SelectYesno);
+                P.TaskManager.EnqueueImmediate(WaitUntilLeavingZone);
             }
             return true;
         });
-        P.TaskManager.Enqueue(() => SetTarget(20f));
-        P.TaskManager.Enqueue(Lockon);
-        P.TaskManager.Enqueue(Approach);
-        P.TaskManager.Enqueue(AutorunOff);
-        P.TaskManager.Enqueue(() => { Chat.Instance.SendMessage("/automove off"); return true; });
-        P.TaskManager.Enqueue(() => SetTarget(5f));
-        P.TaskManager.Enqueue(Interact);
-        P.TaskManager.Enqueue(SelectYesno);
-        P.TaskManager.Enqueue(WaitUntilLeavingZone);
     }
 
     internal static bool? WaitUntilNotBusy()
