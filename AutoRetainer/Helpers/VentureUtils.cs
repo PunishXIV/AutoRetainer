@@ -112,18 +112,18 @@ namespace AutoRetainer.Helpers
 
         internal static string GetHuntingVentureName(uint ClassJob)
         {
-            if (ClassJob == (int)Job.BTN) return Consts.HuntingVentureNames[2];
-            if (ClassJob == (int)Job.MIN) return Consts.HuntingVentureNames[1];
-            if (ClassJob == (int)Job.FSH) return Consts.HuntingVentureNames[3];
-            return Consts.HuntingVentureNames[0];
+            if (ClassJob == (int)Job.BTN) return Consts.HuntingVentureNames[2][..^1];
+            if (ClassJob == (int)Job.MIN) return Consts.HuntingVentureNames[1][..^1];
+            if (ClassJob == (int)Job.FSH) return Consts.HuntingVentureNames[3][..^1];
+            return Consts.HuntingVentureNames[0][..^1];
         }
 
         internal static string GetFieldExVentureName(uint ClassJob)
         {
-            if (ClassJob == (int)Job.BTN) return Consts.FieldExplorationNames[2];
-            if (ClassJob == (int)Job.MIN) return Consts.FieldExplorationNames[1];
-            if (ClassJob == (int)Job.FSH) return Consts.FieldExplorationNames[3];
-            return Consts.FieldExplorationNames[0];
+            if (ClassJob == (int)Job.BTN) return Consts.FieldExplorationNames[2][..^1];
+            if (ClassJob == (int)Job.MIN) return Consts.FieldExplorationNames[1][..^1];
+            if (ClassJob == (int)Job.FSH) return Consts.FieldExplorationNames[3][..^1];
+            return Consts.FieldExplorationNames[0][..^1];
         }
 
         internal static bool IsDoL(uint ClassJob)

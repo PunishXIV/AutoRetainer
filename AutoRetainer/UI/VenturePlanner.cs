@@ -191,17 +191,6 @@ namespace AutoRetainer.UI
                     ImGuiEx.EnumCombo("##unavail", ref P.config.UnavailableVentureDisplay);
                     if (ImGui.BeginChild("##ventureCh", new(ImGui.GetContentRegionAvail().X, ImGuiHelpers.MainViewport.Size.Y / 3)))
                     {
-                        if (ImGui.CollapsingHeader(VentureUtils.GetFieldExVentureName(SelectedRetainer.Job)))
-                        {
-                            foreach (var item in VentureUtils.GetFieldExplorations(SelectedRetainer.Job, SelectedRetainer.Level).Where(x => search.IsNullOrEmpty() || x.GetVentureName().Contains(search, StringComparison.OrdinalIgnoreCase)).Where(x => x.RetainerLevel >= minLevel && x.RetainerLevel <= maxLevel))
-                            {
-                                if (ImGui.Selectable(VentureUtils.GetFancyVentureName(item, SelectedCharacter, out _), adata.VenturePlan.List.Any(x => x.ID == item.RowId), ImGuiSelectableFlags.DontClosePopups))
-                                {
-                                    adata.VenturePlan.List.Add(new(item));
-                                    adata.VenturePlanIndex = 0;
-                                }
-                            }
-                        }
                         if (ImGui.CollapsingHeader(VentureUtils.GetHuntingVentureName(SelectedRetainer.Job)))
                         {
                             foreach (var item in VentureUtils.GetHunts(SelectedRetainer.Job, SelectedRetainer.Level).Where(x => search.IsNullOrEmpty() || x.GetVentureName().Contains(search, StringComparison.OrdinalIgnoreCase)).Where(x => x.RetainerLevel >= minLevel && x.RetainerLevel <= maxLevel))
@@ -220,11 +209,24 @@ namespace AutoRetainer.UI
                                 }
                             }
                         }
-                        if(ImGui.Selectable(" Quick Exploration", adata.VenturePlan.List.Any(x => x.ID == VentureUtils.QuickExplorationID), ImGuiSelectableFlags.DontClosePopups))
+                        if (ImGui.CollapsingHeader(VentureUtils.GetFieldExVentureName(SelectedRetainer.Job)))
+                        {
+                            foreach (var item in VentureUtils.GetFieldExplorations(SelectedRetainer.Job, SelectedRetainer.Level).Where(x => search.IsNullOrEmpty() || x.GetVentureName().Contains(search, StringComparison.OrdinalIgnoreCase)).Where(x => x.RetainerLevel >= minLevel && x.RetainerLevel <= maxLevel))
+                            {
+                                if (ImGui.Selectable(VentureUtils.GetFancyVentureName(item, SelectedCharacter, out _), adata.VenturePlan.List.Any(x => x.ID == item.RowId), ImGuiSelectableFlags.DontClosePopups))
+                                {
+                                    adata.VenturePlan.List.Add(new(item));
+                                    adata.VenturePlanIndex = 0;
+                                }
+                            }
+                        }
+                        ImGui.PushStyleVar(ImGuiStyleVar.ButtonTextAlign, Vector2.Zero);
+                        if(ImGui.Button("    Quick Exploration", ImGuiHelpers.GetButtonSize("A") with { X = ImGui.GetContentRegionAvail().X}))
                         {
                             adata.VenturePlan.List.Add(new(VentureUtils.QuickExplorationID));
                             adata.VenturePlanIndex = 0;
                         }
+                        ImGui.PopStyleVar();
                         ImGui.EndChild();
                     }
                     ImGui.EndCombo();
