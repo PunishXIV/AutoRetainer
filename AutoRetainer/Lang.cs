@@ -22,8 +22,6 @@ internal static class Lang
 
     internal static readonly (string Normal, string GameFont) Digits = ("0123456789", "");
 
-    internal const string Level = "";
-
     internal static readonly string[] FieldExplorationNames = new string[]
     {
         "Field Exploration.",

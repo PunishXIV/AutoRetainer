@@ -158,12 +158,14 @@ namespace AutoRetainer.UI
                     ImGuiEx.SetNextItemFullWidth();
                     ImGuiEx.EnumCombo("##cBeh", ref adata.VenturePlan.PlanCompleteBehavior);
                     //ImGui.Separator();
+                    var overwrite = P.config.SavedPlans.Any(x => x.Name == adata.VenturePlan.Name);
                     ImGuiEx.InputWithRightButtonsArea("SavePlan", delegate
                     {
+                        if (overwrite) ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudYellow);
                         ImGui.InputTextWithHint("##name", "Enter plan name...", ref adata.VenturePlan.Name, 50);
+                        if (overwrite) ImGui.PopStyleColor();
                     }, delegate
                     {
-                        var overwrite = P.config.SavedPlans.Any(x => x.Name == adata.VenturePlan.Name);
                         if (ImGuiEx.IconButton(FontAwesomeIcon.Save))
                         {
                             if (overwrite)
@@ -244,19 +246,23 @@ namespace AutoRetainer.UI
 
                 if(adata.EnablePlanner && adata.VenturePlan.ListUnwrapped.Count > 0)
                 {
-                    var pct = (float)Math.Max(0, adata.VenturePlanIndex - 1) / (float)adata.VenturePlan.ListUnwrapped.Count;
+                    var pct = (float)(adata.VenturePlanIndex) / (float)adata.VenturePlan.ListUnwrapped.Count;
 
-                    ImGui.Separator();
-                    ImGuiEx.InputWithRightButtonsArea("progressbarvp", delegate
+                    if (ImGuiEx.IconButton(Lang.IconRefresh))
                     {
-                        ImGui.ProgressBar(pct);
-                    }, delegate
-                    {
-                        if (ImGuiEx.IconButton(Lang.IconRefresh))
-                        {
+                        adata.VenturePlanIndex = 0;
+                    }
+                    ImGui.SameLine();
+                    ImGuiEx.Tooltip("Cancels remaining ventures from this plan and starts from the beginning");
+                    ImGui.ProgressBar(pct, new Vector2(ImGui.GetContentRegionAvail().X, ImGuiHelpers.GetButtonSize("X").Y));
+                }
 
-                        }
-                    });
+                if(P.config.Verbose)
+                {
+                    if (ImGui.CollapsingHeader("Debug"))
+                    {
+                        ImGuiEx.InputUint("Index", ref adata.VenturePlanIndex);
+                    }
                 }
 
                 ImGui.Columns(1);
