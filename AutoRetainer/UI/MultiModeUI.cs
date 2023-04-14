@@ -60,7 +60,7 @@ internal unsafe static class MultiModeUI
                 ImGui.PushStyleColor(ImGuiCol.Button, 0xFF097000);
                 colen = true;
             }
-            if (ImGuiEx.IconButton("\uf021"))
+            if (ImGuiEx.IconButton(Lang.IconMultiMode))
             {
                 data.Enabled = !data.Enabled;
                 if (data.Enabled && !data.Index.InRange(1, 9))
@@ -260,21 +260,21 @@ internal unsafe static class MultiModeUI
                         {
                             ImGui.SameLine();
                             ImGui.PushFont(UiBuilder.IconFont);
-                            ImGuiEx.Text($"\uf24d");
+                            ImGuiEx.Text(Lang.IconDuplicate);
                             ImGui.PopFont();
                         }
                         if (adata.WithdrawGil)
                         {
                             ImGui.SameLine();
                             ImGui.PushFont(UiBuilder.IconFont);
-                            ImGuiEx.Text($"\uf51e");
+                            ImGuiEx.Text(Lang.IconGil);
                             ImGui.PopFont();
                         }
                         if (adata.IsVenturePlannerActive())
                         {
                             ImGui.SameLine();
                             ImGui.PushFont(UiBuilder.IconFont);
-                            ImGuiEx.Text($"\uf0ae");
+                            ImGuiEx.Text(Lang.IconPlanner);
                             ImGui.PopFont();
                             if (ImGui.IsItemHovered())
                             {
@@ -314,16 +314,16 @@ internal unsafe static class MultiModeUI
                         if (ret.Level > 0)
                         {
                             ImGui.SameLine(0, 2);
-                            var level = $"{Consts.CharLevel}{ret.Level}";
+                            var level = $"{Lang.CharLevel}{ret.Level}";
                             if (adata.Ilvl > 0 && !VentureUtils.IsDoL(ret.Job))
                             {
-                                level += $"  {Consts.CharItemLevel}{adata.Ilvl}";
+                                level += $"  {Lang.CharItemLevel}{adata.Ilvl}";
                             }
                             if (adata.Gathering > 0 && VentureUtils.IsDoL(ret.Job))
                             {
-                                level += $"  {Consts.CharPlant}{adata.Gathering}";
+                                level += $"  {Lang.CharPlant}{adata.Gathering}";
                             }
-                            ImGuiEx.TextV($"{level}".ReplaceByChar("0123456789", ""));
+                            ImGuiEx.TextV($"{level}".ReplaceByChar(Lang.Digits.Normal, Lang.Digits.GameFont));
                         }
                         ImGui.TableNextColumn();
                         ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
@@ -351,7 +351,7 @@ internal unsafe static class MultiModeUI
                             ImGui.EndPopup();
                         }
                         ImGui.SameLine();
-                        if(ImGuiEx.IconButton("\uf0ae", $"{data.CID} {ret.Name} planner"))
+                        if(ImGuiEx.IconButton(Lang.IconPlanner, $"{data.CID} {ret.Name} planner"))
                         {
                             P.VenturePlanner.Open(data, ret);
                         }

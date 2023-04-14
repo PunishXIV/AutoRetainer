@@ -3,7 +3,7 @@ using Lumina.Excel.GeneratedSheets;
 
 namespace AutoRetainer;
 
-internal static class Consts
+internal static class Lang
 {
     internal const string CharPlant = "";
     internal const string CharLevel = "";
@@ -11,6 +11,16 @@ internal static class Consts
     internal const string CharDice = "";
     internal const string CharDeny = "";
     internal const string CharQuestion = "";
+
+    internal const string IconRefresh = "\uf2f9";
+    internal const string IconMultiMode = "\uf021";
+    internal const string IconDuplicate = "\uf24d";
+    internal const string IconGil = "\uf51e";
+    internal const string IconPlanner = "\uf0ae";
+    internal const string IconSettings = "\uf013";
+    internal const string IconWarning = "\uf071";
+
+    internal static readonly (string Normal, string GameFont) Digits = ("0123456789", "");
 
     internal const string Level = "";
 

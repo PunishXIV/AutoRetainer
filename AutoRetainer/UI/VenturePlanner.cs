@@ -163,11 +163,17 @@ namespace AutoRetainer.UI
                         ImGui.InputTextWithHint("##name", "Enter plan name...", ref adata.VenturePlan.Name, 50);
                     }, delegate
                     {
-                        if (ImGui.Button("Save plan"))
+                        var overwrite = P.config.SavedPlans.Any(x => x.Name == adata.VenturePlan.Name);
+                        if (ImGuiEx.IconButton(FontAwesomeIcon.Save))
                         {
+                            if (overwrite)
+                            {
+                                P.config.SavedPlans.RemoveAll(x => x.Name == adata.VenturePlan.Name);
+                            }
                             P.config.SavedPlans.Add(adata.VenturePlan.JSONClone());
                             Notify.Success($"Plan {adata.VenturePlan.Name} saved!");
                         }
+                        ImGuiEx.Tooltip(overwrite ? "Overwrite Existing Venture Plan" : $"Save Venture Plan");
                     });
                 }
 
@@ -225,7 +231,7 @@ namespace AutoRetainer.UI
                             }
                         }
                         ImGui.PushStyleVar(ImGuiStyleVar.ButtonTextAlign, Vector2.Zero);
-                        if(ImGui.Button("    Quick Exploration", ImGuiHelpers.GetButtonSize("A") with { X = ImGui.GetContentRegionAvail().X}))
+                        if(ImGui.Button($"{Lang.CharDice}    Quick Exploration", ImGuiHelpers.GetButtonSize("A") with { X = ImGui.GetContentRegionAvail().X}))
                         {
                             adata.VenturePlan.List.Add(new(VentureUtils.QuickExplorationID));
                             adata.VenturePlanIndex = 0;
@@ -234,6 +240,23 @@ namespace AutoRetainer.UI
                         ImGui.EndChild();
                     }
                     ImGui.EndCombo();
+                }
+
+                if(adata.EnablePlanner && adata.VenturePlan.ListUnwrapped.Count > 0)
+                {
+                    var pct = (float)Math.Max(0, adata.VenturePlanIndex - 1) / (float)adata.VenturePlan.ListUnwrapped.Count;
+
+                    ImGui.Separator();
+                    ImGuiEx.InputWithRightButtonsArea("progressbarvp", delegate
+                    {
+                        ImGui.ProgressBar(pct);
+                    }, delegate
+                    {
+                        if (ImGuiEx.IconButton(Lang.IconRefresh))
+                        {
+
+                        }
+                    });
                 }
 
                 ImGui.Columns(1);

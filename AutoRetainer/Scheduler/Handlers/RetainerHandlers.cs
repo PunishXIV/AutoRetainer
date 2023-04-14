@@ -108,7 +108,7 @@ internal unsafe static class RetainerHandlers
 
     internal static bool? SelectQuickExploration()
     {
-        return Utils.TrySelectSpecificEntry(Consts.QuickExploration);
+        return Utils.TrySelectSpecificEntry(Lang.QuickExploration);
     }
 
     internal static bool? SelectEntrustItems()

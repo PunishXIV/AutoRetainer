@@ -92,7 +92,7 @@ namespace AutoRetainer.Helpers
                     if (canNotGather)
                     {
                         Available = false;
-                        UnavailabilitySymbol = Consts.CharPlant;
+                        UnavailabilitySymbol = Lang.CharPlant;
                     }
                     else
                     {
@@ -104,11 +104,11 @@ namespace AutoRetainer.Helpers
                     Available = false;
                     if(canNotGather)
                     {
-                        UnavailabilitySymbol = Consts.CharQuestion + Consts.CharPlant;
+                        UnavailabilitySymbol = Lang.CharQuestion + Lang.CharPlant;
                     }
                     else
                     {
-                        UnavailabilitySymbol = Consts.CharQuestion;
+                        UnavailabilitySymbol = Lang.CharQuestion;
                     }
                 }
             }
@@ -118,12 +118,12 @@ namespace AutoRetainer.Helpers
                 if (Task.RequiredItemLevel > 0 && adata.Ilvl > 0)
                 {
                     Available = Task.RequiredItemLevel <= adata.Ilvl;
-                    UnavailabilitySymbol = Consts.CharItemLevel;
+                    UnavailabilitySymbol = Lang.CharItemLevel;
                 }
                 else if(Task.RequiredGathering > 0 && adata.Gathering > 0)
                 {
                     Available = !canNotGather;
-                    UnavailabilitySymbol = Consts.CharPlant;
+                    UnavailabilitySymbol = Lang.CharPlant;
                 }
                 else
                 {
@@ -153,18 +153,18 @@ namespace AutoRetainer.Helpers
 
         internal static string GetHuntingVentureName(uint ClassJob)
         {
-            if (ClassJob == (int)Job.BTN) return Consts.HuntingVentureNames[2][..^1];
-            if (ClassJob == (int)Job.MIN) return Consts.HuntingVentureNames[1][..^1];
-            if (ClassJob == (int)Job.FSH) return Consts.HuntingVentureNames[3][..^1];
-            return Consts.HuntingVentureNames[0][..^1];
+            if (ClassJob == (int)Job.BTN) return Lang.HuntingVentureNames[2][..^1];
+            if (ClassJob == (int)Job.MIN) return Lang.HuntingVentureNames[1][..^1];
+            if (ClassJob == (int)Job.FSH) return Lang.HuntingVentureNames[3][..^1];
+            return Lang.HuntingVentureNames[0][..^1];
         }
 
         internal static string GetFieldExVentureName(uint ClassJob)
         {
-            if (ClassJob == (int)Job.BTN) return Consts.FieldExplorationNames[2][..^1];
-            if (ClassJob == (int)Job.MIN) return Consts.FieldExplorationNames[1][..^1];
-            if (ClassJob == (int)Job.FSH) return Consts.FieldExplorationNames[3][..^1];
-            return Consts.FieldExplorationNames[0][..^1];
+            if (ClassJob == (int)Job.BTN) return Lang.FieldExplorationNames[2][..^1];
+            if (ClassJob == (int)Job.MIN) return Lang.FieldExplorationNames[1][..^1];
+            if (ClassJob == (int)Job.FSH) return Lang.FieldExplorationNames[3][..^1];
+            return Lang.FieldExplorationNames[0][..^1];
         }
 
         internal static bool IsDoL(uint ClassJob)

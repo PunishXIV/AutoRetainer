@@ -28,14 +28,14 @@ internal unsafe class AutoGCHandinOverlay : Window
             {
                 ImGui.SameLine();
                 ImGui.PushFont(UiBuilder.IconFont);
-                ImGuiEx.Text($"\uf071");
+                ImGuiEx.Text(Lang.IconWarning);
                 ImGui.PopFont();
             }
             if (d.GCDeliveryType == GCDeliveryType.Show_All_Items)
             {
                 ImGui.SameLine();
                 ImGui.PushFont(UiBuilder.IconFont);
-                ImGuiEx.Text($"\uf071\uf071\uf071");
+                ImGuiEx.Text($"{Lang.IconWarning}{Lang.IconWarning}{Lang.IconWarning}");
                 ImGui.PopFont();
             }
         }

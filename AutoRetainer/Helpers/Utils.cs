@@ -120,7 +120,7 @@ internal static unsafe class Utils
     {
         foreach (var x in Svc.Objects)
         {
-            if ((x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Consts.BellName, "リテイナーベル"))
+            if ((x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName, "リテイナーベル"))
             {
                 if (Vector3.Distance(x.Position, Svc.ClientState.LocalPlayer.Position) < GetValidInteractionDistance(x) && x.IsTargetable())
                 {
@@ -241,7 +241,7 @@ internal static unsafe class Utils
         GameObject currentObject = null;
         foreach (var x in Svc.Objects)
         {
-            if (x.IsTargetable() && x.Name.ToString().EqualsAny(Consts.Entrance))
+            if (x.IsTargetable() && x.Name.ToString().EqualsAny(Lang.Entrance))
             {
                 var distance = Vector3.Distance(Svc.ClientState.LocalPlayer.Position, x.Position);
                 if (distance < currentDistance)
@@ -340,7 +340,7 @@ internal static unsafe class Utils
     {
         return o != null &&
             (o.ObjectKind == ObjectKind.EventObj || o.ObjectKind == ObjectKind.Housing)
-            && o.Name.ToString().EqualsIgnoreCaseAny(Consts.BellName, "リテイナーベル");
+            && o.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName, "リテイナーベル");
     }
 
     internal static long GetVentureSecondsRemaining(this SeRetainer ret, bool allowNegative = true)
