@@ -8,7 +8,7 @@ internal static unsafe class DebugMisc
     internal static void Draw()
     {
         ImGuiEx.Text($"{Utils.TryGetCurrentRetainer(out var n)}/{n}");
-        ImGuiEx.Text($"{ItemLevel.Calculate(out var g)}/{g}");
+        ImGuiEx.Text($"{ItemLevel.Calculate(out var g, out var p)}/{g}/{p}");
         if (ImGui.Button("Regenerate censor seed"))
         {
             P.config.CensorSeed = Guid.NewGuid().ToString();

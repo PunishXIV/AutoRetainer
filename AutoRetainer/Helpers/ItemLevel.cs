@@ -15,9 +15,10 @@ namespace AutoRetainer.Helpers
         private static readonly uint[] canHaveOffhand = { 2, 6, 8, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32 };
         private static readonly uint[] ignoreCategory = { 105 };
 
-        internal static int? Calculate(out int gathering)
+        internal static int? Calculate(out int gathering, out int perception)
         {
             gathering = 0;
+            perception = 0;
             var container = InventoryManager.Instance()->GetInventoryContainer(InventoryType.RetainerEquippedItems);
             if (container == null) return null;
             var sum = 0U;
@@ -43,14 +44,20 @@ namespace AutoRetainer.Helpers
                     i++;
                 }
 
-                var bonus = 0;
+                var bonusGathering = 0;
+
+                var bonusPerception = 0;
 
                 for (var j = 0; j < item.BaseParam.Length; j++)
                 {
                     var baseParam = item.BaseParam[j];
-                    if(baseParam.BaseParam.Value?.RowId == 72)
+                    if (baseParam.BaseParam.Value?.RowId == 72)
                     {
-                        bonus += baseParam.Value;
+                        bonusGathering += baseParam.Value;
+                    }
+                    if (baseParam.BaseParam.Value?.RowId == 73)
+                    {
+                        bonusPerception += baseParam.Value;
                     }
                 }
                 if (slot->Flags.HasFlag(InventoryItem.ItemFlags.HQ))
@@ -60,7 +67,11 @@ namespace AutoRetainer.Helpers
                         var baseParam = item.BaseParamSpecial[j];
                         if (baseParam.BaseParam.Value?.RowId == 72)
                         {
-                            bonus += baseParam.Value;
+                            bonusGathering += baseParam.Value;
+                        }
+                        if (baseParam.BaseParam.Value?.RowId == 73)
+                        {
+                            bonusPerception += baseParam.Value;
                         }
                     }
                 }
@@ -73,11 +84,16 @@ namespace AutoRetainer.Helpers
                         var m = Svc.Data.GetExcelSheet<Materia>().GetRow(materia);
                         if (m != null && m.BaseParam.Value?.RowId == 72)
                         {
-                            bonus += m.Value[materiag];
+                            bonusGathering += m.Value[materiag];
+                        }
+                        if (m != null && m.BaseParam.Value?.RowId == 73)
+                        {
+                            bonusPerception += m.Value[materiag];
                         }
                     }
                 }
-                gathering += bonus;
+                gathering += bonusGathering;
+                perception += bonusPerception;
 
                 sum += item.LevelItem.Row;
             }

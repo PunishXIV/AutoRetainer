@@ -118,12 +118,12 @@ namespace AutoRetainer.Helpers
                 if (Task.RequiredItemLevel > 0 && adata.Ilvl > 0)
                 {
                     Available = Task.RequiredItemLevel <= adata.Ilvl;
-                    UnavailabilitySymbol = Lang.CharItemLevel;
+                    if(!Available) UnavailabilitySymbol = Lang.CharItemLevel;
                 }
                 else if(Task.RequiredGathering > 0 && adata.Gathering > 0)
                 {
                     Available = !canNotGather;
-                    UnavailabilitySymbol = Lang.CharPlant;
+                    if (!Available) UnavailabilitySymbol = Lang.CharPlant;
                 }
                 else
                 {
@@ -138,6 +138,11 @@ namespace AutoRetainer.Helpers
             else
             {
                 ret = $"{Task.RetainerLevel} {Task.GetVentureName()}";
+            }
+            if(retainer.Level < Task.RetainerLevel)
+            {
+                Available = false;
+                UnavailabilitySymbol += Lang.CharLevelSync;
             }
             if (!Available) ret = $"{UnavailabilitySymbol}{ret}";
             return ret;
@@ -185,16 +190,16 @@ namespace AutoRetainer.Helpers
             return Svc.Data.GetExcelSheet<RetainerTask>().GetRow(id);
         }
 
-        internal static IEnumerable<RetainerTask> GetFieldExplorations(uint ClassJob, int level)
+        internal static IEnumerable<RetainerTask> GetFieldExplorations(uint ClassJob)
         {
             var cat = GetCategory(ClassJob);
-            return Svc.Data.GetExcelSheet<RetainerTask>().Where(x => x.ClassJobCategory.Value.RowId == cat).Where(x => x.MaxTimemin == 1080 && x.RetainerLevel <= level && !x.GetVentureName().IsNullOrEmpty()).OrderBy(x => x.RetainerLevel);
+            return Svc.Data.GetExcelSheet<RetainerTask>().Where(x => x.ClassJobCategory.Value.RowId == cat).Where(x => x.MaxTimemin == 1080 && !x.GetVentureName().IsNullOrEmpty()).OrderBy(x => x.RetainerLevel);
         }
 
-        internal static IEnumerable<RetainerTask> GetHunts(uint ClassJob, int level)
+        internal static IEnumerable<RetainerTask> GetHunts(uint ClassJob)
         {
             var cat = GetCategory(ClassJob);
-            return Svc.Data.GetExcelSheet<RetainerTask>().Where(x => x.ClassJobCategory.Value.RowId == cat).Where(x => x.MaxTimemin == 60 && x.RetainerLevel <= level && !x.GetVentureName().IsNullOrEmpty()).OrderBy(x => x.RetainerLevel);
+            return Svc.Data.GetExcelSheet<RetainerTask>().Where(x => x.ClassJobCategory.Value.RowId == cat).Where(x => x.MaxTimemin == 60 && !x.GetVentureName().IsNullOrEmpty()).OrderBy(x => x.RetainerLevel);
         }
 
         internal static RetainerTask QuickExploration => Svc.Data.GetExcelSheet<RetainerTask>().GetRow(QuickExplorationID);

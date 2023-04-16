@@ -26,19 +26,19 @@ internal static class SettingsMain
         });
         InfoBox.DrawBox("Operation", delegate
         {
-            if (ImGui.RadioButton("Assign + Reassign", P.config.EnableAssigningQuickExploration && !P.config.DontReassign))
+            if (ImGui.RadioButton("Assign + Reassign", P.config.EnableAssigningQuickExploration && !P.config._dontReassign))
             {
                 P.config.EnableAssigningQuickExploration = true;
                 P.config.DontReassign = false;
             }
             ImGuiComponents.HelpMarker("Automatically assigns enabled retainers to a Quick Venture if they have none already in progress and reassigns current venture.");
-            if (ImGui.RadioButton("Collect", !P.config.EnableAssigningQuickExploration && P.config.DontReassign))
+            if (ImGui.RadioButton("Collect", !P.config.EnableAssigningQuickExploration && P.config._dontReassign))
             {
                 P.config.EnableAssigningQuickExploration = false;
                 P.config.DontReassign = true;
             }
             ImGuiComponents.HelpMarker("Only collect venture rewards from the retainer, and will not reassign them.\nHold CTRL when interacting with the Summoning Bell to apply this mode temporarily.");
-            if (ImGui.RadioButton("Reassign", !P.config.EnableAssigningQuickExploration && !P.config.DontReassign))
+            if (ImGui.RadioButton("Reassign", !P.config.EnableAssigningQuickExploration && !P.config._dontReassign))
             {
                 P.config.EnableAssigningQuickExploration = false;
                 P.config.DontReassign = false;

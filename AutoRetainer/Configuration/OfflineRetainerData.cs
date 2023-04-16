@@ -9,6 +9,7 @@ public class OfflineRetainerData : IEquatable<OfflineRetainerData>
     public int Level = 0;
     public long VentureBeginsAt = 0;
     public uint Job = 0;
+    public uint VentureID = 0;
 
     public override bool Equals(object obj)
     {

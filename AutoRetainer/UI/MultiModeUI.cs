@@ -256,6 +256,15 @@ internal unsafe static class MultiModeUI
                                 retainers.Remove(ret.Name.ToString());
                             }
                         }
+                        if(ret.VentureID != 0)
+                        {
+                            var vname = VentureUtils.GetFancyVentureName(ret.VentureID, data, ret, out _);
+                            if(vname != null)
+                            {
+                                ImGui.SameLine();
+                                ImGuiEx.Text(vname);
+                            }
+                        }
                         if (adata.EntrustDuplicates)
                         {
                             ImGui.SameLine();
@@ -286,7 +295,7 @@ internal unsafe static class MultiModeUI
                                     {
                                         ImGuiEx.Text(ImGuiColors.ParsedGreen, $"{VentureUtils.GetFancyVentureName(v, data, ret, out _)}");
                                     }
-                                    else if (j == adata.VenturePlanIndex)
+                                    else if (j == adata.VenturePlanIndex || (j == 0 && adata.VenturePlan.PlanCompleteBehavior == PlanCompleteBehavior.Restart_plan && adata.VenturePlanIndex >= adata.VenturePlan.ListUnwrapped.Count))
                                     {
                                         ImGuiEx.Text(ImGuiColors.DalamudYellow, $"{VentureUtils.GetFancyVentureName(v, data, ret, out _)}");
                                     }
@@ -319,9 +328,9 @@ internal unsafe static class MultiModeUI
                             {
                                 level += $"  {Lang.CharItemLevel}{adata.Ilvl}";
                             }
-                            if (adata.Gathering > 0 && VentureUtils.IsDoL(ret.Job))
+                            if (adata.Gathering + adata.Perception > 0 && VentureUtils.IsDoL(ret.Job))
                             {
-                                level += $"  {Lang.CharPlant}{adata.Gathering}";
+                                level += $"  {Lang.CharPlant}{adata.Gathering}/{adata.Perception}";
                             }
                             ImGuiEx.TextV($"{level}".ReplaceByChar(Lang.Digits.Normal, Lang.Digits.GameFont));
                         }

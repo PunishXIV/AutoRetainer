@@ -96,7 +96,19 @@ internal unsafe static class SchedulerMain
                                         P.DebugLog($"Next planned venture: {next}");
                                         var completed = adata.IsLastPlannedVenture();
                                         P.DebugLog($"Is last planned venture: {completed}");
-                                        if (completed && adata.VenturePlan.PlanCompleteBehavior != PlanCompleteBehavior.Restart_plan)
+                                        if(next == 0)
+                                        {
+                                            var t = ($"Next venture ID is zero, planner is to be disabled");
+                                            if(!completed)
+                                            {
+                                                DuoLog.Warning(t);
+                                            }
+                                            else
+                                            {
+                                                P.DebugLog(t);
+                                            }
+                                        }
+                                        if (next == 0 || (completed && adata.VenturePlan.PlanCompleteBehavior != PlanCompleteBehavior.Restart_plan))
                                         {
                                             P.DebugLog($"Completed and behavior is {adata.VenturePlan.PlanCompleteBehavior}");
                                             TaskCollectVenture.Enqueue();
@@ -112,7 +124,14 @@ internal unsafe static class SchedulerMain
                                         {
                                             ret.ProcessVenturePlanner(next);
                                         }
-                                        adata.VenturePlanIndex++;
+                                        if (completed)
+                                        {
+                                            adata.VenturePlanIndex = 0;
+                                        }
+                                        else
+                                        {
+                                            adata.VenturePlanIndex++;
+                                        }
                                     }
 
                                     //entrust duplicates

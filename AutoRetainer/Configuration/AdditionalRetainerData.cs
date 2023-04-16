@@ -12,4 +12,5 @@ public class AdditionalRetainerData
     public bool EnablePlanner = false;
     public int Ilvl = 0;
     public int Gathering = 0;
+    public int Perception = 0;
 }

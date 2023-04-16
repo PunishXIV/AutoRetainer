@@ -22,11 +22,12 @@ internal static class OfflineDataManager
             if(EzThrottler.Throttle("CalculateItemLevel") && Utils.TryGetCurrentRetainer(out var ret))
             {
                 var adata = Utils.GetAdditionalData(Player.CID, ret);
-                var result = Helpers.ItemLevel.Calculate(out var g);
+                var result = Helpers.ItemLevel.Calculate(out var g, out var p);
                 if(result != null)
                 {
                     adata.Ilvl = result.Value;
                     adata.Gathering = g;
+                    adata.Perception = p;
                 }
             }
         }
@@ -76,8 +77,9 @@ internal static class OfflineDataManager
                     VentureEndsAt = ret.VentureCompleteTimeStamp,
                     HasVenture = ret.VentureID != 0,
                     Level = ret.Level,
-                    Job = ret.ClassJob
-                });
+                    Job = ret.ClassJob,
+                    VentureID = ret.VentureID
+                }) ;
             }
         }
         data.Ventures = Utils.GetVenturesAmount();

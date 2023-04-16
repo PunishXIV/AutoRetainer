@@ -68,7 +68,7 @@ internal unsafe class Config : IEzConfig
     {
         get
         {
-            return _dontReassign || (Bitmask.IsBitSet(User32.GetKeyState((int)P.config.TempCollectB), 15) && !CSFramework.Instance()->WindowInactive);
+            return _dontReassign || (P.config.TempCollectB != Keys.None && (Bitmask.IsBitSet(User32.GetKeyState((int)P.config.TempCollectB), 15) && !CSFramework.Instance()->WindowInactive));
         }
         set
         {

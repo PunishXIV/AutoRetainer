@@ -36,17 +36,40 @@ internal static unsafe class Utils
 
     internal static uint GetNextPlannedVenture(this AdditionalRetainerData data)
     {
-        if(data.VenturePlan.ListUnwrapped.Count == 0)
+        var index = data.GetNextPlannedVentureIndex();
+        if(index == -1)
         {
             return 0;
         }
-        try
+        else
         {
-            return data.VenturePlan.ListUnwrapped[(int)data.VenturePlanIndex];
+            return data.VenturePlan.ListUnwrapped[index];
         }
-        catch(Exception)
+    }
+
+    internal static int GetNextPlannedVentureIndex(this AdditionalRetainerData data)
+    {
+        if (data.VenturePlan.ListUnwrapped.Count == 0)
         {
-            return data.VenturePlan.ListUnwrapped[0];
+            return -1;
+        }
+        else
+        {
+            if(data.VenturePlanIndex >= data.VenturePlan.ListUnwrapped.Count)
+            {
+                if(data.VenturePlan.PlanCompleteBehavior == PlanCompleteBehavior.Restart_plan)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return -1;
+                }
+            }
+            else
+            {
+                return (int)data.VenturePlanIndex;
+            }
         }
     }
 
