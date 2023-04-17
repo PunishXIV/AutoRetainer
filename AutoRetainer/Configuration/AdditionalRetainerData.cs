@@ -10,7 +10,7 @@ public class AdditionalRetainerData
     public VenturePlan VenturePlan = new();
     public uint VenturePlanIndex = 0;
     public bool EnablePlanner = false;
-    public int Ilvl = 0;
-    public int Gathering = 0;
-    public int Perception = 0;
+    public int Ilvl = -1;
+    public int Gathering = -1;
+    public int Perception = -1;
 }

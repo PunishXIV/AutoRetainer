@@ -256,15 +256,6 @@ internal unsafe static class MultiModeUI
                                 retainers.Remove(ret.Name.ToString());
                             }
                         }
-                        if(ret.VentureID != 0)
-                        {
-                            var vname = VentureUtils.GetFancyVentureName(ret.VentureID, data, ret, out _);
-                            if(vname != null)
-                            {
-                                ImGui.SameLine();
-                                ImGuiEx.Text(vname);
-                            }
-                        }
                         if (adata.EntrustDuplicates)
                         {
                             ImGui.SameLine();
@@ -324,19 +315,29 @@ internal unsafe static class MultiModeUI
                         {
                             ImGui.SameLine(0, 2);
                             var level = $"{Lang.CharLevel}{ret.Level}";
-                            if (adata.Ilvl > 0 && !VentureUtils.IsDoL(ret.Job))
+                            var add = "";
+                            if (adata.Ilvl > -1 && !VentureUtils.IsDoL(ret.Job))
                             {
-                                level += $"  {Lang.CharItemLevel}{adata.Ilvl}";
+                                add += $"  {Lang.CharItemLevel}{adata.Ilvl}";
                             }
-                            if (adata.Gathering + adata.Perception > 0 && VentureUtils.IsDoL(ret.Job))
+                            if ((adata.Gathering > -1 || adata.Perception > -1) && VentureUtils.IsDoL(ret.Job))
                             {
-                                level += $"  {Lang.CharPlant}{adata.Gathering}/{adata.Perception}";
+                                add += $"  {Lang.CharPlant}{adata.Gathering}/{adata.Perception}";
                             }
-                            ImGuiEx.TextV($"{level}".ReplaceByChar(Lang.Digits.Normal, Lang.Digits.GameFont));
+                            ImGuiEx.TextV(level.ReplaceByChar(Lang.Digits.Normal, Lang.Digits.GameFont) + add);
                         }
                         ImGui.TableNextColumn();
                         ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
-                        ImGuiEx.Text($"{(!ret.HasVenture ? "No Venture" : Utils.ToTimeString(ret.GetVentureSecondsRemaining(false)))}");
+                        if (ret.VentureID != 0)
+                        {
+                            var vname = VentureUtils.GetFancyVentureName(ret.VentureID, data, ret, out _);
+                            if (vname != null)
+                            {
+                                ImGuiEx.Text(vname);
+                                ImGui.SameLine();
+                            }
+                        }
+                        ImGuiEx.Text($"{(!ret.HasVenture ? "No Venture" : Utils.ToTimeString(ret.GetVentureSecondsRemaining(P.config.TimerAllowNegative)))}");
                         ImGui.TableNextColumn();
                         ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
                         var n = $"{data.CID} {ret.Name} settings";

@@ -46,6 +46,7 @@ internal static class Expert
             ImGui.Checkbox($"Show MultiMode checkbox on plugin UI bar", ref P.config.MultiModeUIBar);
             ImGui.SetNextItemWidth(100f);
             ImGuiEx.SliderIntAsFloat("Retainer menu delay, seconds", ref P.config.RetainerMenuDelay.ValidateRange(0, 2000), 0, 2000);
+            ImGui.Checkbox($"Allow venture timer to display negative values", ref P.config.TimerAllowNegative);
         });
 
         InfoBox.DrawBox("Server time", delegate

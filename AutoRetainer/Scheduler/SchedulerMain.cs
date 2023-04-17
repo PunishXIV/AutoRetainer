@@ -128,10 +128,7 @@ internal unsafe static class SchedulerMain
                                         {
                                             adata.VenturePlanIndex = 0;
                                         }
-                                        else
-                                        {
-                                            adata.VenturePlanIndex++;
-                                        }
+                                        adata.VenturePlanIndex++;
                                     }
 
                                     //entrust duplicates

@@ -34,6 +34,7 @@ internal unsafe class Config : IEzConfig
     public bool HideOverlayIcons = false;
     public bool UnsafeProtection = false;
     public bool CharEqualize = false;
+    public bool TimerAllowNegative = false;
 
     public bool LoginOverlay = false;
     public float LoginOverlayScale = 1f;

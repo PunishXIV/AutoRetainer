@@ -186,23 +186,19 @@ internal static class SettingsMain
             if (ImGui.Selectable("Cancel"))
             {
             }
-            if (ImGui.IsItemHovered()) block = true;
             if (ImGui.Selectable("Clear"))
             {
                 key = Keys.None;
             }
-            if (ImGui.IsItemHovered()) block = true;
-            if (!block)
+            var text = "";
+            ImGuiEx.Text(GradientColor.Get(ImGuiColors.ParsedGreen, ImGuiColors.DalamudRed), "Now press new key...");
+            foreach (var x in Enum.GetValues<Keys>())
             {
-                ImGuiEx.Text(GradientColor.Get(ImGuiColors.ParsedGreen, ImGuiColors.DalamudRed), "Now press new key...");
-                foreach (var x in Enum.GetValues<Keys>())
+                if (Bitmask.IsBitSet(User32.GetKeyState((int)x), 15))
                 {
-                    if (Bitmask.IsBitSet(User32.GetKeyState((int)x), 15))
-                    {
-                        ImGui.CloseCurrentPopup();
-                        key = x;
-                        break;
-                    }
+                    ImGui.CloseCurrentPopup();
+                    key = x;
+                    break;
                 }
             }
             ImGui.EndCombo();

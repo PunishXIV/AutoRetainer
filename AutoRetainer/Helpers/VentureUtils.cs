@@ -83,7 +83,7 @@ namespace AutoRetainer.Helpers
         {
             var adata = Utils.GetAdditionalData(data.CID, retainer.Name);
             var UnavailabilitySymbol = "";
-            var canNotGather = Task.RequiredGathering > 0 && adata.Gathering < Task.RequiredGathering && adata.Gathering > 0;
+            var canNotGather = Task.RequiredGathering > 0 && adata.Gathering < Task.RequiredGathering && adata.Gathering > -1;
             if (!Task.IsFieldExploration() && IsDoL(Task.ClassJobCategory.Row))
             {
                 var gathered = data.UnlockedGatheringItems.Count == 0 || data.UnlockedGatheringItems.Contains(VentureUtils.GetGatheringItemByItemID(Task.GetVentureItemId()));
@@ -115,12 +115,12 @@ namespace AutoRetainer.Helpers
             else
             {
                 //PluginLog.Information($"{Task.GetVentureName()}, {Task.RequiredItemLevel} > {adata.Ilvl}, {Task.RequiredGathering} > {adata.Gathering}");
-                if (Task.RequiredItemLevel > 0 && adata.Ilvl > 0)
+                if (Task.RequiredItemLevel > 0 && adata.Ilvl > -1)
                 {
                     Available = Task.RequiredItemLevel <= adata.Ilvl;
                     if(!Available) UnavailabilitySymbol = Lang.CharItemLevel;
                 }
-                else if(Task.RequiredGathering > 0 && adata.Gathering > 0)
+                else if(Task.RequiredGathering > 0 && adata.Gathering > -1)
                 {
                     Available = !canNotGather;
                     if (!Available) UnavailabilitySymbol = Lang.CharPlant;
