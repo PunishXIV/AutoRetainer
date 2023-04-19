@@ -14,6 +14,7 @@ namespace AutoRetainer.UI
         string search = "";
         int minLevel = 1;
         int maxLevel = 90;
+        Dictionary<uint, (string l, string r, bool avail)> Cache = new();
 
         public VenturePlanner() : base("Venture Planner")
         {
@@ -203,7 +204,20 @@ namespace AutoRetainer.UI
                         {
                             foreach (var item in VentureUtils.GetHunts(SelectedRetainer.Job).Where(x => search.IsNullOrEmpty() || x.GetVentureName().Contains(search, StringComparison.OrdinalIgnoreCase)).Where(x => x.RetainerLevel >= minLevel && x.RetainerLevel <= maxLevel))
                             {
-                                var name = item.GetFancyVentureName(SelectedCharacter, SelectedRetainer, out var Avail, out var l, out var r);
+                                string l = "";
+                                string r = "";
+                                bool Avail;
+                                if (Cache.TryGetValue(item.RowId, out var result))
+                                {
+                                    l = result.l;
+                                    r = result.r;
+                                    Avail = result.avail;
+                                }
+                                else
+                                {
+                                    item.GetFancyVentureName(SelectedCharacter, SelectedRetainer, out Avail, out l, out r);
+                                    Cache[item.RowId] = (l, r, Avail);
+                                }
                                 if (Avail || P.config.UnavailableVentureDisplay != UnavailableVentureDisplay.Hide)
                                 {
                                     var d = !Avail && P.config.UnavailableVentureDisplay != UnavailableVentureDisplay.Allow_selection;
@@ -220,6 +234,10 @@ namespace AutoRetainer.UI
                                     if (d) ImGui.EndDisabled();
                                 }
                             }
+                        }
+                        else
+                        {
+                            Cache.Clear();
                         }
                         if (ImGui.CollapsingHeader(VentureUtils.GetFieldExVentureName(SelectedRetainer.Job)))
                         {
