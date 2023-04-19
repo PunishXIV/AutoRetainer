@@ -1,4 +1,5 @@
 ﻿using Dalamud.Interface.Components;
+using ECommons;
 using ECommons.GameHelpers;
 using ECommons.MathHelpers;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
@@ -330,10 +331,11 @@ internal unsafe static class MultiModeUI
                         ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
                         if (ret.VentureID != 0)
                         {
-                            var vname = VentureUtils.GetFancyVentureName(ret.VentureID, data, ret, out _);
-                            if (vname != null)
+                            var parts = VentureUtils.GetVentureById(ret.VentureID).GetFancyVentureNameParts(data, ret, out _);
+                            if (!parts.Name.IsNullOrEmpty())
                             {
-                                ImGuiEx.Text(vname);
+                                var c = parts.YieldRate == 4 ? ImGuiColors.ParsedGreen : ImGui.GetStyle().Colors[(int)ImGuiCol.Text];
+                                ImGuiEx.Text(c, $"{(parts.Level != 0?$"{Lang.CharLevel}{parts.Level} ":"")}{parts.Name}");
                                 ImGui.SameLine();
                             }
                         }

@@ -203,12 +203,16 @@ namespace AutoRetainer.UI
                         {
                             foreach (var item in VentureUtils.GetHunts(SelectedRetainer.Job).Where(x => search.IsNullOrEmpty() || x.GetVentureName().Contains(search, StringComparison.OrdinalIgnoreCase)).Where(x => x.RetainerLevel >= minLevel && x.RetainerLevel <= maxLevel))
                             {
-                                var name = item.GetFancyVentureName(SelectedCharacter, SelectedRetainer, out var Avail);
+                                var name = item.GetFancyVentureName(SelectedCharacter, SelectedRetainer, out var Avail, out var l, out var r);
                                 if (Avail || P.config.UnavailableVentureDisplay != UnavailableVentureDisplay.Hide)
                                 {
                                     var d = !Avail && P.config.UnavailableVentureDisplay != UnavailableVentureDisplay.Allow_selection;
                                     if (d) ImGui.BeginDisabled();
-                                    if (ImGui.Selectable(name, adata.VenturePlan.List.Any(x => x.ID == item.RowId), ImGuiSelectableFlags.DontClosePopups))
+                                    var cur = ImGui.GetCursorPos();
+                                    ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail().X - ImGui.CalcTextSize(r).X);
+                                    ImGuiEx.Text(r);
+                                    ImGui.SetCursorPos(cur);
+                                    if (ImGui.Selectable(l, adata.VenturePlan.List.Any(x => x.ID == item.RowId), ImGuiSelectableFlags.DontClosePopups))
                                     {
                                         adata.VenturePlan.List.Add(new(item));
                                         adata.VenturePlanIndex = 0;

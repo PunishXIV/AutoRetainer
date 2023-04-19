@@ -11,6 +11,8 @@ public class OfflineRetainerData : IEquatable<OfflineRetainerData>
     public uint Job = 0;
     public uint VentureID = 0;
 
+    internal string Identity => $"{Name}";
+
     public override bool Equals(object obj)
     {
         return Equals(obj as OfflineRetainerData);

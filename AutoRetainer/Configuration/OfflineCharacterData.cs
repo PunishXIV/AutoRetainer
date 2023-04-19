@@ -19,6 +19,8 @@ public class OfflineCharacterData
     public GCDeliveryType GCDeliveryType = GCDeliveryType.Disabled;
     public HashSet<uint> UnlockedGatheringItems = new();
 
+    internal string Identity => $"{CID}";
+
     internal uint CharaIndex
     {
         get

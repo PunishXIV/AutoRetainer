@@ -128,53 +128,18 @@ internal static class SettingsMain
 
     static void QRA(string text, ref Keys key)
     {
-        ImGui.PushID(text);
-        ImGuiEx.TextV($"{text}:");
+        if(DrawKeybind(text, ref key))
+        {
+            P.quickSellItems.Toggle();
+        }
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(200f);
-        if (ImGui.BeginCombo("##inputKey", $"{key}"))
-        {
-            var block = false;
-            if (ImGui.Selectable("Cancel"))
-            {
-            }
-            if (ImGui.IsItemHovered()) block = true;
-            if (ImGui.Selectable("Clear"))
-            {
-                key = Keys.None;
-            }
-            if (ImGui.IsItemHovered()) block = true;
-            if (!block)
-            {
-                ImGuiEx.Text(GradientColor.Get(ImGuiColors.ParsedGreen, ImGuiColors.DalamudRed), "Now press new key...");
-                foreach (var x in Enum.GetValues<Keys>())
-                {
-                    if (Bitmask.IsBitSet(User32.GetKeyState((int)x), 15))
-                    {
-                        ImGui.CloseCurrentPopup();
-                        key = x;
-                        P.quickSellItems.Toggle();
-                        break;
-                    }
-                }
-            }
-            ImGui.EndCombo();
-        }
-        if (key != Keys.None)
-        {
-            ImGui.SameLine();
-            if (ImGuiEx.IconButton(FontAwesomeIcon.Trash))
-            {
-                key = Keys.None;
-            }
-            ImGui.SameLine();
-            ImGuiEx.Text("+ right click");
-        }
-        ImGui.PopID();
+        ImGuiEx.Text("+ right click");
     }
 
-    static void DrawKeybind(string text, ref Keys key)
+    static string KeyInputActive = null;
+    static bool DrawKeybind(string text, ref Keys key)
     {
+        bool ret = false;
         ImGui.PushID(text);
         ImGuiEx.Text($"{text}:");
         ImGui.Dummy(new(20, 1));
@@ -182,26 +147,38 @@ internal static class SettingsMain
         ImGui.SetNextItemWidth(200f);
         if (ImGui.BeginCombo("##inputKey", $"{key}"))
         {
-            var block = false;
-            if (ImGui.Selectable("Cancel"))
+            if (text == KeyInputActive)
             {
-            }
-            if (ImGui.Selectable("Clear"))
-            {
-                key = Keys.None;
-            }
-            var text = "";
-            ImGuiEx.Text(GradientColor.Get(ImGuiColors.ParsedGreen, ImGuiColors.DalamudRed), "Now press new key...");
-            foreach (var x in Enum.GetValues<Keys>())
-            {
-                if (Bitmask.IsBitSet(User32.GetKeyState((int)x), 15))
+                ImGuiEx.Text(ImGuiColors.DalamudYellow, $"Now press new key...");
+                foreach (var x in Enum.GetValues<Keys>())
                 {
-                    ImGui.CloseCurrentPopup();
-                    key = x;
-                    break;
+                    if (Bitmask.IsBitSet(User32.GetKeyState((int)x), 15))
+                    {
+                        KeyInputActive = null;
+                        key = x;
+                        ret = true;
+                        break;
+                    }
                 }
             }
+            else
+            {
+                if (ImGui.Selectable("Auto-detect new key", false, ImGuiSelectableFlags.DontClosePopups))
+                {
+                    KeyInputActive = text;
+                }
+                ImGuiEx.Text($"Select key manually:");
+                ImGuiEx.SetNextItemFullWidth();
+                ImGuiEx.EnumCombo("##selkeyman", ref key);
+            }
             ImGui.EndCombo();
+        }
+        else
+        {
+            if(text == KeyInputActive)
+            {
+                KeyInputActive = null;
+            }
         }
         if (key != Keys.None)
         {
@@ -209,8 +186,10 @@ internal static class SettingsMain
             if (ImGuiEx.IconButton(FontAwesomeIcon.Trash))
             {
                 key = Keys.None;
+                ret = true;
             }
         }
         ImGui.PopID();
+        return ret;
     }
 }

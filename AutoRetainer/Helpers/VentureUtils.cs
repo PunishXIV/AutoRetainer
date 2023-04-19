@@ -2,6 +2,7 @@
 using AutoRetainer.Scheduler.Tasks;
 using Dalamud.Memory;
 using Dalamud.Utility;
+using ECommons;
 using ECommons.ExcelServices;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using Lumina.Excel.GeneratedSheets;
@@ -12,6 +13,7 @@ using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AutoRetainer.Helpers
 {
@@ -74,13 +76,78 @@ namespace AutoRetainer.Helpers
             }
         }
 
+        internal static int GetVentureItemAmount(uint Task, OfflineCharacterData data, OfflineRetainerData retainer, out int index)
+        {
+            return GetVentureById(Task).GetVentureItemAmount(data, retainer, out index);
+        }
+
+        internal static int GetVentureItemAmount(this RetainerTask task, OfflineCharacterData data, OfflineRetainerData retainer, out int index)
+        {
+            index = 0;
+            if (task.IsRandom)
+            {
+                return 0;
+            }
+            var adata = Utils.GetAdditionalData(data.CID, retainer.Name);
+
+            var param = task.RetainerTaskParameter.Value;
+            if (param == null) return 0;
+            var normal = Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRow(task.Task);
+            if (task.Task == 0 || normal == null) return 0;
+            if (retainer.Job == (uint)Job.FSH)
+            {
+                for (int i = 0; i < param.PerceptionFSH.Length; i++)
+                {
+                    if(adata.Perception >= param.PerceptionFSH[i])
+                    {
+                        index = i+1;
+                    }
+                }
+            }
+            else if (IsDoL(retainer.Job))
+            {
+                for (int i = 0; i < param.PerceptionDoL.Length; i++)
+                {
+                    if (adata.Perception >= param.PerceptionDoL[i])
+                    {
+                        index = i+1;
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < param.ItemLevelDoW.Length; i++)
+                {
+                    if (adata.Ilvl >= param.ItemLevelDoW[i])
+                    {
+                        index = i+1;
+                    }
+                }
+            }
+            if (index >= normal.Quantity.Length) return 0;
+            return normal.Quantity[index];
+        }
+
         internal static string GetFancyVentureName(uint Task, OfflineCharacterData data, OfflineRetainerData retainer, out bool Available)
         {
             return GetVentureById(Task).GetFancyVentureName(data, retainer, out Available);
         }
 
-        internal static string GetFancyVentureName(this RetainerTask Task, OfflineCharacterData data, OfflineRetainerData retainer, out bool Available)
+        internal static string GetFancyVentureName(this RetainerTask Task, OfflineCharacterData data, OfflineRetainerData retainer, out bool Available) => GetFancyVentureName(Task, data, retainer, out Available, out _, out _);
+
+        internal static string GetFancyVentureName(this RetainerTask Task, OfflineCharacterData data, OfflineRetainerData retainer, out bool Available, out string left, out string right)
         {
+            var r = Task.GetFancyVentureNameParts(data, retainer, out Available);
+            left = Available ? "" : Lang.CharDeny + r.UnavailabilitySymbols + " ";
+            var lvls = r.Level == 0 ? "" : $"{Lang.CharLevel}{r.Level} ";
+            right = r.Yield == 0 ? "" : $"x{r.Yield} {r.YieldStars}";
+            left = $"{left}{lvls}{r.Name}";
+            return left + right;
+        }
+
+        internal static (string UnavailabilitySymbols, int Level, string Name, int Yield, int YieldRate, string YieldStars) GetFancyVentureNameParts(this RetainerTask Task, OfflineCharacterData data, OfflineRetainerData retainer, out bool Available)
+        {
+            (string UnavailabilitySymbols, int Level, string Name, int Yield, int YieldRate, string YieldStars) retp = ("", 0, "", 0, 0, "");
             var adata = Utils.GetAdditionalData(data.CID, retainer.Name);
             var UnavailabilitySymbol = "";
             var canNotGather = Task.RequiredGathering > 0 && adata.Gathering < Task.RequiredGathering && adata.Gathering > -1;
@@ -130,22 +197,32 @@ namespace AutoRetainer.Helpers
                     Available = true;
                 }
             }
-            string ret = "";
-            if(Task.RetainerLevel == 0)
+            retp.Name = Task.GetVentureName();
+            if (Task.RetainerLevel == 0)
             {
-                ret = $"{Task.GetVentureName()}";
+                //
             }
             else
             {
-                ret = $"{Task.RetainerLevel} {Task.GetVentureName()}";
+                retp.Level = Task.RetainerLevel;
             }
             if(retainer.Level < Task.RetainerLevel)
             {
                 Available = false;
                 UnavailabilitySymbol += Lang.CharLevelSync;
             }
-            if (!Available) ret = $"{UnavailabilitySymbol}{ret}";
-            return ret;
+            if (!Available)
+            {
+                retp.UnavailabilitySymbols = UnavailabilitySymbol;
+
+            }
+            if (!Task.IsRandom)
+            {
+                var amount = Task.GetVentureItemAmount(data, retainer, out retp.YieldRate);
+                retp.Yield = amount; 
+                retp.YieldStars = $"{"★".Repeat(retp.YieldRate)}{"☆".Repeat(4 - retp.YieldRate)}";
+            }
+            return retp;
         }
 
         internal static int GetCategory(uint ClassJob)
