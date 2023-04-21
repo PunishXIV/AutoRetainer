@@ -17,11 +17,14 @@ internal unsafe static class HouseEnterTask
         {
             if(Utils.GetReachableRetainerBell() == null)
             {
-                P.TaskManager.EnqueueImmediate(() => SetTarget(20f));
-                P.TaskManager.EnqueueImmediate(Lockon);
-                P.TaskManager.EnqueueImmediate(Approach);
-                P.TaskManager.EnqueueImmediate(AutorunOff);
-                P.TaskManager.EnqueueImmediate(() => { Chat.Instance.SendMessage("/automove off"); });
+                if (Utils.GetNearestEntrance(out var d) != null && d > 4f)
+                {
+                    P.TaskManager.EnqueueImmediate(() => SetTarget(20f));
+                    P.TaskManager.EnqueueImmediate(Lockon);
+                    P.TaskManager.EnqueueImmediate(Approach);
+                    P.TaskManager.EnqueueImmediate(AutorunOff);
+                    P.TaskManager.EnqueueImmediate(() => { Chat.Instance.SendMessage("/automove off"); });
+                }
                 P.TaskManager.EnqueueImmediate(() => SetTarget(5f));
                 P.TaskManager.EnqueueImmediate(Interact);
                 P.TaskManager.EnqueueImmediate(SelectYesno);

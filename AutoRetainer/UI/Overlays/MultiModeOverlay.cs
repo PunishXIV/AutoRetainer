@@ -91,7 +91,7 @@ internal class MultiModeOverlay : Window
                 ImGuiEx.Text($"loading multi.png");
             }
         }
-        else if (AutoLogin.Instance.IsRunning)
+        else if (AutoLogin.IsRunning)
         {
             if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "login.png"), out var t))
             {
@@ -105,7 +105,7 @@ internal class MultiModeOverlay : Window
                     }
                     if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
                     {
-                        AutoLogin.Instance.Abort();
+                        AutoLogin.Abort();
                     }
                     ImGui.SetTooltip("Autologin is running.\nLeft click - open AutoRetainer. \nRight click - disable Multi Mode.");
                 }

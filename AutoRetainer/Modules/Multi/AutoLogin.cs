@@ -10,6 +10,7 @@ using ECommons.Automation;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
+using System.CodeDom;
 using System.Diagnostics;
 using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
 
@@ -17,196 +18,110 @@ namespace AutoRetainer.Modules.Multi;
 
 //Part of code is authored by Caraxi https://github.com/Caraxi/AutoLogin
 
-internal unsafe class AutoLogin
+internal unsafe static class AutoLogin
 {
-    static AutoLogin? instance = null;
-    internal static AutoLogin Instance
+    static TaskManager AutoLoginTaskManager;
+
+    internal static void Initialize()
     {
-        get
+        AutoLoginTaskManager = new()
         {
-            instance ??= new();
-            return instance;
-        }
-    }
-
-    internal static void Dispose()
-    {
-        if (instance != null)
-        {
-            instance.DisposeInternal();
-            instance = null;
-        }
-    }
-
-    void DisposeInternal()
-    {
-        Svc.Framework.Update -= OnFrameworkUpdate;
-        PluginLog.Information("Autologin module disposed");
-    }
-
-    AutoLogin()
-    {
-        Svc.Framework.Update += OnFrameworkUpdate;
-        PluginLog.Information("Autologin module initialized");
-    }
-
-    internal void Logoff()
-    {
-        actionQueue.Clear();
-        actionQueue.Enqueue(Logout);
-        actionQueue.Enqueue(SelectYesLogout);
-    }
-
-    internal void Login(string WorldName, uint characterIndex, int serviceAccount)
-    {
-
-        var world = Svc.Data.Excel.GetSheet<World>()?.FirstOrDefault(w => w.Name.ToDalamudString().TextValue.Equals(WorldName, StringComparison.InvariantCultureIgnoreCase));
-
-        if (world == null)
-        {
-            PluginLog.Error($"'{WorldName}' is not a valid world name.");
-            return;
-        }
-
-        if (characterIndex >= 8)
-        {
-            PluginLog.Error("Invalid Character Index. Must be between 0 and 7.");
-            return;
-        }
-
-        if (serviceAccount < 0 || serviceAccount >= 10)
-        {
-            PluginLog.Error("Invalid Service account Index. Must be between 0 and 9.");
-            return;
-        }
-
-        tempDc = world.DataCenter.Row;
-        tempWorld = world.RowId;
-        tempCharacter = characterIndex;
-        tempServiceAccount = serviceAccount;
-        actionQueue.Clear();
-        actionQueue.Enqueue(OpenDataCenterMenu);
-        actionQueue.Enqueue(SelectDataCentre);
-        actionQueue.Enqueue(SelectServiceAccount);
-        actionQueue.Enqueue(SelectWorld);
-        actionQueue.Enqueue(VariableDelay(10));
-        actionQueue.Enqueue(SelectCharacter);
-        actionQueue.Enqueue(SelectYes);
-        actionQueue.Enqueue(Delay5s);
-        actionQueue.Enqueue(ClearTemp);
-    }
-
-    internal void SwapCharacter(string WorldName, uint characterIndex, int serviceAccount)
-    {
-
-        var world = Svc.Data.Excel.GetSheet<World>()?.FirstOrDefault(w => w.Name.ToDalamudString().TextValue.Equals(WorldName, StringComparison.InvariantCultureIgnoreCase));
-
-        if (world == null)
-        {
-            PluginLog.Error($"'{WorldName}' is not a valid world name.");
-            return;
-        }
-
-        if (characterIndex >= 8)
-        {
-            PluginLog.Error("Invalid Character Index. Must be between 0 and 7.");
-            return;
-        }
-
-        if (serviceAccount < 0 || serviceAccount >= 10)
-        {
-            PluginLog.Error("Invalid Service account Index. Must be between 0 and 9.");
-            return;
-        }
-
-        tempDc = world.DataCenter.Row;
-        tempWorld = world.RowId;
-        tempCharacter = characterIndex;
-        tempServiceAccount = serviceAccount;
-        actionQueue.Clear();
-        actionQueue.Enqueue(VariableDelay(5));
-        actionQueue.Enqueue(Logout);
-        actionQueue.Enqueue(SelectYesLogout);
-        actionQueue.Enqueue(VariableDelay(5));
-        actionQueue.Enqueue(OpenDataCenterMenu);
-        actionQueue.Enqueue(SelectDataCentre);
-        actionQueue.Enqueue(SelectServiceAccount);
-        actionQueue.Enqueue(SelectWorld);
-        actionQueue.Enqueue(VariableDelay(10));
-        actionQueue.Enqueue(SelectCharacter);
-        actionQueue.Enqueue(SelectYes);
-        actionQueue.Enqueue(Delay5s);
-        actionQueue.Enqueue(ClearTemp);
-    }
-
-    private readonly Stopwatch sw = new();
-    private uint Delay = 0;
-
-    private Func<bool> VariableDelay(uint frameDelay)
-    {
-        return () =>
-        {
-            Delay = frameDelay;
-            return true;
+            TimeLimitMS = 60 * 1000
         };
     }
 
-    internal void Abort()
+    internal static bool IsRunning => AutoLoginTaskManager.IsBusy;
+    internal static void Abort() => AutoLoginTaskManager.Abort();
+
+    internal static void Logoff()
     {
-        actionQueue.Clear();
+        AutoLoginTaskManager.Abort();
+        AutoLoginTaskManager.Enqueue(Logout);
+        AutoLoginTaskManager.Enqueue(SelectYesLogout);
     }
 
-    private void OnFrameworkUpdate(Framework framework)
+    internal static void Login(string WorldName, uint characterIndex, int serviceAccount)
     {
-        if (actionQueue.Count == 0)
-        {
-            if (sw.IsRunning) sw.Stop();
-            return;
-        }
-        if (!sw.IsRunning) sw.Restart();
+        var world = Svc.Data.Excel.GetSheet<World>()?.FirstOrDefault(w => w.Name.ToDalamudString().TextValue.Equals(WorldName, StringComparison.InvariantCultureIgnoreCase));
 
-        /*if (Svc.KeyState[VirtualKey.SHIFT])
+        if (world == null)
         {
-            Svc.PluginInterface.UiBuilder.AddNotification("AutoLogin Cancelled.", "AutoLogin", NotificationType.Warning);
-            actionQueue.Clear();
-        }*/
-
-        if (Delay > 0)
-        {
-            Delay -= 1;
+            PluginLog.Error($"'{WorldName}' is not a valid world name.");
             return;
         }
 
-
-
-        if (sw.ElapsedMilliseconds > 20000)
+        if (characterIndex >= 8)
         {
-            actionQueue.Clear();
+            PluginLog.Error("Invalid Character Index. Must be between 0 and 7.");
             return;
         }
 
-        try
+        if (serviceAccount < 0 || serviceAccount >= 10)
         {
-            var hasNext = actionQueue.TryPeek(out var next);
-            if (hasNext)
-            {
-                if (next!())
-                {
-                    actionQueue.Dequeue();
-                    sw.Reset();
-                }
-            }
+            PluginLog.Error("Invalid Service account Index. Must be between 0 and 9.");
+            return;
         }
-        catch (Exception ex)
-        {
-            PluginLog.Log($"Failed: {ex.Message}");
-        }
+
+        tempDc = world.DataCenter.Row;
+        tempWorld = world.RowId;
+        tempCharacter = characterIndex;
+        tempServiceAccount = serviceAccount;
+        if (AutoLoginTaskManager.IsBusy) throw new InvalidOperationException($"AutoLoginTaskManager is busy");
+        AutoLoginTaskManager.Enqueue(OpenDataCenterMenu);
+        AutoLoginTaskManager.Enqueue(SelectDataCentre);
+        AutoLoginTaskManager.Enqueue(SelectServiceAccount);
+        AutoLoginTaskManager.Enqueue(SelectWorld);
+        AutoLoginTaskManager.DelayNext("AutoLoginDelay", 10, true);
+        AutoLoginTaskManager.Enqueue(SelectCharacter);
+        AutoLoginTaskManager.Enqueue(SelectYes);
+        AutoLoginTaskManager.DelayNext("AutoLoginDelay", 5, true);
+        AutoLoginTaskManager.Enqueue(ClearTemp);
     }
 
-    private readonly Queue<Func<bool>> actionQueue = new();
-    internal bool IsRunning => actionQueue.Count != 0;
+    internal static void SwapCharacter(string WorldName, uint characterIndex, int serviceAccount)
+    {
 
-    bool OpenDataCenterMenu()
+        var world = Svc.Data.Excel.GetSheet<World>()?.FirstOrDefault(w => w.Name.ToDalamudString().TextValue.Equals(WorldName, StringComparison.InvariantCultureIgnoreCase));
+
+        if (world == null)
+        {
+            PluginLog.Error($"'{WorldName}' is not a valid world name.");
+            return;
+        }
+
+        if (characterIndex >= 8)
+        {
+            PluginLog.Error("Invalid Character Index. Must be between 0 and 7.");
+            return;
+        }
+
+        if (serviceAccount < 0 || serviceAccount >= 10)
+        {
+            PluginLog.Error("Invalid Service account Index. Must be between 0 and 9.");
+            return;
+        }
+
+        tempDc = world.DataCenter.Row;
+        tempWorld = world.RowId;
+        tempCharacter = characterIndex;
+        tempServiceAccount = serviceAccount;
+        if (AutoLoginTaskManager.IsBusy) throw new InvalidOperationException($"AutoLoginTaskManager is busy");
+        AutoLoginTaskManager.DelayNext("AutoLoginDelay", 5, true);
+        AutoLoginTaskManager.Enqueue(Logout);
+        AutoLoginTaskManager.Enqueue(SelectYesLogout);
+        AutoLoginTaskManager.DelayNext("AutoLoginDelay", 5, true);
+        AutoLoginTaskManager.Enqueue(OpenDataCenterMenu);
+        AutoLoginTaskManager.Enqueue(SelectDataCentre);
+        AutoLoginTaskManager.Enqueue(SelectServiceAccount);
+        AutoLoginTaskManager.Enqueue(SelectWorld);
+        AutoLoginTaskManager.DelayNext("AutoLoginDelay", 10, true);
+        AutoLoginTaskManager.Enqueue(SelectCharacter);
+        AutoLoginTaskManager.Enqueue(SelectYes);
+        AutoLoginTaskManager.DelayNext("AutoLoginDelay", 5, true);
+        AutoLoginTaskManager.Enqueue(ClearTemp);
+    }
+
+    static bool? OpenDataCenterMenu()
     {
         var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("_TitleMenu", 1);
         if (addon == null || addon->IsVisible == false) return false;
@@ -216,7 +131,7 @@ internal unsafe class AutoLogin
         return true;
     }
 
-    bool SelectServiceAccount()
+    static bool? SelectServiceAccount()
     {
         var dcMenu = (AtkUnitBase*)Svc.GameGui.GetAddonByName("TitleDCWorldMap", 1);
         if (dcMenu != null) UiHelper.Close(dcMenu, true);
@@ -244,7 +159,7 @@ internal unsafe class AutoLogin
         return false;
     }
 
-    bool SelectDataCentre()
+    static bool? SelectDataCentre()
     {
         var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("TitleDCWorldMap", 1);
         if (addon == null || tempDc == null) return false;
@@ -252,7 +167,7 @@ internal unsafe class AutoLogin
         return true;
     }
 
-    bool SelectWorld()
+    static bool? SelectWorld()
     {
         // Select World
         var dcMenu = (AtkUnitBase*)Svc.GameGui.GetAddonByName("TitleDCWorldMap", 1);
@@ -280,11 +195,11 @@ internal unsafe class AutoLogin
             return true;
         }
 
-        if (checkedWorldCount > 0) actionQueue.Clear();
+        if (checkedWorldCount > 0) return null;
         return false;
     }
 
-    bool SelectCharacter()
+    static bool? SelectCharacter()
     {
         // Select Character
         var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("_CharaSelectListMenu", 1);
@@ -294,39 +209,24 @@ internal unsafe class AutoLogin
         return nextAddon != null;
     }
 
-    bool SelectYesLogout()
+    static bool? SelectYesLogout()
     {
         var addon = Utils.GetSpecificYesno(Svc.Data.GetExcelSheet<Addon>()?.GetRow(115)?.Text.ToDalamudString().ExtractText());
         if (addon == null) return false;
-        GenerateCallback(addon, 0);
-        UiHelper.Close(addon, true);
+        ClickSelectYesNo.Using((nint)addon).Yes();
         return true;
     }
 
-    bool SelectYes()
+    static bool? SelectYes()
     {
         var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("SelectYesno", 1);
         if (addon == null) return false;
-        GenerateCallback(addon, 0);
-        UiHelper.Close(addon, true);
+        ClickSelectYesNo.Using((nint)addon).Yes();
         return true;
     }
 
 
-    bool Delay5s()
-    {
-        Delay = 300;
-        return true;
-    }
-
-
-    bool Delay1s()
-    {
-        Delay = 60;
-        return true;
-    }
-
-    bool Logout()
+    static bool? Logout()
     {
         var isLoggedIn = Svc.Condition.Any();
         if (!isLoggedIn) return true;
@@ -335,7 +235,7 @@ internal unsafe class AutoLogin
         return true;
     }
 
-    bool ClearTemp()
+    static bool? ClearTemp()
     {
         tempWorld = null;
         tempDc = null;
@@ -345,83 +245,10 @@ internal unsafe class AutoLogin
     }
 
 
-    private uint? tempDc = null;
-    private uint? tempWorld = null;
-    private uint? tempCharacter = null;
-    private int tempServiceAccount = 0;
-
-    internal void DrawUI()
-    {
-        if (ImGui.Button("Clear Queue"))
-        {
-            actionQueue.Clear();
-        }
-
-        if (ImGui.Button("Test Step: Open Data Centre Menu")) actionQueue.Enqueue(OpenDataCenterMenu);
-        if (ImGui.Button($"Test Step: Select Data Center [{tempDc}]")) actionQueue.Enqueue(SelectDataCentre);
-
-        if (ImGui.Button($"Test Step: SELECT WORLD [{tempWorld}]"))
-        {
-            actionQueue.Clear();
-            actionQueue.Enqueue(SelectWorld);
-        }
-
-        if (ImGui.Button($"Test Step: SELECT CHARACTER [{tempCharacter}]"))
-        {
-            actionQueue.Clear();
-            actionQueue.Enqueue(SelectCharacter);
-        }
-
-        if (ImGui.Button("Test Step: SELECT YES"))
-        {
-            actionQueue.Clear();
-            actionQueue.Enqueue(SelectYes);
-        }
-
-        if (ImGui.Button("Logout"))
-        {
-            actionQueue.Clear();
-            actionQueue.Enqueue(Logout);
-            actionQueue.Enqueue(SelectYes);
-            actionQueue.Enqueue(Delay5s);
-        }
-
-
-
-        if (ImGui.Button("Swap Character"))
-        {
-            tempDc = 9;
-            tempWorld = 87;
-            tempCharacter = 0;
-
-            actionQueue.Enqueue(Logout);
-            actionQueue.Enqueue(SelectYes);
-            actionQueue.Enqueue(OpenDataCenterMenu);
-            actionQueue.Enqueue(SelectDataCentre);
-            actionQueue.Enqueue(SelectWorld);
-            actionQueue.Enqueue(SelectCharacter);
-            actionQueue.Enqueue(SelectYes);
-            actionQueue.Enqueue(Delay5s);
-            actionQueue.Enqueue(ClearTemp);
-        }
-
-        if (ImGui.Button("Full Run"))
-        {
-            actionQueue.Clear();
-            actionQueue.Enqueue(OpenDataCenterMenu);
-            actionQueue.Enqueue(SelectDataCentre);
-            actionQueue.Enqueue(SelectWorld);
-            actionQueue.Enqueue(SelectCharacter);
-            actionQueue.Enqueue(SelectYes);
-        }
-
-        ImGui.Text("Current Queue:");
-        foreach (var l in actionQueue.ToList())
-        {
-            ImGui.Text($"{l.Method.Name}");
-        }
-    }
-
+    static private uint? tempDc = null;
+    static private uint? tempWorld = null;
+    static private uint? tempCharacter = null;
+    static private int tempServiceAccount = 0;
 
     static void GenerateCallback(AtkUnitBase* unitBase, params object[] values)
     {

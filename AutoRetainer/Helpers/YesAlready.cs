@@ -36,7 +36,7 @@ internal static class YesAlready
 
     internal static void Tick()
     {
-        if (P.TaskManager.IsBusy || AutoLogin.Instance.IsRunning || AutoGCHandin.Operation)
+        if (P.TaskManager.IsBusy || AutoLogin.IsRunning || AutoGCHandin.Operation)
         {
             if (IsEnabled())
             {

@@ -7,5 +7,7 @@ internal static unsafe class DebugThrottle
     internal static void Draw()
     {
         EzThrottler.ImGuiPrintDebugInfo();
+        ImGui.Separator();
+        FrameThrottler.ImGuiPrintDebugInfo();
     }
 }

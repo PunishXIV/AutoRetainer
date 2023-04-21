@@ -116,7 +116,7 @@ internal unsafe static class MultiMode
                     return;
                 }
             }
-            if (ProperOnLogin.PlayerPresent && !AutoLogin.Instance.IsRunning)
+            if (ProperOnLogin.PlayerPresent && !AutoLogin.IsRunning)
             {
                 if (!Utils.IsInventoryFree())
                 {
@@ -126,7 +126,7 @@ internal unsafe static class MultiMode
                     }
                 }
             }
-            if (ProperOnLogin.PlayerPresent && !AutoLogin.Instance.IsRunning && IsInteractionAllowed()
+            if (ProperOnLogin.PlayerPresent && !AutoLogin.IsRunning && IsInteractionAllowed()
                 && (!Synchronize || P.config.OfflineData.All(x => x.GetEnabledRetainers().All(z => z.GetVentureSecondsRemaining() <= P.config.UnsyncCompensation))))
             {
                 Synchronize = false;
@@ -244,7 +244,7 @@ internal unsafe static class MultiMode
     internal static bool Relog(OfflineCharacterData data, out string ErrorMessage)
     {
         ErrorMessage = string.Empty;
-        if (AutoLogin.Instance.IsRunning)
+        if (AutoLogin.IsRunning)
         {
             ErrorMessage = "AutoLogin is already running";
         }
@@ -264,10 +264,6 @@ internal unsafe static class MultiMode
                 {
                     ErrorMessage = "Targeted player is logged in";
                 }
-                else if (!GameMain.IsInSanctuary() && !ExcelTerritoryHelper.IsSanctuary(Svc.ClientState.TerritoryType) && !P.config.BypassSanctuaryCheck)
-                {
-                    ErrorMessage = "You are not in the sanctuary";
-                }
                 else
                 {
                     if (MultiMode.Enabled)
@@ -280,11 +276,11 @@ internal unsafe static class MultiMode
                     }
                     if (data != null)
                     {
-                        AutoLogin.Instance.SwapCharacter(data.World, data.CharaIndex, data.ServiceAccount);
+                        AutoLogin.SwapCharacter(data.World, data.CharaIndex, data.ServiceAccount);
                     }
                     else
                     {
-                        AutoLogin.Instance.Logoff();
+                        AutoLogin.Logoff();
                     }
                     return true;
                 }
@@ -293,7 +289,7 @@ internal unsafe static class MultiMode
             {
                 if (Utils.CanAutoLogin())
                 {
-                    AutoLogin.Instance.Login(data.World, data.CharaIndex, data.ServiceAccount);
+                    AutoLogin.Login(data.World, data.CharaIndex, data.ServiceAccount);
                     return true;
                 }
                 else
