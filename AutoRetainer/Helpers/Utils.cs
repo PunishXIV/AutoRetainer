@@ -25,7 +25,7 @@ internal static unsafe class Utils
         return !Svc.ClientState.IsLoggedIn 
             && !Svc.Condition.Any() 
             && !P.TaskManager.IsBusy 
-            && !AutoLogin.IsRunning 
+            && !AutoLogin.Instance.IsRunning 
             && TryGetAddonByName<AtkUnitBase>("_TitleMenu", out var title) 
             && IsAddonReady(title) 
             && title->UldManager.NodeListCount > 3 

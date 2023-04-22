@@ -116,7 +116,7 @@ internal unsafe static class MultiMode
                     return;
                 }
             }
-            if (ProperOnLogin.PlayerPresent && !AutoLogin.IsRunning)
+            if (ProperOnLogin.PlayerPresent && !AutoLogin.Instance.IsRunning)
             {
                 if (!Utils.IsInventoryFree())
                 {
@@ -126,7 +126,7 @@ internal unsafe static class MultiMode
                     }
                 }
             }
-            if (ProperOnLogin.PlayerPresent && !AutoLogin.IsRunning && IsInteractionAllowed()
+            if (ProperOnLogin.PlayerPresent && !AutoLogin.Instance.IsRunning && IsInteractionAllowed()
                 && (!Synchronize || P.config.OfflineData.All(x => x.GetEnabledRetainers().All(z => z.GetVentureSecondsRemaining() <= P.config.UnsyncCompensation))))
             {
                 Synchronize = false;
@@ -244,7 +244,7 @@ internal unsafe static class MultiMode
     internal static bool Relog(OfflineCharacterData data, out string ErrorMessage)
     {
         ErrorMessage = string.Empty;
-        if (AutoLogin.IsRunning)
+        if (AutoLogin.Instance.IsRunning)
         {
             ErrorMessage = "AutoLogin is already running";
         }
@@ -276,11 +276,11 @@ internal unsafe static class MultiMode
                     }
                     if (data != null)
                     {
-                        AutoLogin.SwapCharacter(data.World, data.CharaIndex, data.ServiceAccount);
+                        AutoLogin.Instance.SwapCharacter(data.World, data.CharaIndex, data.ServiceAccount);
                     }
                     else
                     {
-                        AutoLogin.Logoff();
+                        AutoLogin.Instance.Logoff();
                     }
                     return true;
                 }
@@ -289,7 +289,7 @@ internal unsafe static class MultiMode
             {
                 if (Utils.CanAutoLogin())
                 {
-                    AutoLogin.Login(data.World, data.CharaIndex, data.ServiceAccount);
+                    AutoLogin.Instance.Login(data.World, data.CharaIndex, data.ServiceAccount);
                     return true;
                 }
                 else

@@ -72,7 +72,6 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 Svc.PluginInterface.UiBuilder.OpenConfigUi += delegate { configGui.IsOpen = true; };
                 Svc.ClientState.Logout += Logout;
                 Svc.Condition.ConditionChange += ConditionChange;
-                AutoLogin.Initialize();
                 EzCmd.Add("/autoretainer", CommandHandler, "Open plugin interface\n/autoretainer e|enable → Enable plugin\n/autoretainer d|disable - Disable plugin\n/autoretainer t|toggle - toggle plugin\n/autoretainer m|multi - toggle MultiMode\n/autoretainer relog Character Name@WorldName - relog to the targeted character if configured\n/autoretainer expert - toggle expert settings\n/autoretainer debug - toggle debug menu and verbose output");
                 EzCmd.Add("/ays", CommandHandler);
                 Svc.Toasts.ErrorToast += Toasts_ErrorToast;
@@ -155,7 +154,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             var target = P.config.OfflineData.Where(x => $"{x.Name}@{x.World}" == arguments[6..]).FirstOrDefault();
             if (target != null)
             {
-                if (!AutoLogin.IsRunning) AutoLogin.SwapCharacter(target.World, target.CharaIndex, target.ServiceAccount);
+                if (!AutoLogin.Instance.IsRunning) AutoLogin.Instance.SwapCharacter(target.World, target.CharaIndex, target.ServiceAccount);
             }
             else
             {
@@ -259,7 +258,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             {
 
                 MultiMode.Enabled = false;
-                AutoLogin.Abort();
+                AutoLogin.Instance.Abort();
             }
         }
     }
@@ -281,6 +280,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 YesAlready.EnableIfNeeded();
             });
             Safe(StatisticsManager.Dispose);
+            Safe(AutoLogin.Dispose);
             Safe(Memory.Dispose);
             Safe(IPC.Shutdown);
             PunishLibMain.Dispose();
@@ -386,7 +386,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     {
         SchedulerMain.DisablePlugin();
 
-        if (!AutoLogin.IsRunning)
+        if (!AutoLogin.Instance.IsRunning)
         {
             MultiMode.LastLogin = 0;
         }

@@ -37,7 +37,7 @@ namespace AutoRetainer.UI.Overlays
                 }
                 if (ImGui.Button(n, new(bWidth * 1.35f, dim.Y * 1.35f)))
                 {
-                    AutoLogin.Login(x.World, x.CharaIndex, x.ServiceAccount);
+                    AutoLogin.Instance.Login(x.World, x.CharaIndex, x.ServiceAccount);
                 }
             }
             ImGui.PopFont();
