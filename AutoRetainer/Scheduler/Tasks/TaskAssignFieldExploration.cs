@@ -17,8 +17,9 @@ namespace AutoRetainer.Scheduler.Tasks
                 TaskWaitSelectString.Enqueue(P.config.RetainerMenuDelay);
             }
             P.TaskManager.Enqueue(RetainerHandlers.SelectAssignVenture);
-            P.TaskManager.Enqueue(() => RetainerHandlers.GenericSelectByName(Lang.FieldExplorationNames));
-            P.TaskManager.Enqueue(() => RetainerHandlers.SelectSpecificVenture(VentureID));
+            P.TaskManager.Enqueue(() => RetainerHandlers.GenericSelectByName(Lang.FieldExplorationNames), "GenericSelectByName");
+            P.TaskManager.Enqueue(() => RetainerHandlers.SelectSpecificVenture(VentureID), "SelectSpecificVenture");
+            P.TaskManager.DelayNext(10, true);
             P.TaskManager.Enqueue(RetainerHandlers.ClickAskAssign);
         }
     }

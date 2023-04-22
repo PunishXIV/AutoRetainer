@@ -13,6 +13,7 @@ internal static class TaskReassignVenture
         }
         P.TaskManager.Enqueue(RetainerHandlers.SelectViewVentureReport);
         P.TaskManager.Enqueue(RetainerHandlers.ClickResultReassign);
+        P.TaskManager.DelayNext(10, true);
         P.TaskManager.Enqueue(RetainerHandlers.ClickAskAssign);
     }
 }
