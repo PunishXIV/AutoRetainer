@@ -297,9 +297,8 @@ internal unsafe class AutoLogin
     bool SelectYesLogout()
     {
         var addon = Utils.GetSpecificYesno(Svc.Data.GetExcelSheet<Addon>()?.GetRow(115)?.Text.ToDalamudString().ExtractText());
-        if (addon == null) return false;
-        GenerateCallback(addon, 0);
-        //UiHelper.Close(addon, true);
+        if (addon == null || !IsAddonReady(addon)) return false;
+        ClickSelectYesNo.Using((nint)addon).Yes();
         return true;
     }
 
