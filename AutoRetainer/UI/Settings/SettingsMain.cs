@@ -44,6 +44,11 @@ internal static class SettingsMain
                 P.config.DontReassign = false;
             }
             ImGuiComponents.HelpMarker("Only reassign ventures that retainers are undertaking.");
+
+            ImGui.Checkbox("RetainerSense", ref P.config.RetainerSense);
+            ImGuiComponents.HelpMarker($"AutoRetainer will automatically enable itself when the player is within interaction range of a Summoning Bell. You must remain stationary or the activation will be cancelled.");
+            ImGui.SetNextItemWidth(200f);
+            ImGuiEx.SliderIntAsFloat("Activation Time", ref P.config.RetainerSenseThreshold, 1000, 100000);
         });
 
         InfoBox.DrawBox("Keybinds", delegate
@@ -58,6 +63,13 @@ internal static class SettingsMain
         ImGuiComponents.HelpMarker("AutoRetainer will wait for all ventures to return before cycling to the next character in multi mode operation.");
         ImGui.SetNextItemWidth(60);
         ImGui.DragInt("Advance Relog Threshold", ref P.config.AdvanceTimer.ValidateRange(0, 300), 0.1f, 0, 300);
+        ImGui.Checkbox($"Housing Bell Support", ref P.config.MultiAllowHET);
+        ImGuiEx.TextWrapped(ImGuiColors.DalamudOrange, $"A Summoning Bell must be within range of the spawn point once the home is entered.");
+        ImGui.Checkbox($"Display Login Overlay", ref P.config.LoginOverlay);
+        ImGui.Checkbox($"Enforce Full Character Rotation", ref P.config.CharEqualize);
+        ImGuiComponents.HelpMarker("Recommended for users with > 15 characters, forces multi mode to make sure ventures are processed on all characters in order before returning to the beginning of the cycle.");
+        ImGui.Checkbox($"Wait on login screen", ref P.config.MultiWaitOnLoginScreen);
+        ImGuiComponents.HelpMarker($"If no character is available for ventures, you will be logged off until any character is available again. Title screen movie will be disabled while this option and MultiMode are enabled.");
         ImGui.Checkbox("Synchronise Retainers (one time)", ref MultiMode.Synchronize);
         ImGuiComponents.HelpMarker("AutoRetainer will wait until all enabled retainers have completed their ventures. After that this setting will be disabled automatically and all characters will be processed.");
         ImGui.Separator();
