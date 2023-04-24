@@ -175,7 +175,7 @@ internal unsafe static class SchedulerMain
                                     {
                                         void Process(TaskCompletedBehavior behavior)
                                         {
-                                            P.DebugLog($"Behavior: {behavior}");
+                                            //P.DebugLog($"Behavior: {behavior}");
                                             if (behavior.EqualsAny(TaskCompletedBehavior.Stay_in_retainer_list_and_disable_plugin, TaskCompletedBehavior.Close_retainer_list_and_disable_plugin))
                                             {
                                                 P.DebugLog($"Scheduling plugin disabling (behavior={behavior})");
