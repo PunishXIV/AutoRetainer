@@ -14,6 +14,7 @@ using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using static AutoRetainer.Modules.OfflineDataManager;
 
 namespace AutoRetainer.Modules.Multi;
@@ -61,6 +62,7 @@ internal unsafe static class MultiMode
     internal static void OnMultiModeEnabled()
     {
         if (!Enabled) return;
+        LastLogin = 0;
         if (P.config.MultiHETOnEnable && CanHET && Player.Available)
         {
             HouseEnterTask.EnqueueTask();
@@ -76,6 +78,10 @@ internal unsafe static class MultiMode
     {
         if (Active)
         {
+            if(!Svc.ClientState.IsLoggedIn && TryGetAddonByName<AtkUnitBase>("Title", out _) && !AutoLogin.Instance.IsRunning)
+            {
+                LastLogin = 0;
+            }
             if (GetAutoAfkOpt() != 0)
             {
                 DuoLog.Warning("Using Multi Mode requires Auto-afk option to be turned off");
@@ -198,10 +204,6 @@ internal unsafe static class MultiMode
                     }
                 }
             }
-        }
-        else
-        {
-            LastLogin = 0;
         }
     }
 
