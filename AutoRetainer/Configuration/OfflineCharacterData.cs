@@ -18,6 +18,7 @@ public class OfflineCharacterData
     public bool ShouldSerializeEnableGCArmoryHandin() => false;
     public GCDeliveryType GCDeliveryType = GCDeliveryType.Disabled;
     public HashSet<uint> UnlockedGatheringItems = new();
+    public short[] ClassJobLevelArray = new short[30];
 
     internal string Identity => $"{CID}";
 

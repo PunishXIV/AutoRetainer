@@ -5,11 +5,12 @@ using ECommons.Events;
 using ECommons.ExcelServices;
 using ECommons.GameHelpers;
 using ECommons.Throttlers;
+using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using Lumina.Excel.GeneratedSheets;
 
 namespace AutoRetainer.Modules;
 
-internal static class OfflineDataManager
+internal unsafe static class OfflineDataManager
 {
     internal static void Tick()
     {
@@ -47,6 +48,10 @@ internal static class OfflineDataManager
         }
         data.World = ExcelWorldHelper.GetWorldNameById(Svc.ClientState.LocalPlayer.HomeWorld.Id);
         data.Name = Svc.ClientState.LocalPlayer.Name.ToString();
+        for (int i = 0; i < 30; i++)
+        {
+            data.ClassJobLevelArray[i] = UIState.Instance()->PlayerState.ClassJobLevelArray[i];
+        }
         if (writeGatherables)
         {
             try

@@ -7,6 +7,7 @@ using Dalamud.Memory;
 using ECommons.Events;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameFunctions;
+using ECommons.GameHelpers;
 using ECommons.MathHelpers;
 using ECommons.Reflection;
 using ECommons.Throttlers;
@@ -20,6 +21,25 @@ namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
+    internal static int GetJobLevel(this OfflineCharacterData data, uint job)
+    {
+        var d = Svc.Data.GetExcelSheet<ClassJob>().GetRow(job);
+        if(d != null)
+        {
+            try
+            {
+                return data.ClassJobLevelArray[d.ExpArrayIndex];
+            }
+            catch (Exception) { }
+        }
+        return 0;
+    }
+
+    internal static OfflineCharacterData GetCurrentCharacterData()
+    {
+        return P.config.OfflineData.FirstOrDefault(x => x.CID == Player.CID);
+    }
+
     internal static bool CanAutoLogin()
     {
         return !Svc.ClientState.IsLoggedIn 

@@ -235,10 +235,6 @@ namespace AutoRetainer.UI
                                 }
                             }
                         }
-                        else
-                        {
-                            Cache.Clear();
-                        }
                         if (ImGui.CollapsingHeader(VentureUtils.GetFieldExVentureName(SelectedRetainer.Job)))
                         {
                             foreach (var item in VentureUtils.GetFieldExplorations(SelectedRetainer.Job).Where(x => search.IsNullOrEmpty() || x.GetVentureName().Contains(search, StringComparison.OrdinalIgnoreCase)).Where(x => x.RetainerLevel >= minLevel && x.RetainerLevel <= maxLevel))
@@ -265,8 +261,12 @@ namespace AutoRetainer.UI
                     }
                     ImGui.EndCombo();
                 }
+                else
+                {
+                    Cache.Clear();
+                }
 
-                if(adata.EnablePlanner && adata.VenturePlan.ListUnwrapped.Count > 0)
+                if (adata.EnablePlanner && adata.VenturePlan.ListUnwrapped.Count > 0)
                 {
                     var pct = (float)(adata.VenturePlanIndex) / (float)adata.VenturePlan.ListUnwrapped.Count;
 

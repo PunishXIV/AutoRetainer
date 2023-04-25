@@ -7,6 +7,13 @@ internal static unsafe class DebugMisc
 {
     internal static void Draw()
     {
+        var ocd = Utils.GetCurrentCharacterData();
+        if(ocd != null)
+        {
+            ImGuiEx.Text($"Level array:");
+            ImGuiEx.Text(ocd.ClassJobLevelArray.Print());
+        }
+        
         ImGuiEx.Text($"{Utils.TryGetCurrentRetainer(out var n)}/{n}");
         ImGuiEx.Text($"{ItemLevel.Calculate(out var g, out var p)}/{g}/{p}");
         if (ImGui.Button("Regenerate censor seed"))

@@ -319,13 +319,21 @@ internal unsafe static class MultiModeUI
                             var add = "";
                             if (adata.Ilvl > -1 && !VentureUtils.IsDoL(ret.Job))
                             {
-                                add += $"  {Lang.CharItemLevel}{adata.Ilvl}";
+                                add += $"{Lang.CharItemLevel}{adata.Ilvl}";
                             }
                             if ((adata.Gathering > -1 || adata.Perception > -1) && VentureUtils.IsDoL(ret.Job))
                             {
-                                add += $"  {Lang.CharPlant}{adata.Gathering}/{adata.Perception}";
+                                add += $"{Lang.CharPlant}{adata.Gathering}/{adata.Perception}";
                             }
-                            ImGuiEx.TextV(level.ReplaceByChar(Lang.Digits.Normal, Lang.Digits.GameFont) + add);
+                            bool cap = ret.Level < 90 && data.GetJobLevel(ret.Job) == ret.Level;
+                            if (cap) ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
+                            ImGuiEx.TextV(level.ReplaceByChar(Lang.Digits.Normal, Lang.Digits.GameFont));
+                            if (cap) ImGui.PopStyleColor();
+                            if(add != "")
+                            {
+                                ImGui.SameLine();
+                                ImGuiEx.Text(add);
+                            }
                         }
                         ImGui.TableNextColumn();
                         ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
