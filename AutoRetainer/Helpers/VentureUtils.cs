@@ -128,6 +128,57 @@ namespace AutoRetainer.Helpers
             return normal.Quantity[index];
         }
 
+        internal static int GetVentureRequitement(this RetainerTask task)
+        {
+            if (IsDoL(task.ClassJobCategory.Row))
+            {
+                return task.RequiredGathering;
+            }
+            else
+            {
+                return task.RequiredItemLevel;
+            }
+        }
+
+        internal static (int[] Stat, int[] Amount) GetVentureAmounts(this RetainerTask task, OfflineRetainerData retainer)
+        {
+            var param = task.RetainerTaskParameter.Value;
+            var normal = Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRow(task.Task);
+            List<int> stat = new()
+            {
+                0
+            };
+            List<int> amount = new()
+            {
+                normal.Quantity[0]
+            };
+            if (retainer.Job == (uint)Job.FSH)
+            {
+                for (int i = 0; i < param.PerceptionFSH.Length; i++)
+                {
+                    amount.Add(normal.Quantity[i+1]);
+                    stat.Add(param.PerceptionFSH[i]);
+                }
+            }
+            else if (IsDoL(retainer.Job))
+            {
+                for (int i = 0; i < param.PerceptionDoL.Length; i++)
+                {
+                    amount.Add(normal.Quantity[i+1]);
+                    stat.Add(param.PerceptionDoL[i]);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < param.ItemLevelDoW.Length; i++)
+                {
+                    amount.Add(normal.Quantity[i+1]);
+                    stat.Add(param.ItemLevelDoW[i]);
+                }
+            }
+            return (stat.ToArray(), amount.ToArray());
+        }
+
         internal static string GetFancyVentureName(uint Task, OfflineCharacterData data, OfflineRetainerData retainer, out bool Available)
         {
             return GetVentureById(Task).GetFancyVentureName(data, retainer, out Available);

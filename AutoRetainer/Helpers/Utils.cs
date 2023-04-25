@@ -21,6 +21,11 @@ namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
+    internal static string FancyDigits(this int n)
+    {
+        return n.ToString().ReplaceByChar(Lang.Digits.Normal, Lang.Digits.GameFont);
+    }
+
     internal static int GetJobLevel(this OfflineCharacterData data, uint job)
     {
         var d = Svc.Data.GetExcelSheet<ClassJob>().GetRow(job);

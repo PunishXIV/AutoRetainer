@@ -42,6 +42,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal bool IsNextToBell;
     internal bool ConditionWasEnabled = false;
     internal VenturePlanner VenturePlanner;
+    internal VentureBrowser VentureBrowser;
 
     internal long Time => P.config.UseServerTime ? FFXIVClientStructs.FFXIV.Client.System.Framework.Framework.GetServerTime() : DateTimeOffset.Now.ToUnixTimeSeconds();
 
@@ -65,6 +66,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 ws = new();
                 VenturePlanner = new();
                 ws.AddWindow(VenturePlanner);
+                VentureBrowser = new();
+                ws.AddWindow(VentureBrowser);
                 configGui = new();
                 TaskManager = new() { AbortOnTimeout = true, TimeLimitMS = 20000 };
                 Memory = new();
@@ -72,7 +75,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 Svc.PluginInterface.UiBuilder.OpenConfigUi += delegate { configGui.IsOpen = true; };
                 Svc.ClientState.Logout += Logout;
                 Svc.Condition.ConditionChange += ConditionChange;
-                EzCmd.Add("/autoretainer", CommandHandler, "Open plugin interface\n/autoretainer e|enable → Enable plugin\n/autoretainer d|disable - Disable plugin\n/autoretainer t|toggle - toggle plugin\n/autoretainer m|multi - toggle MultiMode\n/autoretainer relog Character Name@WorldName - relog to the targeted character if configured\n/autoretainer expert - toggle expert settings\n/autoretainer debug - toggle debug menu and verbose output");
+                EzCmd.Add("/autoretainer", CommandHandler, "Open plugin interface\n/autoretainer e|enable → Enable plugin\n/autoretainer d|disable - Disable plugin\n/autoretainer t|toggle - toggle plugin\n/autoretainer m|multi - toggle MultiMode\n/autoretainer relog Character Name@WorldName - relog to the targeted character if configured\n/autoretainer b|browser - open venture browser\n/autoretainer expert - toggle expert settings\n/autoretainer debug - toggle debug menu and verbose output");
                 EzCmd.Add("/ays", CommandHandler);
                 Svc.Toasts.ErrorToast += Toasts_ErrorToast;
                 Svc.Toasts.Toast += Toasts_Toast;
@@ -148,6 +151,10 @@ public unsafe class AutoRetainer : IDalamudPlugin
         else if (arguments.EqualsIgnoreCaseAny("m", "multi"))
         {
             MultiMode.Enabled = !MultiMode.Enabled;
+        }
+        else if (arguments.EqualsIgnoreCaseAny("b", "browser"))
+        {
+            VentureBrowser.IsOpen = !VentureBrowser.IsOpen;
         }
         else if (arguments.StartsWith("relog "))
         {

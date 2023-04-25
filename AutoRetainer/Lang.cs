@@ -12,6 +12,7 @@ internal static class Lang
     internal const string CharDeny = "";
     internal const string CharQuestion = "";
     internal const string CharLevelSync = "";
+    internal const string CharP = "";
 
     internal const string IconRefresh = "\uf2f9";
     internal const string IconMultiMode = "\uf021";
