@@ -11,18 +11,36 @@ namespace AutoRetainer.UI
     {
         OfflineRetainerData SelectedRetainer = null;
         OfflineCharacterData SelectedCharacter = null;
+
         List<VentureBrowserData> Data = new();
+        int MaxGathering = 0;
+        int MaxPerception = 0;
+        int MaxIlvl = 0;
+
         string search = "";
         int minLevel = 1;
         int maxLevel = 90;
         bool GatherBuddyPresent = false;
         public VentureBrowser() : base("Venture Browser")
         {
+            this.SizeConstraints = new()
+            {
+                MinimumSize = new(100, 100),
+                MaximumSize = new(float.MaxValue, float.MaxValue)
+            };
+        }
+
+        internal void Reset()
+        {
+            Data.Clear();
+            MaxGathering = 0;
+            MaxPerception = 0;
+            MaxIlvl = 0;
         }
 
         public override void OnClose()
         {
-            Data.Clear();
+            Reset();
         }
 
         public override void OnOpen()
@@ -43,7 +61,7 @@ namespace AutoRetainer.UI
                         {
                             SelectedRetainer = r;
                             SelectedCharacter = x;
-                            Data.Clear();
+                            Reset();
                         }
                     }
                 }
@@ -52,6 +70,15 @@ namespace AutoRetainer.UI
 
             if (SelectedRetainer != null && SelectedCharacter != null)
             {
+                var adata = Utils.GetAdditionalData(SelectedCharacter.CID, SelectedRetainer.Name);
+                if (VentureUtils.IsDoL(SelectedRetainer.Job))
+                {
+                    ImGuiEx.TextCentered($"{Lang.CharLevel}{SelectedRetainer.Level} {ExcelJobHelper.GetJobNameById(SelectedRetainer.Job)} | Gathering: {adata.Gathering} ({((float)adata.Gathering/(float)MaxGathering):P0}) | Perception: {adata.Perception} ({((float)adata.Perception / (float)MaxPerception):P0})");
+                }
+                else
+                {
+                    ImGuiEx.TextCentered($"{Lang.CharLevel}{SelectedRetainer.Level} {ExcelJobHelper.GetJobNameById(SelectedRetainer.Job)} | Item Level: {adata.Ilvl} ({((float)adata.Ilvl / (float)MaxPerception):P0})");
+                }
                 ImGuiEx.InputWithRightButtonsArea("VBrowser", delegate
                 {
                     ImGui.InputTextWithHint("##search", "Filter...", ref search, 100);
@@ -67,7 +94,6 @@ namespace AutoRetainer.UI
                     ImGui.SetNextItemWidth(50f);
                     ImGui.DragInt("##maxL", ref maxLevel, 1, 1, 90);
                 });
-                var adata = Utils.GetAdditionalData(SelectedCharacter.CID, SelectedRetainer.Name);
                 if(adata.Gathering == -1 || adata.Perception == -1 || adata.Ilvl == -1 || SelectedRetainer.Level == 0)
                 {
                     ImGuiEx.TextWrapped($"Data is absent for this retainer. Access retainer bell and select that retainer to populate data.");
@@ -90,6 +116,9 @@ namespace AutoRetainer.UI
                                 IlvlGathering = VentureUtils.IsDoL(SelectedRetainer.Job) ? v.RequiredGathering : v.RequiredItemLevel,
                             };
                             (ventureBrowserData.Requirements, ventureBrowserData.Amounts) = VentureUtils.GetVentureAmounts(v, SelectedRetainer);
+                            if(v.RequiredGathering > MaxGathering) MaxGathering = v.RequiredGathering;
+                            if(v.RequiredItemLevel > MaxIlvl) MaxIlvl = v.RequiredItemLevel;
+                            if (ventureBrowserData.Requirements[4] > MaxPerception) MaxPerception = ventureBrowserData.Requirements[4];
                             Data.Add(ventureBrowserData);
                         }
                     }
@@ -112,46 +141,36 @@ namespace AutoRetainer.UI
                             var n = x.IsDol ? Lang.CharP : Lang.CharItemLevel;
                             ImGui.TableNextRow();
                             ImGui.TableNextColumn();
-                            ImGuiEx.Text(SelectedRetainer.Level >= x.VentureLevel?ImGuiColors.ParsedGreen:ImGuiColors.DalamudRed, $"{x.VentureLevel}");
+                            ImGuiEx.TextCentered(SelectedRetainer.Level >= x.VentureLevel?ImGuiColors.ParsedGreen:ImGuiColors.DalamudRed, $"{x.VentureLevel}");
                             ImGui.TableNextColumn();
                             ImGuiEx.Text($"{x.VentureName}");
                             ImGui.TableNextColumn();
-                            ImGuiEx.Text(x.AvailableByGear? ImGuiColors.ParsedGreen : ImGuiColors.DalamudRed, $"{x.IlvlGathering}");
+                            ImGuiEx.TextCentered(x.AvailableByGear? ImGuiColors.ParsedGreen : ImGuiColors.DalamudRed, $"{x.IlvlGathering}");
                             ImGui.TableNextColumn();
 
-                            var col = x.AvailableByGear && x.CurrentIndex == 1 ? ImGuiColors.ParsedGreen : ImGuiColors.DalamudWhite;
-                            ImGuiEx.Text(col, $"{n} < {x.Requirements[1]}");
-                            var t = $"{x.Amounts[0].FancyDigits()}";
-                            ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetColumnWidth() / 2 - ImGui.CalcTextSize(t).X / 2);
-                            ImGuiEx.Text(col, t);
+                            Vector4? col = x.AvailableByGear && x.CurrentIndex == 0 ? ImGuiColors.ParsedGreen : null;
+                            ImGuiEx.TextCentered(col, $"  {n} < {x.Requirements[1]}  ");
+                            ImGuiEx.TextCentered(col, $"  {x.Amounts[0].FancyDigits()}  ");
                             ImGui.TableNextColumn();
 
-                            col = x.AvailableByGear && x.CurrentIndex == 2 ? ImGuiColors.ParsedGreen : ImGuiColors.DalamudWhite;
-                            ImGuiEx.Text(col, $"{n} {x.Requirements[1]} - {x.Requirements[2] - 1}");
-                            t = $"{x.Amounts[1].FancyDigits()}";
-                            ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetColumnWidth() / 2 - ImGui.CalcTextSize(t).X / 2);
-                            ImGuiEx.Text(col, t);
+                            col = x.AvailableByGear && x.CurrentIndex == 1 ? ImGuiColors.ParsedGreen : null;
+                            ImGuiEx.TextCentered(col, $"  {n} {x.Requirements[1]} - {x.Requirements[2] - 1}  ");
+                            ImGuiEx.TextCentered(col, $"  {x.Amounts[1].FancyDigits()}  ");
                             ImGui.TableNextColumn();
 
-                            col = x.AvailableByGear && x.CurrentIndex == 3 ? ImGuiColors.ParsedGreen : ImGuiColors.DalamudWhite;
-                            ImGuiEx.Text(col, $"{n} {x.Requirements[2]} - {x.Requirements[3] - 1}");
-                            t = $"{x.Amounts[2].FancyDigits()}";
-                            ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetColumnWidth() / 2 - ImGui.CalcTextSize(t).X / 2);
-                            ImGuiEx.Text(col, t);
+                            col = x.AvailableByGear && x.CurrentIndex == 2 ? ImGuiColors.ParsedGreen : null;
+                            ImGuiEx.TextCentered(col, $"  {n} {x.Requirements[2]} - {x.Requirements[3] - 1}  ");
+                            ImGuiEx.TextCentered(col, $"  {x.Amounts[2].FancyDigits()}  ");
                             ImGui.TableNextColumn();
 
-                            col = x.AvailableByGear && x.CurrentIndex == 4 ? ImGuiColors.ParsedGreen : ImGuiColors.DalamudWhite;
-                            ImGuiEx.Text(col, $"{n} {x.Requirements[3]} - {x.Requirements[4] - 1}");
-                            t = $"{x.Amounts[3].FancyDigits()}";
-                            ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetColumnWidth() / 2 - ImGui.CalcTextSize(t).X / 2);
-                            ImGuiEx.Text(col, t);
+                            col = x.AvailableByGear && x.CurrentIndex == 3 ? ImGuiColors.ParsedGreen : null;
+                            ImGuiEx.TextCentered(col, $"  {n} {x.Requirements[3]} - {x.Requirements[4] - 1}  ");
+                            ImGuiEx.TextCentered(col, $"  {x.Amounts[3].FancyDigits()}  ");
                             ImGui.TableNextColumn();
 
-                            col = x.AvailableByGear && x.CurrentIndex == 5 ? ImGuiColors.ParsedGreen : ImGuiColors.DalamudWhite;
-                            ImGuiEx.Text(col, $"{n} {x.Requirements[4]}+");
-                            t = $"{x.Amounts[4].FancyDigits()}";
-                            ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetColumnWidth() / 2 - ImGui.CalcTextSize(t).X / 2);
-                            ImGuiEx.Text(col, t);
+                            col = x.AvailableByGear && x.CurrentIndex == 4 ? ImGuiColors.ParsedGreen : null;
+                            ImGuiEx.TextCentered(col, $"{n} {x.Requirements[4]}+");
+                            ImGuiEx.TextCentered(col, $"  {x.Amounts[4].FancyDigits()}  ");
                             ImGui.TableNextColumn();
 
                             if (x.IsDol)

@@ -385,6 +385,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         }
         if(flag == ConditionFlag.Gathering)
         {
+            VentureBrowser.Reset();
             OfflineDataManager.WriteOfflineData(true, true);
         }
     }
