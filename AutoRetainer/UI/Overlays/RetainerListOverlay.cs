@@ -66,6 +66,7 @@ internal unsafe class RetainerListOverlay : Window
         {
             if (ImGui.Checkbox("MultiMode", ref MultiMode.Enabled))
             {
+                MultiMode.OnMultiModeEnabled();
                 if (MultiMode.Active)
                 {
                     SchedulerMain.EnablePlugin(PluginEnableReason.MultiMode);

@@ -151,6 +151,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         else if (arguments.EqualsIgnoreCaseAny("m", "multi"))
         {
             MultiMode.Enabled = !MultiMode.Enabled;
+            MultiMode.OnMultiModeEnabled();
         }
         else if (arguments.EqualsIgnoreCaseAny("b", "browser"))
         {

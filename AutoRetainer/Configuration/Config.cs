@@ -25,6 +25,7 @@ internal unsafe class Config : IEzConfig
     public bool GCHandinNotify = false;
     internal bool BypassSanctuaryCheck = false;
     public bool MultiAllowHET = false;
+    public bool MultiHETOnEnable = true;
     public bool UseServerTime = true;
     public bool NoTheme = false;
     public Dictionary<string, AdditionalRetainerData> AdditionalData = new();
@@ -64,6 +65,8 @@ internal unsafe class Config : IEzConfig
     public List<VenturePlan> SavedPlans = new();
     public bool MultiWaitOnLoginScreen = false;
     public UnavailableVentureDisplay UnavailableVentureDisplay = UnavailableVentureDisplay.Hide;
+
+    public bool ShowAdditionalInfo = true;
 
     internal bool DontReassign
     {

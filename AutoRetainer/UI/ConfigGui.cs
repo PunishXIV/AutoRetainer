@@ -59,7 +59,10 @@ unsafe internal class ConfigGui : Window
             ImGuiEx.Text(GradientColor.Get(ImGuiColors.DalamudGrey, ImGuiColors.DalamudGrey3, 500), $"Paused");
         }
         ImGui.SameLine();
-        ImGui.Checkbox("Multi", ref MultiMode.Enabled);
+        if(ImGui.Checkbox("Multi", ref MultiMode.Enabled))
+        {
+            MultiMode.OnMultiModeEnabled();
+        }
         if(P.config.CharEqualize && MultiMode.Enabled)
         {
             ImGui.SameLine();

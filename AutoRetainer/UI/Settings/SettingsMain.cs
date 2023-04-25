@@ -10,6 +10,15 @@ internal static class SettingsMain
 {
     internal static void Draw()
     {
+        ImGuiEx.EzTabBar("GeneralSettings",
+            ("General", TabGeneral, null, true),
+            ("Multi Mode", TabMulti, null, true),
+            ("Other", TabOther, null, true)
+            );
+    }
+
+    static void TabGeneral()
+    {
         ImGuiHelpers.ScaledDummy(5f);
         InfoBox.DrawBox("Settings", delegate
         {
@@ -23,6 +32,8 @@ internal static class SettingsMain
             ImGui.SetNextItemWidth(100f);
             ImGuiEx.SliderIntAsFloat("Interaction Delay, seconds", ref P.config.Delay.ValidateRange(10, 1000), 20, 1000);
             ImGuiComponents.HelpMarker("The lower this value is the faster plugin will use actions. When dealing with low FPS or high latency you may want to increase this value. If you want the plugin to operate faster you may decrease it. ");
+            ImGui.Checkbox($"Display Extended Retainer Info", ref P.config.ShowAdditionalInfo);
+            ImGuiComponents.HelpMarker("Displays retainer item level/gathering/perception and the name of their current venture in the main UI.");
         });
         InfoBox.DrawBox("Operation", delegate
         {
@@ -45,26 +56,30 @@ internal static class SettingsMain
             }
             ImGuiComponents.HelpMarker("Only reassign ventures that retainers are undertaking.");
 
+            var d = MultiMode.GetAutoAfkOpt() != 0;
+            if (d) ImGui.BeginDisabled();
             ImGui.Checkbox("RetainerSense", ref P.config.RetainerSense);
             ImGuiComponents.HelpMarker($"AutoRetainer will automatically enable itself when the player is within interaction range of a Summoning Bell. You must remain stationary or the activation will be cancelled.");
+            if (d)
+            {
+                ImGui.EndDisabled();
+                ImGuiComponents.HelpMarker("Using RetainerSense requires Auto-afk option to be turned off.");
+            }
             ImGui.SetNextItemWidth(200f);
             ImGuiEx.SliderIntAsFloat("Activation Time", ref P.config.RetainerSenseThreshold, 1000, 100000);
         });
+    }
 
-        InfoBox.DrawBox("Keybinds", delegate
-        {
-            DrawKeybind("Temporarily prevents AutoRetainer from being automatically enabled when using a Summoning Bell", ref P.config.Suppress);
-            DrawKeybind("Temporarily set the Collect Operation mode, preventing ventures from being assigned for the current cycle", ref P.config.TempCollectB);
-        });
-
-        InfoBox.DrawBox("Multi Mode", delegate
+    static void TabMulti()
     {
+        ImGuiHelpers.ScaledDummy(5f);
         ImGui.Checkbox("Wait For Venture Completion", ref P.config.MultiWaitForAll);
         ImGuiComponents.HelpMarker("AutoRetainer will wait for all ventures to return before cycling to the next character in multi mode operation.");
         ImGui.SetNextItemWidth(60);
         ImGui.DragInt("Advance Relog Threshold", ref P.config.AdvanceTimer.ValidateRange(0, 300), 0.1f, 0, 300);
         ImGui.Checkbox($"Housing Bell Support", ref P.config.MultiAllowHET);
         ImGuiEx.TextWrapped(ImGuiColors.DalamudOrange, $"A Summoning Bell must be within range of the spawn point once the home is entered.");
+        ImGui.Checkbox($"Upon activating Multi Mode, attempt to enter nearby house", ref P.config.MultiHETOnEnable);
         ImGui.Checkbox($"Display Login Overlay", ref P.config.LoginOverlay);
         ImGui.Checkbox($"Enforce Full Character Rotation", ref P.config.CharEqualize);
         ImGuiComponents.HelpMarker("Recommended for users with > 15 characters, forces multi mode to make sure ventures are processed on all characters in order before returning to the beginning of the cycle.");
@@ -105,19 +120,7 @@ internal static class SettingsMain
             ImGuiEx.TextV(Censor.Character(P.config.OfflineData[index].Name));
             ImGui.PopID();
         }
-    });
-        InfoBox.DrawBox("Quick Retainer Action", delegate
-        {
-            QRA("Sell Item", ref P.config.SellKey);
-            QRA("Entrust Item", ref P.config.EntrustKey);
-            QRA("Retrieve Item", ref P.config.RetrieveKey);
-            QRA("Put up For Sale", ref P.config.SellMarketKey);
-        });
-        InfoBox.DrawBox("Statistics", delegate
-        {
-            ImGui.Checkbox($"Record Venture Statistics", ref P.config.RecordStats);
-        });
-        InfoBox.DrawBox("Automatic Grand Company Expert Delivery", AutoGCHandinUI.Draw);
+
         if (P.config.Blacklist.Any())
         {
             InfoBox.DrawBox("Excluded Characters", delegate
@@ -136,6 +139,29 @@ internal static class SettingsMain
                 }
             });
         }
+    }
+
+    static void TabOther()
+    {
+        ImGuiHelpers.ScaledDummy(5f);
+        InfoBox.DrawBox("Keybinds", delegate
+        {
+            DrawKeybind("Temporarily prevents AutoRetainer from being automatically enabled when using a Summoning Bell", ref P.config.Suppress);
+            DrawKeybind("Temporarily set the Collect Operation mode, preventing ventures from being assigned for the current cycle", ref P.config.TempCollectB);
+        });
+
+        InfoBox.DrawBox("Quick Retainer Action", delegate
+        {
+            QRA("Sell Item", ref P.config.SellKey);
+            QRA("Entrust Item", ref P.config.EntrustKey);
+            QRA("Retrieve Item", ref P.config.RetrieveKey);
+            QRA("Put up For Sale", ref P.config.SellMarketKey);
+        });
+        InfoBox.DrawBox("Statistics", delegate
+        {
+            ImGui.Checkbox($"Record Venture Statistics", ref P.config.RecordStats);
+        });
+        InfoBox.DrawBox("Automatic Grand Company Expert Delivery", AutoGCHandinUI.Draw);
     }
 
     static void QRA(string text, ref Keys key)

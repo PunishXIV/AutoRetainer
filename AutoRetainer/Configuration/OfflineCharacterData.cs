@@ -1,4 +1,6 @@
-﻿namespace AutoRetainer.Configuration;
+﻿using Lumina.Excel.GeneratedSheets;
+
+namespace AutoRetainer.Configuration;
 
 [Serializable]
 public class OfflineCharacterData
@@ -19,6 +21,7 @@ public class OfflineCharacterData
     public GCDeliveryType GCDeliveryType = GCDeliveryType.Disabled;
     public HashSet<uint> UnlockedGatheringItems = new();
     public short[] ClassJobLevelArray = new short[30];
+    public uint Gil = 0;
 
     internal string Identity => $"{CID}";
 

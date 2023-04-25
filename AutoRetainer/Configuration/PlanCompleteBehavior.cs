@@ -10,6 +10,7 @@ namespace AutoRetainer.Configuration
     {
         Restart_plan,
         Assign_Quick_Venture,
-        Do_nothing
+        Do_nothing,
+        Repeat_last_venture
     }
 }

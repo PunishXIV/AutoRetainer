@@ -43,6 +43,16 @@ internal unsafe static class SchedulerMain
     {
         if (PluginEnabled)
         {
+            if (P.config.RetainerSense && MultiMode.GetAutoAfkOpt() != 0)
+            {
+                P.config.RetainerSense = false;
+                DuoLog.Warning("Using RetainerSense requires Auto-afk option to be turned off. That option has been automatically disabled.");
+            }
+            if (P.config.OldRetainerSense && MultiMode.GetAutoAfkOpt() != 0)
+            {
+                P.config.OldRetainerSense = false;
+                DuoLog.Warning("Using old RetainerSense requires Auto-afk option to be turned off. That option has been automatically disabled.");
+            }
             if (TryGetAddonByName<AtkUnitBase>("RetainerList", out var addon) && addon->IsVisible)
             {
                 if (Utils.GenericThrottle)
@@ -111,11 +121,19 @@ internal unsafe static class SchedulerMain
                                         if (next == 0 || (completed && adata.VenturePlan.PlanCompleteBehavior != PlanCompleteBehavior.Restart_plan))
                                         {
                                             P.DebugLog($"Completed and behavior is {adata.VenturePlan.PlanCompleteBehavior}");
-                                            TaskCollectVenture.Enqueue();
-                                            if (adata.VenturePlan.PlanCompleteBehavior == PlanCompleteBehavior.Assign_Quick_Venture)
+                                            if (adata.VenturePlan.PlanCompleteBehavior == PlanCompleteBehavior.Repeat_last_venture)
                                             {
-                                                P.DebugLog($"Assigning quick venture");
-                                                TaskAssignQuickVenture.Enqueue();
+                                                P.DebugLog($"Reassigning this venture and disabling planner");
+                                                TaskReassignVenture.Enqueue();
+                                            }
+                                            else
+                                            {
+                                                TaskCollectVenture.Enqueue();
+                                                if (adata.VenturePlan.PlanCompleteBehavior == PlanCompleteBehavior.Assign_Quick_Venture)
+                                                {
+                                                    P.DebugLog($"Assigning quick venture");
+                                                    TaskAssignQuickVenture.Enqueue();
+                                                }
                                             }
                                             adata.EnablePlanner = false;
                                             P.DebugLog($"Now disabling planner");

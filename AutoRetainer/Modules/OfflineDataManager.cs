@@ -5,6 +5,7 @@ using ECommons.Events;
 using ECommons.ExcelServices;
 using ECommons.GameHelpers;
 using ECommons.Throttlers;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using Lumina.Excel.GeneratedSheets;
 
@@ -48,6 +49,7 @@ internal unsafe static class OfflineDataManager
         }
         data.World = ExcelWorldHelper.GetWorldNameById(Svc.ClientState.LocalPlayer.HomeWorld.Id);
         data.Name = Svc.ClientState.LocalPlayer.Name.ToString();
+        data.Gil = (uint)InventoryManager.Instance()->GetInventoryItemCount(1);
         for (int i = 0; i < 30; i++)
         {
             data.ClassJobLevelArray[i] = UIState.Instance()->PlayerState.ClassJobLevelArray[i];
@@ -83,7 +85,8 @@ internal unsafe static class OfflineDataManager
                     HasVenture = ret.VentureID != 0,
                     Level = ret.Level,
                     Job = ret.ClassJob,
-                    VentureID = ret.VentureID
+                    VentureID = ret.VentureID, 
+                    Gil = ret.Gil,
                 }) ;
             }
         }

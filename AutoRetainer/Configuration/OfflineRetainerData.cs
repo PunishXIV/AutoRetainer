@@ -10,6 +10,7 @@ public class OfflineRetainerData : IEquatable<OfflineRetainerData>
     public long VentureBeginsAt = 0;
     public uint Job = 0;
     public uint VentureID = 0;
+    public uint Gil = 0;
 
     internal string Identity => $"{Name}";
 

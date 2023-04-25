@@ -27,9 +27,11 @@ internal unsafe static class MultiMode
     internal static bool Synchronize = false;
     internal static long NextInteractionAt { get; private set; } = 0;
     internal static ulong LastLogin = 0;
+    internal static bool IsAutoLogin = false;
     internal static CircularBuffer<long> Interactions = new(5);
 
     internal static Dictionary<ulong, int> CharaCnt = new();
+    internal static bool CanHET => Active && P.config.MultiAllowHET && ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType);
 
     internal static void Init()
     {
@@ -43,7 +45,7 @@ internal unsafe static class MultiMode
             }
             LastLogin = Svc.ClientState.LocalContentId;
             Interactions.Clear();
-            if (Active && P.config.MultiAllowHET && ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType))
+            if (CanHET)
             {
                 P.DebugLog($"ProperOnLogin: {Svc.ClientState.LocalPlayer}, residential area, scheduling HET");
                 HouseEnterTask.EnqueueTask();
@@ -52,14 +54,22 @@ internal unsafe static class MultiMode
         });
         if (ProperOnLogin.PlayerPresent)
         {
-            LastLogin = Svc.ClientState.LocalContentId;
             WriteOfflineData(true, true);
+        }
+    }
+
+    internal static void OnMultiModeEnabled()
+    {
+        if (!Enabled) return;
+        if (P.config.MultiHETOnEnable && CanHET && Player.Available)
+        {
+            HouseEnterTask.EnqueueTask();
         }
     }
 
     internal static int GetAutoAfkOpt()
     {
-        return ConfigModule.Instance()->GetIntValue(145);
+        return (int)(Svc.GameConfig.System.TryGetUInt("AutoAfkSwitchingTime", out var val) ? val : 1);
     }
 
     internal static void Tick()
@@ -188,6 +198,10 @@ internal unsafe static class MultiMode
                     }
                 }
             }
+        }
+        else
+        {
+            LastLogin = 0;
         }
     }
 

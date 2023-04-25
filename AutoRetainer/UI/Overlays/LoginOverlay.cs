@@ -43,7 +43,10 @@ namespace AutoRetainer.UI.Overlays
             ImGui.PopFont();
             ImGuiEx.ImGuiLineCentered("LoginCenter", delegate
             {
-                ImGui.Checkbox("Multi Mode", ref MultiMode.Enabled);
+                if(ImGui.Checkbox("Multi Mode", ref MultiMode.Enabled))
+                {
+                    MultiMode.OnMultiModeEnabled();
+                }
             });
         }
     }

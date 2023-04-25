@@ -7,6 +7,10 @@ internal static unsafe class DebugMisc
 {
     internal static void Draw()
     {
+        foreach(var x in P.config.OfflineData)
+        {
+            ImGuiEx.Text($"{x.Name}@{x.World}: {(x.Gil + x.RetainerData.Sum(z => z.Gil))}");
+        }
         var ocd = Utils.GetCurrentCharacterData();
         if(ocd != null)
         {

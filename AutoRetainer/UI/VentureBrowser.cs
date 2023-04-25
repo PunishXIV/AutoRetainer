@@ -1,4 +1,5 @@
 ﻿using ECommons.ExcelServices;
+using ECommons.GameHelpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,7 +54,7 @@ namespace AutoRetainer.UI
             ImGuiEx.SetNextItemFullWidth();
             if (ImGui.BeginCombo("##selectRet", SelectedCharacter != null?$"{Censor.Character(SelectedCharacter.Name, SelectedCharacter.World)} - {Censor.Retainer(SelectedRetainer.Name)} - {SelectedRetainer.Level} {ExcelJobHelper.GetJobNameById(SelectedRetainer.Job)}" : "Select a retainer..."))
             {
-                foreach (var x in P.config.OfflineData)
+                foreach (var x in P.config.OfflineData.OrderBy(x => !P.config.NoCurrentCharaOnTop && x.CID == Player.CID ? 0 : 1))
                 {
                     foreach (var r in x.RetainerData)
                     {

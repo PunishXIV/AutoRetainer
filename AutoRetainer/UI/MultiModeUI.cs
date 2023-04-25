@@ -12,18 +12,6 @@ internal unsafe static class MultiModeUI
     static Dictionary<string, (Vector2 start, Vector2 end)> bars = new();
     internal static void Draw()
     {
-        if(MultiMode.Enabled && MultiMode.GetAutoAfkOpt() != 0)
-        {
-            ImGuiEx.TextWrapped(ImGuiColors.DalamudRed, "Multi Mode requires Auto-afk option to be turned off");
-        }
-        /*if (ImGui.CollapsingHeader("Setup Guide"))
-        {
-            ImGuiEx.TextWrapped("1. Log into each of your characters, assign necessary ventures to your retainers and enable retainers that you want to resend on each character.");
-            ImGuiEx.TextWrapped("2. For each character, configure character index. Character index is position of your character on a screen where you select characters. If you only have one character per world, it's usually just 1.");
-            ImGuiEx.TextWrapped("3. Ensure that your characters are in their home worlds and close to retainer bells, preferably in not crowded areas. No housing retainer bells. The suggested place is the inn.");
-            ImGuiEx.TextWrapped("4. Characters that ran out of ventures or inventory space will be automatically excluded from rotation. You will need to reenable them once you clean up inventory and restock ventures.");
-            ImGuiEx.TextWrapped("5. You may set up one character to be preferred. When no retainers have upcoming ventures in next 15 minutes, you will be relogged back on that character.");
-        }*/
         P.config.OfflineData.RemoveAll(x => P.config.Blacklist.Any(z => z.CID == x.CID));
         var sortedData = new List<OfflineCharacterData>();
         var shouldExpand = false;
@@ -329,7 +317,7 @@ internal unsafe static class MultiModeUI
                             if (cap) ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
                             ImGuiEx.TextV(level.ReplaceByChar(Lang.Digits.Normal, Lang.Digits.GameFont));
                             if (cap) ImGui.PopStyleColor();
-                            if(add != "")
+                            if(P.config.ShowAdditionalInfo && add != "")
                             {
                                 ImGui.SameLine();
                                 ImGuiEx.Text(add);
@@ -337,7 +325,7 @@ internal unsafe static class MultiModeUI
                         }
                         ImGui.TableNextColumn();
                         ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
-                        if (ret.VentureID != 0)
+                        if (ret.VentureID != 0 && P.config.ShowAdditionalInfo)
                         {
                             var parts = VentureUtils.GetVentureById(ret.VentureID).GetFancyVentureNameParts(data, ret, out _);
                             if (!parts.Name.IsNullOrEmpty())
