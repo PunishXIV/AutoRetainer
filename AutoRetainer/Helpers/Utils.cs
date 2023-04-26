@@ -59,6 +59,17 @@ internal static unsafe class Utils
             && !TryGetAddonByName<AtkUnitBase>("TitleConnect", out _);
     }
 
+    internal static OfflineCharacterData GetOfflineCharacterDataFromAdditionalRetainerDataKey(string key)
+    {
+        var cid = ulong.Parse(key.Split(" ")[0].Replace("#", ""), System.Globalization.NumberStyles.HexNumber);
+        return P.config.OfflineData.FirstOrDefault(x => x.CID == cid);
+    }
+
+    internal static OfflineRetainerData GetOfflineRetainerDataFromAdditionalRetainerDataKey(string key)
+    {
+        return GetOfflineCharacterDataFromAdditionalRetainerDataKey(key).RetainerData.FirstOrDefault(x => x.Name == key.Split(" ")[1]);
+    }
+
     internal static uint GetNextPlannedVenture(this AdditionalRetainerData data)
     {
         var index = data.GetNextPlannedVentureIndex();
@@ -192,12 +203,18 @@ internal static unsafe class Utils
 
     internal static AdditionalRetainerData GetAdditionalData(ulong cid, string name)
     {
+        var key = GetAdditionalDataKey(cid, name, true);
+        return P.config.AdditionalData[key];
+    }
+
+    internal static string GetAdditionalDataKey(ulong cid, string name, bool create = true)
+    {
         var key = $"#{cid:X16} {name}";
-        if (!P.config.AdditionalData.ContainsKey(key))
+        if (create && !P.config.AdditionalData.ContainsKey(key))
         {
             P.config.AdditionalData[key] = new();
         }
-        return P.config.AdditionalData[key];
+        return key;
     }
 
     internal static bool GenericThrottle => EzThrottler.Throttle("AutoRetainerGenericThrottle", P.config.Delay);

@@ -115,6 +115,9 @@ namespace AutoRetainer.UI
                                 CurrentIndex = parts.YieldRate,
                                 IsDol = VentureUtils.IsDoL(SelectedRetainer.Job),
                                 IlvlGathering = VentureUtils.IsDoL(SelectedRetainer.Job) ? v.RequiredGathering : v.RequiredItemLevel,
+                                Available = avail,
+                                ID = v.RowId,
+                                ItemID = v.GetVentureItemId()
                             };
                             (ventureBrowserData.Requirements, ventureBrowserData.Amounts) = VentureUtils.GetVentureAmounts(v, SelectedRetainer);
                             if(v.RequiredGathering > MaxGathering) MaxGathering = v.RequiredGathering;
@@ -145,6 +148,15 @@ namespace AutoRetainer.UI
                             ImGuiEx.TextCentered(SelectedRetainer.Level >= x.VentureLevel?ImGuiColors.ParsedGreen:ImGuiColors.DalamudRed, $"{x.VentureLevel}");
                             ImGui.TableNextColumn();
                             ImGuiEx.Text($"{x.VentureName}");
+                            if(ImGui.SmallButton("To planner"))
+                            {
+                                adata.VenturePlan.List.Add(new(x.ID));
+                            }
+                            ImGui.SameLine();
+                            if (ImGui.SmallButton("Check price"))
+                            {
+                                Svc.Commands.ProcessCommand($"/pmb {x.ItemID}");
+                            }
                             ImGui.TableNextColumn();
                             ImGuiEx.TextCentered(x.AvailableByGear? ImGuiColors.ParsedGreen : ImGuiColors.DalamudRed, $"{x.IlvlGathering}");
                             ImGui.TableNextColumn();
@@ -209,6 +221,9 @@ namespace AutoRetainer.UI
             internal int VentureLevel;
             internal bool IsDol;
             internal int IlvlGathering;
+            internal bool Available;
+            internal uint ID;
+            internal uint ItemID;
         }
     }
 }
