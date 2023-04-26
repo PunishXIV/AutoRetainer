@@ -148,12 +148,12 @@ namespace AutoRetainer.UI
                             ImGuiEx.TextCentered(SelectedRetainer.Level >= x.VentureLevel?ImGuiColors.ParsedGreen:ImGuiColors.DalamudRed, $"{x.VentureLevel}");
                             ImGui.TableNextColumn();
                             ImGuiEx.Text($"{x.VentureName}");
-                            if(ImGui.SmallButton("To planner"))
+                            if(ImGui.SmallButton($"To planner##{x.ID}"))
                             {
                                 adata.VenturePlan.List.Add(new(x.ID));
                             }
                             ImGui.SameLine();
-                            if (ImGui.SmallButton("Check price"))
+                            if (ImGui.SmallButton($"Check price##{x.ID}"))
                             {
                                 Svc.Commands.ProcessCommand($"/pmb {x.ItemID}");
                             }
@@ -191,7 +191,7 @@ namespace AutoRetainer.UI
                                 ImGuiEx.Text(x.Gathered?ImGuiColors.ParsedGreen:ImGuiColors.DalamudRed, x.Gathered?"Yes":"No");
                                 if(!x.Gathered && GatherBuddyPresent)
                                 {
-                                    if (ImGui.SmallButton($"Gather##{x.VentureName}"))
+                                    if (ImGui.SmallButton($"Gather##{x.ID}"))
                                     {
                                         Svc.Commands.ProcessCommand($"/gather {x.VentureName}");
                                     }
