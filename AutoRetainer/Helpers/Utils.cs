@@ -7,6 +7,7 @@ using Dalamud.Memory;
 using ECommons.Events;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameFunctions;
+using ECommons.GameHelpers;
 using ECommons.MathHelpers;
 using ECommons.Reflection;
 using ECommons.Throttlers;
@@ -20,6 +21,93 @@ namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
+    internal static string FancyDigits(this int n)
+    {
+        return n.ToString().ReplaceByChar(Lang.Digits.Normal, Lang.Digits.GameFont);
+    }
+
+    internal static int GetJobLevel(this OfflineCharacterData data, uint job)
+    {
+        var d = Svc.Data.GetExcelSheet<ClassJob>().GetRow(job);
+        if(d != null)
+        {
+            try
+            {
+                return data.ClassJobLevelArray[d.ExpArrayIndex];
+            }
+            catch (Exception) { }
+        }
+        return 0;
+    }
+
+    internal static OfflineCharacterData GetCurrentCharacterData()
+    {
+        return P.config.OfflineData.FirstOrDefault(x => x.CID == Player.CID);
+    }
+
+    internal static bool CanAutoLogin()
+    {
+        return !Svc.ClientState.IsLoggedIn 
+            && !Svc.Condition.Any() 
+            && !P.TaskManager.IsBusy 
+            && !AutoLogin.Instance.IsRunning 
+            && TryGetAddonByName<AtkUnitBase>("_TitleMenu", out var title) 
+            && IsAddonReady(title) 
+            && title->UldManager.NodeListCount > 3 
+            && title->UldManager.NodeList[3]->Color.A == 0xFF 
+            && !TryGetAddonByName<AtkUnitBase>("TitleDCWorldMap", out _) 
+            && !TryGetAddonByName<AtkUnitBase>("TitleConnect", out _);
+    }
+
+    internal static uint GetNextPlannedVenture(this AdditionalRetainerData data)
+    {
+        var index = data.GetNextPlannedVentureIndex();
+        if(index == -1)
+        {
+            return 0;
+        }
+        else
+        {
+            return data.VenturePlan.ListUnwrapped[index];
+        }
+    }
+
+    internal static int GetNextPlannedVentureIndex(this AdditionalRetainerData data)
+    {
+        if (data.VenturePlan.ListUnwrapped.Count == 0)
+        {
+            return -1;
+        }
+        else
+        {
+            if(data.VenturePlanIndex >= data.VenturePlan.ListUnwrapped.Count)
+            {
+                if(data.VenturePlan.PlanCompleteBehavior == PlanCompleteBehavior.Restart_plan)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return -1;
+                }
+            }
+            else
+            {
+                return (int)data.VenturePlanIndex;
+            }
+        }
+    }
+
+    internal static bool IsLastPlannedVenture(this AdditionalRetainerData data)
+    {
+        return data.VenturePlanIndex >= data.VenturePlan.ListUnwrapped.Count;
+    }
+
+    internal static bool IsVenturePlannerActive(this AdditionalRetainerData data)
+    {
+        return data.EnablePlanner && data.VenturePlan.ListUnwrapped.Count > 0;
+    }
+
     internal static DateTime DateFromTimeStamp(uint timeStamp)
     {
         const long timeFromEpoch = 62135596800;
@@ -80,7 +168,7 @@ internal static unsafe class Utils
     {
         foreach (var x in Svc.Objects)
         {
-            if ((x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Consts.BellName, "リテイナーベル"))
+            if ((x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName, "リテイナーベル"))
             {
                 if (Vector3.Distance(x.Position, Svc.ClientState.LocalPlayer.Position) < GetValidInteractionDistance(x) && x.IsTargetable())
                 {
@@ -201,7 +289,7 @@ internal static unsafe class Utils
         GameObject currentObject = null;
         foreach (var x in Svc.Objects)
         {
-            if (x.IsTargetable() && x.Name.ToString() == "Entrance")
+            if (x.IsTargetable() && x.Name.ToString().EqualsAny(Lang.Entrance))
             {
                 var distance = Vector3.Distance(Svc.ClientState.LocalPlayer.Position, x.Position);
                 if (distance < currentDistance)
@@ -300,7 +388,7 @@ internal static unsafe class Utils
     {
         return o != null &&
             (o.ObjectKind == ObjectKind.EventObj || o.ObjectKind == ObjectKind.Housing)
-            && o.Name.ToString().EqualsIgnoreCaseAny(Consts.BellName, "リテイナーベル");
+            && o.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName, "リテイナーベル");
     }
 
     internal static long GetVentureSecondsRemaining(this SeRetainer ret, bool allowNegative = true)

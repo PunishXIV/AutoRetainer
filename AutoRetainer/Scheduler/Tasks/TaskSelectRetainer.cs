@@ -7,7 +7,7 @@ internal static class TaskSelectRetainer
     internal static void Enqueue(string name)
     {
         P.TaskManager.Enqueue(YesAlready.WaitForYesAlreadyDisabledTask);
-        P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(name));
-        P.TaskManager.Enqueue(() => Utils.TryGetCurrentRetainer(out _));
+        P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(name), $"RetainerListHandlers.SelectRetainerByName({name})");
+        P.TaskManager.Enqueue(() => Utils.TryGetCurrentRetainer(out _), $"Utils.TryGetCurrentRetainer");
     }
 }

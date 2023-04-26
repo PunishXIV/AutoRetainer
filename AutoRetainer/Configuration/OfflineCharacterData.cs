@@ -1,4 +1,6 @@
-﻿namespace AutoRetainer.Configuration;
+﻿using Lumina.Excel.GeneratedSheets;
+
+namespace AutoRetainer.Configuration;
 
 [Serializable]
 public class OfflineCharacterData
@@ -17,6 +19,11 @@ public class OfflineCharacterData
     public bool EnableGCArmoryHandin = false; //todo: remove
     public bool ShouldSerializeEnableGCArmoryHandin() => false;
     public GCDeliveryType GCDeliveryType = GCDeliveryType.Disabled;
+    public HashSet<uint> UnlockedGatheringItems = new();
+    public short[] ClassJobLevelArray = new short[30];
+    public uint Gil = 0;
+
+    internal string Identity => $"{CID}";
 
     internal uint CharaIndex
     {
@@ -32,6 +39,6 @@ public class OfflineCharacterData
 
     public override string ToString()
     {
-        return P.config.Verbose ? $"{Name}@{World} #{CID:X16}" : $"{Name}@{World}";
+        return P.config.Verbose ? $"{Name}@{World}" : $"{Name}@{World}";
     }
 }

@@ -1,40 +1,41 @@
 using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace AutoRetainer.UI.Overlays;
 
 internal unsafe class AutoGCHandinOverlay : Window
 {
     internal float height;
+    internal bool Allowed = false;
     public AutoGCHandinOverlay() : base("AutoRetainer GC Handin overlay", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysUseWindowPadding | ImGuiWindowFlags.AlwaysAutoResize, true)
     {
         RespectCloseHotkey = false;
-    }
-
-    public override void PreDraw()
-    {
-        //ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, Vector2.Zero);
+        this.IsOpen = true;
     }
 
     public override void Draw()
     {
-        ImGui.Checkbox("Enable Automatic Expert Delivery", ref AutoGCHandin.Operation);
+        if (Allowed)
+        {
+            ImGui.Checkbox("Enable Automatic Expert Delivery", ref AutoGCHandin.Operation);
+        }
         if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var d) && !AutoGCHandin.Operation) 
         {
             ImGui.SameLine();
             ImGui.SetNextItemWidth(200);
-            ImGuiEx.EnumCombo("##mode", ref d.GCDeliveryType, x => x != GCDeliveryType.Disabled);
+            ImGuiEx.EnumCombo("##mode", ref d.GCDeliveryType);
             if (d.GCDeliveryType == GCDeliveryType.Hide_Gear_Set_Items)
             {
                 ImGui.SameLine();
                 ImGui.PushFont(UiBuilder.IconFont);
-                ImGuiEx.Text($"\uf071");
+                ImGuiEx.Text(Lang.IconWarning);
                 ImGui.PopFont();
             }
             if (d.GCDeliveryType == GCDeliveryType.Show_All_Items)
             {
                 ImGui.SameLine();
                 ImGui.PushFont(UiBuilder.IconFont);
-                ImGuiEx.Text($"\uf071\uf071\uf071");
+                ImGuiEx.Text($"{Lang.IconWarning}{Lang.IconWarning}{Lang.IconWarning}");
                 ImGui.PopFont();
             }
         }
@@ -47,8 +48,10 @@ internal unsafe class AutoGCHandinOverlay : Window
         height = ImGui.GetWindowSize().Y;
     }
 
-    public override void PostDraw()
+    public override bool DrawConditions()
     {
-        //ImGui.PopStyleVar();
+        return Svc.Condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.OccupiedInQuestEvent] && (Allowed || (TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon)
+                && addon->UldManager.NodeListCount > 20
+                && addon->UldManager.NodeList[5]->IsVisible));
     }
 }

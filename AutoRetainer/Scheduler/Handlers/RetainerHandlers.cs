@@ -3,10 +3,13 @@ using AutoRetainer.Scheduler.Tasks;
 using ClickLib.Clicks;
 using Dalamud.Memory;
 using Dalamud.Utility;
+using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using Lumina.Excel.GeneratedSheets;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace AutoRetainer.Scheduler.Handlers;
 
@@ -105,7 +108,7 @@ internal unsafe static class RetainerHandlers
 
     internal static bool? SelectQuickExploration()
     {
-        return Utils.TrySelectSpecificEntry(Consts.QuickExploration);
+        return Utils.TrySelectSpecificEntry(Lang.QuickExploration);
     }
 
     internal static bool? SelectEntrustItems()
@@ -130,8 +133,9 @@ internal unsafe static class RetainerHandlers
             var button = (AtkComponentButton*)addon->UldManager.NodeList[invName.EntrustDuplicatesIndex]->GetComponent();
             if (addon->UldManager.NodeList[invName.EntrustDuplicatesIndex]->IsVisible && button->IsEnabled && Utils.GenericThrottle)
             {
-                new ClickButtonGeneric(addon, invName.Name).Click(button);
-                P.DebugLog($"Clicked entrust duplicates");
+                //new ClickButtonGeneric(addon, invName.Name).Click(button);
+                Callback(addon, (int)0);
+                P.DebugLog($"Clicked entrust duplicates {invName.Name} {invName.EntrustDuplicatesIndex}");
                 return true;
             }
         }
@@ -335,6 +339,37 @@ internal unsafe static class RetainerHandlers
                         //new ClickButtonGeneric(addon, "Bank").Click(cancel);
                         return true;
                     }
+                }
+            }
+        }
+        else
+        {
+            Utils.RethrottleGeneric();
+        }
+        return false;
+    }
+
+    public static bool? GenericSelectByName(params string[] text)
+    {
+        return Utils.TrySelectSpecificEntry(text);
+    }
+
+    public static bool? SelectSpecificVenture(uint VentureID)
+    {
+        if (TryGetAddonByName<AtkUnitBase>("RetainerTaskList", out var addon) && IsAddonReady(addon))
+        {
+            var ventureData = Svc.Data.GetExcelSheet<RetainerTask>().GetRow(VentureID);
+            var ventureName = ventureData.GetVentureName();
+            if (Utils.GenericThrottle && EzThrottler.Throttle("AssignSpecificVenture", 1000))
+            {
+                if (VentureUtils.GetAvailableVentureNames().Contains(ventureName))
+                {
+                    Callback(addon, (int)11, (int)VentureID);
+                    return true;
+                }
+                else
+                {
+                    PluginLog.Error($"Can not find venture id {VentureID} [{ventureName}] in list {VentureUtils.GetAvailableVentureNames().Print()}");
                 }
             }
         }

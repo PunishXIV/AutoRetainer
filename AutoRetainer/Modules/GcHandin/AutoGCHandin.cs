@@ -104,12 +104,12 @@ internal unsafe static class AutoGCHandin
                     }
                     else
                     {
-                        Overlay.IsOpen = true;
+                        Overlay.Allowed = true;
                         if (EzThrottler.Check("AutoGCHandin"))
                         {
                             try
                             {
-                                var sealsCnt = MemoryHelper.ReadSeString(&addon->UldManager.NodeList[23]->GetAsAtkTextNode()->NodeText).ExtractText().Replace(",", "").Replace(".", "").Split("/");
+                                var sealsCnt = MemoryHelper.ReadSeString(&addon->UldManager.NodeList[23]->GetAsAtkTextNode()->NodeText).ExtractText().ReplaceByChar(",. ", "", true).Split("/");
                                 if (sealsCnt.Length != 2)
                                 {
                                     throw new FormatException();
@@ -163,20 +163,20 @@ internal unsafe static class AutoGCHandin
                 }
                 else
                 {
-                    Overlay.IsOpen = IsReadyToOperate(addon);
+                    Overlay.Allowed = IsReadyToOperate(addon);
                 }
             }
             else
             {
-                Overlay.IsOpen = Operation || IsReadyToOperate(addon);
+                Overlay.Allowed = Operation || IsReadyToOperate(addon);
                 AddonOpenedAt = 0;
             }
         }
         else
         {
-            if (Overlay.IsOpen)
+            if (Overlay.Allowed)
             {
-                Overlay.IsOpen = false;
+                Overlay.Allowed = false;
             }
             if (Operation)
             {
@@ -260,8 +260,9 @@ internal unsafe static class AutoGCHandin
 
     internal static bool HasInInventory(string item)
     {
+        if (item.EndsWith("...")) return true;
         var id = Svc.Data.GetExcelSheet<Item>().FirstOrDefault(x => x.Name.ExtractText() == item);
-        //InternalLog.Information($"{id}");
+        InternalLog.Information($"{item}, {id}");
         return id != null && InventoryManager.Instance()->GetInventoryItemCount(id.RowId) + InventoryManager.Instance()->GetInventoryItemCount(id.RowId, true) > 0;
     }
 }

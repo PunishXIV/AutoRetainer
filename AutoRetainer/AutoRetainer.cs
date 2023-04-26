@@ -40,6 +40,9 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal long LastMovementAt;
     internal Vector3 LastPosition;
     internal bool IsNextToBell;
+    internal bool ConditionWasEnabled = false;
+    internal VenturePlanner VenturePlanner;
+    internal VentureBrowser VentureBrowser;
 
     internal long Time => P.config.UseServerTime ? FFXIVClientStructs.FFXIV.Client.System.Framework.Framework.GetServerTime() : DateTimeOffset.Now.ToUnixTimeSeconds();
 
@@ -61,6 +64,10 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 Migrator.MigrateGC();
                 retainerManager = new(Svc.SigScanner);
                 ws = new();
+                VenturePlanner = new();
+                ws.AddWindow(VenturePlanner);
+                VentureBrowser = new();
+                ws.AddWindow(VentureBrowser);
                 configGui = new();
                 TaskManager = new() { AbortOnTimeout = true, TimeLimitMS = 20000 };
                 Memory = new();
@@ -68,7 +75,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 Svc.PluginInterface.UiBuilder.OpenConfigUi += delegate { configGui.IsOpen = true; };
                 Svc.ClientState.Logout += Logout;
                 Svc.Condition.ConditionChange += ConditionChange;
-                EzCmd.Add("/autoretainer", CommandHandler, "Open plugin interface\n/autoretainer e|enable → Enable plugin\n/autoretainer d|disable - Disable plugin\n/autoretainer t|toggle - toggle plugin\n/autoretainer m|multi - toggle MultiMode\n/autoretainer relog Character Name@WorldName - relog to the targeted character if configured\n/autoretainer expert - toggle expert settings\n/autoretainer debug - toggle debug menu and verbose output");
+                EzCmd.Add("/autoretainer", CommandHandler, "Open plugin interface\n/autoretainer e|enable → Enable plugin\n/autoretainer d|disable - Disable plugin\n/autoretainer t|toggle - toggle plugin\n/autoretainer m|multi - toggle MultiMode\n/autoretainer relog Character Name@WorldName - relog to the targeted character if configured\n/autoretainer b|browser - open venture browser\n/autoretainer expert - toggle expert settings\n/autoretainer debug - toggle debug menu and verbose output");
                 EzCmd.Add("/ays", CommandHandler);
                 Svc.Toasts.ErrorToast += Toasts_ErrorToast;
                 Svc.Toasts.Toast += Toasts_Toast;
@@ -80,6 +87,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
                 ws.AddWindow(new MultiModeOverlay());
                 ws.AddWindow(new RetainerListOverlay());
+                ws.AddWindow(new LoginOverlay());
                 MultiMode.Init();
 
                 Safety.Check();
@@ -143,6 +151,11 @@ public unsafe class AutoRetainer : IDalamudPlugin
         else if (arguments.EqualsIgnoreCaseAny("m", "multi"))
         {
             MultiMode.Enabled = !MultiMode.Enabled;
+            MultiMode.OnMultiModeEnabled();
+        }
+        else if (arguments.EqualsIgnoreCaseAny("b", "browser"))
+        {
+            VentureBrowser.IsOpen = !VentureBrowser.IsOpen;
         }
         else if (arguments.StartsWith("relog "))
         {
@@ -174,7 +187,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                     P.config.SelectedRetainers[Svc.ClientState.LocalContentId] = new();
                 }
             }
-            if (SchedulerMain.PluginEnabled || P.TaskManager.IsBusy || Svc.Condition[ConditionFlag.OccupiedSummoningBell])
+            if (Svc.Condition[ConditionFlag.OccupiedSummoningBell] && (SchedulerMain.PluginEnabled || P.TaskManager.IsBusy || ConditionWasEnabled))
             {
                 if (TryGetAddonByName<AddonTalk>("Talk", out var addon) && addon->AtkUnitBase.IsVisible)
                 {
@@ -187,15 +200,23 @@ public unsafe class AutoRetainer : IDalamudPlugin
         MultiMode.Tick();
         NotificationHandler.Tick();
         YesAlready.Tick();
-        if(SchedulerMain.PluginEnabled || MultiMode.Enabled)
+        if(SchedulerMain.PluginEnabled || MultiMode.Enabled || TaskManager.IsBusy)
         {
             if(Svc.ClientState.TerritoryType == Prisons.Mordion_Gaol)
             {
                 Process.GetCurrentProcess().Kill();
             }
+            if (Svc.Condition[ConditionFlag.OccupiedSummoningBell])
+            {
+                if (!ConditionWasEnabled)
+                {
+                    ConditionWasEnabled = true;
+                    P.DebugLog($"ConditionWasEnabled = true");
+                }
+            }
         }
         IsNextToBell = false;
-        if (P.config.RetainerSense && Svc.ClientState.LocalPlayer != null)
+        if (P.config.RetainerSense && Svc.ClientState.LocalPlayer != null && Svc.ClientState.LocalPlayer.HomeWorld.Id == Svc.ClientState.LocalPlayer.CurrentWorld.Id)
         {
             if(!IPC.Suppressed && !IsOccupied() && !P.config.OldRetainerSense && !TaskManager.IsBusy && !MultiMode.Active && !Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BoundByDuty] && Utils.IsAnyRetainersCompletedVenture())
             {
@@ -267,7 +288,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 YesAlready.EnableIfNeeded();
             });
             Safe(StatisticsManager.Dispose);
-            Safe(TaskManager.Dispose);
+            Safe(AutoLogin.Dispose);
             Safe(Memory.Dispose);
             Safe(IPC.Shutdown);
             PunishLibMain.Dispose();
@@ -287,13 +308,19 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
     internal void DebugLog(string message)
     {
-        PluginLog.Information(message);
+        PluginLog.Debug(message);
     }
 
     private void ConditionChange(ConditionFlag flag, bool value)
     {
         if(flag == ConditionFlag.OccupiedSummoningBell)
         {
+            OfflineDataManager.WriteOfflineData(true, true);
+            if (!value)
+            {
+                ConditionWasEnabled = false;
+                P.DebugLog("ConditionWasEnabled = false;");
+            }
             if (Svc.Targets.Target.IsRetainerBell()) {
                 if (value)
                 {
@@ -356,6 +383,11 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 }
             }
             IsCloseActionAutomatic = false;
+        }
+        if(flag == ConditionFlag.Gathering)
+        {
+            VentureBrowser.Reset();
+            OfflineDataManager.WriteOfflineData(true, true);
         }
     }
 

@@ -59,7 +59,18 @@ unsafe internal class ConfigGui : Window
             ImGuiEx.Text(GradientColor.Get(ImGuiColors.DalamudGrey, ImGuiColors.DalamudGrey3, 500), $"Paused");
         }
         ImGui.SameLine();
-        ImGui.Checkbox("Multi", ref MultiMode.Enabled);
+        if(ImGui.Checkbox("Multi", ref MultiMode.Enabled))
+        {
+            MultiMode.OnMultiModeEnabled();
+        }
+        if(P.config.CharEqualize && MultiMode.Enabled)
+        {
+            ImGui.SameLine();
+            if(ImGui.Button("Reset counters"))
+            {
+                MultiMode.CharaCnt.Clear();
+            }
+        }
 
         if(IPC.Suppressed)
         {
@@ -86,7 +97,7 @@ unsafe internal class ConfigGui : Window
                 (P.config.RecordStats ? "Statistics" : null, StatisticsUI.Draw, null, true),
                 ("Settings", SettingsMain.Draw, null, true),
                 (P.config.Expert?"Expert":null, Expert.Draw, null, true),
-                ("Beta", Beta.Draw, null, true),
+                //("Beta", Beta.Draw, null, true),
                 ("About", delegate { AboutTab.Draw(P); }, null, true),
                 (P.config.Verbose ? "Dev" : null, delegate
                 {

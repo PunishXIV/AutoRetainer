@@ -66,6 +66,7 @@ internal unsafe class RetainerListOverlay : Window
         {
             if (ImGui.Checkbox("MultiMode", ref MultiMode.Enabled))
             {
+                MultiMode.OnMultiModeEnabled();
                 if (MultiMode.Active)
                 {
                     SchedulerMain.EnablePlugin(PluginEnableReason.MultiMode);
@@ -73,7 +74,7 @@ internal unsafe class RetainerListOverlay : Window
             }
             ImGui.SameLine();
         }
-        if (ImGuiEx.IconButton("\uf013##Open plugin interface"))
+        if (ImGuiEx.IconButton($"{Lang.IconSettings}##Open plugin interface"))
         {
             Svc.Commands.ProcessCommand("/ays");
         }
@@ -81,7 +82,7 @@ internal unsafe class RetainerListOverlay : Window
         if (!P.TaskManager.IsBusy)
         {
             ImGui.SameLine();
-            if (ImGuiEx.IconButton("\uf24d##Entrust all duplicates"))
+            if (ImGuiEx.IconButton($"{Lang.IconDuplicate}##Entrust all duplicates"))
             {
                 for (var i = 0; i < P.retainerManager.Count; i++)
                 {
@@ -102,7 +103,7 @@ internal unsafe class RetainerListOverlay : Window
             ImGuiEx.Tooltip("Quick Entrust Duplicates");
 
             ImGui.SameLine();
-            if (ImGuiEx.IconButton("\uf51e##WithdrawGil"))
+            if (ImGuiEx.IconButton($"{Lang.IconGil}##WithdrawGil"))
             {
                 for (var i = 0; i < P.retainerManager.Count; i++)
                 {

@@ -8,6 +8,7 @@ namespace AutoRetainer.Configuration;
 [Serializable]
 internal unsafe class Config : IEzConfig
 {
+    public string CensorSeed = Guid.NewGuid().ToString();
     public Dictionary<ulong, HashSet<string>> SelectedRetainers = new();
     public bool EnableAssigningQuickExploration = false;
     public bool Verbose = false;
@@ -24,6 +25,7 @@ internal unsafe class Config : IEzConfig
     public bool GCHandinNotify = false;
     internal bool BypassSanctuaryCheck = false;
     public bool MultiAllowHET = false;
+    public bool MultiHETOnEnable = true;
     public bool UseServerTime = true;
     public bool NoTheme = false;
     public Dictionary<string, AdditionalRetainerData> AdditionalData = new();
@@ -32,6 +34,11 @@ internal unsafe class Config : IEzConfig
     public List<(ulong CID, string Name)> Blacklist = new();
     public bool HideOverlayIcons = false;
     public bool UnsafeProtection = false;
+    public bool CharEqualize = false;
+    public bool TimerAllowNegative = false;
+
+    public bool LoginOverlay = false;
+    public float LoginOverlayScale = 1f;
 
     public OpenBellBehavior OpenBellBehaviorNoVentures = OpenBellBehavior.Enable_AutoRetainer;
     public OpenBellBehavior OpenBellBehaviorWithVentures = OpenBellBehavior.Enable_AutoRetainer;
@@ -55,12 +62,17 @@ internal unsafe class Config : IEzConfig
     public Keys TempCollectB = Keys.ShiftKey;
 
     public int RetainerMenuDelay = 0;
+    public List<VenturePlan> SavedPlans = new();
+    public bool MultiWaitOnLoginScreen = false;
+    public UnavailableVentureDisplay UnavailableVentureDisplay = UnavailableVentureDisplay.Hide;
+
+    public bool ShowAdditionalInfo = true;
 
     internal bool DontReassign
     {
         get
         {
-            return _dontReassign || (Bitmask.IsBitSet(User32.GetKeyState((int)P.config.TempCollectB), 15) && !CSFramework.Instance()->WindowInactive);
+            return _dontReassign || (P.config.TempCollectB != Keys.None && (Bitmask.IsBitSet(User32.GetKeyState((int)P.config.TempCollectB), 15) && !CSFramework.Instance()->WindowInactive));
         }
         set
         {

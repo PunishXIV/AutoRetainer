@@ -20,6 +20,8 @@ internal unsafe static class SchedulerMain
         } 
     }
 
+    internal static volatile uint VentureOverride = 0;
+
     internal static PluginEnableReason Reason { get; private set; }
 
     internal static bool? EnablePlugin(PluginEnableReason reason)
@@ -41,6 +43,16 @@ internal unsafe static class SchedulerMain
     {
         if (PluginEnabled)
         {
+            if (P.config.RetainerSense && MultiMode.GetAutoAfkOpt() != 0)
+            {
+                P.config.RetainerSense = false;
+                DuoLog.Warning("Using RetainerSense requires Auto-afk option to be turned off. That option has been automatically disabled.");
+            }
+            if (P.config.OldRetainerSense && MultiMode.GetAutoAfkOpt() != 0)
+            {
+                P.config.OldRetainerSense = false;
+                DuoLog.Warning("Using old RetainerSense requires Auto-afk option to be turned off. That option has been automatically disabled.");
+            }
             if (TryGetAddonByName<AtkUnitBase>("RetainerList", out var addon) && addon->IsVisible)
             {
                 if (Utils.GenericThrottle)
@@ -52,32 +64,90 @@ internal unsafe static class SchedulerMain
                             var retainer = GetNextRetainerName();
                             if (retainer != null && Utils.TryGetRetainerByName(retainer, out var ret))
                             {
-                                if (EzThrottler.Throttle("ScheduleSelectRetainer", 5000))
+                                if (EzThrottler.Throttle("ScheduleSelectRetainer", 2000))
                                 {
                                     P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(retainer));
 
-                                    //resend retainer
+                                    var adata = Utils.GetAdditionalData(Svc.ClientState.LocalContentId, ret.Name.ToString());
+                                    VentureOverride = 0;
+                                    Svc.PluginInterface.GetIpcProvider<string, object>("AutoRetainer.OnSendRetainerToVenture").SendMessage(retainer);
 
-                                    if (ret.VentureID != 0)
+                                    if(VentureOverride > 0)
                                     {
-                                        if (P.config.DontReassign)
+                                        P.DebugLog($"Using VentureOverride = {VentureOverride}");
+                                        ret.ProcessVenturePlanner(VentureOverride);
+                                    }
+                                    else if (!adata.IsVenturePlannerActive())
+                                    {
+                                        //resend retainer
+
+                                        if (ret.VentureID != 0)
                                         {
-                                            TaskCollectVenture.Enqueue();
+                                            if (P.config.DontReassign)
+                                            {
+                                                TaskCollectVenture.Enqueue();
+                                            }
+                                            else
+                                            {
+                                                TaskReassignVenture.Enqueue();
+                                            }
                                         }
                                         else
                                         {
-                                            TaskReassignVenture.Enqueue();
+                                            if (P.config.EnableAssigningQuickExploration)
+                                            {
+                                                TaskAssignQuickVenture.Enqueue();
+                                            }
                                         }
                                     }
                                     else
                                     {
-                                        if (P.config.EnableAssigningQuickExploration)
+                                        var next = adata.GetNextPlannedVenture();
+                                        P.DebugLog($"Next planned venture: {next}");
+                                        var completed = adata.IsLastPlannedVenture();
+                                        P.DebugLog($"Is last planned venture: {completed}");
+                                        if(next == 0)
                                         {
-                                            TaskAssignQuickVenture.Enqueue();
+                                            var t = ($"Next venture ID is zero, planner is to be disabled");
+                                            if(!completed)
+                                            {
+                                                DuoLog.Warning(t);
+                                            }
+                                            else
+                                            {
+                                                P.DebugLog(t);
+                                            }
                                         }
+                                        if (next == 0 || (completed && adata.VenturePlan.PlanCompleteBehavior != PlanCompleteBehavior.Restart_plan))
+                                        {
+                                            P.DebugLog($"Completed and behavior is {adata.VenturePlan.PlanCompleteBehavior}");
+                                            if (adata.VenturePlan.PlanCompleteBehavior == PlanCompleteBehavior.Repeat_last_venture)
+                                            {
+                                                P.DebugLog($"Reassigning this venture and disabling planner");
+                                                TaskReassignVenture.Enqueue();
+                                            }
+                                            else
+                                            {
+                                                TaskCollectVenture.Enqueue();
+                                                if (adata.VenturePlan.PlanCompleteBehavior == PlanCompleteBehavior.Assign_Quick_Venture)
+                                                {
+                                                    P.DebugLog($"Assigning quick venture");
+                                                    TaskAssignQuickVenture.Enqueue();
+                                                }
+                                            }
+                                            adata.EnablePlanner = false;
+                                            P.DebugLog($"Now disabling planner");
+                                        }
+                                        else
+                                        {
+                                            ret.ProcessVenturePlanner(next);
+                                        }
+                                        if (completed)
+                                        {
+                                            adata.VenturePlanIndex = 0;
+                                        }
+                                        adata.VenturePlanIndex++;
                                     }
-
-                                    var adata = Utils.GetAdditionalData(Svc.ClientState.LocalContentId, ret.Name.ToString());
 
                                     //entrust duplicates
                                     if (adata.EntrustDuplicates)
@@ -123,7 +193,7 @@ internal unsafe static class SchedulerMain
                                     {
                                         void Process(TaskCompletedBehavior behavior)
                                         {
-                                            P.DebugLog($"Behavior: {behavior}");
+                                            //P.DebugLog($"Behavior: {behavior}");
                                             if (behavior.EqualsAny(TaskCompletedBehavior.Stay_in_retainer_list_and_disable_plugin, TaskCompletedBehavior.Close_retainer_list_and_disable_plugin))
                                             {
                                                 P.DebugLog($"Scheduling plugin disabling (behavior={behavior})");
@@ -218,8 +288,9 @@ internal unsafe static class SchedulerMain
             {
                 var r = P.retainerManager.Retainer(i);
                 var rname = r.Name.ToString();
+                var adata = Utils.GetAdditionalData(Svc.ClientState.LocalContentId, rname);
                 if (P.GetSelectedRetainers(Svc.ClientState.LocalContentId).Contains(rname)
-                    && r.GetVentureSecondsRemaining() <= P.config.UnsyncCompensation && (r.VentureID != 0 || P.config.EnableAssigningQuickExploration))
+                    && r.GetVentureSecondsRemaining() <= P.config.UnsyncCompensation && (r.VentureID != 0 || P.config.EnableAssigningQuickExploration || (adata.EnablePlanner && adata.VenturePlan.ListUnwrapped.Count > 0)))
                 {
                     return rname;
                 }
