@@ -162,7 +162,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             var target = P.config.OfflineData.Where(x => $"{x.Name}@{x.World}" == arguments[6..]).FirstOrDefault();
             if (target != null)
             {
-                if (!AutoLogin.Instance.IsRunning) AutoLogin.Instance.SwapCharacter(target.World, target.CharaIndex, target.ServiceAccount);
+                if (!AutoLogin.Instance.IsRunning) AutoLogin.Instance.SwapCharacter(target.World, target.Name, target.ServiceAccount);
             }
             else
             {

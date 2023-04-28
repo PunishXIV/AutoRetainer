@@ -50,7 +50,7 @@ namespace AutoRetainer.UI
             if (SelectedRetainer != null && SelectedCharacter != null)
             {
                 var adata = Utils.GetAdditionalData(SelectedCharacter.CID, SelectedRetainer.Name);
-                ImGuiEx.TextV("Share venture plan with:");
+                /*ImGuiEx.TextV("Share venture plan with:");
                 ImGui.SameLine();
                 ImGuiEx.SetNextItemFullWidth();
                 var n = "No shared plan";
@@ -81,7 +81,7 @@ namespace AutoRetainer.UI
                         }
                     }
                     ImGui.EndCombo();
-                }
+                }*/
                 if (adata.LinkedVenturePlan == "")
                 {
                     var ww = ImGui.GetContentRegionAvail().X;

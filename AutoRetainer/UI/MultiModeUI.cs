@@ -52,11 +52,11 @@ internal unsafe static class MultiModeUI
             if (ImGuiEx.IconButton(Lang.IconMultiMode))
             {
                 data.Enabled = !data.Enabled;
-                if (data.Enabled && !data.Index.InRange(1, 9))
+                /*if (data.Enabled && !data.Index.InRange(1, 9))
                 {
                     data.Enabled = false;
                     Svc.Chat.PrintError("[AutoRetainer] Error: Please set the character index and service account for this character before enabling multi mode.");
-                }
+                }*/
             }
             if (colen) ImGui.PopStyleColor();
             ImGuiEx.Tooltip($"Enable multi-mode for this character");
@@ -101,7 +101,7 @@ internal unsafe static class MultiModeUI
                 {
                     ImGui.CloseCurrentPopup();
                 }
-                ImGuiEx.TextV("Character index:");
+                /*ImGuiEx.TextV("Character index:");
                 ImGui.SameLine();
                 ImGui.SetNextItemWidth(100);
                 if (ImGui.BeginCombo("##index", data.Index == 0 ? "n/a" : data.Index.ToString()))
@@ -114,11 +114,11 @@ internal unsafe static class MultiModeUI
                         }
                     }
                     ImGui.EndCombo();
-                }
+                }*/
 
                 //if (P.config.MultipleServiceAccounts)
                 {
-                    ImGui.SameLine();
+                    //ImGui.SameLine();
                     ImGui.SetNextItemWidth(150);
                     if (ImGui.BeginCombo("##sindex", $"Service Account {data.ServiceAccount + 1}"))
                     {

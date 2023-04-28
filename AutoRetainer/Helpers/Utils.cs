@@ -21,6 +21,33 @@ namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
+    internal static bool TryGetCharacterIndex(string name, out int index)
+    {
+        index = GetCharacterNames().IndexOf(name);
+        return index >= 0;
+    }
+
+    internal static List<string> GetCharacterNames()
+    {
+        List<string> ret = new();
+        var data = CSFramework.Instance()->UIModule->GetRaptureAtkModule()->AtkModule.GetStringArrayData(1);
+        if (data != null)
+        {
+            for (int i = 60; i < data->AtkArrayData.Size; i++)
+            {
+                if (data->StringArray[i] == null) break;
+                var item = data->StringArray[i];
+                if (item != null)
+                {
+                    var str = MemoryHelper.ReadSeStringNullTerminated((nint)item).ExtractText();
+                    if (str == "") break;
+                    ret.Add(str);
+                }
+            }
+        }
+        return ret;
+    }
+
     internal static string FancyDigits(this int n)
     {
         return n.ToString().ReplaceByChar(Lang.Digits.Normal, Lang.Digits.GameFont);

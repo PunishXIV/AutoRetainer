@@ -27,7 +27,7 @@ namespace AutoRetainer.UI.Overlays
             var num = 1;
             ImGui.SetWindowFontScale(P.config.LoginOverlayScale);
             ImGui.PushFont(Svc.PluginInterface.UiBuilder.GetGameFontHandle(new GameFontStyle(GameFontFamilyAndSize.MiedingerMid18)).ImFont);
-            foreach(var x in P.config.OfflineData.Where(x => !x.Name.IsNullOrEmpty() && x.Index != 0))
+            foreach(var x in P.config.OfflineData.Where(x => !x.Name.IsNullOrEmpty()))
             {
                 var n = Censor.Character(x.Name, x.World);
                 var dim = ImGuiHelpers.GetButtonSize(n);
@@ -37,7 +37,7 @@ namespace AutoRetainer.UI.Overlays
                 }
                 if (ImGui.Button(n, new(bWidth * 1.35f, dim.Y * 1.35f)))
                 {
-                    AutoLogin.Instance.Login(x.World, x.CharaIndex, x.ServiceAccount);
+                    AutoLogin.Instance.Login(x.World, x.Name, x.ServiceAccount);
                 }
             }
             ImGui.PopFont();
