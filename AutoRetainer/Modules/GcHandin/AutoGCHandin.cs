@@ -53,9 +53,21 @@ internal unsafe static class AutoGCHandin
 
     internal static void Tick()
     {
+        {
+            if (Svc.Condition[ConditionFlag.OccupiedInQuestEvent] && TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon))
+            {
+                if (addon->X != 0 || addon->Y != 0)
+                {
+                    Overlay.Position = new(addon->X, addon->Y - Overlay.height);
+                }
+            }
+        }
         if (Svc.Condition[ConditionFlag.OccupiedInQuestEvent] && IsEnabled())
         {
             Safety.Check();
+            {
+                
+            }
             if (TryGetAddonByName<AddonGrandCompanySupplyReward>("GrandCompanySupplyReward", out var addonGCSR) && IsAddonReady(&addonGCSR->AtkUnitBase) && Operation)
             {
                 if (TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon) && IsAddonReady(addon) && EzThrottler.Throttle("CloseSupplyList", 200))
@@ -89,7 +101,6 @@ internal unsafe static class AutoGCHandin
                 {
                     AddonOpenedAt = Environment.TickCount64;
                 }
-                Overlay.Position = new(addon->X, addon->Y - Overlay.height);
                 if (Operation)
                 {
                     if (IsDone(addon))
@@ -123,6 +134,10 @@ internal unsafe static class AutoGCHandin
                                 if (seals == null || maxSeals == null || sealsForItem == null)
                                 {
                                     throw new FormatException();
+                                }
+                                else
+                                {
+                                    sealsForItem = (int)((float)sealsForItem.Value * Utils.GetGCSealMultiplier());
                                 }
                                 var step3 = step2->GetAsAtkComponentNode()->Component->UldManager.NodeList[5];
                                 var text = MemoryHelper.ReadSeString(&step3->GetAsAtkTextNode()->NodeText).ExtractText();

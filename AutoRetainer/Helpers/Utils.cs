@@ -21,6 +21,17 @@ namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
+    internal static float GetGCSealMultiplier()
+    {
+        var ret = 1f;
+        if (Player.Available)
+        {
+            if (Player.Object.StatusList.TryGetFirst(x => x.StatusId == 414, out var s)) ret = 1f + (float)s.StackCount / 100f;
+            if (Player.Object.StatusList.Any(x => x.StatusId == 1078)) ret = 1.15f;
+        }
+        return ret > 1f?ret:1f;
+    }
+
     internal static bool TryGetCharacterIndex(string name, out int index)
     {
         index = GetCharacterNames().IndexOf(name);
