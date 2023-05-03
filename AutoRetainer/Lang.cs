@@ -1,4 +1,5 @@
 ﻿using Dalamud;
+using Dalamud.Game.Text;
 using Lumina.Excel.GeneratedSheets;
 
 namespace AutoRetainer;
@@ -21,6 +22,7 @@ internal static class Lang
     internal const string IconPlanner = "\uf0ae";
     internal const string IconSettings = "\uf013";
     internal const string IconWarning = "\uf071";
+    internal const string IconCrystal = "\uf72b";
 
     internal static readonly (string Normal, string GameFont) Digits = ("0123456789", "");
 
