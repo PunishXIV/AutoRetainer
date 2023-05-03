@@ -20,6 +20,7 @@ using AutoRetainer.Modules.Statistics;
 using AutoRetainer.Internal;
 using AutoRetainer.UI.Overlays;
 using ECommons.Throttlers;
+using AutoRetainer.Modules;
 
 namespace AutoRetainer;
 
@@ -200,6 +201,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         MultiMode.Tick();
         NotificationHandler.Tick();
         YesAlready.Tick();
+        if(P.config.RetryItemSearch) RetryItemSearch.Tick();
         if(SchedulerMain.PluginEnabled || MultiMode.Enabled || TaskManager.IsBusy)
         {
             if(Svc.ClientState.TerritoryType == Prisons.Mordion_Gaol)

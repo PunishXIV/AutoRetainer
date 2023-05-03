@@ -16,11 +16,41 @@ using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
 using System.Text.RegularExpressions;
+using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
 
 namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
+    public static void Callback(AtkUnitBase* Base, bool updateState, params object[] args)
+    {
+        var stk = stackalloc AtkValue[args.Length];
+        for (int i = 0; i < args.Length; i++)
+        {
+            if (args[i] is int v)
+            {
+                stk[i] = new() { Type = ValueType.Int, Int = v };
+            }
+            else if (args[i] is uint u)
+            {
+                stk[i] = new() { Type = ValueType.UInt, UInt = u };
+            }
+            else if (args[i] is bool b)
+            {
+                stk[i] = new() { Type = ValueType.Bool, Byte = (byte)(b ? 1 : 0) };
+            }
+            else if (args[i] is AtkValue av)
+            {
+                stk[i] = av;
+            }
+            else
+            {
+                throw new Exception("Unsupported arguments");
+            }
+        }
+        P.Memory.FireCallback(Base, args.Length, stk, (byte)(updateState ? 1 : 0));
+    }
+
     internal static float GetGCSealMultiplier()
     {
         var ret = 1f;

@@ -67,6 +67,7 @@ internal unsafe class Config : IEzConfig
     public UnavailableVentureDisplay UnavailableVentureDisplay = UnavailableVentureDisplay.Hide;
 
     public bool ShowAdditionalInfo = true;
+    public bool RetryItemSearch = false;
 
     internal bool DontReassign
     {
