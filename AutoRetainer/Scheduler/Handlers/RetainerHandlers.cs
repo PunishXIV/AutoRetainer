@@ -4,17 +4,30 @@ using ClickLib.Clicks;
 using Dalamud.Memory;
 using Dalamud.Utility;
 using ECommons.Throttlers;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace AutoRetainer.Scheduler.Handlers;
 
 internal unsafe static class RetainerHandlers
 {
+    internal static List<InventoryType> RetainerInventories = new List<InventoryType>()
+    {
+        InventoryType.RetainerPage1,
+        InventoryType.RetainerPage2,
+        InventoryType.RetainerPage3,
+        InventoryType.RetainerPage4,
+        InventoryType.RetainerPage5,
+        InventoryType.RetainerPage6,
+        InventoryType.RetainerPage7,
+        InventoryType.RetainerCrystals
+    };
+
+
     internal static bool? SelectAssignVenture()
     {
         var text = new string[] { Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(2386).Text.ToDalamudString().ExtractText(), Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(2387).Text.ToDalamudString().ExtractText() };
@@ -34,6 +47,57 @@ internal unsafe static class RetainerHandlers
         return Utils.TrySelectSpecificEntry(text);
     }
 
+    internal static bool? OpenWithdrawItemMenu(uint itemId, out int retainerQuantity)
+    {
+        retainerQuantity = 0;
+        foreach (var inventory in RetainerInventories)
+        {
+            var container = InventoryManager.Instance()->GetInventoryContainer(inventory);
+
+            for (int i = 0; i < container->Size; i++) 
+            {
+                var item = container->GetInventorySlot(i);
+                if (item->ItemID == itemId)
+                {
+                    retainerQuantity = (int)item->Quantity;
+                    var ag = AgentInventoryContext.Instance();
+                    ag->OpenForItemSlot(item->Container, i, AgentModule.Instance()->GetAgentByInternalId(AgentId.Retainer)->GetAddonID());
+                    var contextMenu = (AtkUnitBase*)Svc.GameGui.GetAddonByName("ContextMenu", 1);
+                    if (contextMenu != null)
+                    {
+                        if (item->Quantity == 1 || item->ItemID <= 19)
+                        {
+                            Callback(contextMenu, 0, 0, 0, 0, 0);
+                        }
+                        else
+                        {
+                            Callback(contextMenu, 0, 1, 0, 0, 0);
+                        }
+                        return true;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    internal static bool ConfirmNumericInputValue(int value)
+    {
+        if (value == 0) return true;
+        var numeric = (AtkUnitBase*)Svc.GameGui.GetAddonByName("InputNumeric", 1);
+        if (numeric != null)
+        {
+            var values = stackalloc AtkValue[1];
+            values[0] = new AtkValue()
+            {
+                Type = FFXIVClientStructs.FFXIV.Component.GUI.ValueType.Int,
+                Int = value
+            };
+            numeric->FireCallback(1, values, (void*)1);
+            return true;
+        }
+        return false;
+    }
     internal static bool? ClickResultReassign()
     {
         if (TryGetAddonByName<AddonRetainerTaskResult>("RetainerTaskResult", out var addon) && IsAddonReady(&addon->AtkUnitBase))

@@ -122,6 +122,62 @@ internal unsafe class RetainerListOverlay : Window
                 }
             }
             ImGuiEx.Tooltip("Quick Withdraw Gil");
+
+            ImGui.SameLine();
+            if (ImGuiEx.IconButton($"{Lang.IconCrystal}##WithdrawCrystals"))
+            {
+                for (var i = 0; i < P.retainerManager.Count; i++)
+                {
+                    var ret = P.retainerManager.Retainer(i);
+                    if (ret.Available)
+                    {
+                        P.TaskManager.Enqueue(() =>
+                        {
+                            if (!TaskManageCrystals.InventoryHasUnderMaxCrystals(500))
+                            {
+                                PluginLog.Debug($"Character has max crystals");
+                                P.TaskManager.EnqueueImmediate(() => P.TaskManager.Abort());
+                            }
+                        });
+                        P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
+                        TaskManageCrystals.Enqueue(500, TaskManageCrystals.TransactionType.Withdraw);
+                        if (P.config.RetainerMenuDelay > 0)
+                        {
+                            TaskWaitSelectString.Enqueue(P.config.RetainerMenuDelay);
+                        }
+                        P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
+                    }
+                }
+            }
+            ImGuiEx.Tooltip("Quick Withdraw Crystals");
+
+            ImGui.SameLine();
+            if (ImGuiEx.IconButton($"{Lang.IconCrystal}##DepositCrystals"))
+            {
+                for (var i = 0; i < P.retainerManager.Count; i++)
+                {
+                    var ret = P.retainerManager.Retainer(i);
+                    if (ret.Available)
+                    {
+                        P.TaskManager.Enqueue(() =>
+                        {
+                            if (!TaskManageCrystals.InventoryHasOverMaxCrystals(500))
+                            {
+                                PluginLog.Debug($"Character has deposited enough crystals");
+                                P.TaskManager.EnqueueImmediate(() => P.TaskManager.Abort());
+                            }
+                        });
+                        P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
+                        TaskManageCrystals.Enqueue(500, TaskManageCrystals.TransactionType.Deposit);
+                        if (P.config.RetainerMenuDelay > 0)
+                        {
+                            TaskWaitSelectString.Enqueue(P.config.RetainerMenuDelay);
+                        }
+                        P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
+                    }
+                }
+            }
+            ImGuiEx.Tooltip("Quick Deposit Crystals");
         }
         height = ImGui.GetWindowSize().Y;
     }
