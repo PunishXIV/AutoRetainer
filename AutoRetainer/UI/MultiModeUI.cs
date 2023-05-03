@@ -238,7 +238,7 @@ internal unsafe static class MultiModeUI
                         ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
                         var start = ImGui.GetCursorPos();
                         var selected = retainers.Contains(ret.Name.ToString());
-                        if (ImGui.Checkbox($"{Censor.Retainer(ret.Name)} {ret.DisplayOrder + 1}", ref selected))
+                        if (ImGui.Checkbox($"{Censor.Retainer(ret.Name)}", ref selected))
                         {
                             if (selected)
                             {
