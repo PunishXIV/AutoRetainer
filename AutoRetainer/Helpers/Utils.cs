@@ -4,6 +4,7 @@ using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Memory;
+using Dalamud.Utility;
 using ECommons.Events;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameFunctions;
@@ -48,7 +49,15 @@ internal static unsafe class Utils
                 throw new Exception("Unsupported arguments");
             }
         }
-        P.Memory.FireCallback(Base, args.Length, stk, (byte)(updateState ? 1 : 0));
+        P.Memory.FireCallbackHook.Original(Base, args.Length, stk, (byte)(updateState ? 1 : 0));
+    }
+
+    internal static IEnumerable<string> GetEObjNames(params uint[] values)
+    {
+        foreach(var x in values)
+        {
+            yield return Svc.Data.GetExcelSheet<EObjName>().GetRow(x).Singular.ToDalamudString().ExtractText();
+        }
     }
 
     internal static float GetGCSealMultiplier()

@@ -17,18 +17,14 @@ namespace AutoRetainer.Modules
             {
                 if(TryGetAddonByName<AtkUnitBase>("ItemSearchResult", out var addon) && IsAddonReady(addon))
                 {
-                    if (EzThrottler.Throttle("log1")) InternalLog.Verbose("ItemSearchResult visible");
                     if (addon->UldManager.NodeList[25]->IsVisible)
                     {
-                        if (EzThrottler.Throttle("log2")) InternalLog.Verbose("Node 25 visible");
                         var t = MemoryHelper.ReadSeString(&addon->UldManager.NodeList[25]->GetAsAtkTextNode()->NodeText).ExtractText();
-                        if (EzThrottler.Throttle("log3")) InternalLog.Verbose("Node text is" + t);
                         if (t.EqualsAny(Utils.GetAddonText(1997), Utils.GetAddonText(1998)))
                         {
-                            if (EzThrottler.Throttle("log4")) InternalLog.Verbose("ItemSearchResult visible");
                             if (!P.TaskManager.IsBusy && EzThrottler.Throttle("RetrySearch", 1000))
                             {
-                                P.DebugLog("Enqueueing ItemSearchResult retry");
+                                P.DebugLog("Enqueueing ItemSearchResult retry (retainer)");
                                 P.TaskManager.Enqueue(delegate
                                 {
                                     if (TryGetAddonByName<AtkUnitBase>("ItemSearchResult", out var a))
@@ -47,6 +43,54 @@ namespace AutoRetainer.Modules
                             }
                         }
                     }
+                }
+            }
+
+
+
+            if (Svc.Condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.OccupiedInEvent] 
+                && Svc.Targets.Target?.Name.ToString().EqualsIgnoreCaseAny(Utils.GetEObjNames(2000073, 2000402, 2000440, 2000442, 2010285)) == true)
+            {
+                if (!P.Memory.FireCallbackHook.IsEnabled)
+                {
+                    P.Memory.FireCallbackHook.Enable();
+                }
+                if (TryGetAddonByName<AtkUnitBase>("ItemSearchResult", out var addon) && IsAddonReady(addon))
+                {
+                    if (addon->UldManager.NodeList[25]->IsVisible)
+                    {
+                        var t = MemoryHelper.ReadSeString(&addon->UldManager.NodeList[25]->GetAsAtkTextNode()->NodeText).ExtractText();
+                        if (t.EqualsAny(Utils.GetAddonText(1997), Utils.GetAddonText(1998)))
+                        {
+                            if (!P.TaskManager.IsBusy && P.Memory.LastSearchItem != -1 && EzThrottler.Throttle("RetrySearch", 1500))
+                            {
+                                P.DebugLog("Enqueueing ItemSearchResult retry (marketboard)");
+                                P.TaskManager.Enqueue(delegate
+                                {
+                                    if (TryGetAddonByName<AtkUnitBase>("ItemSearchResult", out var a))
+                                    {
+                                        Utils.Callback(a, true, (int)-1);
+                                    }
+                                });
+                                P.TaskManager.Enqueue(() => !TryGetAddonByName<AtkUnitBase>("ItemSearchResult", out _));
+                                P.TaskManager.Enqueue(delegate
+                                {
+                                    if (TryGetAddonByName<AtkUnitBase>("ItemSearch", out var a))
+                                    {
+                                        Utils.Callback(a, true, (int)5, (int)P.Memory.LastSearchItem);
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                P.Memory.LastSearchItem = -1;
+                if (P.Memory.FireCallbackHook.IsEnabled)
+                {
+                    P.Memory.FireCallbackHook.Disable();
                 }
             }
         }

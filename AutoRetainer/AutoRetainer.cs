@@ -44,6 +44,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal bool ConditionWasEnabled = false;
     internal VenturePlanner VenturePlanner;
     internal VentureBrowser VentureBrowser;
+    internal LogWindow LogWindow;
 
     internal long Time => P.config.UseServerTime ? FFXIVClientStructs.FFXIV.Client.System.Framework.Framework.GetServerTime() : DateTimeOffset.Now.ToUnixTimeSeconds();
 
@@ -69,6 +70,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 ws.AddWindow(VenturePlanner);
                 VentureBrowser = new();
                 ws.AddWindow(VentureBrowser);
+                LogWindow = new();
+                ws.AddWindow(LogWindow);
                 configGui = new();
                 TaskManager = new() { AbortOnTimeout = true, TimeLimitMS = 20000 };
                 Memory = new();
@@ -157,6 +160,10 @@ public unsafe class AutoRetainer : IDalamudPlugin
         else if (arguments.EqualsIgnoreCaseAny("b", "browser"))
         {
             VentureBrowser.IsOpen = !VentureBrowser.IsOpen;
+        }
+        else if (arguments.EqualsIgnoreCaseAny("l", "log"))
+        {
+            LogWindow.IsOpen = !LogWindow.IsOpen;
         }
         else if (arguments.StartsWith("relog "))
         {
