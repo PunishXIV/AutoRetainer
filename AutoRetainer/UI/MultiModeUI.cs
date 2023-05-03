@@ -2,6 +2,7 @@
 using ECommons;
 using ECommons.GameHelpers;
 using ECommons.MathHelpers;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 
 namespace AutoRetainer.UI;
@@ -145,6 +146,8 @@ internal unsafe static class MultiModeUI
                 }
                 ImGuiComponents.HelpMarker("When operating in multi mode, if there are no other characters with imminent ventures to collect, it will relog back to your preferred character.");
 
+                ImGui.Checkbox("Show Retainers in Display Order", ref data.ShowRetainersInDisplayOrder);
+
                 ImGuiEx.Text($"Automatic Grand Company Expert Delivery:");
                 if (!AutoGCHandin.Operation)
                 {
@@ -224,9 +227,10 @@ internal unsafe static class MultiModeUI
                     ImGui.TableSetupColumn("");
                     ImGui.TableHeadersRow();
                     var retainers = P.GetSelectedRetainers(data.CID);
+
                     for (var i = 0; i < data.RetainerData.Count; i++)
                     {
-                        var ret = data.RetainerData[i];
+                        var ret = data.ShowRetainersInDisplayOrder ? data.RetainerData.First(x => x.DisplayOrder == i) : data.RetainerData[i];
                         if (ret.Level == 0 || ret.Name.ToString().IsNullOrEmpty()) continue;
                         var adata = Utils.GetAdditionalData(data.CID, ret.Name);
                         ImGui.TableNextRow();
@@ -234,7 +238,7 @@ internal unsafe static class MultiModeUI
                         ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
                         var start = ImGui.GetCursorPos();
                         var selected = retainers.Contains(ret.Name.ToString());
-                        if (ImGui.Checkbox($"{Censor.Retainer(ret.Name)}", ref selected))
+                        if (ImGui.Checkbox($"{Censor.Retainer(ret.Name)} {ret.DisplayOrder + 1}", ref selected))
                         {
                             if (selected)
                             {
