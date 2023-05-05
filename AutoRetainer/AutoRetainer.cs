@@ -208,7 +208,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         MultiMode.Tick();
         NotificationHandler.Tick();
         YesAlready.Tick();
-        if(P.config.RetryItemSearch) RetryItemSearch.Tick();
+        //if(P.config.RetryItemSearch) RetryItemSearch.Tick();
         if(SchedulerMain.PluginEnabled || MultiMode.Enabled || TaskManager.IsBusy)
         {
             if(Svc.ClientState.TerritoryType == Prisons.Mordion_Gaol)
