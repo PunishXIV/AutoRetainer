@@ -16,13 +16,21 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
+using PInvoke;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
 
 namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
+    public static bool IsKeyPressed(Keys key)
+    {
+        if(key == Keys.None) return false;
+        return Bitmask.IsBitSet(User32.GetKeyState((int)key), 15);
+    }
+
     public static void Callback(AtkUnitBase* Base, bool updateState, params object[] args)
     {
         var stk = stackalloc AtkValue[args.Length];
