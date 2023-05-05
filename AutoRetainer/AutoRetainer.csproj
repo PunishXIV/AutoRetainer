@@ -9,7 +9,6 @@
 		<TargetFramework>net7.0-windows</TargetFramework>
 		<Platforms>x64</Platforms>
 		<LangVersion>preview</LangVersion>
-		<DalamudDevPlugins>$(appdata)\XIVLauncher\devPlugins\AutoRetainer\</DalamudDevPlugins>
 		<DalamudLibPath>$(appdata)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
 		<DalamudPluginPath>$(appdata)\XIVLauncher\installedPlugins\AutoRetainer\$(version)</DalamudPluginPath>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -34,9 +33,11 @@
 		<OutputPath>bin/Debug</OutputPath>
 	</PropertyGroup>
 
-	<ProjectReference Include="..\ClickLib\ClickLib\ClickLib.csproj" />
-	<ProjectReference Include="..\ECommons\ECommons\ECommons.csproj" />
-	<ProjectReference Include="..\PunishLib\PunishLib\PunishLib.csproj" />
+	<ItemGroup>
+		<ProjectReference Include="..\ClickLib\ClickLib\ClickLib.csproj" />
+		<ProjectReference Include="..\ECommons\ECommons\ECommons.csproj" />
+		<ProjectReference Include="..\PunishLib\PunishLib\PunishLib.csproj" />
+	</ItemGroup>
 
 	<PropertyGroup Condition="'$(OS)' != 'Windows_NT' OR '$(CI)' == 'true'">
 		<DalamudLibPath>$(DALAMUD_HOME)/</DalamudLibPath>
