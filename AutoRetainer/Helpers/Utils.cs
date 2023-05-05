@@ -4,6 +4,7 @@ using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Memory;
+using Dalamud.Utility;
 using ECommons.Events;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameFunctions;
@@ -15,12 +16,96 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
+using PInvoke;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
+using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
 
 namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
+    public static bool IsKeyPressed(Keys key)
+    {
+        if(key == Keys.None) return false;
+        return Bitmask.IsBitSet(User32.GetKeyState((int)key), 15);
+    }
+
+    public static void Callback(AtkUnitBase* Base, bool updateState, params object[] args)
+    {
+        var stk = stackalloc AtkValue[args.Length];
+        for (int i = 0; i < args.Length; i++)
+        {
+            if (args[i] is int v)
+            {
+                stk[i] = new() { Type = ValueType.Int, Int = v };
+            }
+            else if (args[i] is uint u)
+            {
+                stk[i] = new() { Type = ValueType.UInt, UInt = u };
+            }
+            else if (args[i] is bool b)
+            {
+                stk[i] = new() { Type = ValueType.Bool, Byte = (byte)(b ? 1 : 0) };
+            }
+            else if (args[i] is AtkValue av)
+            {
+                stk[i] = av;
+            }
+            else
+            {
+                throw new Exception("Unsupported arguments");
+            }
+        }
+        P.Memory.FireCallbackHook.Original(Base, args.Length, stk, (byte)(updateState ? 1 : 0));
+    }
+
+    internal static IEnumerable<string> GetEObjNames(params uint[] values)
+    {
+        foreach(var x in values)
+        {
+            yield return Svc.Data.GetExcelSheet<EObjName>().GetRow(x).Singular.ToDalamudString().ExtractText();
+        }
+    }
+
+    internal static float GetGCSealMultiplier()
+    {
+        var ret = 1f;
+        if (Player.Available)
+        {
+            if (Player.Object.StatusList.TryGetFirst(x => x.StatusId == 414, out var s)) ret = 1f + (float)s.StackCount / 100f;
+            if (Player.Object.StatusList.Any(x => x.StatusId == 1078)) ret = 1.15f;
+        }
+        return ret > 1f?ret:1f;
+    }
+
+    internal static bool TryGetCharacterIndex(string name, out int index)
+    {
+        index = GetCharacterNames().IndexOf(name);
+        return index >= 0;
+    }
+
+    internal static List<string> GetCharacterNames()
+    {
+        List<string> ret = new();
+        var data = CSFramework.Instance()->UIModule->GetRaptureAtkModule()->AtkModule.GetStringArrayData(1);
+        if (data != null)
+        {
+            for (int i = 60; i < data->AtkArrayData.Size; i++)
+            {
+                if (data->StringArray[i] == null) break;
+                var item = data->StringArray[i];
+                if (item != null)
+                {
+                    var str = MemoryHelper.ReadSeStringNullTerminated((nint)item).ExtractText();
+                    if (str == "") break;
+                    ret.Add(str);
+                }
+            }
+        }
+        return ret;
+    }
+
     internal static string FancyDigits(this int n)
     {
         return n.ToString().ReplaceByChar(Lang.Digits.Normal, Lang.Digits.GameFont);
@@ -57,6 +142,17 @@ internal static unsafe class Utils
             && title->UldManager.NodeList[3]->Color.A == 0xFF 
             && !TryGetAddonByName<AtkUnitBase>("TitleDCWorldMap", out _) 
             && !TryGetAddonByName<AtkUnitBase>("TitleConnect", out _);
+    }
+
+    internal static OfflineCharacterData GetOfflineCharacterDataFromAdditionalRetainerDataKey(string key)
+    {
+        var cid = ulong.Parse(key.Split(" ")[0].Replace("#", ""), System.Globalization.NumberStyles.HexNumber);
+        return P.config.OfflineData.FirstOrDefault(x => x.CID == cid);
+    }
+
+    internal static OfflineRetainerData GetOfflineRetainerDataFromAdditionalRetainerDataKey(string key)
+    {
+        return GetOfflineCharacterDataFromAdditionalRetainerDataKey(key).RetainerData.FirstOrDefault(x => x.Name == key.Split(" ")[1]);
     }
 
     internal static uint GetNextPlannedVenture(this AdditionalRetainerData data)
@@ -192,12 +288,18 @@ internal static unsafe class Utils
 
     internal static AdditionalRetainerData GetAdditionalData(ulong cid, string name)
     {
+        var key = GetAdditionalDataKey(cid, name, true);
+        return P.config.AdditionalData[key];
+    }
+
+    internal static string GetAdditionalDataKey(ulong cid, string name, bool create = true)
+    {
         var key = $"#{cid:X16} {name}";
-        if (!P.config.AdditionalData.ContainsKey(key))
+        if (create && !P.config.AdditionalData.ContainsKey(key))
         {
             P.config.AdditionalData[key] = new();
         }
-        return P.config.AdditionalData[key];
+        return key;
     }
 
     internal static bool GenericThrottle => EzThrottler.Throttle("AutoRetainerGenericThrottle", P.config.Delay);

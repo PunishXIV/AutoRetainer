@@ -57,7 +57,7 @@ internal unsafe class AutoLogin
         actionQueue.Enqueue(SelectYesLogout);
     }
 
-    internal void Login(string WorldName, uint characterIndex, int serviceAccount)
+    internal void Login(string WorldName, string characterName, int serviceAccount)
     {
 
         var world = Svc.Data.Excel.GetSheet<World>()?.FirstOrDefault(w => w.Name.ToDalamudString().TextValue.Equals(WorldName, StringComparison.InvariantCultureIgnoreCase));
@@ -68,11 +68,11 @@ internal unsafe class AutoLogin
             return;
         }
 
-        if (characterIndex >= 8)
+        /*if (characterName >= 8)
         {
             PluginLog.Error("Invalid Character Index. Must be between 0 and 7.");
             return;
-        }
+        }*/
 
         if (serviceAccount < 0 || serviceAccount >= 10)
         {
@@ -82,7 +82,7 @@ internal unsafe class AutoLogin
 
         tempDc = world.DataCenter.Row;
         tempWorld = world.RowId;
-        tempCharacter = characterIndex;
+        tempCharacter = characterName;
         tempServiceAccount = serviceAccount;
         actionQueue.Clear();
         actionQueue.Enqueue(OpenDataCenterMenu);
@@ -96,7 +96,7 @@ internal unsafe class AutoLogin
         actionQueue.Enqueue(ClearTemp);
     }
 
-    internal void SwapCharacter(string WorldName, uint characterIndex, int serviceAccount)
+    internal void SwapCharacter(string WorldName, string characterName, int serviceAccount)
     {
 
         var world = Svc.Data.Excel.GetSheet<World>()?.FirstOrDefault(w => w.Name.ToDalamudString().TextValue.Equals(WorldName, StringComparison.InvariantCultureIgnoreCase));
@@ -107,11 +107,11 @@ internal unsafe class AutoLogin
             return;
         }
 
-        if (characterIndex >= 8)
+        /*if (characterName >= 8)
         {
             PluginLog.Error("Invalid Character Index. Must be between 0 and 7.");
             return;
-        }
+        }*/
 
         if (serviceAccount < 0 || serviceAccount >= 10)
         {
@@ -121,7 +121,7 @@ internal unsafe class AutoLogin
 
         tempDc = world.DataCenter.Row;
         tempWorld = world.RowId;
-        tempCharacter = characterIndex;
+        tempCharacter = characterName;
         tempServiceAccount = serviceAccount;
         actionQueue.Clear();
         actionQueue.Enqueue(VariableDelay(5));
@@ -289,9 +289,13 @@ internal unsafe class AutoLogin
         // Select Character
         var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("_CharaSelectListMenu", 1);
         if (addon == null || tempCharacter == null) return false;
-        GenerateCallback(addon, 17, 0, tempCharacter);
-        var nextAddon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("SelectYesno", 1);
-        return nextAddon != null;
+        if (Utils.TryGetCharacterIndex(tempCharacter, out var index))
+        {
+            GenerateCallback(addon, (int)17, (int)0, (int)index);
+            var nextAddon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("SelectYesno", 1);
+            return nextAddon != null;
+        }
+        return false;
     }
 
     bool SelectYesLogout()
@@ -346,7 +350,7 @@ internal unsafe class AutoLogin
 
     private uint? tempDc = null;
     private uint? tempWorld = null;
-    private uint? tempCharacter = null;
+    private string? tempCharacter = null;
     private int tempServiceAccount = 0;
 
     internal void DrawUI()
@@ -391,7 +395,7 @@ internal unsafe class AutoLogin
         {
             tempDc = 9;
             tempWorld = 87;
-            tempCharacter = 0;
+            //tempCharacter = "";
 
             actionQueue.Enqueue(Logout);
             actionQueue.Enqueue(SelectYes);

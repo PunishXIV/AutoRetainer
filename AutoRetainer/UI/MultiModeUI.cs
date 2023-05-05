@@ -2,6 +2,7 @@
 using ECommons;
 using ECommons.GameHelpers;
 using ECommons.MathHelpers;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 
 namespace AutoRetainer.UI;
@@ -52,11 +53,11 @@ internal unsafe static class MultiModeUI
             if (ImGuiEx.IconButton(Lang.IconMultiMode))
             {
                 data.Enabled = !data.Enabled;
-                if (data.Enabled && !data.Index.InRange(1, 9))
+                /*if (data.Enabled && !data.Index.InRange(1, 9))
                 {
                     data.Enabled = false;
                     Svc.Chat.PrintError("[AutoRetainer] Error: Please set the character index and service account for this character before enabling multi mode.");
-                }
+                }*/
             }
             if (colen) ImGui.PopStyleColor();
             ImGuiEx.Tooltip($"Enable multi-mode for this character");
@@ -101,7 +102,7 @@ internal unsafe static class MultiModeUI
                 {
                     ImGui.CloseCurrentPopup();
                 }
-                ImGuiEx.TextV("Character index:");
+                /*ImGuiEx.TextV("Character index:");
                 ImGui.SameLine();
                 ImGui.SetNextItemWidth(100);
                 if (ImGui.BeginCombo("##index", data.Index == 0 ? "n/a" : data.Index.ToString()))
@@ -114,11 +115,11 @@ internal unsafe static class MultiModeUI
                         }
                     }
                     ImGui.EndCombo();
-                }
+                }*/
 
                 //if (P.config.MultipleServiceAccounts)
                 {
-                    ImGui.SameLine();
+                    //ImGui.SameLine();
                     ImGui.SetNextItemWidth(150);
                     if (ImGui.BeginCombo("##sindex", $"Service Account {data.ServiceAccount + 1}"))
                     {
@@ -144,6 +145,8 @@ internal unsafe static class MultiModeUI
                     }
                 }
                 ImGuiComponents.HelpMarker("When operating in multi mode, if there are no other characters with imminent ventures to collect, it will relog back to your preferred character.");
+
+                ImGui.Checkbox("Show Retainers in Display Order", ref data.ShowRetainersInDisplayOrder);
 
                 ImGuiEx.Text($"Automatic Grand Company Expert Delivery:");
                 if (!AutoGCHandin.Operation)
@@ -224,9 +227,10 @@ internal unsafe static class MultiModeUI
                     ImGui.TableSetupColumn("");
                     ImGui.TableHeadersRow();
                     var retainers = P.GetSelectedRetainers(data.CID);
+
                     for (var i = 0; i < data.RetainerData.Count; i++)
                     {
-                        var ret = data.RetainerData[i];
+                        var ret = data.ShowRetainersInDisplayOrder ? data.RetainerData.First(x => x.DisplayOrder == i) : data.RetainerData[i];
                         if (ret.Level == 0 || ret.Name.ToString().IsNullOrEmpty()) continue;
                         var adata = Utils.GetAdditionalData(data.CID, ret.Name);
                         ImGui.TableNextRow();

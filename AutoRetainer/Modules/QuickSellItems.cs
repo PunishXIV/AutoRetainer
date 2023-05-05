@@ -92,19 +92,19 @@ public unsafe class QuickSellItems : IDisposable
     {
         text = new();
         if (CSFramework.Instance()->WindowInactive) return false;
-        if (Bitmask.IsBitSet(User32.GetKeyState((int)P.config.SellKey), 15))
+        if (Utils.IsKeyPressed(P.config.SellKey))
         {
             text.Add(retainerSellText);
         }
-        if (Bitmask.IsBitSet(User32.GetKeyState((int)P.config.RetrieveKey), 15))
+        if (Utils.IsKeyPressed(P.config.RetrieveKey))
         {
             text.Add(retrieveFromRetainerText);
         }
-        if (Bitmask.IsBitSet(User32.GetKeyState((int)P.config.EntrustKey), 15))
+        if (Utils.IsKeyPressed(P.config.EntrustKey))
         {
             text.Add(entrustToRetainerText);
         }
-        if (Bitmask.IsBitSet(User32.GetKeyState((int)P.config.SellMarketKey), 15))
+        if (Utils.IsKeyPressed(P.config.SellMarketKey))
         {
             text.Add(putUpForSaleText);
         }
@@ -114,7 +114,7 @@ public unsafe class QuickSellItems : IDisposable
     private void* OpenInventoryContextDetour(AgentInventoryContext* agent, InventoryType inventoryType, ushort slot, int a4, ushort a5, byte a6)
     {
         var retVal = openInventoryContextHook.Original(agent, inventoryType, slot, a4, a5, a6);
-
+        InternalLog.Verbose($"Inventory hook: {inventoryType}, {slot}");
         try
         {
             if (CanSellFrom.Contains(inventoryType) && IsReadyToUse() && GetAction(out var text))

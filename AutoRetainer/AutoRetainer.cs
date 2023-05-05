@@ -20,6 +20,7 @@ using AutoRetainer.Modules.Statistics;
 using AutoRetainer.Internal;
 using AutoRetainer.UI.Overlays;
 using ECommons.Throttlers;
+using AutoRetainer.Modules;
 
 namespace AutoRetainer;
 
@@ -43,6 +44,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal bool ConditionWasEnabled = false;
     internal VenturePlanner VenturePlanner;
     internal VentureBrowser VentureBrowser;
+    internal LogWindow LogWindow;
 
     internal long Time => P.config.UseServerTime ? FFXIVClientStructs.FFXIV.Client.System.Framework.Framework.GetServerTime() : DateTimeOffset.Now.ToUnixTimeSeconds();
 
@@ -68,6 +70,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 ws.AddWindow(VenturePlanner);
                 VentureBrowser = new();
                 ws.AddWindow(VentureBrowser);
+                LogWindow = new();
+                ws.AddWindow(LogWindow);
                 configGui = new();
                 TaskManager = new() { AbortOnTimeout = true, TimeLimitMS = 20000 };
                 Memory = new();
@@ -157,12 +161,16 @@ public unsafe class AutoRetainer : IDalamudPlugin
         {
             VentureBrowser.IsOpen = !VentureBrowser.IsOpen;
         }
+        else if (arguments.EqualsIgnoreCaseAny("l", "log"))
+        {
+            LogWindow.IsOpen = !LogWindow.IsOpen;
+        }
         else if (arguments.StartsWith("relog "))
         {
             var target = P.config.OfflineData.Where(x => $"{x.Name}@{x.World}" == arguments[6..]).FirstOrDefault();
             if (target != null)
             {
-                if (!AutoLogin.Instance.IsRunning) AutoLogin.Instance.SwapCharacter(target.World, target.CharaIndex, target.ServiceAccount);
+                if (!AutoLogin.Instance.IsRunning) AutoLogin.Instance.SwapCharacter(target.World, target.Name, target.ServiceAccount);
             }
             else
             {
@@ -200,6 +208,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         MultiMode.Tick();
         NotificationHandler.Tick();
         YesAlready.Tick();
+        //if(P.config.RetryItemSearch) RetryItemSearch.Tick();
         if(SchedulerMain.PluginEnabled || MultiMode.Enabled || TaskManager.IsBusy)
         {
             if(Svc.ClientState.TerritoryType == Prisons.Mordion_Gaol)
@@ -336,7 +345,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                     else
                     {
                         var bellBehavior = Utils.IsAnyRetainersCompletedVenture() ? P.config.OpenBellBehaviorWithVentures : P.config.OpenBellBehaviorNoVentures;
-                        if(bellBehavior != OpenBellBehavior.Pause_AutoRetainer && (Bitmask.IsBitSet(User32.GetKeyState((int)P.config.Suppress), 15) && !CSFramework.Instance()->WindowInactive))
+                        if(bellBehavior != OpenBellBehavior.Pause_AutoRetainer && Utils.IsKeyPressed(P.config.Suppress) && !CSFramework.Instance()->WindowInactive)
                         {
                             bellBehavior = OpenBellBehavior.Do_nothing;
                             Notify.Info($"Open bell action cancelled");

@@ -67,12 +67,13 @@ internal unsafe class Config : IEzConfig
     public UnavailableVentureDisplay UnavailableVentureDisplay = UnavailableVentureDisplay.Hide;
 
     public bool ShowAdditionalInfo = true;
+    public bool RetryItemSearch = false;
 
     internal bool DontReassign
     {
         get
         {
-            return _dontReassign || (P.config.TempCollectB != Keys.None && (Bitmask.IsBitSet(User32.GetKeyState((int)P.config.TempCollectB), 15) && !CSFramework.Instance()->WindowInactive));
+            return _dontReassign || (P.config.TempCollectB != Keys.None && (Utils.IsKeyPressed(P.config.TempCollectB) && !CSFramework.Instance()->WindowInactive));
         }
         set
         {

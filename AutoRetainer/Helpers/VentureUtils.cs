@@ -361,6 +361,11 @@ namespace AutoRetainer.Helpers
             return Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRow(Task.Task)?.Item.Value.RowId ?? 0;
         }
 
+        internal static Item GetVentureItem(this RetainerTask Task)
+        {
+            return Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRow(Task.Task)?.Item.Value;
+        }
+
         internal static List<string> GetAvailableVentureNames()
         {
             List<string> ret = new();

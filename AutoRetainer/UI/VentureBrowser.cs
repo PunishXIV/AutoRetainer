@@ -115,6 +115,9 @@ namespace AutoRetainer.UI
                                 CurrentIndex = parts.YieldRate,
                                 IsDol = VentureUtils.IsDoL(SelectedRetainer.Job),
                                 IlvlGathering = VentureUtils.IsDoL(SelectedRetainer.Job) ? v.RequiredGathering : v.RequiredItemLevel,
+                                Available = avail,
+                                ID = v.RowId,
+                                ItemID = v.GetVentureItemId()
                             };
                             (ventureBrowserData.Requirements, ventureBrowserData.Amounts) = VentureUtils.GetVentureAmounts(v, SelectedRetainer);
                             if(v.RequiredGathering > MaxGathering) MaxGathering = v.RequiredGathering;
@@ -145,6 +148,15 @@ namespace AutoRetainer.UI
                             ImGuiEx.TextCentered(SelectedRetainer.Level >= x.VentureLevel?ImGuiColors.ParsedGreen:ImGuiColors.DalamudRed, $"{x.VentureLevel}");
                             ImGui.TableNextColumn();
                             ImGuiEx.Text($"{x.VentureName}");
+                            if(ImGui.SmallButton($"To planner##{x.ID}"))
+                            {
+                                adata.VenturePlan.List.Add(new(x.ID));
+                            }
+                            ImGui.SameLine();
+                            if (ImGui.SmallButton($"Check price##{x.ID}"))
+                            {
+                                Svc.Commands.ProcessCommand($"/pmb {x.ItemID}");
+                            }
                             ImGui.TableNextColumn();
                             ImGuiEx.TextCentered(x.AvailableByGear? ImGuiColors.ParsedGreen : ImGuiColors.DalamudRed, $"{x.IlvlGathering}");
                             ImGui.TableNextColumn();
@@ -179,7 +191,7 @@ namespace AutoRetainer.UI
                                 ImGuiEx.Text(x.Gathered?ImGuiColors.ParsedGreen:ImGuiColors.DalamudRed, x.Gathered?"Yes":"No");
                                 if(!x.Gathered && GatherBuddyPresent)
                                 {
-                                    if (ImGui.SmallButton($"Gather##{x.VentureName}"))
+                                    if (ImGui.SmallButton($"Gather##{x.ID}"))
                                     {
                                         Svc.Commands.ProcessCommand($"/gather {x.VentureName}");
                                     }
@@ -209,6 +221,9 @@ namespace AutoRetainer.UI
             internal int VentureLevel;
             internal bool IsDol;
             internal int IlvlGathering;
+            internal bool Available;
+            internal uint ID;
+            internal uint ItemID;
         }
     }
 }

@@ -17,6 +17,7 @@ public class OfflineCharacterData
     public uint VentureCoffers = 0;
     public int ServiceAccount = 0;
     public bool EnableGCArmoryHandin = false; //todo: remove
+    public bool ShowRetainersInDisplayOrder = false;
     public bool ShouldSerializeEnableGCArmoryHandin() => false;
     public GCDeliveryType GCDeliveryType = GCDeliveryType.Disabled;
     public HashSet<uint> UnlockedGatheringItems = new();

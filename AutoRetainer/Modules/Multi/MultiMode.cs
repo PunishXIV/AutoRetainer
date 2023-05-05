@@ -264,10 +264,10 @@ internal unsafe static class MultiMode
         {
             ErrorMessage = "AutoLogin is already running";
         }
-        else if (data != null && !data.Index.InRange(1, 9))
+        /*else if (data != null && !data.Index.InRange(1, 9))
         {
             ErrorMessage = "Invalid character index";
-        }
+        }*/
         else 
         {
             if (Player.Available)
@@ -292,7 +292,7 @@ internal unsafe static class MultiMode
                     }
                     if (data != null)
                     {
-                        AutoLogin.Instance.SwapCharacter(data.World, data.CharaIndex, data.ServiceAccount);
+                        AutoLogin.Instance.SwapCharacter(data.World, data.Name, data.ServiceAccount);
                     }
                     else
                     {
@@ -305,7 +305,7 @@ internal unsafe static class MultiMode
             {
                 if (Utils.CanAutoLogin())
                 {
-                    AutoLogin.Instance.Login(data.World, data.CharaIndex, data.ServiceAccount);
+                    AutoLogin.Instance.Login(data.World, data.Name, data.ServiceAccount);
                     return true;
                 }
                 else
