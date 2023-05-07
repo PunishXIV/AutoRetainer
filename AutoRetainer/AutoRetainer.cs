@@ -208,7 +208,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         MultiMode.Tick();
         NotificationHandler.Tick();
         YesAlready.Tick();
-        if(P.config.RetryItemSearch) RetryItemSearch.Tick();
+        //if(P.config.RetryItemSearch) RetryItemSearch.Tick();
         if(SchedulerMain.PluginEnabled || MultiMode.Enabled || TaskManager.IsBusy)
         {
             if(Svc.ClientState.TerritoryType == Prisons.Mordion_Gaol)
@@ -345,7 +345,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                     else
                     {
                         var bellBehavior = Utils.IsAnyRetainersCompletedVenture() ? P.config.OpenBellBehaviorWithVentures : P.config.OpenBellBehaviorNoVentures;
-                        if(bellBehavior != OpenBellBehavior.Pause_AutoRetainer && (Bitmask.IsBitSet(User32.GetKeyState((int)P.config.Suppress), 15) && !CSFramework.Instance()->WindowInactive))
+                        if(bellBehavior != OpenBellBehavior.Pause_AutoRetainer && Utils.IsKeyPressed(P.config.Suppress) && !CSFramework.Instance()->WindowInactive)
                         {
                             bellBehavior = OpenBellBehavior.Do_nothing;
                             Notify.Info($"Open bell action cancelled");

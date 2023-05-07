@@ -97,7 +97,7 @@ unsafe internal class ConfigGui : Window
                 (P.config.RecordStats ? "Statistics" : null, StatisticsUI.Draw, null, true),
                 ("Settings", SettingsMain.Draw, null, true),
                 (P.config.Expert?"Expert":null, Expert.Draw, null, true),
-                ("Beta", Beta.Draw, null, true),
+                //("Beta", Beta.Draw, null, true),
                 ("About", delegate { AboutTab.Draw(P); }, null, true),
                 (P.config.Verbose ? "Dev" : null, delegate
                 {
