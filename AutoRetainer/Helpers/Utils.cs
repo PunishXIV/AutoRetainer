@@ -25,12 +25,6 @@ namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
-    public static bool IsKeyPressed(Keys key)
-    {
-        if(key == Keys.None) return false;
-        return Bitmask.IsBitSet(User32.GetKeyState((int)key), 15);
-    }
-
     public static void Callback(AtkUnitBase* Base, bool updateState, params object[] args)
     {
         var stk = stackalloc AtkValue[args.Length];
