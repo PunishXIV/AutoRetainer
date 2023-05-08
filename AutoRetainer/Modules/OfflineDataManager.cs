@@ -92,7 +92,10 @@ internal unsafe static class OfflineDataManager
                 for (int p = 0; p < P.retainerManager.Count; p++)
                 {
                     if (FFXIVClientStructs.FFXIV.Client.Game.RetainerManager.Instance()->DisplayOrder[p] == i)
+                    {
                         data.RetainerData[i].DisplayOrder = p;
+                        break;
+                    }
                 }
             }
         }

@@ -12,9 +12,11 @@ internal class MultiModeOverlay : Window
         RespectCloseHotkey = false;
     }
 
+    bool DisplayNotify => P.config.NotifyEnableOverlay && NotificationHandler.CurrentState && !NotificationHandler.IsHidden && (!P.config.NotifyCombatDutyNoDisplay || !(Svc.Condition[ConditionFlag.BoundByDuty56] && Svc.Condition[ConditionFlag.InCombat]));
+
     public override bool DrawConditions()
     {
-        return !P.config.HideOverlayIcons;
+        return !P.config.HideOverlayIcons && (P.TaskManager.IsBusy || P.IsNextToBell || MultiMode.Enabled || AutoLogin.Instance.IsRunning || SchedulerMain.PluginEnabled || DisplayNotify);
     }
 
     public override void Draw()
@@ -139,7 +141,7 @@ internal class MultiModeOverlay : Window
                 ImGuiEx.Text($"loading bell.png");
             }
         }
-        else if (P.config.NotifyEnableOverlay && NotificationHandler.CurrentState && !NotificationHandler.IsHidden && (!P.config.NotifyCombatDutyNoDisplay || !(Svc.Condition[ConditionFlag.BoundByDuty56] && Svc.Condition[ConditionFlag.InCombat])))
+        else if (DisplayNotify)
         {
             if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "notify.png"), out var t))
             {
