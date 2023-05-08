@@ -92,19 +92,19 @@ public unsafe class QuickSellItems : IDisposable
     {
         text = new();
         if (CSFramework.Instance()->WindowInactive) return false;
-        if (Utils.IsKeyPressed(P.config.SellKey))
+        if (IsKeyPressed(P.config.SellKey))
         {
             text.Add(retainerSellText);
         }
-        if (Utils.IsKeyPressed(P.config.RetrieveKey))
+        if (IsKeyPressed(P.config.RetrieveKey))
         {
             text.Add(retrieveFromRetainerText);
         }
-        if (Utils.IsKeyPressed(P.config.EntrustKey))
+        if (IsKeyPressed(P.config.EntrustKey))
         {
             text.Add(entrustToRetainerText);
         }
-        if (Utils.IsKeyPressed(P.config.SellMarketKey))
+        if (IsKeyPressed(P.config.SellMarketKey))
         {
             text.Add(putUpForSaleText);
         }

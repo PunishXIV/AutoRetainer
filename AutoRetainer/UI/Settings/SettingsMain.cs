@@ -190,7 +190,7 @@ internal static class SettingsMain
                 ImGuiEx.Text(ImGuiColors.DalamudYellow, $"Now press new key...");
                 foreach (var x in Enum.GetValues<Keys>())
                 {
-                    if (Utils.IsKeyPressed(x))
+                    if (IsKeyPressed(x))
                     {
                         KeyInputActive = null;
                         key = x;

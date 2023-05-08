@@ -227,10 +227,14 @@ internal unsafe static class MultiModeUI
                     ImGui.TableSetupColumn("");
                     ImGui.TableHeadersRow();
                     var retainers = P.GetSelectedRetainers(data.CID);
-
-                    for (var i = 0; i < data.RetainerData.Count; i++)
+                    var retainerData = data.RetainerData;
+                    if (data.ShowRetainersInDisplayOrder)
                     {
-                        var ret = data.ShowRetainersInDisplayOrder ? data.RetainerData.First(x => x.DisplayOrder == i) : data.RetainerData[i];
+                        retainerData = retainerData.OrderBy(x => x.DisplayOrder).ToList();
+                    }
+                    for (var i = 0; i < retainerData.Count; i++)
+                    {
+                        var ret = retainerData[i];
                         if (ret.Level == 0 || ret.Name.ToString().IsNullOrEmpty()) continue;
                         var adata = Utils.GetAdditionalData(data.CID, ret.Name);
                         ImGui.TableNextRow();
