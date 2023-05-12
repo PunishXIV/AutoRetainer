@@ -1,4 +1,5 @@
 ﻿using ECommons.Configuration;
+using ECommons.Interop;
 using ECommons.MathHelpers;
 using PInvoke;
 using System.Windows.Forms;
@@ -58,8 +59,8 @@ internal unsafe class Config : IEzConfig
     public bool MultiModeUIBar = false;
     public bool UIBar = true;
 
-    public Keys Suppress = Keys.Control;
-    public Keys TempCollectB = Keys.ShiftKey;
+    public LimitedKeys Suppress = LimitedKeys.LeftControlKey;
+    public LimitedKeys TempCollectB = LimitedKeys.LeftShiftKey;
 
     public int RetainerMenuDelay = 0;
     public List<VenturePlan> SavedPlans = new();
@@ -73,7 +74,7 @@ internal unsafe class Config : IEzConfig
     {
         get
         {
-            return _dontReassign || (P.config.TempCollectB != Keys.None && (IsKeyPressed(P.config.TempCollectB) && !CSFramework.Instance()->WindowInactive));
+            return _dontReassign || (P.config.TempCollectB != LimitedKeys.None && IsKeyPressed(P.config.TempCollectB) && !CSFramework.Instance()->WindowInactive);
         }
         set
         {
@@ -81,10 +82,10 @@ internal unsafe class Config : IEzConfig
         }
     }
 
-    public Keys SellKey = Keys.None;
-    public Keys EntrustKey = Keys.None;
-    public Keys RetrieveKey = Keys.None;
-    public Keys SellMarketKey = Keys.None;
+    public LimitedKeys SellKey = LimitedKeys.None;
+    public LimitedKeys EntrustKey = LimitedKeys.None;
+    public LimitedKeys RetrieveKey = LimitedKeys.None;
+    public LimitedKeys SellMarketKey = LimitedKeys.None;
 
     public bool NotifyEnableOverlay = false;
     public bool NotifyCombatDutyNoDisplay = true;
