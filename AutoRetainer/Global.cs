@@ -25,3 +25,4 @@ global using AutoRetainer.Scheduler;
 global using AutoRetainer.Modules;
 global using AutoRetainer.Modules.GcHandin;
 global using AutoRetainer.Modules.Multi;
+global using Callback = ECommons.Automation.Callback;
