@@ -2,6 +2,7 @@
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Hooking;
 using Dalamud.Utility.Signatures;
+using ECommons.Interop;
 using ECommons.MathHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
@@ -178,7 +179,7 @@ public unsafe class QuickSellItems : IDisposable
 
     public void Toggle()
     {
-        if (P.config.SellKey == Keys.None && P.config.RetrieveKey == Keys.None && P.config.EntrustKey == Keys.None && P.config.SellMarketKey == Keys.None)
+        if (P.config.SellKey == LimitedKeys.None && P.config.RetrieveKey == LimitedKeys.None && P.config.EntrustKey == LimitedKeys.None && P.config.SellMarketKey == LimitedKeys.None)
         {
             Disable();
         }

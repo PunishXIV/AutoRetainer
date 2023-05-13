@@ -46,7 +46,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal VentureBrowser VentureBrowser;
     internal LogWindow LogWindow;
 
-    internal long Time => P.config.UseServerTime ? FFXIVClientStructs.FFXIV.Client.System.Framework.Framework.GetServerTime() : DateTimeOffset.Now.ToUnixTimeSeconds();
+    internal long Time => P.config.UseServerTime ? CSFramework.GetServerTime() : DateTimeOffset.Now.ToUnixTimeSeconds();
 
     internal StyleModel Style;
     internal bool StylePushed = false;

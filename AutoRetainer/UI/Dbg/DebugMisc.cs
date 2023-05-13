@@ -1,5 +1,8 @@
 ﻿using AutoRetainer.Helpers;
+using ECommons.MathHelpers;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using PInvoke;
+using System.Windows.Forms;
 
 namespace AutoRetainer.UI.Dbg;
 
@@ -7,6 +10,10 @@ internal static unsafe class DebugMisc
 {
     internal static void Draw()
     {
+        ImGuiEx.Text($"CSFramework.Instance()->WindowInactive: {CSFramework.Instance()->WindowInactive}");
+        ImGuiEx.Text($"IsKeyPressed(P.config.TempCollectB): {IsKeyPressed(P.config.TempCollectB)}");
+        ImGuiEx.Text($"Bitmask.IsBitSet(User32.GetKeyState((int)P.config.TempCollectB), 15): {Bitmask.IsBitSet(User32.GetKeyState((int)P.config.TempCollectB), 15)}");
+        ImGuiEx.Text($"DontReassign: {P.config.DontReassign}, key {P.config.TempCollectB}/{(int)P.config.TempCollectB}");
         foreach(var x in P.config.OfflineData)
         {
             ImGuiEx.Text($"{x.Name}@{x.World}: {(x.Gil + x.RetainerData.Sum(z => z.Gil))}");

@@ -134,7 +134,7 @@ internal unsafe static class RetainerHandlers
             if (addon->UldManager.NodeList[invName.EntrustDuplicatesIndex]->IsVisible && button->IsEnabled && Utils.GenericThrottle)
             {
                 //new ClickButtonGeneric(addon, invName.Name).Click(button);
-                Callback(addon, (int)0);
+                Callback.Fire(addon,false, (int)0);
                 P.DebugLog($"Clicked entrust duplicates {invName.Name} {invName.EntrustDuplicatesIndex}");
                 return true;
             }
@@ -364,7 +364,7 @@ internal unsafe static class RetainerHandlers
             {
                 if (VentureUtils.GetAvailableVentureNames().Contains(ventureName))
                 {
-                    Callback(addon, (int)11, (int)VentureID);
+                    Callback.Fire(addon, false,(int)11, (int)VentureID);
                     return true;
                 }
                 else
