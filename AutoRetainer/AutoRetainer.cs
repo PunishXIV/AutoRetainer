@@ -88,6 +88,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 StatisticsManager.Init();
                 AutoGCHandin.Init();
                 IPC.Init();
+                Utils.FixKeys();
 
                 ws.AddWindow(new MultiModeOverlay());
                 ws.AddWindow(new RetainerListOverlay());
