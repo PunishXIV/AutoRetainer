@@ -1,4 +1,5 @@
 ﻿using Dalamud.Interface.Components;
+using ECommons.Interop;
 using ECommons.MathHelpers;
 using PInvoke;
 using PunishLib.ImGuiMethods;
@@ -164,7 +165,7 @@ internal static class SettingsMain
         InfoBox.DrawBox("Automatic Grand Company Expert Delivery", AutoGCHandinUI.Draw);
     }
 
-    static void QRA(string text, ref Keys key)
+    static void QRA(string text, ref LimitedKeys key)
     {
         if(DrawKeybind(text, ref key))
         {
@@ -175,7 +176,7 @@ internal static class SettingsMain
     }
 
     static string KeyInputActive = null;
-    static bool DrawKeybind(string text, ref Keys key)
+    static bool DrawKeybind(string text, ref LimitedKeys key)
     {
         bool ret = false;
         ImGui.PushID(text);
@@ -188,7 +189,7 @@ internal static class SettingsMain
             if (text == KeyInputActive)
             {
                 ImGuiEx.Text(ImGuiColors.DalamudYellow, $"Now press new key...");
-                foreach (var x in Enum.GetValues<Keys>())
+                foreach (var x in Enum.GetValues<LimitedKeys>())
                 {
                     if (IsKeyPressed(x))
                     {
@@ -218,12 +219,12 @@ internal static class SettingsMain
                 KeyInputActive = null;
             }
         }
-        if (key != Keys.None)
+        if (key != LimitedKeys.None)
         {
             ImGui.SameLine();
             if (ImGuiEx.IconButton(FontAwesomeIcon.Trash))
             {
-                key = Keys.None;
+                key = LimitedKeys.None;
                 ret = true;
             }
         }

@@ -210,7 +210,7 @@ internal unsafe class AutoLogin
     {
         var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("_TitleMenu", 1);
         if (addon == null || addon->IsVisible == false) return false;
-        GenerateCallback(addon, 12);
+        Callback.Fire(addon,false, 12);
         var nextAddon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("TitleDCWorldMap", 1);
         if (nextAddon == null) return false;
         return true;
@@ -248,7 +248,7 @@ internal unsafe class AutoLogin
     {
         var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("TitleDCWorldMap", 1);
         if (addon == null || tempDc == null) return false;
-        GenerateCallback(addon, 2, (int)tempDc);
+        Callback.Fire(addon, false, 2, (int)tempDc);
         return true;
     }
 
@@ -276,7 +276,7 @@ internal unsafe class AutoLogin
             if (s.Trim().Length == 0) continue;
             checkedWorldCount++;
             if (s != world.Name.RawString) continue;
-            GenerateCallback(addon, 9, 0, i);
+            Callback.Fire(addon, false, 9, 0, i);
             return true;
         }
 
@@ -291,7 +291,7 @@ internal unsafe class AutoLogin
         if (addon == null || tempCharacter == null) return false;
         if (Utils.TryGetCharacterIndex(tempCharacter, out var index))
         {
-            GenerateCallback(addon, (int)17, (int)0, (int)index);
+            Callback.Fire(addon, false, (int)17, (int)0, (int)index);
             var nextAddon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("SelectYesno", 1);
             return nextAddon != null;
         }
@@ -310,7 +310,7 @@ internal unsafe class AutoLogin
     {
         var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("SelectYesno", 1);
         if (addon == null) return false;
-        GenerateCallback(addon, 0);
+        Callback.Fire(addon, false, 0);
         UiHelper.Close(addon, true);
         return true;
     }
@@ -422,65 +422,6 @@ internal unsafe class AutoLogin
         foreach (var l in actionQueue.ToList())
         {
             ImGui.Text($"{l.Method.Name}");
-        }
-    }
-
-
-    static void GenerateCallback(AtkUnitBase* unitBase, params object[] values)
-    {
-        if (unitBase == null) throw new Exception("Null UnitBase");
-        var atkValues = (AtkValue*)Marshal.AllocHGlobal(values.Length * sizeof(AtkValue));
-        if (atkValues == null) return;
-        try
-        {
-            for (var i = 0; i < values.Length; i++)
-            {
-                var v = values[i];
-                switch (v)
-                {
-                    case uint uintValue:
-                        atkValues[i].Type = ValueType.UInt;
-                        atkValues[i].UInt = uintValue;
-                        break;
-                    case int intValue:
-                        atkValues[i].Type = ValueType.Int;
-                        atkValues[i].Int = intValue;
-                        break;
-                    case float floatValue:
-                        atkValues[i].Type = ValueType.Float;
-                        atkValues[i].Float = floatValue;
-                        break;
-                    case bool boolValue:
-                        atkValues[i].Type = ValueType.Bool;
-                        atkValues[i].Byte = (byte)(boolValue ? 1 : 0);
-                        break;
-                    case string stringValue:
-                        {
-                            atkValues[i].Type = ValueType.String;
-                            var stringBytes = Encoding.UTF8.GetBytes(stringValue);
-                            var stringAlloc = Marshal.AllocHGlobal(stringBytes.Length + 1);
-                            Marshal.Copy(stringBytes, 0, stringAlloc, stringBytes.Length);
-                            Marshal.WriteByte(stringAlloc, stringBytes.Length, 0);
-                            atkValues[i].String = (byte*)stringAlloc;
-                            break;
-                        }
-                    default:
-                        throw new ArgumentException($"Unable to convert type {v.GetType()} to AtkValue");
-                }
-            }
-
-            unitBase->FireCallback(values.Length, atkValues);
-        }
-        finally
-        {
-            for (var i = 0; i < values.Length; i++)
-            {
-                if (atkValues[i].Type == ValueType.String)
-                {
-                    Marshal.FreeHGlobal(new IntPtr(atkValues[i].String));
-                }
-            }
-            Marshal.FreeHGlobal(new IntPtr(atkValues));
         }
     }
 }
