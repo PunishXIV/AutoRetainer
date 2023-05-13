@@ -20,6 +20,7 @@ internal unsafe static class SchedulerMain
         } 
     }
 
+    internal static bool CanAssignQuickExploration => P.config.EnableAssigningQuickExploration && !P.config.DontReassign;
     internal static volatile uint VentureOverride = 0;
 
     internal static PluginEnableReason Reason { get; private set; }
@@ -94,7 +95,7 @@ internal unsafe static class SchedulerMain
                                         }
                                         else
                                         {
-                                            if (P.config.EnableAssigningQuickExploration)
+                                            if (CanAssignQuickExploration)
                                             {
                                                 TaskAssignQuickVenture.Enqueue();
                                             }
@@ -290,7 +291,7 @@ internal unsafe static class SchedulerMain
                 var rname = r.Name.ToString();
                 var adata = Utils.GetAdditionalData(Svc.ClientState.LocalContentId, rname);
                 if (P.GetSelectedRetainers(Svc.ClientState.LocalContentId).Contains(rname)
-                    && r.GetVentureSecondsRemaining() <= P.config.UnsyncCompensation && (r.VentureID != 0 || P.config.EnableAssigningQuickExploration || (adata.EnablePlanner && adata.VenturePlan.ListUnwrapped.Count > 0)))
+                    && r.GetVentureSecondsRemaining() <= P.config.UnsyncCompensation && (r.VentureID != 0 || CanAssignQuickExploration || (adata.EnablePlanner && adata.VenturePlan.ListUnwrapped.Count > 0)))
                 {
                     return rname;
                 }
