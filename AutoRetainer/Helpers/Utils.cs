@@ -387,6 +387,34 @@ internal static unsafe class Utils
         return currentObject;
     }
 
+    internal static AtkUnitBase* GetSpecificYesno(Predicate<string> compare)
+    {
+        for (int i = 1; i < 100; i++)
+        {
+            try
+            {
+                var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("SelectYesno", i);
+                if (addon == null) return null;
+                if (IsAddonReady(addon))
+                {
+                    var textNode = addon->UldManager.NodeList[15]->GetAsAtkTextNode();
+                    var text = MemoryHelper.ReadSeString(&textNode->NodeText).ExtractText().Replace(" ", "");
+                    if (compare(text))
+                    {
+                        PluginLog.Verbose($"SelectYesno {text} addon {i} by predicate");
+                        return addon;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.Log();
+                return null;
+            }
+        }
+        return null;
+    }
+
     internal static AtkUnitBase* GetSpecificYesno(params string[] s)
     {
         for (int i = 1; i < 100; i++)

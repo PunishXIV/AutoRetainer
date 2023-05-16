@@ -20,24 +20,7 @@ internal static unsafe class DebugMisc
     {
         if (Player.Available)
         {
-            {
-                sw1.Start();
-                for (uint i = 0; i < 1000; i++)
-                {
-                    var x = Svc.Data.GetExcelSheet<LogMessage>().GetRow(i).Text.ToDalamudString().ExtractText(false, false);
-                }
-                sw1.Stop();
-                ImGuiEx.Text($"Non-cached: {sw1.ElapsedMilliseconds} ms");
-            }
-            {
-                sw2.Start();
-                for (uint i = 0; i < 1000; i++)
-                {
-                    var x = Svc.Data.GetExcelSheet<LogMessage>().GetRow(i).Text.ToDalamudString().ExtractText();
-                }
-                sw2.Stop();
-                ImGuiEx.Text($"Cached: {sw2.ElapsedMilliseconds} ms");
-            }
+            
         }
         ImGui.Separator();
         ImGuiEx.Text($"CSFramework.Instance()->WindowInactive: {CSFramework.Instance()->WindowInactive}");
