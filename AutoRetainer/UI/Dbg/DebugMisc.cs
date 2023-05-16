@@ -1,15 +1,45 @@
 ﻿using AutoRetainer.Helpers;
+using Dalamud.Utility;
+using ECommons.GameHelpers;
 using ECommons.MathHelpers;
+using ECommons.Reflection;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using Lumina.Excel.GeneratedSheets;
 using PInvoke;
+using System.Diagnostics;
 using System.Windows.Forms;
+using ItemLevel = AutoRetainer.Helpers.ItemLevel;
 
 namespace AutoRetainer.UI.Dbg;
 
 internal static unsafe class DebugMisc
 {
+    static Stopwatch sw1 = new();
+    static Stopwatch sw2 = new();
     internal static void Draw()
     {
+        if (Player.Available)
+        {
+            {
+                sw1.Start();
+                for (uint i = 0; i < 1000; i++)
+                {
+                    var x = Svc.Data.GetExcelSheet<LogMessage>().GetRow(i).Text.ToDalamudString().ExtractText(false, false);
+                }
+                sw1.Stop();
+                ImGuiEx.Text($"Non-cached: {sw1.ElapsedMilliseconds} ms");
+            }
+            {
+                sw2.Start();
+                for (uint i = 0; i < 1000; i++)
+                {
+                    var x = Svc.Data.GetExcelSheet<LogMessage>().GetRow(i).Text.ToDalamudString().ExtractText();
+                }
+                sw2.Stop();
+                ImGuiEx.Text($"Cached: {sw2.ElapsedMilliseconds} ms");
+            }
+        }
+        ImGui.Separator();
         ImGuiEx.Text($"CSFramework.Instance()->WindowInactive: {CSFramework.Instance()->WindowInactive}");
         ImGuiEx.Text($"IsKeyPressed(P.config.TempCollectB): {IsKeyPressed(P.config.TempCollectB)}");
         ImGuiEx.Text($"Bitmask.IsBitSet(User32.GetKeyState((int)P.config.TempCollectB), 15): {Bitmask.IsBitSet(User32.GetKeyState((int)P.config.TempCollectB), 15)}");
