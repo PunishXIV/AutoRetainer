@@ -118,7 +118,7 @@ internal static class SettingsMain
                 }
             }
             ImGui.SameLine();
-            ImGuiEx.TextV(Censor.Character(P.config.OfflineData[index].Name));
+            ImGuiEx.TextV(Censor.Character(P.config.OfflineData[index].Name, P.config.OfflineData[index].World));
             ImGui.PopID();
         }
 

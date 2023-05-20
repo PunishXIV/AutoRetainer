@@ -14,13 +14,12 @@ namespace AutoRetainer.UI.Dbg;
 
 internal static unsafe class DebugMisc
 {
-    static Stopwatch sw1 = new();
-    static Stopwatch sw2 = new();
+
     internal static void Draw()
     {
         if (Player.Available)
         {
-            
+
         }
         ImGui.Separator();
         ImGuiEx.Text($"CSFramework.Instance()->WindowInactive: {CSFramework.Instance()->WindowInactive}");

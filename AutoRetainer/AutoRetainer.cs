@@ -4,7 +4,6 @@ using Dalamud.Game.ClientState.Conditions;
 using Lumina.Excel.GeneratedSheets;
 using ECommons.Events;
 using PunishLib;
-using PunishLib.Sponsor;
 using ECommons.Automation;
 using ECommons.Configuration;
 using Dalamud.Interface.Style;
@@ -56,8 +55,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         //PluginLoader.CheckAndLoad(pi, "https://love.puni.sh/plugins/AutoRetainer/blacklist.txt", delegate
         {
             ECommonsMain.Init(pi, this, Module.DalamudReflector);
-            PunishLibMain.Init(pi, this);
-            SponsorManager.SetSponsorInfo("https://ko-fi.com/spetsnaz");
+            PunishLibMain.Init(pi, this, PunishOption.DefaultKoFi); // Default button
             P = this;
             new TickScheduler(delegate
             {
@@ -177,6 +175,10 @@ public unsafe class AutoRetainer : IDalamudPlugin
             {
                 Notify.Error($"Could not find target character");
             }
+        }
+        else if (arguments.EqualsIgnoreCase("het"))
+        {
+            HouseEnterTask.EnqueueTask();
         }
         else
         {
