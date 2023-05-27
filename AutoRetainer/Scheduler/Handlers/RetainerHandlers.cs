@@ -379,4 +379,46 @@ internal unsafe static class RetainerHandlers
         }
         return false;
     }
+
+    public static bool? SearchVentureByName(uint id) => SearchVentureByName(VentureUtils.GetVentureName(id));
+
+    public static bool? SearchVentureByName(string name)
+    {
+        if (TryGetAddonByName<AtkUnitBase>("RetainerTaskSupply", out var addon) && IsAddonReady(addon))
+        {
+            if (Utils.GenericThrottle) 
+            {
+                Callback.Fire(addon, true, 2, new AtkValue() { Type = 0, Int = 0}, name);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static bool? SelectSpecificVentureByName(uint id) => SelectSpecificVentureByName(VentureUtils.GetVentureName(id));
+
+    public static bool? SelectSpecificVentureByName(string name)
+    {
+        if (TryGetAddonByName<AtkUnitBase>("RetainerTaskSupply", out var addon) && IsAddonReady(addon))
+        {
+            if (Utils.GenericThrottle)
+            {
+                var list = addon->UldManager.NodeList[3]->GetAsAtkComponentList();
+                InternalLog.Information($"Cnt: {list->ListLength}");
+                for (int i = 0; i < list->ListLength; i++)
+                {
+                    var el = list->AtkComponentBase.UldManager.NodeList[2 + i];
+                    var text = MemoryHelper.ReadSeString(&el->GetAsAtkComponentNode()->Component->UldManager.NodeList[9]->GetAsAtkTextNode()->NodeText).ExtractText();
+                    InternalLog.Information($"Text: {text}, name: {name}");
+                    if(text == name)
+                    {
+                        InternalLog.Information($"Match");
+                        Callback.Fire(addon, true, 5, i, new AtkValue() { Type = 0, Int = 0 });
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 }
