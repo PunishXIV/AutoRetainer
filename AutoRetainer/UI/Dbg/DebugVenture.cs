@@ -20,7 +20,8 @@ internal static unsafe class DebugVenture
         }
         ImGui.InputInt("Venture id", ref VentureID);
         ImGui.InputText("Venture name", ref VentureName, 100);
-        if (ImGui.Button("SearchVentureByName")) DuoLog.Information(RetainerHandlers.SearchVentureByName(VentureName).ToString());
+        //if (ImGui.Button("SearchVentureByName")) DuoLog.Information(RetainerHandlers.SearchVentureByName(VentureName).ToString());
+        if (ImGui.Button("Clear Venture list")) DuoLog.Information(RetainerHandlers.ClearTaskSupplylist().ToString());
         if (ImGui.Button("SelectSpecificVenture Name")) DuoLog.Information(RetainerHandlers.SelectSpecificVentureByName(VentureName).ToString());
         if (ImGui.Button("TaskAssignHuntingVenture"))
         {
