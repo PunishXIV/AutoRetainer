@@ -27,11 +27,27 @@ internal unsafe static class RetainerHandlers
         return Utils.TrySelectSpecificEntry(text);
     }
 
+    internal static void EnforceSelectStringThrottle() => EzThrottler.Throttle("EnforceSelectString", 3000, true);
     internal static bool? SelectViewVentureReport()
     {
+        EnforceSelectStringThrottle();
         //2385	View venture report. (Complete)
         var text = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(2385).Text.ToDalamudString().ExtractText();
         return Utils.TrySelectSpecificEntry(text);
+    }
+
+    internal static bool? EnforceSelectString(Func<bool?> Action)
+    {
+        if(!(TryGetAddonByName<AtkUnitBase>("SelectString", out var a) && a->IsVisible))
+        {
+            return true;
+        }
+        if(EzThrottler.Throttle("EnforceSelectString", 3000))
+        {
+            PluginLog.Warning($"Enforcing {Action.GetType().FullName} ");
+            Action();
+        }
+        return false;
     }
 
     internal static bool? ClickResultReassign()
