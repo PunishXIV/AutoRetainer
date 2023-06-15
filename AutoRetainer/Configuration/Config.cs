@@ -69,6 +69,7 @@ internal unsafe class Config : IEzConfig
 
     public bool ShowAdditionalInfo = true;
     public bool RetryItemSearch = false;
+    public bool ArtisanIntegration = false;
 
     internal bool DontReassign
     {

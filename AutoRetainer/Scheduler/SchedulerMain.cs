@@ -190,6 +190,12 @@ internal unsafe static class SchedulerMain
                                         P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
                                         P.TaskManager.Enqueue(DisablePlugin);
                                     }
+                                    else if (Reason == PluginEnableReason.Artisan)
+                                    {
+                                        P.DebugLog($"Scheduling closing  as Artisan is running");
+                                        P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
+                                        //P.TaskManager.Enqueue(DisablePlugin);
+                                    }
                                     else
                                     {
                                         void Process(TaskCompletedBehavior behavior)

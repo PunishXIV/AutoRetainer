@@ -27,6 +27,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
 {
     public string Name => "AutoRetainer";
     internal static AutoRetainer P;
+    internal static Config C => P.config;
     internal Config config;
     internal WindowSystem ws;
     internal ConfigGui configGui;
@@ -230,7 +231,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         IsNextToBell = false;
         if (P.config.RetainerSense && Svc.ClientState.LocalPlayer != null && Svc.ClientState.LocalPlayer.HomeWorld.Id == Svc.ClientState.LocalPlayer.CurrentWorld.Id)
         {
-            if(!IPC.Suppressed && !IsOccupied() && !P.config.OldRetainerSense && !TaskManager.IsBusy && !MultiMode.Active && !Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BoundByDuty] && Utils.IsAnyRetainersCompletedVenture())
+            if(!IPC.Suppressed && !IsOccupied() && !P.config.OldRetainerSense && !TaskManager.IsBusy && !Utils.MultiModeOrArtisan && !Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BoundByDuty] && Utils.IsAnyRetainersCompletedVenture())
             {
                 var bell = Utils.GetReachableRetainerBell();
                 if (bell == null || LastPosition != Svc.ClientState.LocalPlayer.Position)
@@ -336,13 +337,13 @@ public unsafe class AutoRetainer : IDalamudPlugin
             if (Svc.Targets.Target.IsRetainerBell()) {
                 if (value)
                 {
-                    if (MultiMode.Active)
+                    if (Utils.MultiModeOrArtisan)
                     {
                         WasEnabled = false;
                         if (IsInteractionAutomatic)
                         {
                             IsInteractionAutomatic = false;
-                            SchedulerMain.EnablePlugin(PluginEnableReason.MultiMode);
+                            SchedulerMain.EnablePlugin(MultiMode.Enabled? PluginEnableReason.MultiMode : PluginEnableReason.Artisan);
                         }
                     }
                     else

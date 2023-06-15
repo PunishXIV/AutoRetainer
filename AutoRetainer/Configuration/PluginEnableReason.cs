@@ -2,5 +2,5 @@
 
 public enum PluginEnableReason
 {
-    Access, Manual, Auto, MultiMode
+    Access, Manual, Auto, MultiMode, Artisan
 }
