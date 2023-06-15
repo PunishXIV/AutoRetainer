@@ -26,7 +26,7 @@ namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
-    internal static bool MultiModeOrArtisan => MultiMode.Enabled || (SchedulerMain.PluginEnabled && SchedulerMain.Reason == PluginEnableReason.Artisan);
+    internal static bool MultiModeOrArtisan => MultiMode.Active || (SchedulerMain.PluginEnabled && SchedulerMain.Reason == PluginEnableReason.Artisan);
 
     internal static void FixKeys()
     {

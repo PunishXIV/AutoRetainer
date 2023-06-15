@@ -388,7 +388,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                         SchedulerMain.EnablePlugin(PluginEnableReason.Auto);
                         WasEnabled = false;
                     }
-                    else if(!IsCloseActionAutomatic && P.config.AutoDisable && !MultiMode.Active)
+                    else if(!IsCloseActionAutomatic && P.config.AutoDisable && !Utils.MultiModeOrArtisan)
                     {
                         P.DebugLog($"Disabling plugin because AutoDisable is on");
                         SchedulerMain.DisablePlugin();

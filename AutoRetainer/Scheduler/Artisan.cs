@@ -9,7 +9,17 @@ namespace AutoRetainer.Scheduler
 {
     internal static class Artisan
     {
-        internal static void CheckIfArtisanShouldBeEnabled()
+        internal static bool IsListRunning => Svc.PluginInterface.GetIpcSubscriber<bool>("Artisan.IsListRunning").InvokeFunc();
+        internal static bool IsListPaused => Svc.PluginInterface.GetIpcSubscriber<bool>("Artisan.IsListPaused").InvokeFunc();
+        internal static bool GetStopRequest => Svc.PluginInterface.GetIpcSubscriber<bool>("Artisan.GetStopRequest").InvokeFunc();
+        internal static bool GetEnduranceStatus => Svc.PluginInterface.GetIpcSubscriber<bool>("Artisan.GetEnduranceStatus").InvokeFunc();
+        internal static void SetEnduranceStatus(bool b) => Svc.PluginInterface.GetIpcSubscriber<bool, object>("Artisan.IsListRunning").InvokeAction(b);
+        internal static void SetListPause(bool b) => Svc.PluginInterface.GetIpcSubscriber<bool, object>("Artisan.SetListPause").InvokeAction(b);
+        internal static void SetStopRequest(bool b) => Svc.PluginInterface.GetIpcSubscriber<bool, object>("Artisan.SetStopRequest").InvokeAction(b);
+
+        internal static bool WasPaused = false;
+
+        internal static void ArtisanTick()
         {
             if (C.ArtisanIntegration)
             {
@@ -20,16 +30,46 @@ namespace AutoRetainer.Scheduler
                         SchedulerMain.EnablePlugin(PluginEnableReason.Artisan);
                         P.DebugLog($"Enabling AutoRetainer because of Artisan integration");
                     }
+                    try
+                    {
+                        if (MultiMode.AnyRetainersAvailable())
+                        {
+                            if (!WasPaused)
+                            {
+                                WasPaused = true;
+                                SetStopRequest(true);
+                            }
+                        }
+                        else
+                        {
+                            if (WasPaused)
+                            {
+                                WasPaused = false;
+                                SetStopRequest(false);
+                            }
+                        }
+                    }
+                    catch(Exception ex) 
+                    {
+                        {
+                            ex.Log();
+                        } 
+                    }
                 }
             }
         }
 
         internal static bool IsCurrentlyOperating()
         {
-
-            return true;
+            try
+            {
+                return IsListRunning || GetEnduranceStatus;
+            }
+            catch(Exception ex)
+            {
+                ex.LogWarning();
+            }
+            return false;
         }
-
-        
     }
 }
