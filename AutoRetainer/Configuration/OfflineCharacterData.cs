@@ -9,6 +9,7 @@ public class OfflineCharacterData
     public string Name = "Unknown";
     public int Index = 0;
     public string World = "";
+    public string WorldOverride = null;
     public bool Enabled = false;
     public List<OfflineRetainerData> RetainerData = new();
     public bool Preferred = false;

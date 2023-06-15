@@ -292,7 +292,7 @@ internal unsafe static class MultiMode
                     }
                     if (data != null)
                     {
-                        AutoLogin.Instance.SwapCharacter(data.World, data.Name, data.ServiceAccount);
+                        AutoLogin.Instance.SwapCharacter(data.WorldOverride ?? data.World, data.Name, data.ServiceAccount);
                     }
                     else
                     {
