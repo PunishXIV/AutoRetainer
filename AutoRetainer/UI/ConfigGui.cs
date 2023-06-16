@@ -8,7 +8,7 @@ namespace AutoRetainer.UI;
 
 unsafe internal class ConfigGui : Window
 {
-    public ConfigGui() : base($"{P.Name} {P.GetType().Assembly.GetName().Version}###AutoRetainer")
+    public ConfigGui() : base($"")
     {
         this.SizeConstraints = new()
         {
@@ -25,6 +25,8 @@ unsafe internal class ConfigGui : Window
             P.Style.Push();
             P.StylePushed = true;
         }
+        var prefix = SchedulerMain.PluginEnabled ? $" [{SchedulerMain.Reason}]" : "";
+        this.WindowName = $"{P.Name} {P.GetType().Assembly.GetName().Version}{prefix}###AutoRetainer";
     }
 
     public override void Draw()

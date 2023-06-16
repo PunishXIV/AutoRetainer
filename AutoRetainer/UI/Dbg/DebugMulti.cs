@@ -41,6 +41,5 @@ internal unsafe static class DebugMulti
             ImGuiEx.Text($"Target hitbox: {Svc.Targets.Target.HitboxRadius}");
             ImGuiEx.Text($"Distance to target's hitbox: {Vector3.Distance(Svc.ClientState.LocalPlayer.Position, Svc.Targets.Target.Position) - Svc.Targets.Target.HitboxRadius}");
         }
-
     }
 }

@@ -1,4 +1,5 @@
 ﻿using ECommons.GameHelpers;
+using ECommons.Throttlers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,20 +41,24 @@ namespace AutoRetainer.Scheduler
                                 SetStopRequest(true);
                             }
                         }
-                        else
-                        {
-                            if (WasPaused)
-                            {
-                                WasPaused = false;
-                                SetStopRequest(false);
-                            }
-                        }
                     }
                     catch(Exception ex) 
                     {
                         {
                             ex.Log();
                         } 
+                    }
+                }
+                if (!MultiMode.AnyRetainersAvailable() && WasPaused)
+                {
+                    if (IsOccupied())
+                    {
+                        EzThrottler.Throttle("ArtisanCanReenableOccupied", 2500, true);
+                    }
+                    if (EzThrottler.Check("ArtisanCanReenableOccupied"))
+                    {
+                        WasPaused = false;
+                        SetStopRequest(false);
                     }
                 }
             }

@@ -23,7 +23,7 @@ internal unsafe static class SchedulerMain
     internal static bool CanAssignQuickExploration => P.config.EnableAssigningQuickExploration && !P.config.DontReassign;
     internal static volatile uint VentureOverride = 0;
 
-    internal static PluginEnableReason Reason { get; private set; }
+    internal static PluginEnableReason Reason { get; set; }
 
     internal static bool? EnablePlugin(PluginEnableReason reason)
     {
@@ -273,13 +273,20 @@ internal unsafe static class SchedulerMain
             else
             {
                 //DuoLog.Information($"123");
-                if(P.config.OldRetainerSense)
+                if(P.config.OldRetainerSense || SchedulerMain.Reason == PluginEnableReason.Artisan)
                 {
-                    if (!IsOccupied() && Utils.AnyRetainersAvailableCurrentChara())
+                    if (Utils.AnyRetainersAvailableCurrentChara())
                     {
-                        if (EzThrottler.Throttle("InteractWithBellGeneralEnqueue", 5000))
+                        if (!IsOccupied())
                         {
-                            TaskInteractWithNearestBell.Enqueue();
+                            if (EzThrottler.Check("InteractWithBellDelay") && EzThrottler.Throttle("InteractWithBellGeneralEnqueue", 5000))
+                            {
+                                TaskInteractWithNearestBell.Enqueue();
+                            }
+                        }
+                        else
+                        {
+                            EzThrottler.Throttle("InteractWithBellDelay", 2500, true);
                         }
                     }
                 }
