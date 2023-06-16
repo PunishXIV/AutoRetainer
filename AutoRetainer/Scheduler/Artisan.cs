@@ -49,7 +49,7 @@ namespace AutoRetainer.Scheduler
                         } 
                     }
                 }
-                if (!MultiMode.AnyRetainersAvailable() && WasPaused)
+                if (!AnyRetainersAvailable() && WasPaused)
                 {
                     if (IsOccupied())
                     {
@@ -62,6 +62,15 @@ namespace AutoRetainer.Scheduler
                     }
                 }
             }
+        }
+
+        internal static bool AnyRetainersAvailable()
+        {
+            if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
+            {
+                return data.GetEnabledRetainers().Any(z => z.GetVentureSecondsRemaining() <= P.config.UnsyncCompensation);
+            }
+            return false;
         }
 
         internal static bool IsCurrentlyOperating()
