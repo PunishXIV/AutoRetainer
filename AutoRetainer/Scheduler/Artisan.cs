@@ -33,7 +33,7 @@ namespace AutoRetainer.Scheduler
                     }
                     try
                     {
-                        if (MultiMode.AnyRetainersAvailable())
+                        if (AnyRetainersAvailable())
                         {
                             if (!WasPaused)
                             {
