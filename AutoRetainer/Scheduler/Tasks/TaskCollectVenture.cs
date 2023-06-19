@@ -12,7 +12,7 @@ internal static class TaskCollectVenture
             TaskWaitSelectString.Enqueue(P.config.RetainerMenuDelay);
         }
         P.TaskManager.Enqueue(RetainerHandlers.SelectViewVentureReport);
-        P.TaskManager.Enqueue(() => RetainerHandlers.EnforceSelectString(RetainerHandlers.SelectViewVentureReport));
+        P.TaskManager.Enqueue(() => RetainerHandlers.EnforceSelectString(RetainerHandlers.SelectViewVentureReport), "EnforceSelectString/SelectViewVentureReport");
         P.TaskManager.Enqueue(RetainerHandlers.ClickResultConfirm);
     }
 }
