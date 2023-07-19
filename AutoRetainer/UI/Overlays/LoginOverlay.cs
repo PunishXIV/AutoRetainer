@@ -31,10 +31,8 @@ namespace AutoRetainer.UI.Overlays
             {
                 var n = Censor.Character(x.Name, x.World);
                 var dim = ImGuiHelpers.GetButtonSize(n);
-                if(dim.X > bWidth)
-                {
-                    bWidth = dim.X;
-                }
+                bWidth = dim.X;
+
                 if (ImGui.Button(n, new(bWidth * 1.35f, dim.Y * 1.35f)))
                 {
                     AutoLogin.Instance.Login(x.World, x.Name, x.ServiceAccount);
