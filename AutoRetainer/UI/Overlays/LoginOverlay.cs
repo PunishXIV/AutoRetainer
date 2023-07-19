@@ -30,7 +30,7 @@ namespace AutoRetainer.UI.Overlays
             foreach(var x in C.OfflineData.Where(x => !x.Name.IsNullOrEmpty()))
             {
                 var n = Censor.Character(x.Name, x.World);
-                var dim = ImGuiHelpers.GetButtonSize(n) * C.LoginOverlayScale;
+                var dim = ImGuiHelpers.GetButtonSize(n);
                 if(dim.X > bWidth)
                 {
                     bWidth = dim.X;
