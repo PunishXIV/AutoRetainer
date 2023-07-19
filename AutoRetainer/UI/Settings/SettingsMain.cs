@@ -35,6 +35,8 @@ internal static class SettingsMain
             ImGuiComponents.HelpMarker("The lower this value is the faster plugin will use actions. When dealing with low FPS or high latency you may want to increase this value. If you want the plugin to operate faster you may decrease it. ");
             ImGui.Checkbox($"Display Extended Retainer Info", ref P.config.ShowAdditionalInfo);
             ImGuiComponents.HelpMarker("Displays retainer item level/gathering/perception and the name of their current venture in the main UI.");
+            ImGui.Checkbox($"Artisan integration", ref P.config.ArtisanIntegration);
+            ImGuiComponents.HelpMarker($"Automatically enables AutoRetainer while Artisan is Pauses Artisan operation when ventures are ready to be collected and a retainer bell is within range. Once ventures have been dealt with Artisan will be enabled and resume whatever it was doing.");
         });
         InfoBox.DrawBox("Operation", delegate
         {
@@ -118,7 +120,7 @@ internal static class SettingsMain
                 }
             }
             ImGui.SameLine();
-            ImGuiEx.TextV(Censor.Character(P.config.OfflineData[index].Name));
+            ImGuiEx.TextV(Censor.Character(P.config.OfflineData[index].Name, P.config.OfflineData[index].World));
             ImGui.PopID();
         }
 

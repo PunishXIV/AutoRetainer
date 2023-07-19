@@ -27,11 +27,27 @@ internal unsafe static class RetainerHandlers
         return Utils.TrySelectSpecificEntry(text);
     }
 
+    internal static void EnforceSelectStringThrottle() => EzThrottler.Throttle("EnforceSelectString", 3000, true);
     internal static bool? SelectViewVentureReport()
     {
+        EnforceSelectStringThrottle();
         //2385	View venture report. (Complete)
         var text = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(2385).Text.ToDalamudString().ExtractText();
         return Utils.TrySelectSpecificEntry(text);
+    }
+
+    internal static bool? EnforceSelectString(Func<bool?> Action)
+    {
+        if(!(TryGetAddonByName<AtkUnitBase>("SelectString", out var a) && a->IsVisible))
+        {
+            return true;
+        }
+        if(EzThrottler.Throttle("EnforceSelectString", 3000))
+        {
+            PluginLog.Warning($"Enforcing {Action.GetType().FullName} ");
+            Action();
+        }
+        return false;
     }
 
     internal static bool? ClickResultReassign()
@@ -376,6 +392,72 @@ internal unsafe static class RetainerHandlers
         else
         {
             Utils.RethrottleGeneric();
+        }
+        return false;
+    }
+
+    /*public static bool? SearchVentureByName(uint id) => SearchVentureByName(VentureUtils.GetVentureName(id));
+
+    public static bool? SearchVentureByName(string name)
+    {
+        if (TryGetAddonByName<AtkUnitBase>("RetainerTaskSupply", out var addon) && IsAddonReady(addon))
+        {
+            if (Utils.GenericThrottle) 
+            {
+                Callback.Fire(addon, true, 2, new AtkValue() { Type = 0, Int = 0}, name);
+                return true;
+            }
+        }
+        return false;
+    }*/
+
+    public static bool? SelectSpecificVentureByName(uint id) => SelectSpecificVentureByName(VentureUtils.GetVentureName(id));
+
+    public static bool? SelectSpecificVentureByName(string name)
+    {
+        if (TryGetAddonByName<AtkUnitBase>("RetainerTaskSupply", out var addon) && IsAddonReady(addon))
+        {
+            if (Utils.GenericThrottle)
+            {
+                if (addon->UldManager.NodeList[3]->IsVisible)
+                {
+                    var list = addon->UldManager.NodeList[3]->GetAsAtkComponentList();
+                    PluginLog.Debug($"Cnt: {list->ListLength}");
+                    for (int i = 0; i < Math.Min(list->ListLength, 16); i++)
+                    {
+                        var el = list->AtkComponentBase.UldManager.NodeList[2 + i];
+                        var text = MemoryHelper.ReadSeString(&el->GetAsAtkComponentNode()->Component->UldManager.NodeList[9]->GetAsAtkTextNode()->NodeText).ExtractText();
+                        PluginLog.Debug($"Text: {text}, name: {name}");
+                        if (text == name)
+                        {
+                            PluginLog.Debug($"Match");
+                            Callback.Fire(addon, true, 5, i, new AtkValue() { Type = 0, Int = 0 });
+                            return true;
+                        }
+                    }
+
+                    Callback.Fire(addon, true, 1);
+                    return false;
+                }
+                else
+                {
+                    Callback.Fire(addon, true, 2, new AtkValue() { Type = 0, Int = 0 }, name);
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
+
+    internal static bool? ClearTaskSupplylist()
+    {
+        if (TryGetAddonByName<AtkUnitBase>("RetainerTaskSupply", out var addon) && IsAddonReady(addon))
+        {
+            if (Utils.GenericThrottle)
+            {
+                Callback.Fire(addon, true, 1);
+                return true;
+            }
         }
         return false;
     }

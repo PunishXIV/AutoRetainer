@@ -4,7 +4,6 @@ using Dalamud.Game.ClientState.Conditions;
 using Lumina.Excel.GeneratedSheets;
 using ECommons.Events;
 using PunishLib;
-using PunishLib.Sponsor;
 using ECommons.Automation;
 using ECommons.Configuration;
 using Dalamud.Interface.Style;
@@ -21,6 +20,10 @@ using AutoRetainer.Internal;
 using AutoRetainer.UI.Overlays;
 using ECommons.Throttlers;
 using AutoRetainer.Modules;
+using AutoRetainerAPI.Configuration;
+using AutoRetainerAPI;
+using ECommons.GameHelpers;
+using System.Xml.Linq;
 
 namespace AutoRetainer;
 
@@ -28,6 +31,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
 {
     public string Name => "AutoRetainer";
     internal static AutoRetainer P;
+    internal static Config C => P.config;
     internal Config config;
     internal WindowSystem ws;
     internal ConfigGui configGui;
@@ -45,6 +49,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal VenturePlanner VenturePlanner;
     internal VentureBrowser VentureBrowser;
     internal LogWindow LogWindow;
+    internal AutoRetainerApi API;
 
     internal long Time => P.config.UseServerTime ? CSFramework.GetServerTime() : DateTimeOffset.Now.ToUnixTimeSeconds();
 
@@ -56,8 +61,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         //PluginLoader.CheckAndLoad(pi, "https://love.puni.sh/plugins/AutoRetainer/blacklist.txt", delegate
         {
             ECommonsMain.Init(pi, this, Module.DalamudReflector);
-            PunishLibMain.Init(pi, this);
-            SponsorManager.SetSponsorInfo("https://ko-fi.com/spetsnaz");
+            PunishLibMain.Init(pi, this, PunishOption.DefaultKoFi); // Default button
             P = this;
             new TickScheduler(delegate
             {
@@ -88,6 +92,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 StatisticsManager.Init();
                 AutoGCHandin.Init();
                 IPC.Init();
+                Utils.FixKeys();
 
                 ws.AddWindow(new MultiModeOverlay());
                 ws.AddWindow(new RetainerListOverlay());
@@ -97,6 +102,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 Safety.Check();
 
                 Style = StyleModel.Deserialize("DS1H4sIAAAAAAAACqVYS3ObOhT+L6w9HZ4CvGuS22bRdDJNOu29OxkrNjUxFGP3kcl/75F0jiSwO3MBb4Swvu+8jyRePO4tgzf+wlt5yxfvq7fM5ORfNb4uvMJb+vLFGkeBq3xc5b9JYNUTcCy8Db7eImOJc77Ch28IZggOlYgd/lvh+IyrYlzF1Kr9AKvf1hffNvg2wreRevsd1FLGtfAAohfegR46NPuIKpxw/IHjTxx/GesTx/rfZz6R4ji/qEVRg50v3qP42RlY5kd5GDAEZ3KSpAvvPznLE5axMAV5X5RbgUJib8oDX1VibThY4ueZHyMHS7M4CmLkUJMojR2OL+V+Xf+42ljVmfqlZIGZKobAT7IsjBKX4npbVuuJDNpF93VzbFyGjLAZouSDWp7HsP6qbteitcvzOAhSRqGwUy0wVh7RjoNA+UHO/MywPGw5OGCG8u9a/iwc5QMZNZYRg5Qm/Y4MoSYkcxKtqqW5rU+idcIZpkok2Rb24hklIdgaIldsWd4WXXmyJRoZFyiSyKSSYokpzxQLQ4Eyv8quErNSAxkG6kzmua6rijcHxz3jqe7E/njFWzdgVCzGr4ELeChaELvqQcZniWF538o2OD5XgnOayblygWtyxlAPEMXujre7v/ShLJdlFyCeyS4UMleXqoRa7PlmrDWGYaYpV8euq2mXgQWhkhUi3KxX6CRM4tx3C1Cjh5GJQQEAEkkCNR+nxhuyBcRUf7lW13INzEnkWp/2CEYcWkB0TnIruNsrR3WnSJJEeWRoZnSnzJDMjM+DaHjLu3qiTbb/G6IZVtGO6tLNaL5O3D6JQ/lbvG/LZnq3sBwzW4Ulmhm8x2nND9IHW6rmmBMxWT5JrnlmhKrH83n/VBdHd2MaZVyeyj4yoJrp6Zu62JX7zX0rTqWw55tYNizQBmlSfeQ0h8xeP0tNqSDZP89N98vZBqmfhWSWI/++qrsP5V4c7I4QUNOyne8SYBjcnOKne6f2A2nMdF4kA6Lb8tDVGzgMWZZe38yk82LyHqPZZY4zhfrndHST2RLk8dOtQghqJXTr6x0TTWpc8J7C4AG1a+u9xUXkRfmA+X0Z+KHcbO3dQu4NOlgmCc9wnybfBPwByduKJKsbIBCoEZBq1AiGd5gHUYmiE+4dYkyaRnppKPO05Zubtm4eebsR3ejYw0qT8h/56RYcWPWcmMCxBUSbwEsXUJuxWWGcChz6fgW1MyT7u1/SAfKmfHY8Q1cjyjfqIdL8u3rNK437f6AoeZVXargzeEvvmndNcyyKcu/BPV9fT/nkKlyNObEE9I1h7HlJA9fjT2saaNtrxqIwN+0arEkZ1Ukegzj3RvA09cK+mdpCthMKQyNLG4aeS/tFkOk90sHRJxrJKTcy6Q0dPwkzoUhVHji43cSGWxmcqSptoNn2tIFmHzVI2+IJQxXpxmw/8WJST639xhqkdTafZEi+Rp67Ar5PTcsSeyI2XtK43tkj143b1dXu0WOCBkDYF+Gf1z+6Z+sXPRQAAA==");
+
+                API = new();
             });
         }
         //);
@@ -170,12 +177,16 @@ public unsafe class AutoRetainer : IDalamudPlugin
             var target = P.config.OfflineData.Where(x => $"{x.Name}@{x.World}" == arguments[6..]).FirstOrDefault();
             if (target != null)
             {
-                if (!AutoLogin.Instance.IsRunning) AutoLogin.Instance.SwapCharacter(target.World, target.Name, target.ServiceAccount);
+                if (!AutoLogin.Instance.IsRunning) AutoLogin.Instance.SwapCharacter(target.WorldOverride ?? target.World, target.Name, target.ServiceAccount);
             }
             else
             {
                 Notify.Error($"Could not find target character");
             }
+        }
+        else if (arguments.EqualsIgnoreCase("het"))
+        {
+            HouseEnterTask.EnqueueTask();
         }
         else
         {
@@ -208,8 +219,9 @@ public unsafe class AutoRetainer : IDalamudPlugin
         MultiMode.Tick();
         NotificationHandler.Tick();
         YesAlready.Tick();
+        Artisan.ArtisanTick();
         //if(P.config.RetryItemSearch) RetryItemSearch.Tick();
-        if(SchedulerMain.PluginEnabled || MultiMode.Enabled || TaskManager.IsBusy)
+        if (SchedulerMain.PluginEnabled || MultiMode.Enabled || TaskManager.IsBusy)
         {
             if(Svc.ClientState.TerritoryType == Prisons.Mordion_Gaol)
             {
@@ -227,7 +239,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         IsNextToBell = false;
         if (P.config.RetainerSense && Svc.ClientState.LocalPlayer != null && Svc.ClientState.LocalPlayer.HomeWorld.Id == Svc.ClientState.LocalPlayer.CurrentWorld.Id)
         {
-            if(!IPC.Suppressed && !IsOccupied() && !P.config.OldRetainerSense && !TaskManager.IsBusy && !MultiMode.Active && !Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BoundByDuty] && Utils.IsAnyRetainersCompletedVenture())
+            if(!IPC.Suppressed && !IsOccupied() && !P.config.OldRetainerSense && !TaskManager.IsBusy && !Utils.MultiModeOrArtisan && !Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BoundByDuty] && Utils.IsAnyRetainersCompletedVenture())
             {
                 var bell = Utils.GetReachableRetainerBell();
                 if (bell == null || LastPosition != Svc.ClientState.LocalPlayer.Position)
@@ -300,10 +312,39 @@ public unsafe class AutoRetainer : IDalamudPlugin
             Safe(AutoLogin.Dispose);
             Safe(Memory.Dispose);
             Safe(IPC.Shutdown);
+            Safe(API.Dispose);
             PunishLibMain.Dispose();
             ECommonsMain.Dispose();
         }
         //PluginLoader.Dispose();
+    }
+
+    void AddVenture(string name, uint ventureId)
+    {
+        if (API.Ready && API.GetOfflineCharacterData(Player.CID).RetainerData.TryGetFirst(x => x.Name == name, out var rdata))
+        {
+            var adata = API.GetAdditionalRetainerData(Player.CID, rdata.Name);
+            if(adata.VenturePlan.List.TryGetFirst(x => x.ID == ventureId, out var v))
+            {
+                v.Num += 1;
+            }
+            else
+            {
+                adata.VenturePlan.List.Add(new(ventureId, 1));
+            }
+            API.WriteAdditionalRetainerData(Player.CID, rdata.Name, adata);
+        }
+    }
+
+    IEnumerable<string> ListRetainers()
+    {
+        if (API.Ready)
+        {
+            foreach (var x in API.GetOfflineCharacterData(Player.CID).RetainerData)
+            {
+                yield return x.Name;
+            }
+        }
     }
 
     internal HashSet<string> GetSelectedRetainers(ulong cid)
@@ -333,13 +374,13 @@ public unsafe class AutoRetainer : IDalamudPlugin
             if (Svc.Targets.Target.IsRetainerBell()) {
                 if (value)
                 {
-                    if (MultiMode.Active)
+                    if (Utils.MultiModeOrArtisan)
                     {
                         WasEnabled = false;
                         if (IsInteractionAutomatic)
                         {
                             IsInteractionAutomatic = false;
-                            SchedulerMain.EnablePlugin(PluginEnableReason.MultiMode);
+                            SchedulerMain.EnablePlugin(MultiMode.Enabled? PluginEnableReason.MultiMode : PluginEnableReason.Artisan);
                         }
                     }
                     else
@@ -384,7 +425,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                         SchedulerMain.EnablePlugin(PluginEnableReason.Auto);
                         WasEnabled = false;
                     }
-                    else if(!IsCloseActionAutomatic && P.config.AutoDisable && !MultiMode.Active)
+                    else if(!IsCloseActionAutomatic && P.config.AutoDisable && !Utils.MultiModeOrArtisan)
                     {
                         P.DebugLog($"Disabling plugin because AutoDisable is on");
                         SchedulerMain.DisablePlugin();

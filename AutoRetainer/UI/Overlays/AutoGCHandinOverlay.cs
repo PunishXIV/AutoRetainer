@@ -1,3 +1,4 @@
+using AutoRetainerAPI.Configuration;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 

@@ -1,4 +1,5 @@
-﻿using Dalamud.Game.ClientState.Conditions;
+﻿using AutoRetainerAPI.Configuration;
+using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.Text.SeStringHandling;
 using ECommons.Configuration;
 using ECommons.Events;
@@ -49,6 +50,14 @@ internal unsafe static class OfflineDataManager
         }
         data.World = ExcelWorldHelper.GetWorldNameById(Svc.ClientState.LocalPlayer.HomeWorld.Id);
         data.Name = Svc.ClientState.LocalPlayer.Name.ToString();
+        if(Player.Object.CurrentWorld.GameData.DataCenter.Row != Player.Object.HomeWorld.GameData.DataCenter.Row)
+        {
+            data.WorldOverride = Player.CurrentWorld;
+        }
+        else
+        {
+            data.WorldOverride = null;
+        }
         data.Gil = (uint)InventoryManager.Instance()->GetInventoryItemCount(1);
         for (int i = 0; i < 30; i++)
         {

@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AutoRetainer.Configuration
+namespace AutoRetainerAPI.Configuration
 {
     [Serializable]
     public class PlannedVenture
     {
-        internal string GUID = Guid.NewGuid().ToString();
+        [NonSerialized] public string GUID = Guid.NewGuid().ToString();
         public uint ID;
         public int Num = 1;
 

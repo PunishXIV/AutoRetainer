@@ -1,4 +1,4 @@
-﻿namespace AutoRetainer.Configuration;
+﻿namespace AutoRetainerAPI.Configuration;
 
 public enum OpenBellBehavior
 {

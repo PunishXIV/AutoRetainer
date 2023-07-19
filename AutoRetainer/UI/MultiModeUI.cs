@@ -1,4 +1,5 @@
-﻿using Dalamud.Interface.Components;
+﻿using AutoRetainerAPI.Configuration;
+using Dalamud.Interface.Components;
 using ECommons;
 using ECommons.GameHelpers;
 using ECommons.MathHelpers;
@@ -191,7 +192,7 @@ internal unsafe static class MultiModeUI
             {
                 ImGui.SetNextItemOpen(index == 0);
             }
-            if (ImGui.CollapsingHeader(Censor.Character(data.Name, data.World) +$"###chara{data.CID}"))
+            if (ImGui.CollapsingHeader($"{(data.WorldOverride == null ? "" : $"{Lang.StrDCV} ")}" + Censor.Character(data.Name, data.World) +$"###chara{data.CID}"))
             {
                 SetAsPreferred(data);
                 if (col)

@@ -1,4 +1,5 @@
-﻿using ECommons.Configuration;
+﻿using AutoRetainerAPI.Configuration;
+using ECommons.Configuration;
 using ECommons.Interop;
 using ECommons.MathHelpers;
 using PInvoke;
@@ -69,6 +70,7 @@ internal unsafe class Config : IEzConfig
 
     public bool ShowAdditionalInfo = true;
     public bool RetryItemSearch = false;
+    public bool ArtisanIntegration = false;
 
     internal bool DontReassign
     {

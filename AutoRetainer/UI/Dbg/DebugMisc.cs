@@ -1,15 +1,27 @@
 ﻿using AutoRetainer.Helpers;
+using Dalamud.Utility;
+using ECommons.GameHelpers;
 using ECommons.MathHelpers;
+using ECommons.Reflection;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using Lumina.Excel.GeneratedSheets;
 using PInvoke;
+using System.Diagnostics;
 using System.Windows.Forms;
+using ItemLevel = AutoRetainer.Helpers.ItemLevel;
 
 namespace AutoRetainer.UI.Dbg;
 
 internal static unsafe class DebugMisc
 {
+
     internal static void Draw()
     {
+        if (Player.Available)
+        {
+
+        }
+        ImGui.Separator();
         ImGuiEx.Text($"CSFramework.Instance()->WindowInactive: {CSFramework.Instance()->WindowInactive}");
         ImGuiEx.Text($"IsKeyPressed(P.config.TempCollectB): {IsKeyPressed(P.config.TempCollectB)}");
         ImGuiEx.Text($"Bitmask.IsBitSet(User32.GetKeyState((int)P.config.TempCollectB), 15): {Bitmask.IsBitSet(User32.GetKeyState((int)P.config.TempCollectB), 15)}");

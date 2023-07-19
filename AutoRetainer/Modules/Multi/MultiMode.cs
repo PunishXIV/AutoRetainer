@@ -1,5 +1,6 @@
 ﻿using AutoRetainer.Scheduler.Tasks;
 using AutoRetainer.UI;
+using AutoRetainerAPI.Configuration;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
@@ -292,7 +293,7 @@ internal unsafe static class MultiMode
                     }
                     if (data != null)
                     {
-                        AutoLogin.Instance.SwapCharacter(data.World, data.Name, data.ServiceAccount);
+                        AutoLogin.Instance.SwapCharacter(data.WorldOverride ?? data.World, data.Name, data.ServiceAccount);
                     }
                     else
                     {

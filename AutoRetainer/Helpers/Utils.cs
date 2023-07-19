@@ -1,4 +1,6 @@
-﻿using ClickLib.Clicks;
+﻿using AutoRetainer.Configuration;
+using AutoRetainerAPI.Configuration;
+using ClickLib.Clicks;
 using Dalamud;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Enums;
@@ -9,6 +11,7 @@ using ECommons.Events;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;
+using ECommons.Interop;
 using ECommons.MathHelpers;
 using ECommons.Reflection;
 using ECommons.Throttlers;
@@ -25,33 +28,22 @@ namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
-    public static void Callback(AtkUnitBase* Base, bool updateState, params object[] args)
+    internal static bool MultiModeOrArtisan => MultiMode.Active || (SchedulerMain.PluginEnabled && SchedulerMain.Reason == PluginEnableReason.Artisan);
+
+    internal static void FixKeys()
     {
-        var stk = stackalloc AtkValue[args.Length];
-        for (int i = 0; i < args.Length; i++)
+        Fix(ref P.config.EntrustKey);
+        Fix(ref P.config.RetrieveKey);
+        Fix(ref P.config.SellKey);
+        Fix(ref P.config.SellMarketKey);
+        Fix(ref P.config.TempCollectB);
+        Fix(ref P.config.Suppress);
+        static void Fix(ref LimitedKeys key)
         {
-            if (args[i] is int v)
-            {
-                stk[i] = new() { Type = ValueType.Int, Int = v };
-            }
-            else if (args[i] is uint u)
-            {
-                stk[i] = new() { Type = ValueType.UInt, UInt = u };
-            }
-            else if (args[i] is bool b)
-            {
-                stk[i] = new() { Type = ValueType.Bool, Byte = (byte)(b ? 1 : 0) };
-            }
-            else if (args[i] is AtkValue av)
-            {
-                stk[i] = av;
-            }
-            else
-            {
-                throw new Exception("Unsupported arguments");
-            }
+            if (((Keys)key).EqualsAny(Keys.Control, Keys.ControlKey)) key = LimitedKeys.LeftControlKey;
+            if (((Keys)key).EqualsAny(Keys.Shift, Keys.ShiftKey)) key = LimitedKeys.LeftShiftKey;
+            if (((Keys)key).EqualsAny(Keys.Alt, Keys.Menu)) key = LimitedKeys.LeftAltKey;
         }
-        P.Memory.FireCallbackHook.Original(Base, args.Length, stk, (byte)(updateState ? 1 : 0));
     }
 
     internal static IEnumerable<string> GetEObjNames(params uint[] values)
@@ -397,6 +389,34 @@ internal static unsafe class Utils
         }
         Distance = currentDistance;
         return currentObject;
+    }
+
+    internal static AtkUnitBase* GetSpecificYesno(Predicate<string> compare)
+    {
+        for (int i = 1; i < 100; i++)
+        {
+            try
+            {
+                var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("SelectYesno", i);
+                if (addon == null) return null;
+                if (IsAddonReady(addon))
+                {
+                    var textNode = addon->UldManager.NodeList[15]->GetAsAtkTextNode();
+                    var text = MemoryHelper.ReadSeString(&textNode->NodeText).ExtractText().Replace(" ", "");
+                    if (compare(text))
+                    {
+                        PluginLog.Verbose($"SelectYesno {text} addon {i} by predicate");
+                        return addon;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.Log();
+                return null;
+            }
+        }
+        return null;
     }
 
     internal static AtkUnitBase* GetSpecificYesno(params string[] s)

@@ -1,4 +1,5 @@
-﻿using ECommons.ExcelServices;
+﻿using AutoRetainerAPI.Configuration;
+using ECommons.ExcelServices;
 using ECommons.GameHelpers;
 using System;
 using System.Collections.Generic;

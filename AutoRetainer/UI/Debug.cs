@@ -16,7 +16,8 @@ internal unsafe static class Debug
                 ("Throttle", DebugThrottle.Draw, null, true),
                 ("IPC", DebugIPC.Draw, null, true),
                 ("Misc", DebugMisc.Draw, null, true),
-                ("GCAuto", DebugGCAuto.Draw, null, true)
+                ("GCAuto", DebugGCAuto.Draw, null, true),
+                ("Artisan", DebugArtisan.Draw, null, true)
                 );
         });
     }

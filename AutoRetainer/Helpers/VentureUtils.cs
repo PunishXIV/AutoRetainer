@@ -1,5 +1,6 @@
 ﻿using AutoRetainer.Modules.Statistics;
 using AutoRetainer.Scheduler.Tasks;
+using AutoRetainerAPI.Configuration;
 using Dalamud.Memory;
 using Dalamud.Utility;
 using ECommons;

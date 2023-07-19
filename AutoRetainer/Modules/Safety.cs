@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using AutoRetainerAPI.Configuration;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Linq;

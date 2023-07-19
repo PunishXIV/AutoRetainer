@@ -4,17 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AutoRetainer.Configuration
+namespace AutoRetainerAPI.Configuration
 {
     [Serializable]
     public class VenturePlan
     {
-        internal string GUID = Guid.NewGuid().ToString();
+        [NonSerialized] public string GUID = Guid.NewGuid().ToString();
         public string Name = "";
         public List<PlannedVenture> List = new();
         public PlanCompleteBehavior PlanCompleteBehavior = PlanCompleteBehavior.Restart_plan;
-        
-        internal List<uint> ListUnwrapped
+
+        public List<uint> ListUnwrapped
         {
             get
             {

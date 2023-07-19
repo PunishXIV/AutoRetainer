@@ -7,6 +7,7 @@ namespace AutoRetainer.UI.Dbg;
 internal static unsafe class DebugVenture
 {
     internal static int VentureID = 0;
+    internal static string VentureName = "";
     internal static void Draw()
     {
         foreach(var x in P.config.OfflineData)
@@ -18,6 +19,10 @@ internal static unsafe class DebugVenture
             }
         }
         ImGui.InputInt("Venture id", ref VentureID);
+        ImGui.InputText("Venture name", ref VentureName, 100);
+        //if (ImGui.Button("SearchVentureByName")) DuoLog.Information(RetainerHandlers.SearchVentureByName(VentureName).ToString());
+        if (ImGui.Button("Clear Venture list")) DuoLog.Information(RetainerHandlers.ClearTaskSupplylist().ToString());
+        if (ImGui.Button("SelectSpecificVenture Name")) DuoLog.Information(RetainerHandlers.SelectSpecificVentureByName(VentureName).ToString());
         if (ImGui.Button("TaskAssignHuntingVenture"))
         {
             TaskAssignHuntingVenture.Enqueue((uint)VentureID);
