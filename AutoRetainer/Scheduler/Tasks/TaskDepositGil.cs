@@ -11,9 +11,9 @@ internal unsafe static class TaskDepositGil
     internal static void Enqueue(int percent)
     {
         P.TaskManager.Enqueue(YesAlready.WaitForYesAlreadyDisabledTask);
-        if (P.config.RetainerMenuDelay > 0)
+        if (C.RetainerMenuDelay > 0)
         {
-            TaskWaitSelectString.Enqueue(P.config.RetainerMenuDelay);
+            TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
         }
         P.TaskManager.Enqueue(() => HasGil == false ? true : RetainerHandlers.SelectEntrustGil());
         P.TaskManager.Enqueue(() => HasGil == false ? true : GenericHandlers.Throttle(500));

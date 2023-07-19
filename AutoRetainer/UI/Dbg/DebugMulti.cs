@@ -34,7 +34,7 @@ internal unsafe static class DebugMulti
         }
         ImGuiEx.Text($"Is in sanctuary: {GameMain.IsInSanctuary()}");
         ImGuiEx.Text($"Is in sanctuary ExcelTerritoryHelper: {ExcelTerritoryHelper.IsSanctuary(Svc.ClientState.TerritoryType)}");
-        ImGui.Checkbox($"Bypass sanctuary check", ref P.config.BypassSanctuaryCheck);
+        ImGui.Checkbox($"Bypass sanctuary check", ref C.BypassSanctuaryCheck);
         if (Svc.ClientState.LocalPlayer != null && Svc.Targets.Target != null)
         {
             ImGuiEx.Text($"Distance to target: {Vector3.Distance(Svc.ClientState.LocalPlayer.Position, Svc.Targets.Target.Position)}");

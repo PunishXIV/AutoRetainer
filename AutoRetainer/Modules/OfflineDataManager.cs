@@ -39,14 +39,14 @@ internal unsafe static class OfflineDataManager
     internal static void WriteOfflineData(bool writeGatherables, bool saveConfig)
     {
         if (!ProperOnLogin.PlayerPresent) return;
-        if (P.config.Blacklist.Any(x => x.CID == Svc.ClientState.LocalContentId)) return;
-        if (!P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
+        if (C.Blacklist.Any(x => x.CID == Svc.ClientState.LocalContentId)) return;
+        if (!C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
         {
             data = new()
             {
                 CID = Svc.ClientState.LocalContentId,
             };
-            P.config.OfflineData.Add(data);
+            C.OfflineData.Add(data);
         }
         data.World = ExcelWorldHelper.GetWorldNameById(Svc.ClientState.LocalPlayer.HomeWorld.Id);
         data.Name = Svc.ClientState.LocalPlayer.Name.ToString();
@@ -110,7 +110,7 @@ internal unsafe static class OfflineDataManager
         }
         data.Ventures = Utils.GetVenturesAmount();
         data.InventorySpace = (uint)Utils.GetInventoryFreeSlotCount();
-        P.config.OfflineData.RemoveAll(x => x.World == "" && x.Name == "Unknown");
+        C.OfflineData.RemoveAll(x => x.World == "" && x.Name == "Unknown");
         if (saveConfig) EzConfig.Save();
     }
 
@@ -119,7 +119,7 @@ internal unsafe static class OfflineDataManager
     internal static OfflineRetainerData GetData(string name, ulong? CID = null)
     {
         var cid = CID ?? Svc.ClientState.LocalContentId;
-        if (P.config.OfflineData.TryGetFirst(x => x.CID == cid, out var data) && data.RetainerData.TryGetFirst(x => x.Name == name, out var rdata))
+        if (C.OfflineData.TryGetFirst(x => x.CID == cid, out var data) && data.RetainerData.TryGetFirst(x => x.Name == name, out var rdata))
         {
             return rdata;
         }

@@ -32,7 +32,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     public string Name => "AutoRetainer";
     internal static AutoRetainer P;
     internal static Config C => P.config;
-    internal Config config;
+    private Config config;
     internal WindowSystem ws;
     internal ConfigGui configGui;
     internal RetainerManager retainerManager;
@@ -52,7 +52,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal AutoRetainerApi API;
     internal LoginOverlay LoginOverlay;
 
-    internal long Time => P.config.UseServerTime ? CSFramework.GetServerTime() : DateTimeOffset.Now.ToUnixTimeSeconds();
+    internal long Time => C.UseServerTime ? CSFramework.GetServerTime() : DateTimeOffset.Now.ToUnixTimeSeconds();
 
     internal StyleModel Style;
     internal bool StylePushed = false;
@@ -121,7 +121,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             //4330	57	33	0	False	Vous avez confié la tâche “<SheetFr(Item,12,IntegerParameter(1),2,1)/> ( <Value>IntegerParameter(2)</Value>)” à votre servant.
             if (text.StartsWithAny("You assign your retainer", "リテイナーベンチャー", "Du hast deinen Gehilfen mit", "Vous avez confié la tâche")
                 && Utils.TryGetCurrentRetainer(out var ret) 
-                && P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var offlineData) 
+                && C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var offlineData) 
                 && offlineData.RetainerData.TryGetFirst(x => x.Name == ret, out var offlineRetainerData))
             {
                 offlineRetainerData.VentureBeginsAt = P.Time;
@@ -176,7 +176,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         }
         else if (arguments.StartsWith("relog "))
         {
-            var target = P.config.OfflineData.Where(x => $"{x.Name}@{x.World}" == arguments[6..]).FirstOrDefault();
+            var target = C.OfflineData.Where(x => $"{x.Name}@{x.World}" == arguments[6..]).FirstOrDefault();
             if (target != null)
             {
                 if (!AutoLogin.Instance.IsRunning) AutoLogin.Instance.SwapCharacter(target.WorldOverride ?? target.World, target.Name, target.ServiceAccount);
@@ -203,9 +203,9 @@ public unsafe class AutoRetainer : IDalamudPlugin
             if (SchedulerMain.PluginEnabled && Svc.ClientState.LocalPlayer != null)
             {
                 SchedulerMain.Tick();
-                if (!P.config.SelectedRetainers.ContainsKey(Svc.ClientState.LocalContentId))
+                if (!C.SelectedRetainers.ContainsKey(Svc.ClientState.LocalContentId))
                 {
-                    P.config.SelectedRetainers[Svc.ClientState.LocalContentId] = new();
+                    C.SelectedRetainers[Svc.ClientState.LocalContentId] = new();
                 }
             }
             if (Svc.Condition[ConditionFlag.OccupiedSummoningBell] && (SchedulerMain.PluginEnabled || P.TaskManager.IsBusy || ConditionWasEnabled))
@@ -222,7 +222,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         NotificationHandler.Tick();
         YesAlready.Tick();
         Artisan.ArtisanTick();
-        //if(P.config.RetryItemSearch) RetryItemSearch.Tick();
+        //if(C.RetryItemSearch) RetryItemSearch.Tick();
         if (SchedulerMain.PluginEnabled || MultiMode.Enabled || TaskManager.IsBusy)
         {
             if(Svc.ClientState.TerritoryType == Prisons.Mordion_Gaol)
@@ -239,9 +239,9 @@ public unsafe class AutoRetainer : IDalamudPlugin
             }
         }
         IsNextToBell = false;
-        if (P.config.RetainerSense && Svc.ClientState.LocalPlayer != null && Svc.ClientState.LocalPlayer.HomeWorld.Id == Svc.ClientState.LocalPlayer.CurrentWorld.Id)
+        if (C.RetainerSense && Svc.ClientState.LocalPlayer != null && Svc.ClientState.LocalPlayer.HomeWorld.Id == Svc.ClientState.LocalPlayer.CurrentWorld.Id)
         {
-            if(!IPC.Suppressed && !IsOccupied() && !P.config.OldRetainerSense && !TaskManager.IsBusy && !Utils.MultiModeOrArtisan && !Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BoundByDuty] && Utils.IsAnyRetainersCompletedVenture())
+            if(!IPC.Suppressed && !IsOccupied() && !C.OldRetainerSense && !TaskManager.IsBusy && !Utils.MultiModeOrArtisan && !Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BoundByDuty] && Utils.IsAnyRetainersCompletedVenture())
             {
                 var bell = Utils.GetReachableRetainerBell();
                 if (bell == null || LastPosition != Svc.ClientState.LocalPlayer.Position)
@@ -253,7 +253,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 {
                     IsNextToBell = true;
                 }
-                if(Environment.TickCount64 - LastMovementAt > P.config.RetainerSenseThreshold)
+                if(Environment.TickCount64 - LastMovementAt > C.RetainerSenseThreshold)
                 {
                     if (bell != null)
                     {
@@ -387,8 +387,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
                     }
                     else
                     {
-                        var bellBehavior = Utils.IsAnyRetainersCompletedVenture() ? P.config.OpenBellBehaviorWithVentures : P.config.OpenBellBehaviorNoVentures;
-                        if(bellBehavior != OpenBellBehavior.Pause_AutoRetainer && IsKeyPressed(P.config.Suppress) && !CSFramework.Instance()->WindowInactive)
+                        var bellBehavior = Utils.IsAnyRetainersCompletedVenture() ? C.OpenBellBehaviorWithVentures : C.OpenBellBehaviorNoVentures;
+                        if(bellBehavior != OpenBellBehavior.Pause_AutoRetainer && IsKeyPressed(C.Suppress) && !CSFramework.Instance()->WindowInactive)
                         {
                             bellBehavior = OpenBellBehavior.Do_nothing;
                             Notify.Info($"Open bell action cancelled");
@@ -427,7 +427,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                         SchedulerMain.EnablePlugin(PluginEnableReason.Auto);
                         WasEnabled = false;
                     }
-                    else if(!IsCloseActionAutomatic && P.config.AutoDisable && !Utils.MultiModeOrArtisan)
+                    else if(!IsCloseActionAutomatic && C.AutoDisable && !Utils.MultiModeOrArtisan)
                     {
                         P.DebugLog($"Disabling plugin because AutoDisable is on");
                         SchedulerMain.DisablePlugin();

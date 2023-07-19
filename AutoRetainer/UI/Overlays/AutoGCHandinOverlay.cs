@@ -20,7 +20,7 @@ internal unsafe class AutoGCHandinOverlay : Window
         {
             ImGui.Checkbox("Enable Automatic Expert Delivery", ref AutoGCHandin.Operation);
         }
-        if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var d) && !AutoGCHandin.Operation) 
+        if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var d) && !AutoGCHandin.Operation) 
         {
             ImGui.SameLine();
             ImGui.SetNextItemWidth(200);

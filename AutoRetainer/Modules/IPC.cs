@@ -42,18 +42,18 @@ namespace AutoRetainer.Modules
 
         static List<ulong> GetRegisteredCIDs()
         {
-            return P.config.OfflineData.Where(x => !P.config.Blacklist.Any(z => z.CID == x.CID) && !x.Name.EqualsAny("Unknown", "")).Select(x => x.CID).ToList();
+            return C.OfflineData.Where(x => !C.Blacklist.Any(z => z.CID == x.CID) && !x.Name.EqualsAny("Unknown", "")).Select(x => x.CID).ToList();
         }
 
         static OfflineCharacterData GetOCD(ulong CID)
         {
-            return P.config.OfflineData.FirstOrDefault(x => x.CID == CID);
+            return C.OfflineData.FirstOrDefault(x => x.CID == CID);
         }
 
         static void SetOCD(OfflineCharacterData OCD)
         {
-            P.config.OfflineData.RemoveAll(x => x.CID == OCD.CID);
-            P.config.OfflineData.Add(OCD);
+            C.OfflineData.RemoveAll(x => x.CID == OCD.CID);
+            C.OfflineData.Add(OCD);
         }
 
         static AdditionalRetainerData GetARD(ulong cid, string name)
@@ -63,7 +63,7 @@ namespace AutoRetainer.Modules
 
         static void SetARD(ulong cid, string name, AdditionalRetainerData data)
         {
-            P.config.AdditionalData[Utils.GetAdditionalDataKey(cid, name)] = data;
+            C.AdditionalData[Utils.GetAdditionalDataKey(cid, name)] = data;
         }
 
         static void SetVenture(uint VentureID)

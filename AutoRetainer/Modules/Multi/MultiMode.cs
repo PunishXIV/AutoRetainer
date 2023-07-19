@@ -33,7 +33,7 @@ internal unsafe static class MultiMode
     internal static CircularBuffer<long> Interactions = new(5);
 
     internal static Dictionary<ulong, int> CharaCnt = new();
-    internal static bool CanHET => Active && P.config.MultiAllowHET && ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType);
+    internal static bool CanHET => Active && C.MultiAllowHET && ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType);
 
     internal static void Init()
     {
@@ -64,7 +64,7 @@ internal unsafe static class MultiMode
     {
         if (!Enabled) return;
         LastLogin = 0;
-        if (P.config.MultiHETOnEnable && CanHET && Player.Available)
+        if (C.MultiHETOnEnable && CanHET && Player.Available)
         {
             HouseEnterTask.EnqueueTask();
         }
@@ -97,7 +97,7 @@ internal unsafe static class MultiMode
             {
                 return;
             }
-            if(P.config.MultiWaitOnLoginScreen)
+            if(C.MultiWaitOnLoginScreen)
             {
                 if(!Player.Available && Utils.CanAutoLogin())
                 {
@@ -118,7 +118,7 @@ internal unsafe static class MultiMode
             }
             if (Interactions.Count() == Interactions.Capacity && Interactions.All(x => Environment.TickCount64 - x < 60000))
             {
-                if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data) && data.Enabled)
+                if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data) && data.Enabled)
                 {
                     data.Enabled = false;
                     DuoLog.Warning("Too many errors, current character is excluded.");
@@ -137,14 +137,14 @@ internal unsafe static class MultiMode
             {
                 if (!Utils.IsInventoryFree())
                 {
-                    if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
+                    if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
                     {
                         data.Enabled = false;
                     }
                 }
             }
             if (ProperOnLogin.PlayerPresent && !AutoLogin.Instance.IsRunning && IsInteractionAllowed()
-                && (!Synchronize || P.config.OfflineData.All(x => x.GetEnabledRetainers().All(z => z.GetVentureSecondsRemaining() <= P.config.UnsyncCompensation))))
+                && (!Synchronize || C.OfflineData.All(x => x.GetEnabledRetainers().All(z => z.GetVentureSecondsRemaining() <= C.UnsyncCompensation))))
             {
                 Synchronize = false;
                 if (IsCurrentCharacterDone() && !IsOccupied())
@@ -172,7 +172,7 @@ internal unsafe static class MultiMode
                     }
                     else
                     {
-                        if(P.config.MultiWaitOnLoginScreen)
+                        if(C.MultiWaitOnLoginScreen)
                         {
                             P.DebugLog($"Enqueueing logoff");
                             BlockInteraction(20);
@@ -194,7 +194,7 @@ internal unsafe static class MultiMode
                 {
                     //DuoLog.Information($"1234");
                     EnsureCharacterValidity();
-                    if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data) && data.Enabled)
+                    if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data) && data.Enabled)
                     {
                         P.DebugLog($"Enqueueing interaction with bell");
                         TaskInteractWithNearestBell.Enqueue();
@@ -210,14 +210,14 @@ internal unsafe static class MultiMode
 
     internal static IEnumerable<OfflineCharacterData> GetEnabledOfflineData()
     {
-        return P.config.OfflineData.Where(x => x.Enabled);
+        return C.OfflineData.Where(x => x.Enabled);
     }
 
     internal static bool AnyRetainersAvailable()
     {
         if (GetEnabledOfflineData().TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
         {
-            return data.GetEnabledRetainers().Any(z => z.GetVentureSecondsRemaining() <= P.config.UnsyncCompensation);
+            return data.GetEnabledRetainers().Any(z => z.GetVentureSecondsRemaining() <= C.UnsyncCompensation);
         }
         return false;
     }
@@ -236,7 +236,7 @@ internal unsafe static class MultiMode
 
     internal static OfflineCharacterData GetPreferredCharacter()
     {
-        return P.config.OfflineData.FirstOrDefault(x => x.Preferred && x.CID != Svc.ClientState.LocalContentId);
+        return C.OfflineData.FirstOrDefault(x => x.Preferred && x.CID != Svc.ClientState.LocalContentId);
     }
 
     internal static void BlockInteraction(int seconds)
@@ -251,7 +251,7 @@ internal unsafe static class MultiMode
 
     internal static OfflineRetainerData[] GetEnabledRetainers(this OfflineCharacterData data)
     {
-        if (P.config.SelectedRetainers.TryGetValue(data.CID, out var enabledRetainers))
+        if (C.SelectedRetainers.TryGetValue(data.CID, out var enabledRetainers))
         {
             return data.RetainerData.Where(z => enabledRetainers.Contains(z.Name) && z.HasVenture).ToArray();
         }
@@ -320,19 +320,19 @@ internal unsafe static class MultiMode
 
     internal static OfflineCharacterData GetCurrentTargetCharacter()
     {
-        var data = P.config.OfflineData;
-        if (P.config.CharEqualize)
+        var data = C.OfflineData;
+        if (C.CharEqualize)
         {
             data = data.OrderBy(x => CharaCnt.GetOrDefault(x.CID)).ToList();
         }
         foreach (var x in data)
         {
             if (x.CID == Player.CID) continue;
-            if (x.Enabled && P.config.SelectedRetainers.TryGetValue(x.CID, out var enabledRetainers))
+            if (x.Enabled && C.SelectedRetainers.TryGetValue(x.CID, out var enabledRetainers))
             {
                 var selectedRetainers = x.GetEnabledRetainers().Where(z => z.HasVenture);
                 if (selectedRetainers.Any() &&
-                    P.config.MultiWaitForAll ? selectedRetainers.All(z => z.GetVentureSecondsRemaining() <= P.config.AdvanceTimer) : selectedRetainers.Any(z => z.GetVentureSecondsRemaining() <= P.config.AdvanceTimer))
+                    C.MultiWaitForAll ? selectedRetainers.All(z => z.GetVentureSecondsRemaining() <= C.AdvanceTimer) : selectedRetainers.Any(z => z.GetVentureSecondsRemaining() <= C.AdvanceTimer))
                 {
                     return x;
                 }
@@ -344,7 +344,7 @@ internal unsafe static class MultiMode
     internal static bool IsCurrentCharacterDone()
     {
         if (!ProperOnLogin.PlayerPresent) return false;
-        if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
+        if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
         {
             if (!data.Enabled) return true;
             if (Utils.GetVenturesAmount() < 2 || !Utils.IsInventoryFree()) return true;
@@ -367,7 +367,7 @@ internal unsafe static class MultiMode
     internal static bool EnsureCharacterValidity(bool ro = false)
     {
         if (!ProperOnLogin.PlayerPresent) return false;
-        if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
+        if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
         {
             if (Svc.ClientState.LocalPlayer.HomeWorld.Id == Svc.ClientState.LocalPlayer.CurrentWorld.Id && Utils.GetVenturesAmount() >= data.GetNeededVentureAmount() && Utils.IsInventoryFree() && GetNearbyBell() != null)
             {

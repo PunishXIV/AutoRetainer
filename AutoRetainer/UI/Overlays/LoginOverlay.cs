@@ -19,18 +19,18 @@ namespace AutoRetainer.UI.Overlays
 
         public override bool DrawConditions()
         {
-            return  P.config.LoginOverlay && Utils.CanAutoLogin();
+            return  C.LoginOverlay && Utils.CanAutoLogin();
         }
 
         public override void Draw()
         {
             var num = 1;
-            ImGui.SetWindowFontScale(P.config.LoginOverlayScale);
+            ImGui.SetWindowFontScale(C.LoginOverlayScale);
             ImGui.PushFont(Svc.PluginInterface.UiBuilder.GetGameFontHandle(new GameFontStyle(GameFontFamilyAndSize.MiedingerMid18)).ImFont);
-            foreach(var x in P.config.OfflineData.Where(x => !x.Name.IsNullOrEmpty()))
+            foreach(var x in C.OfflineData.Where(x => !x.Name.IsNullOrEmpty()))
             {
                 var n = Censor.Character(x.Name, x.World);
-                var dim = ImGuiHelpers.GetButtonSize(n) * P.config.LoginOverlayScale;
+                var dim = ImGuiHelpers.GetButtonSize(n) * C.LoginOverlayScale;
                 if(dim.X > bWidth)
                 {
                     bWidth = dim.X;

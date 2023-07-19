@@ -17,11 +17,11 @@ namespace AutoRetainer.Helpers
 
         internal static readonly string[] Worlds = new string[] { "Albion", "Asgard", "Avalon", "Averoigne", "Azeroth", "Barsoom", "Darkover", "Deltora", "Dinotopia", "Discworld", "Dreamlands", "Earthsea", "Encantadia", "Equestria", "Eternia", "Etheria", "Filgaia", "Gielinor", "Glorantha", "Gor", "Greyhawk", "Halkeginia", "Hyrule", "Ivalice", "Lankhmar", "Melnibone", "Narnia", "Neverland", "Nirn", "Pellucidar", "Pern", "Prydain", "Spira", "Thedas", "Tyria", "Westeros", "Wonderland", "Xanth" };
 
-        static string Seed => P.config.CensorSeed;
+        static string Seed => C.CensorSeed;
 
         internal static string Character(string name, string world)
         {
-            if (P.config.NoNames)
+            if (C.NoNames)
             {
                 var n1 = Crc32.Get(Seed + name) % Adjectives.Length;
                 var n2 = Crc32.Get(Seed + name) % Animals.Length;
@@ -36,7 +36,7 @@ namespace AutoRetainer.Helpers
 
         internal static string Character(string name)
         {
-            if (P.config.NoNames)
+            if (C.NoNames)
             {
                 if(name.Contains('@'))
                 {
@@ -55,7 +55,7 @@ namespace AutoRetainer.Helpers
 
         internal static string World(string world)
         {
-            if (P.config.NoNames)
+            if (C.NoNames)
             {
                 var w = Crc32.Get(Seed + world) % Worlds.Length;
                 return $"{Worlds[w]}";
@@ -68,7 +68,7 @@ namespace AutoRetainer.Helpers
 
         internal static string Retainer(string name)
         {
-            if (P.config.NoNames)
+            if (C.NoNames)
             {
                 var w = Crc32.Get(Seed + name) % Fishes.Length;
                 return $"{Fishes[w]}";

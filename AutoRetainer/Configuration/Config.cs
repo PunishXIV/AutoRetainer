@@ -77,7 +77,7 @@ internal unsafe class Config : IEzConfig
     {
         get
         {
-            return _dontReassign || (P.config.TempCollectB != LimitedKeys.None && IsKeyPressed(P.config.TempCollectB) && !CSFramework.Instance()->WindowInactive);
+            return _dontReassign || (C.TempCollectB != LimitedKeys.None && IsKeyPressed(C.TempCollectB) && !CSFramework.Instance()->WindowInactive);
         }
         set
         {

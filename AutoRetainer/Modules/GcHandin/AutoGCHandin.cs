@@ -21,7 +21,7 @@ internal unsafe static class AutoGCHandin
 
     internal static bool IsEnabled()
     {
-        if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var d))
+        if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var d))
         {
             return d.GCDeliveryType != GCDeliveryType.Disabled;
         }
@@ -29,7 +29,7 @@ internal unsafe static class AutoGCHandin
     }
     internal static bool IsArmoryChestEnabled()
     {
-        if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var d))
+        if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var d))
         {
             return d.GCDeliveryType.EqualsAny(GCDeliveryType.Hide_Gear_Set_Items, GCDeliveryType.Show_All_Items);
         }
@@ -39,7 +39,7 @@ internal unsafe static class AutoGCHandin
     internal static bool IsAllItemsEnabled()
     {
         Safety.Check();
-        if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var d))
+        if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var d))
         {
             return d.GCDeliveryType == GCDeliveryType.Show_All_Items;
         }
@@ -108,7 +108,7 @@ internal unsafe static class AutoGCHandin
                     {
                         var s = $"Automatic handin has been completed";
                         DuoLog.Information(s);
-                        if (P.config.GCHandinNotify)
+                        if (C.GCHandinNotify)
                         {
                             Utils.TryNotify(s);
                         }
@@ -164,7 +164,7 @@ internal unsafe static class AutoGCHandin
                             {
                                 Operation = false;
                                 DuoLog.Information($"{e.Message}");
-                                if (P.config.GCHandinNotify)
+                                if (C.GCHandinNotify)
                                 {
                                     Utils.TryNotify(e.Message);
                                 }
@@ -242,7 +242,7 @@ internal unsafe static class AutoGCHandin
         }
         else
         {
-            if(P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
+            if(C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
             {
                 if(text.EqualsAny(hideGearSet))
                 {

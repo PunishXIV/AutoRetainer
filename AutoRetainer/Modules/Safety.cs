@@ -34,9 +34,9 @@ namespace AutoRetainer.Modules
 
         internal static void Check()
         {
-            if (P.config.UnsafeProtection || Get())
+            if (C.UnsafeProtection || Get())
             {
-                foreach(var x in P.config.OfflineData)
+                foreach(var x in C.OfflineData)
                 {
                     if(x.GCDeliveryType == GCDeliveryType.Show_All_Items)
                     {
