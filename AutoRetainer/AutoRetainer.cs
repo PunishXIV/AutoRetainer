@@ -50,6 +50,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal VentureBrowser VentureBrowser;
     internal LogWindow LogWindow;
     internal AutoRetainerApi API;
+    internal LoginOverlay LoginOverlay;
 
     internal long Time => P.config.UseServerTime ? CSFramework.GetServerTime() : DateTimeOffset.Now.ToUnixTimeSeconds();
 
@@ -96,7 +97,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
                 ws.AddWindow(new MultiModeOverlay());
                 ws.AddWindow(new RetainerListOverlay());
-                ws.AddWindow(new LoginOverlay());
+                LoginOverlay = (new LoginOverlay());
+                ws.AddWindow(LoginOverlay);
                 MultiMode.Init();
 
                 Safety.Check();

@@ -41,6 +41,7 @@ internal unsafe class Config : IEzConfig
 
     public bool LoginOverlay = false;
     public float LoginOverlayScale = 1f;
+    public float LoginOverlayBPadding = 1.35f;
 
     public OpenBellBehavior OpenBellBehaviorNoVentures = OpenBellBehavior.Enable_AutoRetainer;
     public OpenBellBehavior OpenBellBehaviorWithVentures = OpenBellBehavior.Enable_AutoRetainer;

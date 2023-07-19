@@ -84,6 +84,11 @@ internal static class SettingsMain
         ImGuiEx.TextWrapped(ImGuiColors.DalamudOrange, $"A Summoning Bell must be within range of the spawn point once the home is entered.");
         ImGui.Checkbox($"Upon activating Multi Mode, attempt to enter nearby house", ref P.config.MultiHETOnEnable);
         ImGui.Checkbox($"Display Login Overlay", ref P.config.LoginOverlay);
+        ImGui.SetNextItemWidth(150f);
+        if (ImGui.SliderFloat($"Login overlay scale multiplier", ref C.LoginOverlayScale.ValidateRange(0.1f, 5f), 0.2f, 2f)) P.LoginOverlay.bWidth = 0;
+        ImGui.SetNextItemWidth(150f);
+        if (ImGui.SliderFloat($"Login overlay button padding", ref C.LoginOverlayBPadding.ValidateRange(0.5f, 5f), 1f, 1.5f)) P.LoginOverlay.bWidth = 0;
+
         ImGui.Checkbox($"Enforce Full Character Rotation", ref P.config.CharEqualize);
         ImGuiComponents.HelpMarker("Recommended for users with > 15 characters, forces multi mode to make sure ventures are processed on all characters in order before returning to the beginning of the cycle.");
         ImGui.Checkbox($"Wait on login screen", ref P.config.MultiWaitOnLoginScreen);

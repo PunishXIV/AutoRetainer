@@ -10,7 +10,7 @@ namespace AutoRetainer.UI.Overlays
 {
     internal unsafe class LoginOverlay : Window
     {
-        float bWidth = 0f;
+        internal float bWidth = 0f;
         public LoginOverlay() : base("AutoRetainer login overlay", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoTitleBar, true)
         {
             this.RespectCloseHotkey = false;
@@ -30,12 +30,12 @@ namespace AutoRetainer.UI.Overlays
             foreach(var x in P.config.OfflineData.Where(x => !x.Name.IsNullOrEmpty()))
             {
                 var n = Censor.Character(x.Name, x.World);
-                var dim = ImGuiHelpers.GetButtonSize(n);
+                var dim = ImGuiHelpers.GetButtonSize(n) * P.config.LoginOverlayScale;
                 if(dim.X > bWidth)
                 {
                     bWidth = dim.X;
                 }
-                if (ImGui.Button(n, new(bWidth * 1.35f, dim.Y * 1.35f)))
+                if (ImGui.Button(n, new(bWidth * C.LoginOverlayBPadding, dim.Y * C.LoginOverlayBPadding)))
                 {
                     AutoLogin.Instance.Login(x.World, x.Name, x.ServiceAccount);
                 }
