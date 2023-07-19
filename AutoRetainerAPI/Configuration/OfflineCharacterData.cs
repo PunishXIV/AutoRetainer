@@ -1,13 +1,18 @@
-﻿using Lumina.Excel.GeneratedSheets;
+﻿using Dalamud.Interface;
+using ECommons.DalamudServices;
+using Lumina.Excel.GeneratedSheets;
+using System;
+using System.Collections.Generic;
 
-namespace AutoRetainer.Configuration;
+namespace AutoRetainerAPI.Configuration;
 
 [Serializable]
 public class OfflineCharacterData
 {
+    public readonly ulong CreationFrame = Svc.PluginInterface.UiBuilder.FrameCount;
+    public bool ShouldSerializeCreationFrame => false;
     public ulong CID = 0;
     public string Name = "Unknown";
-    public int Index = 0;
     public string World = "";
     public string WorldOverride = null;
     public bool Enabled = false;
@@ -25,22 +30,11 @@ public class OfflineCharacterData
     public short[] ClassJobLevelArray = new short[30];
     public uint Gil = 0;
 
-    internal string Identity => $"{CID}";
-
-    internal uint CharaIndex
-    {
-        get
-        {
-            if (Index == 0)
-            {
-                throw new Exception("Index must not be 0");
-            }
-            return (uint)(Index - 1);
-        }
-    }
+    public string Identity => $"{CID}";
+    public bool ShouldSerializeIdentity() => false;
 
     public override string ToString()
     {
-        return P.config.Verbose ? $"{Name}@{World}" : $"{Name}@{World}";
+        return $"{Name}@{World}";
     }
 }

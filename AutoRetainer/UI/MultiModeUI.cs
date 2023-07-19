@@ -1,4 +1,5 @@
-﻿using Dalamud.Interface.Components;
+﻿using AutoRetainerAPI.Configuration;
+using Dalamud.Interface.Components;
 using ECommons;
 using ECommons.GameHelpers;
 using ECommons.MathHelpers;

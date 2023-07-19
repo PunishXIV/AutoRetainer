@@ -1,0 +1,134 @@
+﻿using AutoRetainerAPI.Configuration;
+using ECommons;
+using ECommons.DalamudServices;
+using Microsoft.Win32.SafeHandles;
+using System;
+using System.Collections.Generic;
+
+namespace AutoRetainerAPI
+{
+    public class AutoRetainerApi : IDisposable
+    {
+        public delegate void OnSendRetainerToVentureDelegate(string retainerName);
+        /// <summary>
+        /// Event which is fired when a retainer is about to be sent to a venture.
+        /// </summary>
+        public event OnSendRetainerToVentureDelegate OnSendRetainerToVenture;
+
+        public AutoRetainerApi()
+        {
+            Svc.PluginInterface.GetIpcSubscriber<string, object>("AutoRetainer.OnSendRetainerToVenture").Subscribe(OnSendRetainerToVentureAction);
+        }
+
+        void OnSendRetainerToVentureAction(string n)
+        {
+            if(OnSendRetainerToVenture != null)
+            {
+                GenericHelpers.Safe(() => OnSendRetainerToVenture(n));
+            }
+        }
+
+        /// <summary>
+        /// Indicates whether AutoRetainer's API has been initialized and is ready to use.
+        /// </summary>
+        public bool Ready 
+        { 
+            get
+            {
+                try
+                {
+                    Svc.PluginInterface.GetIpcSubscriber<object>("AutoRetainer.Init").InvokeAction();
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Allows to set suppressed state in which AutoRetainer will not perform any actions regardless of configuration.
+        /// </summary>
+        public bool Suppressed
+        {
+            get
+            {
+                return Svc.PluginInterface.GetIpcSubscriber<bool>("AutoRetainer.GetSuppressed").InvokeFunc();
+            }
+            set
+            {
+                Svc.PluginInterface.GetIpcSubscriber<bool, object>("AutoRetainer.SetSuppressed").InvokeAction(value);
+            }
+        }
+
+        /// <summary>
+        /// Disposes API. Don't forget to call it.
+        /// </summary>
+        public void Dispose()
+        {
+            Svc.PluginInterface.GetIpcSubscriber<string, object>("AutoRetainer.OnSendRetainerToVenture").Unsubscribe(OnSendRetainerToVentureAction);
+        }
+
+        /// <summary>
+        /// While inside <see cref="OnSendRetainerToVenture"/>, allows you to set venture where retainer will be sent, overriding any user-defined configuration.
+        /// </summary>
+        /// <param name="ventureId"></param>
+        public void SetVenture(uint ventureId)
+        {
+            Svc.PluginInterface.GetIpcSubscriber<uint, object>("AutoRetainer.SetVenture").InvokeAction(ventureId);
+        }
+
+        /// <summary>
+        /// Retrieves <see cref="OfflineCharacterData"/> for specified content ID. Warning! This data must not be stored. You must access this function every time you want to read <see cref="OfflineCharacterData"/> that is up to date. 
+        /// </summary>
+        /// <param name="cid">Content ID of a character</param>
+        /// <returns></returns>
+        public OfflineCharacterData GetOfflineCharacterData(ulong cid)
+        {
+            return Svc.PluginInterface.GetIpcSubscriber<ulong, OfflineCharacterData>("AutoRetainer.GetOfflineCharacterData").InvokeFunc(cid);
+        }
+
+        /// <summary>
+        /// Writes <see cref="OfflineCharacterData"/> to AutoRetainer. If another instance of <see cref="OfflineCharacterData"/> is already present for specified content ID, it will be replaced. Warning! You must read the data, make changes and immediately write it back within single framework update, storing <see cref="OfflineCharacterData"/> is prohibited.
+        /// </summary>
+        /// <param name="data"></param>
+        public void WriteOfflineCharacterData(OfflineCharacterData data)
+        {
+            if (data.CreationFrame != Svc.PluginInterface.UiBuilder.FrameCount) throw new Exception("You must read the data, make changes and immediately write it back within single framework update, storing OfflineCharacterData is prohibited.");
+            Svc.PluginInterface.GetIpcSubscriber<OfflineCharacterData, object>("AutoRetainer.WriteOfflineCharacterData").InvokeAction(data);
+        }
+
+        /// <summary>
+        /// Retrieves <see cref="AdditionalRetainerData"/> for specified character and retainer. Warning! This data must not be stored. You must access this function every time you want to read <see cref="AdditionalRetainerData"/> that is up to date. 
+        /// </summary>
+        /// <param name="cid">Target character's content ID</param>
+        /// <param name="name">Retainer's name</param>
+        /// <returns></returns>
+        public AdditionalRetainerData GetAdditionalRetainerData(ulong cid, string name)
+        {
+            return Svc.PluginInterface.GetIpcSubscriber<ulong, string, AdditionalRetainerData>("AutoRetainer.GetAdditionalRetainerData").InvokeFunc(cid, name);
+        }
+
+        /// <summary>
+        /// Writes <see cref="AdditionalRetainerData"/> to AutoRetainer. Warning! You must read the data, make changes and immediately write it back within single framework update, storing <see cref="AdditionalRetainerData"/> is prohibited.
+        /// </summary>
+        /// <param name="cid"></param>
+        /// <param name="name"></param>
+        /// <param name="data"></param>
+        public void WriteAdditionalRetainerData(ulong cid, string name, AdditionalRetainerData data)
+        {
+            if (data.CreationFrame != Svc.PluginInterface.UiBuilder.FrameCount) throw new Exception("You must read the data, make changes and immediately write it back within single framework update, storing AdditionalRetainerData is prohibited.");
+            Svc.PluginInterface.GetIpcSubscriber<ulong, string, AdditionalRetainerData, object>("AutoRetainer.WriteAdditionalRetainerData").InvokeAction(cid, name, data);
+        }
+
+        /// <summary>
+        /// Returns all known characters' CIDs, excluding blacklisted and not initialized.
+        /// </summary>
+        /// <returns></returns>
+        public List<ulong> GetRegisteredCharacters()
+        {
+            return Svc.PluginInterface.GetIpcSubscriber<List<ulong>>("AutoRetainer.GetRegisteredCIDs").InvokeFunc();
+        }
+    }
+}

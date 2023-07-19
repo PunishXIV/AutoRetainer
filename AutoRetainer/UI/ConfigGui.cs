@@ -3,6 +3,7 @@ using ECommons.Configuration;
 using PunishLib.ImGuiMethods;
 using AutoRetainer.UI.Settings;
 using Dalamud.Interface.Style;
+using AutoRetainerAPI.Configuration;
 
 namespace AutoRetainer.UI;
 

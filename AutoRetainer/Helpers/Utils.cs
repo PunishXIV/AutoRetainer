@@ -1,4 +1,6 @@
-﻿using ClickLib.Clicks;
+﻿using AutoRetainer.Configuration;
+using AutoRetainerAPI.Configuration;
+using ClickLib.Clicks;
 using Dalamud;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Enums;

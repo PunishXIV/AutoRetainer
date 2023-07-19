@@ -1,5 +1,6 @@
 using AutoRetainer.Scheduler.Handlers;
 using AutoRetainer.Scheduler.Tasks;
+using AutoRetainerAPI.Configuration;
 using Dalamud.Interface.Components;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 

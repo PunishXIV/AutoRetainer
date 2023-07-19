@@ -1,8 +1,14 @@
-﻿namespace AutoRetainer.Configuration;
+﻿using ECommons.DalamudServices;
+using System;
+using System.Collections.Generic;
+
+namespace AutoRetainerAPI.Configuration;
 
 [Serializable]
 public class OfflineRetainerData : IEquatable<OfflineRetainerData>
 {
+    public readonly ulong CreationFrame = Svc.PluginInterface.UiBuilder.FrameCount;
+    public bool ShouldSerializeCreationFrame => false;
     public string Name = "";
     public long VentureEndsAt = 0;
     public bool HasVenture = false;
@@ -13,7 +19,8 @@ public class OfflineRetainerData : IEquatable<OfflineRetainerData>
     public uint Gil = 0;
     public int DisplayOrder = 0;
 
-    internal string Identity => $"{Name}";
+    public string Identity => $"{Name}";
+    public bool ShouldSerializeIdentity() => false;
 
     public override bool Equals(object obj)
     {

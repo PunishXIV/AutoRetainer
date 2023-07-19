@@ -34,6 +34,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\AutoRetainerAPI\AutoRetainerAPI.csproj" />
 		<ProjectReference Include="..\ClickLib\ClickLib\ClickLib.csproj" />
 		<ProjectReference Include="..\ECommons\ECommons\ECommons.csproj" />
 		<ProjectReference Include="..\PunishLib\PunishLib\PunishLib.csproj" />

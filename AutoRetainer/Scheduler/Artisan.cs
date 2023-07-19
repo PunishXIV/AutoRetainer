@@ -1,4 +1,5 @@
-﻿using ECommons.GameHelpers;
+﻿using AutoRetainerAPI.Configuration;
+using ECommons.GameHelpers;
 using ECommons.Throttlers;
 using System;
 using System.Collections.Generic;

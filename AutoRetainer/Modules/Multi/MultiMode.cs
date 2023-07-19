@@ -1,5 +1,6 @@
 ﻿using AutoRetainer.Scheduler.Tasks;
 using AutoRetainer.UI;
+using AutoRetainerAPI.Configuration;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
