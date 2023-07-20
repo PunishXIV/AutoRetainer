@@ -11,11 +11,12 @@ namespace AutoRetainer.Modules
 {
     internal static class IPC
     {
+        static void Log(string s) => P.DebugLog($"[IPC] {s}");
         internal static bool Suppressed = false;
 
         internal static void Init()
         {
-            P.DebugLog("IPC init");
+            Log("IPC init");
             Svc.PluginInterface.GetIpcProvider<object>("AutoRetainer.Init").RegisterAction(() => { });
             Svc.PluginInterface.GetIpcProvider<bool>("AutoRetainer.GetSuppressed").RegisterFunc(GetSuppressed);
             Svc.PluginInterface.GetIpcProvider<bool, object>("AutoRetainer.SetSuppressed").RegisterAction(SetSuppressed);
@@ -31,7 +32,7 @@ namespace AutoRetainer.Modules
 
         internal static void Shutdown()
         {
-            P.DebugLog("IPC Shutdown");
+            Log("IPC Shutdown");
             Svc.PluginInterface.GetIpcProvider<object>("AutoRetainer.Init").UnregisterAction();
             Svc.PluginInterface.GetIpcProvider<bool>("AutoRetainer.GetSuppressed").UnregisterFunc();
             Svc.PluginInterface.GetIpcProvider<bool, object>("AutoRetainer.SetSuppressed").UnregisterAction();
@@ -45,7 +46,11 @@ namespace AutoRetainer.Modules
             Svc.PluginInterface.GetIpcProvider<object>("AutoRetainer.FinishPostprocessRequest").UnregisterAction();
         }
 
-        static void FinishPostprocessRequest() => SchedulerMain.PostProcessLocked = false;
+        static void FinishPostprocessRequest()
+        {
+            Log("Received postprocess request finish");
+            SchedulerMain.PostProcessLocked = false;
+        }
 
         static void RequestPostprocess(string pluginName)
         {
@@ -54,7 +59,7 @@ namespace AutoRetainer.Modules
                 throw new Exception($"Postprocess request from {pluginName} already exist");
             }
             SchedulerMain.RetainerPostprocess = SchedulerMain.RetainerPostprocess.Add(pluginName);
-            PluginLog.Information($"Postprocess requested from {pluginName}");
+            Log($"Postprocess requested from {pluginName}");
         }
 
         static List<ulong> GetRegisteredCIDs()
@@ -99,10 +104,22 @@ namespace AutoRetainer.Modules
             Suppressed = s;
         }
 
-        internal static void FireSendRetainerToVentureEvent(string retainer) => Svc.PluginInterface.GetIpcProvider<string, object>(ApiConsts.OnSendRetainerToVenture).SendMessage(retainer);
+        internal static void FireSendRetainerToVentureEvent(string retainer)
+        {
+            Log($"Firing FireSendRetainerToVentureEvent for {retainer}");
+            Svc.PluginInterface.GetIpcProvider<string, object>(ApiConsts.OnSendRetainerToVenture).SendMessage(retainer);
+        }
 
-        internal static void FirePostprocessTaskRequestEvent(string retainer) => Svc.PluginInterface.GetIpcProvider<string, object>(ApiConsts.OnRetainerAdditionalTask).SendMessage(retainer);
+        internal static void FirePostprocessTaskRequestEvent(string retainer)
+        {
+            Log($"Firing FirePostprocessTaskRequestEvent for {retainer}");
+            Svc.PluginInterface.GetIpcProvider<string, object>(ApiConsts.OnRetainerAdditionalTask).SendMessage(retainer);
+        }
 
-        internal static void FirePluginPostprocessEvent(string pluginName, string retainer) => Svc.PluginInterface.GetIpcProvider<string, string, object>(ApiConsts.OnRetainerReadyForPostprocess).SendMessage(pluginName, retainer);
+        internal static void FirePluginPostprocessEvent(string pluginName, string retainer)
+        {
+            Log($"Firing FirePluginPostprocessEvent for {retainer} for plugin {pluginName}");
+            Svc.PluginInterface.GetIpcProvider<string, string, object>(ApiConsts.OnRetainerReadyForPostprocess).SendMessage(pluginName, retainer);
+        }
     }
 }

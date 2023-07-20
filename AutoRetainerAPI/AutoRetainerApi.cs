@@ -51,9 +51,9 @@ namespace AutoRetainerAPI
         {
             if(ECommonsMain.Instance.Name == plugin)
             {
-                if (OnRetainerPostprocessStep != null)
+                if (OnRetainerReadyToPostprocess != null)
                 {
-                    GenericHelpers.Safe(() => OnRetainerPostprocessStep(retainer));
+                    GenericHelpers.Safe(() => OnRetainerReadyToPostprocess(retainer));
                 }
             }
         }
@@ -68,9 +68,9 @@ namespace AutoRetainerAPI
 
         void OnRetainerAdditionalTask(string n)
         {
-            if (OnRetainerAdditionalTask != null)
+            if (OnRetainerPostprocessStep != null)
             {
-                GenericHelpers.Safe(() => OnRetainerAdditionalTask(n));
+                GenericHelpers.Safe(() => OnRetainerPostprocessStep(n));
             }
         }
 
@@ -113,7 +113,9 @@ namespace AutoRetainerAPI
         /// </summary>
         public void Dispose()
         {
-            Svc.PluginInterface.GetIpcSubscriber<string, object>("AutoRetainer.OnSendRetainerToVenture").Unsubscribe(OnSendRetainerToVentureAction);
+            Svc.PluginInterface.GetIpcSubscriber<string, object>(ApiConsts.OnSendRetainerToVenture).Unsubscribe(OnSendRetainerToVentureAction);
+            Svc.PluginInterface.GetIpcSubscriber<string, object>(ApiConsts.OnRetainerAdditionalTask).Unsubscribe(OnRetainerAdditionalTask);
+            Svc.PluginInterface.GetIpcSubscriber<string, string, object>(ApiConsts.OnRetainerReadyForPostprocess).Unsubscribe(OnRetainerReadyForPostprocessIntl);
         }
 
         /// <summary>

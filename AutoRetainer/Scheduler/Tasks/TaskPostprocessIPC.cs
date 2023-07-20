@@ -18,6 +18,7 @@ namespace AutoRetainer.Scheduler.Tasks
             }, "TaskPostprocessIPCEnqueue");
             P.TaskManager.Enqueue(() =>
             {
+                P.DebugLog($"SchedulerMain.RetainerPostprocess contains: {SchedulerMain.RetainerPostprocess.Print()}");
                 foreach (var x in SchedulerMain.RetainerPostprocess)
                 {
                     P.TaskManager.EnqueueImmediate(() =>
@@ -25,7 +26,7 @@ namespace AutoRetainer.Scheduler.Tasks
                         SchedulerMain.RetainerPostprocess = SchedulerMain.RetainerPostprocess.Remove(x);
                         SchedulerMain.PostProcessLocked = true;
                         IPC.FirePluginPostprocessEvent(x, retainer);
-                    }, "Postprocess request from {x}");
+                    }, $"Postprocess request from {x}");
                     P.TaskManager.EnqueueImmediate(() => !SchedulerMain.PostProcessLocked, int.MaxValue, $"Postprocess task from {x}");
                 }
             }, "TaskPostprocessProcessEntries");

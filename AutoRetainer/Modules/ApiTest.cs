@@ -21,14 +21,16 @@ namespace AutoRetainer.Modules
             TaskManager = new();
         }
 
-        private static void API_OnRetainerReadyToPostprocess(string retainerName)
+        private static void API_OnRetainerPostprocessTask(string retainerName)
         {
             if (!Enabled) return;
+            PluginLog.Information($"Now requesting postprocess for {retainerName}");
             P.API.RequestPostprocess();
         }
 
-        private static void API_OnRetainerPostprocessTask(string retainerName)
+        private static void API_OnRetainerReadyToPostprocess(string retainerName)
         {
+            PluginLog.Information($"Now postprocessing {retainerName}");
             TaskManager.Enqueue(() =>
             {
                 if (GenericHelpers.IsKeyPressed(System.Windows.Forms.Keys.Back))

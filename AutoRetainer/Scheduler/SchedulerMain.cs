@@ -155,10 +155,6 @@ internal unsafe static class SchedulerMain
                                         adata.VenturePlanIndex++;
                                     }
 
-                                    // post-process task
-
-                                    IPC.FirePostprocessTaskRequestEvent(retainer);
-
                                     //entrust duplicates
                                     if (adata.EntrustDuplicates)
                                     {
