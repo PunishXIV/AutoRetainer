@@ -7,6 +7,7 @@ internal static unsafe class DebugIPC
 {
     internal static void Draw()
     {
+        ImGui.Checkbox($"API Test", ref ApiTest.Enabled);
         ImGuiEx.Text($"IPC suppressed: {Svc.PluginInterface.GetIpcSubscriber<bool>("AutoRetainer.GetSuppressed").InvokeFunc()}");
         if (ImGui.Button($"Suppress = true"))
         {

@@ -1,4 +1,5 @@
-﻿using AutoRetainerAPI.Configuration;
+﻿using AutoRetainerAPI;
+using AutoRetainerAPI.Configuration;
 using ECommons.GameHelpers;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,8 @@ namespace AutoRetainer.Modules
             Svc.PluginInterface.GetIpcProvider<ulong, string, AdditionalRetainerData>("AutoRetainer.GetAdditionalRetainerData").RegisterFunc(GetARD);
             Svc.PluginInterface.GetIpcProvider<ulong, string, AdditionalRetainerData, object>("AutoRetainer.WriteAdditionalRetainerData").RegisterAction(SetARD);
             Svc.PluginInterface.GetIpcProvider<List<ulong>>("AutoRetainer.GetRegisteredCIDs").RegisterFunc(GetRegisteredCIDs);
+            Svc.PluginInterface.GetIpcProvider<string, object>("AutoRetainer.RequestPostprocess").RegisterAction(RequestPostprocess);
+            Svc.PluginInterface.GetIpcProvider<object>("AutoRetainer.FinishPostprocessRequest").RegisterAction(FinishPostprocessRequest);
         }
 
         internal static void Shutdown()
@@ -38,6 +41,20 @@ namespace AutoRetainer.Modules
             Svc.PluginInterface.GetIpcProvider<ulong, string, AdditionalRetainerData>("AutoRetainer.GetAdditionalRetainerData").UnregisterFunc();
             Svc.PluginInterface.GetIpcProvider<ulong, string, AdditionalRetainerData, object>("AutoRetainer.WriteAdditionalRetainerData").UnregisterAction();
             Svc.PluginInterface.GetIpcProvider<List<ulong>>("AutoRetainer.GetRegisteredCIDs").UnregisterFunc();
+            Svc.PluginInterface.GetIpcProvider<string, object>("AutoRetainer.RequestPostprocess").UnregisterAction();
+            Svc.PluginInterface.GetIpcProvider<object>("AutoRetainer.FinishPostprocessRequest").UnregisterAction();
+        }
+
+        static void FinishPostprocessRequest() => SchedulerMain.PostProcessLocked = false;
+
+        static void RequestPostprocess(string pluginName)
+        {
+            if(SchedulerMain.RetainerPostprocess.Contains(pluginName))
+            {
+                throw new Exception($"Postprocess request from {pluginName} already exist");
+            }
+            SchedulerMain.RetainerPostprocess = SchedulerMain.RetainerPostprocess.Add(pluginName);
+            PluginLog.Information($"Postprocess requested from {pluginName}");
         }
 
         static List<ulong> GetRegisteredCIDs()
@@ -81,5 +98,11 @@ namespace AutoRetainer.Modules
         {
             Suppressed = s;
         }
+
+        internal static void FireSendRetainerToVentureEvent(string retainer) => Svc.PluginInterface.GetIpcProvider<string, object>(ApiConsts.OnSendRetainerToVenture).SendMessage(retainer);
+
+        internal static void FirePostprocessTaskRequestEvent(string retainer) => Svc.PluginInterface.GetIpcProvider<string, object>(ApiConsts.OnRetainerAdditionalTask).SendMessage(retainer);
+
+        internal static void FirePluginPostprocessEvent(string pluginName, string retainer) => Svc.PluginInterface.GetIpcProvider<string, string, object>(ApiConsts.OnRetainerReadyForPostprocess).SendMessage(pluginName, retainer);
     }
 }

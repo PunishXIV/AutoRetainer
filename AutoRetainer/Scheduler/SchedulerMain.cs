@@ -3,6 +3,7 @@ using AutoRetainer.Scheduler.Tasks;
 using AutoRetainerAPI.Configuration;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using System.Collections.Immutable;
 
 namespace AutoRetainer.Scheduler;
 
@@ -23,6 +24,8 @@ internal unsafe static class SchedulerMain
 
     internal static bool CanAssignQuickExploration => C.EnableAssigningQuickExploration && !C.DontReassign;
     internal static volatile uint VentureOverride = 0;
+    internal static volatile bool PostProcessLocked = false;
+    internal static ImmutableList<string> RetainerPostprocess = Array.Empty<string>().ToImmutableList();
 
     internal static PluginEnableReason Reason { get; set; }
 
@@ -72,7 +75,8 @@ internal unsafe static class SchedulerMain
 
                                     var adata = Utils.GetAdditionalData(Svc.ClientState.LocalContentId, ret.Name.ToString());
                                     VentureOverride = 0;
-                                    Svc.PluginInterface.GetIpcProvider<string, object>("AutoRetainer.OnSendRetainerToVenture").SendMessage(retainer);
+
+                                    IPC.FireSendRetainerToVentureEvent(retainer);
 
                                     if(VentureOverride > 0)
                                     {
@@ -151,6 +155,10 @@ internal unsafe static class SchedulerMain
                                         adata.VenturePlanIndex++;
                                     }
 
+                                    // post-process task
+
+                                    IPC.FirePostprocessTaskRequestEvent(retainer);
+
                                     //entrust duplicates
                                     if (adata.EntrustDuplicates)
                                     {
@@ -169,6 +177,9 @@ internal unsafe static class SchedulerMain
                                             TaskWithdrawGil.Enqueue(adata.WithdrawGilPercent);
                                         }
                                     }
+
+                                    //fire event, let other plugins deal with retainer
+                                    TaskPostprocessIPC.Enqueue(retainer);
 
                                     if (C.RetainerMenuDelay > 0)
                                     {

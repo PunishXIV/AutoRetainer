@@ -15,16 +15,62 @@ namespace AutoRetainerAPI
         /// </summary>
         public event OnSendRetainerToVentureDelegate OnSendRetainerToVenture;
 
+        public delegate void OnRetainerPostprocessTaskDelegate(string retainerName);
+        /// <summary>
+        /// Event which is fired when a retainer is processed and ready to receive additional postprocess tasks
+        /// </summary>
+        public event OnRetainerPostprocessTaskDelegate OnRetainerPostprocessStep;
+
+        public delegate void OnRetainerReadyToPostprocessDelegate(string retainerName);
+        /// <summary>
+        /// Event which is fired when your plugin should do additional post-process tasks. You must return game UI into the state from where you picked it up.
+        /// </summary>
+        public event OnRetainerReadyToPostprocessDelegate OnRetainerReadyToPostprocess;
+
         public AutoRetainerApi()
         {
-            Svc.PluginInterface.GetIpcSubscriber<string, object>("AutoRetainer.OnSendRetainerToVenture").Subscribe(OnSendRetainerToVentureAction);
+            Svc.PluginInterface.GetIpcSubscriber<string, object>(ApiConsts.OnSendRetainerToVenture).Subscribe(OnSendRetainerToVentureAction);
+            Svc.PluginInterface.GetIpcSubscriber<string, object>(ApiConsts.OnRetainerAdditionalTask).Subscribe(OnRetainerAdditionalTask);
+            Svc.PluginInterface.GetIpcSubscriber<string, string, object>(ApiConsts.OnRetainerReadyForPostprocess).Subscribe(OnRetainerReadyForPostprocessIntl);
+        }
+
+        /// <summary>
+        /// Fire inside <see cref="OnRetainerPostprocessStep"/> event to indicate that you want to do the postprocessing of a retainer.
+        /// </summary>
+        public void RequestPostprocess()
+        {
+            Svc.PluginInterface.GetIpcSubscriber<string, object>("AutoRetainer.RequestPostprocess").InvokeAction(ECommonsMain.Instance.Name);
+        }
+
+        /// <summary>
+        /// Fire inside <see cref="OnRetainerReadyToPostprocess"/> to indicate that you have finished your postprocessing tasks
+        /// </summary>
+        public void FinishPostProcess() => Svc.PluginInterface.GetIpcSubscriber<object>("AutoRetainer.FinishPostprocessRequest").InvokeAction();
+
+        private void OnRetainerReadyForPostprocessIntl(string plugin, string retainer)
+        {
+            if(ECommonsMain.Instance.Name == plugin)
+            {
+                if (OnRetainerPostprocessStep != null)
+                {
+                    GenericHelpers.Safe(() => OnRetainerPostprocessStep(retainer));
+                }
+            }
         }
 
         void OnSendRetainerToVentureAction(string n)
         {
-            if(OnSendRetainerToVenture != null)
+            if (OnSendRetainerToVenture != null)
             {
                 GenericHelpers.Safe(() => OnSendRetainerToVenture(n));
+            }
+        }
+
+        void OnRetainerAdditionalTask(string n)
+        {
+            if (OnRetainerAdditionalTask != null)
+            {
+                GenericHelpers.Safe(() => OnRetainerAdditionalTask(n));
             }
         }
 
