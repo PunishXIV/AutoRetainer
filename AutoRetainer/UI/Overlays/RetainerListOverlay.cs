@@ -18,7 +18,7 @@ internal unsafe class RetainerListOverlay : Window
 
     public override bool DrawConditions()
     {
-        if (!P.config.UIBar) return false;
+        if (!C.UIBar) return false;
         if (Svc.Condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.OccupiedSummoningBell] && TryGetAddonByName<AtkUnitBase>("RetainerList", out var addon) && IsAddonReady(addon))
         {
             Position = new(addon->X, addon->Y - height);
@@ -63,7 +63,7 @@ internal unsafe class RetainerListOverlay : Window
             ImGuiEx.Text(GradientColor.Get(ImGuiColors.DalamudGrey, ImGuiColors.DalamudGrey3, 500), $"Paused");
         }
         ImGui.SameLine();
-        if (P.config.MultiModeUIBar)
+        if (C.MultiModeUIBar)
         {
             if (ImGui.Checkbox("MultiMode", ref MultiMode.Enabled))
             {
@@ -93,9 +93,9 @@ internal unsafe class RetainerListOverlay : Window
                         P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
                         TaskEntrustDuplicates.Enqueue();
 
-                        if (P.config.RetainerMenuDelay > 0)
+                        if (C.RetainerMenuDelay > 0)
                         {
-                            TaskWaitSelectString.Enqueue(P.config.RetainerMenuDelay);
+                            TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
                         }
                         P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
                     }
@@ -114,9 +114,9 @@ internal unsafe class RetainerListOverlay : Window
                         P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
                         TaskWithdrawGil.Enqueue(100);
 
-                        if (P.config.RetainerMenuDelay > 0)
+                        if (C.RetainerMenuDelay > 0)
                         {
-                            TaskWaitSelectString.Enqueue(P.config.RetainerMenuDelay);
+                            TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
                         }
                         P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
                     }

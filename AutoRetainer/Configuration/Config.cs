@@ -41,6 +41,7 @@ internal unsafe class Config : IEzConfig
 
     public bool LoginOverlay = false;
     public float LoginOverlayScale = 1f;
+    public float LoginOverlayBPadding = 1.35f;
 
     public OpenBellBehavior OpenBellBehaviorNoVentures = OpenBellBehavior.Enable_AutoRetainer;
     public OpenBellBehavior OpenBellBehaviorWithVentures = OpenBellBehavior.Enable_AutoRetainer;
@@ -76,7 +77,7 @@ internal unsafe class Config : IEzConfig
     {
         get
         {
-            return _dontReassign || (P.config.TempCollectB != LimitedKeys.None && IsKeyPressed(P.config.TempCollectB) && !CSFramework.Instance()->WindowInactive);
+            return _dontReassign || (C.TempCollectB != LimitedKeys.None && IsKeyPressed(C.TempCollectB) && !CSFramework.Instance()->WindowInactive);
         }
         set
         {

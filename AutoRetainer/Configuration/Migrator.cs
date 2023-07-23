@@ -12,9 +12,9 @@ namespace AutoRetainer.Configuration
     {
         internal static void MigrateGC()
         {
-            if (P.config.EnableAutoGCHandin)
+            if (C.EnableAutoGCHandin)
             {
-                foreach (var x in P.config.OfflineData)
+                foreach (var x in C.OfflineData)
                 {
                     if (x.EnableGCArmoryHandin)
                     {

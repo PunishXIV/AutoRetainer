@@ -7,9 +7,9 @@ internal static class TaskReassignVenture
     internal static void Enqueue()
     {
         P.TaskManager.Enqueue(YesAlready.WaitForYesAlreadyDisabledTask);
-        if (P.config.RetainerMenuDelay > 0)
+        if (C.RetainerMenuDelay > 0)
         {
-            TaskWaitSelectString.Enqueue(P.config.RetainerMenuDelay);
+            TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
         }
         P.TaskManager.Enqueue(RetainerHandlers.SelectViewVentureReport);
         P.TaskManager.Enqueue(() => RetainerHandlers.EnforceSelectString(RetainerHandlers.SelectViewVentureReport));

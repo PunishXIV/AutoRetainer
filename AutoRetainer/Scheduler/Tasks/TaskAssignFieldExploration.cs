@@ -12,9 +12,9 @@ namespace AutoRetainer.Scheduler.Tasks
         internal static void Enqueue(uint VentureID)
         {
             P.TaskManager.Enqueue(YesAlready.WaitForYesAlreadyDisabledTask);
-            if (P.config.RetainerMenuDelay > 0)
+            if (C.RetainerMenuDelay > 0)
             {
-                TaskWaitSelectString.Enqueue(P.config.RetainerMenuDelay);
+                TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
             }
             P.TaskManager.Enqueue(RetainerHandlers.SelectAssignVenture);
             P.TaskManager.Enqueue(() => RetainerHandlers.GenericSelectByName(Lang.FieldExplorationNames), "GenericSelectByName");

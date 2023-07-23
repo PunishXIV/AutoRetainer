@@ -21,7 +21,7 @@ unsafe internal class ConfigGui : Window
 
     public override void PreDraw()
     {
-        if (!P.config.NoTheme)
+        if (!C.NoTheme)
         {
             P.Style.Push();
             P.StylePushed = true;
@@ -66,7 +66,7 @@ unsafe internal class ConfigGui : Window
         {
             MultiMode.OnMultiModeEnabled();
         }
-        if(P.config.CharEqualize && MultiMode.Enabled)
+        if(C.CharEqualize && MultiMode.Enabled)
         {
             ImGui.SameLine();
             if(ImGui.Button("Reset counters"))
@@ -97,12 +97,12 @@ unsafe internal class ConfigGui : Window
 
         ImGuiEx.EzTabBar("tabbar",
                 ("Retainers", MultiModeUI.Draw, null, true),
-                (P.config.RecordStats ? "Statistics" : null, StatisticsUI.Draw, null, true),
+                (C.RecordStats ? "Statistics" : null, StatisticsUI.Draw, null, true),
                 ("Settings", SettingsMain.Draw, null, true),
-                (P.config.Expert?"Expert":null, Expert.Draw, null, true),
+                (C.Expert?"Expert":null, Expert.Draw, null, true),
                 //("Beta", Beta.Draw, null, true),
                 ("About", delegate { AboutTab.Draw(P); }, null, true),
-                (P.config.Verbose ? "Dev" : null, delegate
+                (C.Verbose ? "Dev" : null, delegate
                 {
                     ImGuiEx.EzTabBar("DebugBar",
                         ("Log", InternalLog.PrintImgui, null, false),

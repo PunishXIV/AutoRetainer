@@ -93,19 +93,19 @@ public unsafe class QuickSellItems : IDisposable
     {
         text = new();
         if (CSFramework.Instance()->WindowInactive) return false;
-        if (IsKeyPressed(P.config.SellKey))
+        if (IsKeyPressed(C.SellKey))
         {
             text.Add(retainerSellText);
         }
-        if (IsKeyPressed(P.config.RetrieveKey))
+        if (IsKeyPressed(C.RetrieveKey))
         {
             text.Add(retrieveFromRetainerText);
         }
-        if (IsKeyPressed(P.config.EntrustKey))
+        if (IsKeyPressed(C.EntrustKey))
         {
             text.Add(entrustToRetainerText);
         }
-        if (IsKeyPressed(P.config.SellMarketKey))
+        if (IsKeyPressed(C.SellMarketKey))
         {
             text.Add(putUpForSaleText);
         }
@@ -179,7 +179,7 @@ public unsafe class QuickSellItems : IDisposable
 
     public void Toggle()
     {
-        if (P.config.SellKey == LimitedKeys.None && P.config.RetrieveKey == LimitedKeys.None && P.config.EntrustKey == LimitedKeys.None && P.config.SellMarketKey == LimitedKeys.None)
+        if (C.SellKey == LimitedKeys.None && C.RetrieveKey == LimitedKeys.None && C.EntrustKey == LimitedKeys.None && C.SellMarketKey == LimitedKeys.None)
         {
             Disable();
         }

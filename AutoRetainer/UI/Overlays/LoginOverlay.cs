@@ -10,7 +10,7 @@ namespace AutoRetainer.UI.Overlays
 {
     internal unsafe class LoginOverlay : Window
     {
-        float bWidth = 0f;
+        internal float bWidth = 0f;
         public LoginOverlay() : base("AutoRetainer login overlay", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoTitleBar, true)
         {
             this.RespectCloseHotkey = false;
@@ -19,23 +19,23 @@ namespace AutoRetainer.UI.Overlays
 
         public override bool DrawConditions()
         {
-            return  P.config.LoginOverlay && Utils.CanAutoLogin();
+            return  C.LoginOverlay && Utils.CanAutoLogin();
         }
 
         public override void Draw()
         {
             var num = 1;
-            ImGui.SetWindowFontScale(P.config.LoginOverlayScale);
+            ImGui.SetWindowFontScale(C.LoginOverlayScale);
             ImGui.PushFont(Svc.PluginInterface.UiBuilder.GetGameFontHandle(new GameFontStyle(GameFontFamilyAndSize.MiedingerMid18)).ImFont);
-            foreach(var x in P.config.OfflineData.Where(x => !x.Name.IsNullOrEmpty()))
+            foreach(var x in C.OfflineData.Where(x => !x.Name.IsNullOrEmpty()))
             {
                 var n = Censor.Character(x.Name, x.World);
-                var dim = ImGuiHelpers.GetButtonSize(n);
+                var dim = ImGuiHelpers.GetButtonSize(n) * C.LoginOverlayScale;
                 if(dim.X > bWidth)
                 {
                     bWidth = dim.X;
                 }
-                if (ImGui.Button(n, new(bWidth * 1.35f, dim.Y * 1.35f)))
+                if (ImGui.Button(n, new(bWidth * C.LoginOverlayBPadding, dim.Y * C.LoginOverlayBPadding)))
                 {
                     AutoLogin.Instance.Login(x.World, x.Name, x.ServiceAccount);
                 }

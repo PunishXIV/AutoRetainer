@@ -10,7 +10,7 @@ internal static unsafe class DebugVenture
     internal static string VentureName = "";
     internal static void Draw()
     {
-        foreach(var x in P.config.OfflineData)
+        foreach(var x in C.OfflineData)
         {
             foreach(var r in x.RetainerData)
             {

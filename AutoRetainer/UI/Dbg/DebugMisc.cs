@@ -23,10 +23,10 @@ internal static unsafe class DebugMisc
         }
         ImGui.Separator();
         ImGuiEx.Text($"CSFramework.Instance()->WindowInactive: {CSFramework.Instance()->WindowInactive}");
-        ImGuiEx.Text($"IsKeyPressed(P.config.TempCollectB): {IsKeyPressed(P.config.TempCollectB)}");
-        ImGuiEx.Text($"Bitmask.IsBitSet(User32.GetKeyState((int)P.config.TempCollectB), 15): {Bitmask.IsBitSet(User32.GetKeyState((int)P.config.TempCollectB), 15)}");
-        ImGuiEx.Text($"DontReassign: {P.config.DontReassign}, key {P.config.TempCollectB}/{(int)P.config.TempCollectB}");
-        foreach(var x in P.config.OfflineData)
+        ImGuiEx.Text($"IsKeyPressed(C.TempCollectB): {IsKeyPressed(C.TempCollectB)}");
+        ImGuiEx.Text($"Bitmask.IsBitSet(User32.GetKeyState((int)C.TempCollectB), 15): {Bitmask.IsBitSet(User32.GetKeyState((int)C.TempCollectB), 15)}");
+        ImGuiEx.Text($"DontReassign: {C.DontReassign}, key {C.TempCollectB}/{(int)C.TempCollectB}");
+        foreach(var x in C.OfflineData)
         {
             ImGuiEx.Text($"{x.Name}@{x.World}: {(x.Gil + x.RetainerData.Sum(z => z.Gil))}");
         }
@@ -41,7 +41,7 @@ internal static unsafe class DebugMisc
         ImGuiEx.Text($"{ItemLevel.Calculate(out var g, out var p)}/{g}/{p}");
         if (ImGui.Button("Regenerate censor seed"))
         {
-            P.config.CensorSeed = Guid.NewGuid().ToString();
+            C.CensorSeed = Guid.NewGuid().ToString();
         }
         var inv = Utils.GetActiveRetainerInventoryName();
         ImGuiEx.Text($"Utils.GetActiveRetainerInventoryName(): {inv.Name} {inv.EntrustDuplicatesIndex}");

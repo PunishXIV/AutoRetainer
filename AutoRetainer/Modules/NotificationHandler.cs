@@ -33,11 +33,11 @@ internal static class NotificationHandler
 
     internal static bool GetNotifyState()
     {
-        if (P.config.NotifyIncludeAllChara)
+        if (C.NotifyIncludeAllChara)
         {
-            foreach (var x in P.config.OfflineData)
+            foreach (var x in C.OfflineData)
             {
-                if (!P.config.NotifyIgnoreNoMultiMode || x.Enabled)
+                if (!C.NotifyIgnoreNoMultiMode || x.Enabled)
                 {
                     foreach (var r in x.RetainerData)
                     {
@@ -52,7 +52,7 @@ internal static class NotificationHandler
         }
         else
         {
-            if (Svc.ClientState.LocalContentId != 0 && P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var x))
+            if (Svc.ClientState.LocalContentId != 0 && C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var x))
             {
                 foreach (var r in x.RetainerData)
                 {

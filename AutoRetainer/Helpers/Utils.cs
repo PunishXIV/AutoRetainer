@@ -32,12 +32,12 @@ internal static unsafe class Utils
 
     internal static void FixKeys()
     {
-        Fix(ref P.config.EntrustKey);
-        Fix(ref P.config.RetrieveKey);
-        Fix(ref P.config.SellKey);
-        Fix(ref P.config.SellMarketKey);
-        Fix(ref P.config.TempCollectB);
-        Fix(ref P.config.Suppress);
+        Fix(ref C.EntrustKey);
+        Fix(ref C.RetrieveKey);
+        Fix(ref C.SellKey);
+        Fix(ref C.SellMarketKey);
+        Fix(ref C.TempCollectB);
+        Fix(ref C.Suppress);
         static void Fix(ref LimitedKeys key)
         {
             if (((Keys)key).EqualsAny(Keys.Control, Keys.ControlKey)) key = LimitedKeys.LeftControlKey;
@@ -113,7 +113,7 @@ internal static unsafe class Utils
 
     internal static OfflineCharacterData GetCurrentCharacterData()
     {
-        return P.config.OfflineData.FirstOrDefault(x => x.CID == Player.CID);
+        return C.OfflineData.FirstOrDefault(x => x.CID == Player.CID);
     }
 
     internal static bool CanAutoLogin()
@@ -133,7 +133,7 @@ internal static unsafe class Utils
     internal static OfflineCharacterData GetOfflineCharacterDataFromAdditionalRetainerDataKey(string key)
     {
         var cid = ulong.Parse(key.Split(" ")[0].Replace("#", ""), System.Globalization.NumberStyles.HexNumber);
-        return P.config.OfflineData.FirstOrDefault(x => x.CID == cid);
+        return C.OfflineData.FirstOrDefault(x => x.CID == cid);
     }
 
     internal static OfflineRetainerData GetOfflineRetainerDataFromAdditionalRetainerDataKey(string key)
@@ -201,7 +201,7 @@ internal static unsafe class Utils
     internal static bool IsAnyRetainersCompletedVenture()
     {
         if (!ProperOnLogin.PlayerPresent) return false;
-        if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
+        if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
         {
             var selectedRetainers = data.GetEnabledRetainers().Where(z => z.HasVenture);
             return selectedRetainers.Any(z => z.GetVentureSecondsRemaining() <= 10);
@@ -211,7 +211,7 @@ internal static unsafe class Utils
 
     internal static bool IsAllCurrentCharacterRetainersHaveMoreThan5Mins()
     {
-        if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
+        if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
         {
             foreach (var z in data.GetEnabledRetainers())
             {
@@ -265,9 +265,9 @@ internal static unsafe class Utils
 
     internal static bool AnyRetainersAvailableCurrentChara()
     {
-        if (P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
+        if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
         {
-            return data.GetEnabledRetainers().Any(z => z.GetVentureSecondsRemaining() <= P.config.UnsyncCompensation);
+            return data.GetEnabledRetainers().Any(z => z.GetVentureSecondsRemaining() <= C.UnsyncCompensation);
         }
         return false;
     }
@@ -275,22 +275,22 @@ internal static unsafe class Utils
     internal static AdditionalRetainerData GetAdditionalData(ulong cid, string name)
     {
         var key = GetAdditionalDataKey(cid, name, true);
-        return P.config.AdditionalData[key];
+        return C.AdditionalData[key];
     }
 
     internal static string GetAdditionalDataKey(ulong cid, string name, bool create = true)
     {
         var key = $"#{cid:X16} {name}";
-        if (create && !P.config.AdditionalData.ContainsKey(key))
+        if (create && !C.AdditionalData.ContainsKey(key))
         {
-            P.config.AdditionalData[key] = new();
+            C.AdditionalData[key] = new();
         }
         return key;
     }
 
-    internal static bool GenericThrottle => EzThrottler.Throttle("AutoRetainerGenericThrottle", P.config.Delay);
+    internal static bool GenericThrottle => EzThrottler.Throttle("AutoRetainerGenericThrottle", C.Delay);
     internal static void RethrottleGeneric(int num) => EzThrottler.Throttle("AutoRetainerGenericThrottle", num, true);
-    internal static void RethrottleGeneric() => EzThrottler.Throttle("AutoRetainerGenericThrottle", P.config.Delay, true);
+    internal static void RethrottleGeneric() => EzThrottler.Throttle("AutoRetainerGenericThrottle", C.Delay, true);
 
     internal static bool TrySelectSpecificEntry(string text)
     {
@@ -464,7 +464,7 @@ internal static unsafe class Utils
 
     internal static bool IsCurrentRetainerEnabled()
     {
-        return TryGetCurrentRetainer(out var ret) && P.config.SelectedRetainers.TryGetValue(Svc.ClientState.LocalContentId, out var rets) && rets.Contains(ret);
+        return TryGetCurrentRetainer(out var ret) && C.SelectedRetainers.TryGetValue(Svc.ClientState.LocalContentId, out var rets) && rets.Contains(ret);
     }
 
     internal static bool TryGetCurrentRetainer(out string name)

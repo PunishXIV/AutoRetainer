@@ -12,11 +12,11 @@ internal class MultiModeOverlay : Window
         RespectCloseHotkey = false;
     }
 
-    bool DisplayNotify => P.config.NotifyEnableOverlay && NotificationHandler.CurrentState && !NotificationHandler.IsHidden && (!P.config.NotifyCombatDutyNoDisplay || !(Svc.Condition[ConditionFlag.BoundByDuty56] && Svc.Condition[ConditionFlag.InCombat]));
+    bool DisplayNotify => C.NotifyEnableOverlay && NotificationHandler.CurrentState && !NotificationHandler.IsHidden && (!C.NotifyCombatDutyNoDisplay || !(Svc.Condition[ConditionFlag.BoundByDuty56] && Svc.Condition[ConditionFlag.InCombat]));
 
     public override bool DrawConditions()
     {
-        return !P.config.HideOverlayIcons && (P.TaskManager.IsBusy || P.IsNextToBell || MultiMode.Enabled || AutoLogin.Instance.IsRunning || SchedulerMain.PluginEnabled || DisplayNotify);
+        return !C.HideOverlayIcons && (P.TaskManager.IsBusy || P.IsNextToBell || MultiMode.Enabled || AutoLogin.Instance.IsRunning || SchedulerMain.PluginEnabled || DisplayNotify);
     }
 
     public override void Draw()
@@ -61,7 +61,7 @@ internal class MultiModeOverlay : Window
                     }
                     ImGui.SetTooltip("RetainerSense is active. \nLeft click - open AutoRetainer.");
                 }
-                var f = (float)(Environment.TickCount64 - P.LastMovementAt) / (float)P.config.RetainerSenseThreshold;
+                var f = (float)(Environment.TickCount64 - P.LastMovementAt) / (float)C.RetainerSenseThreshold;
                 ImGui.ProgressBar(f, new(128, 10), "");
             }
             else

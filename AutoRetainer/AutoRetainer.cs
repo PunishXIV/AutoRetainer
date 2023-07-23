@@ -32,7 +32,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     public string Name => "AutoRetainer";
     internal static AutoRetainer P;
     internal static Config C => P.config;
-    internal Config config;
+    private Config config;
     internal WindowSystem ws;
     internal ConfigGui configGui;
     internal RetainerManager retainerManager;
@@ -50,8 +50,9 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal VentureBrowser VentureBrowser;
     internal LogWindow LogWindow;
     internal AutoRetainerApi API;
+    internal LoginOverlay LoginOverlay;
 
-    internal long Time => P.config.UseServerTime ? CSFramework.GetServerTime() : DateTimeOffset.Now.ToUnixTimeSeconds();
+    internal long Time => C.UseServerTime ? CSFramework.GetServerTime() : DateTimeOffset.Now.ToUnixTimeSeconds();
 
     internal StyleModel Style;
     internal bool StylePushed = false;
@@ -96,7 +97,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
                 ws.AddWindow(new MultiModeOverlay());
                 ws.AddWindow(new RetainerListOverlay());
-                ws.AddWindow(new LoginOverlay());
+                LoginOverlay = (new LoginOverlay());
+                ws.AddWindow(LoginOverlay);
                 MultiMode.Init();
 
                 Safety.Check();
@@ -104,6 +106,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 Style = StyleModel.Deserialize("DS1H4sIAAAAAAAACqVYS3ObOhT+L6w9HZ4CvGuS22bRdDJNOu29OxkrNjUxFGP3kcl/75F0jiSwO3MBb4Swvu+8jyRePO4tgzf+wlt5yxfvq7fM5ORfNb4uvMJb+vLFGkeBq3xc5b9JYNUTcCy8Db7eImOJc77Ch28IZggOlYgd/lvh+IyrYlzF1Kr9AKvf1hffNvg2wreRevsd1FLGtfAAohfegR46NPuIKpxw/IHjTxx/GesTx/rfZz6R4ji/qEVRg50v3qP42RlY5kd5GDAEZ3KSpAvvPznLE5axMAV5X5RbgUJib8oDX1VibThY4ueZHyMHS7M4CmLkUJMojR2OL+V+Xf+42ljVmfqlZIGZKobAT7IsjBKX4npbVuuJDNpF93VzbFyGjLAZouSDWp7HsP6qbteitcvzOAhSRqGwUy0wVh7RjoNA+UHO/MywPGw5OGCG8u9a/iwc5QMZNZYRg5Qm/Y4MoSYkcxKtqqW5rU+idcIZpkok2Rb24hklIdgaIldsWd4WXXmyJRoZFyiSyKSSYokpzxQLQ4Eyv8quErNSAxkG6kzmua6rijcHxz3jqe7E/njFWzdgVCzGr4ELeChaELvqQcZniWF538o2OD5XgnOayblygWtyxlAPEMXujre7v/ShLJdlFyCeyS4UMleXqoRa7PlmrDWGYaYpV8euq2mXgQWhkhUi3KxX6CRM4tx3C1Cjh5GJQQEAEkkCNR+nxhuyBcRUf7lW13INzEnkWp/2CEYcWkB0TnIruNsrR3WnSJJEeWRoZnSnzJDMjM+DaHjLu3qiTbb/G6IZVtGO6tLNaL5O3D6JQ/lbvG/LZnq3sBwzW4Ulmhm8x2nND9IHW6rmmBMxWT5JrnlmhKrH83n/VBdHd2MaZVyeyj4yoJrp6Zu62JX7zX0rTqWw55tYNizQBmlSfeQ0h8xeP0tNqSDZP89N98vZBqmfhWSWI/++qrsP5V4c7I4QUNOyne8SYBjcnOKne6f2A2nMdF4kA6Lb8tDVGzgMWZZe38yk82LyHqPZZY4zhfrndHST2RLk8dOtQghqJXTr6x0TTWpc8J7C4AG1a+u9xUXkRfmA+X0Z+KHcbO3dQu4NOlgmCc9wnybfBPwByduKJKsbIBCoEZBq1AiGd5gHUYmiE+4dYkyaRnppKPO05Zubtm4eebsR3ejYw0qT8h/56RYcWPWcmMCxBUSbwEsXUJuxWWGcChz6fgW1MyT7u1/SAfKmfHY8Q1cjyjfqIdL8u3rNK437f6AoeZVXargzeEvvmndNcyyKcu/BPV9fT/nkKlyNObEE9I1h7HlJA9fjT2saaNtrxqIwN+0arEkZ1Ukegzj3RvA09cK+mdpCthMKQyNLG4aeS/tFkOk90sHRJxrJKTcy6Q0dPwkzoUhVHji43cSGWxmcqSptoNn2tIFmHzVI2+IJQxXpxmw/8WJST639xhqkdTafZEi+Rp67Ar5PTcsSeyI2XtK43tkj143b1dXu0WOCBkDYF+Gf1z+6Z+sXPRQAAA==");
 
                 API = new();
+                ApiTest.Init();
             });
         }
         //);
@@ -119,7 +122,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             //4330	57	33	0	False	Vous avez confié la tâche “<SheetFr(Item,12,IntegerParameter(1),2,1)/> ( <Value>IntegerParameter(2)</Value>)” à votre servant.
             if (text.StartsWithAny("You assign your retainer", "リテイナーベンチャー", "Du hast deinen Gehilfen mit", "Vous avez confié la tâche")
                 && Utils.TryGetCurrentRetainer(out var ret) 
-                && P.config.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var offlineData) 
+                && C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var offlineData) 
                 && offlineData.RetainerData.TryGetFirst(x => x.Name == ret, out var offlineRetainerData))
             {
                 offlineRetainerData.VentureBeginsAt = P.Time;
@@ -174,7 +177,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         }
         else if (arguments.StartsWith("relog "))
         {
-            var target = P.config.OfflineData.Where(x => $"{x.Name}@{x.World}" == arguments[6..]).FirstOrDefault();
+            var target = C.OfflineData.Where(x => $"{x.Name}@{x.World}" == arguments[6..]).FirstOrDefault();
             if (target != null)
             {
                 if (!AutoLogin.Instance.IsRunning) AutoLogin.Instance.SwapCharacter(target.WorldOverride ?? target.World, target.Name, target.ServiceAccount);
@@ -201,9 +204,9 @@ public unsafe class AutoRetainer : IDalamudPlugin
             if (SchedulerMain.PluginEnabled && Svc.ClientState.LocalPlayer != null)
             {
                 SchedulerMain.Tick();
-                if (!P.config.SelectedRetainers.ContainsKey(Svc.ClientState.LocalContentId))
+                if (!C.SelectedRetainers.ContainsKey(Svc.ClientState.LocalContentId))
                 {
-                    P.config.SelectedRetainers[Svc.ClientState.LocalContentId] = new();
+                    C.SelectedRetainers[Svc.ClientState.LocalContentId] = new();
                 }
             }
             if (Svc.Condition[ConditionFlag.OccupiedSummoningBell] && (SchedulerMain.PluginEnabled || P.TaskManager.IsBusy || ConditionWasEnabled))
@@ -220,7 +223,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         NotificationHandler.Tick();
         YesAlready.Tick();
         Artisan.ArtisanTick();
-        //if(P.config.RetryItemSearch) RetryItemSearch.Tick();
+        //if(C.RetryItemSearch) RetryItemSearch.Tick();
         if (SchedulerMain.PluginEnabled || MultiMode.Enabled || TaskManager.IsBusy)
         {
             if(Svc.ClientState.TerritoryType == Prisons.Mordion_Gaol)
@@ -237,9 +240,9 @@ public unsafe class AutoRetainer : IDalamudPlugin
             }
         }
         IsNextToBell = false;
-        if (P.config.RetainerSense && Svc.ClientState.LocalPlayer != null && Svc.ClientState.LocalPlayer.HomeWorld.Id == Svc.ClientState.LocalPlayer.CurrentWorld.Id)
+        if (C.RetainerSense && Svc.ClientState.LocalPlayer != null && Svc.ClientState.LocalPlayer.HomeWorld.Id == Svc.ClientState.LocalPlayer.CurrentWorld.Id)
         {
-            if(!IPC.Suppressed && !IsOccupied() && !P.config.OldRetainerSense && !TaskManager.IsBusy && !Utils.MultiModeOrArtisan && !Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BoundByDuty] && Utils.IsAnyRetainersCompletedVenture())
+            if(!IPC.Suppressed && !IsOccupied() && !C.OldRetainerSense && !TaskManager.IsBusy && !Utils.MultiModeOrArtisan && !Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BoundByDuty] && Utils.IsAnyRetainersCompletedVenture())
             {
                 var bell = Utils.GetReachableRetainerBell();
                 if (bell == null || LastPosition != Svc.ClientState.LocalPlayer.Position)
@@ -251,7 +254,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 {
                     IsNextToBell = true;
                 }
-                if(Environment.TickCount64 - LastMovementAt > P.config.RetainerSenseThreshold)
+                if(Environment.TickCount64 - LastMovementAt > C.RetainerSenseThreshold)
                 {
                     if (bell != null)
                     {
@@ -385,8 +388,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
                     }
                     else
                     {
-                        var bellBehavior = Utils.IsAnyRetainersCompletedVenture() ? P.config.OpenBellBehaviorWithVentures : P.config.OpenBellBehaviorNoVentures;
-                        if(bellBehavior != OpenBellBehavior.Pause_AutoRetainer && IsKeyPressed(P.config.Suppress) && !CSFramework.Instance()->WindowInactive)
+                        var bellBehavior = Utils.IsAnyRetainersCompletedVenture() ? C.OpenBellBehaviorWithVentures : C.OpenBellBehaviorNoVentures;
+                        if(bellBehavior != OpenBellBehavior.Pause_AutoRetainer && IsKeyPressed(C.Suppress) && !CSFramework.Instance()->WindowInactive)
                         {
                             bellBehavior = OpenBellBehavior.Do_nothing;
                             Notify.Info($"Open bell action cancelled");
@@ -425,7 +428,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                         SchedulerMain.EnablePlugin(PluginEnableReason.Auto);
                         WasEnabled = false;
                     }
-                    else if(!IsCloseActionAutomatic && P.config.AutoDisable && !Utils.MultiModeOrArtisan)
+                    else if(!IsCloseActionAutomatic && C.AutoDisable && !Utils.MultiModeOrArtisan)
                     {
                         P.DebugLog($"Disabling plugin because AutoDisable is on");
                         SchedulerMain.DisablePlugin();

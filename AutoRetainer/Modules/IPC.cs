@@ -1,4 +1,5 @@
-﻿using AutoRetainerAPI.Configuration;
+﻿using AutoRetainerAPI;
+using AutoRetainerAPI.Configuration;
 using ECommons.GameHelpers;
 using System;
 using System.Collections.Generic;
@@ -10,11 +11,12 @@ namespace AutoRetainer.Modules
 {
     internal static class IPC
     {
+        static void Log(string s) => P.DebugLog($"[IPC] {s}");
         internal static bool Suppressed = false;
 
         internal static void Init()
         {
-            P.DebugLog("IPC init");
+            Log("IPC init");
             Svc.PluginInterface.GetIpcProvider<object>("AutoRetainer.Init").RegisterAction(() => { });
             Svc.PluginInterface.GetIpcProvider<bool>("AutoRetainer.GetSuppressed").RegisterFunc(GetSuppressed);
             Svc.PluginInterface.GetIpcProvider<bool, object>("AutoRetainer.SetSuppressed").RegisterAction(SetSuppressed);
@@ -24,11 +26,13 @@ namespace AutoRetainer.Modules
             Svc.PluginInterface.GetIpcProvider<ulong, string, AdditionalRetainerData>("AutoRetainer.GetAdditionalRetainerData").RegisterFunc(GetARD);
             Svc.PluginInterface.GetIpcProvider<ulong, string, AdditionalRetainerData, object>("AutoRetainer.WriteAdditionalRetainerData").RegisterAction(SetARD);
             Svc.PluginInterface.GetIpcProvider<List<ulong>>("AutoRetainer.GetRegisteredCIDs").RegisterFunc(GetRegisteredCIDs);
+            Svc.PluginInterface.GetIpcProvider<string, object>("AutoRetainer.RequestPostprocess").RegisterAction(RequestPostprocess);
+            Svc.PluginInterface.GetIpcProvider<object>("AutoRetainer.FinishPostprocessRequest").RegisterAction(FinishPostprocessRequest);
         }
 
         internal static void Shutdown()
         {
-            P.DebugLog("IPC Shutdown");
+            Log("IPC Shutdown");
             Svc.PluginInterface.GetIpcProvider<object>("AutoRetainer.Init").UnregisterAction();
             Svc.PluginInterface.GetIpcProvider<bool>("AutoRetainer.GetSuppressed").UnregisterFunc();
             Svc.PluginInterface.GetIpcProvider<bool, object>("AutoRetainer.SetSuppressed").UnregisterAction();
@@ -38,22 +42,40 @@ namespace AutoRetainer.Modules
             Svc.PluginInterface.GetIpcProvider<ulong, string, AdditionalRetainerData>("AutoRetainer.GetAdditionalRetainerData").UnregisterFunc();
             Svc.PluginInterface.GetIpcProvider<ulong, string, AdditionalRetainerData, object>("AutoRetainer.WriteAdditionalRetainerData").UnregisterAction();
             Svc.PluginInterface.GetIpcProvider<List<ulong>>("AutoRetainer.GetRegisteredCIDs").UnregisterFunc();
+            Svc.PluginInterface.GetIpcProvider<string, object>("AutoRetainer.RequestPostprocess").UnregisterAction();
+            Svc.PluginInterface.GetIpcProvider<object>("AutoRetainer.FinishPostprocessRequest").UnregisterAction();
+        }
+
+        static void FinishPostprocessRequest()
+        {
+            Log("Received postprocess request finish");
+            SchedulerMain.PostProcessLocked = false;
+        }
+
+        static void RequestPostprocess(string pluginName)
+        {
+            if(SchedulerMain.RetainerPostprocess.Contains(pluginName))
+            {
+                throw new Exception($"Postprocess request from {pluginName} already exist");
+            }
+            SchedulerMain.RetainerPostprocess = SchedulerMain.RetainerPostprocess.Add(pluginName);
+            Log($"Postprocess requested from {pluginName}");
         }
 
         static List<ulong> GetRegisteredCIDs()
         {
-            return P.config.OfflineData.Where(x => !P.config.Blacklist.Any(z => z.CID == x.CID) && !x.Name.EqualsAny("Unknown", "")).Select(x => x.CID).ToList();
+            return C.OfflineData.Where(x => !C.Blacklist.Any(z => z.CID == x.CID) && !x.Name.EqualsAny("Unknown", "")).Select(x => x.CID).ToList();
         }
 
         static OfflineCharacterData GetOCD(ulong CID)
         {
-            return P.config.OfflineData.FirstOrDefault(x => x.CID == CID);
+            return C.OfflineData.FirstOrDefault(x => x.CID == CID);
         }
 
         static void SetOCD(OfflineCharacterData OCD)
         {
-            P.config.OfflineData.RemoveAll(x => x.CID == OCD.CID);
-            P.config.OfflineData.Add(OCD);
+            C.OfflineData.RemoveAll(x => x.CID == OCD.CID);
+            C.OfflineData.Add(OCD);
         }
 
         static AdditionalRetainerData GetARD(ulong cid, string name)
@@ -63,7 +85,7 @@ namespace AutoRetainer.Modules
 
         static void SetARD(ulong cid, string name, AdditionalRetainerData data)
         {
-            P.config.AdditionalData[Utils.GetAdditionalDataKey(cid, name)] = data;
+            C.AdditionalData[Utils.GetAdditionalDataKey(cid, name)] = data;
         }
 
         static void SetVenture(uint VentureID)
@@ -80,6 +102,24 @@ namespace AutoRetainer.Modules
         static void SetSuppressed(bool s)
         {
             Suppressed = s;
+        }
+
+        internal static void FireSendRetainerToVentureEvent(string retainer)
+        {
+            Log($"Firing FireSendRetainerToVentureEvent for {retainer}");
+            Svc.PluginInterface.GetIpcProvider<string, object>(ApiConsts.OnSendRetainerToVenture).SendMessage(retainer);
+        }
+
+        internal static void FirePostprocessTaskRequestEvent(string retainer)
+        {
+            Log($"Firing FirePostprocessTaskRequestEvent for {retainer}");
+            Svc.PluginInterface.GetIpcProvider<string, object>(ApiConsts.OnRetainerAdditionalTask).SendMessage(retainer);
+        }
+
+        internal static void FirePluginPostprocessEvent(string pluginName, string retainer)
+        {
+            Log($"Firing FirePluginPostprocessEvent for {retainer} for plugin {pluginName}");
+            Svc.PluginInterface.GetIpcProvider<string, string, object>(ApiConsts.OnRetainerReadyForPostprocess).SendMessage(pluginName, retainer);
         }
     }
 }

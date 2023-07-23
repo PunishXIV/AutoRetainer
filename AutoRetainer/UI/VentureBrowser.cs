@@ -55,7 +55,7 @@ namespace AutoRetainer.UI
             ImGuiEx.SetNextItemFullWidth();
             if (ImGui.BeginCombo("##selectRet", SelectedCharacter != null?$"{Censor.Character(SelectedCharacter.Name, SelectedCharacter.World)} - {Censor.Retainer(SelectedRetainer.Name)} - {SelectedRetainer.Level} {ExcelJobHelper.GetJobNameById(SelectedRetainer.Job)}" : "Select a retainer..."))
             {
-                foreach (var x in P.config.OfflineData.OrderBy(x => !P.config.NoCurrentCharaOnTop && x.CID == Player.CID ? 0 : 1))
+                foreach (var x in C.OfflineData.OrderBy(x => !C.NoCurrentCharaOnTop && x.CID == Player.CID ? 0 : 1))
                 {
                     foreach (var r in x.RetainerData)
                     {

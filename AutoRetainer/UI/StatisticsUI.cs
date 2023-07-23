@@ -24,7 +24,7 @@ internal static class StatisticsUI
             Load();
         }
         ImGui.SameLine();
-        ImGui.Checkbox("Show HQ and non-HQ together", ref P.config.StatsUnifyHQ);
+        ImGui.Checkbox("Show HQ and non-HQ together", ref C.StatsUnifyHQ);
         ImGui.SameLine();
         ImGuiEx.SetNextItemFullWidth();
         ImGui.InputTextWithHint("##search", "Filter items...", ref Filter, 100);
@@ -55,7 +55,7 @@ internal static class StatisticsUI
                         foreach (var c in array)
                         {
                             var iName = $"{Svc.Data.GetExcelSheet<Item>().GetRow(c.Key).Name}";
-                            ImGuiEx.Text($"             {iName}: {(P.config.StatsUnifyHQ ? c.Value.Amount + c.Value.AmountHQ : $"{c.Value.Amount}/{c.Value.AmountHQ}")}");
+                            ImGuiEx.Text($"             {iName}: {(C.StatsUnifyHQ ? c.Value.Amount + c.Value.AmountHQ : $"{c.Value.Amount}/{c.Value.AmountHQ}")}");
                         }
                     }
                 }

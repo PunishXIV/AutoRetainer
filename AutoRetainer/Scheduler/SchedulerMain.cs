@@ -3,6 +3,7 @@ using AutoRetainer.Scheduler.Tasks;
 using AutoRetainerAPI.Configuration;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using System.Collections.Immutable;
 
 namespace AutoRetainer.Scheduler;
 
@@ -21,8 +22,10 @@ internal unsafe static class SchedulerMain
         } 
     }
 
-    internal static bool CanAssignQuickExploration => P.config.EnableAssigningQuickExploration && !P.config.DontReassign;
+    internal static bool CanAssignQuickExploration => C.EnableAssigningQuickExploration && !C.DontReassign;
     internal static volatile uint VentureOverride = 0;
+    internal static volatile bool PostProcessLocked = false;
+    internal static ImmutableList<string> RetainerPostprocess = Array.Empty<string>().ToImmutableList();
 
     internal static PluginEnableReason Reason { get; set; }
 
@@ -45,14 +48,14 @@ internal unsafe static class SchedulerMain
     {
         if (PluginEnabled)
         {
-            if (P.config.RetainerSense && MultiMode.GetAutoAfkOpt() != 0)
+            if (C.RetainerSense && MultiMode.GetAutoAfkOpt() != 0)
             {
-                P.config.RetainerSense = false;
+                C.RetainerSense = false;
                 DuoLog.Warning("Using RetainerSense requires Auto-afk option to be turned off. That option has been automatically disabled.");
             }
-            if (P.config.OldRetainerSense && MultiMode.GetAutoAfkOpt() != 0)
+            if (C.OldRetainerSense && MultiMode.GetAutoAfkOpt() != 0)
             {
-                P.config.OldRetainerSense = false;
+                C.OldRetainerSense = false;
                 DuoLog.Warning("Using old RetainerSense requires Auto-afk option to be turned off. That option has been automatically disabled.");
             }
             if (TryGetAddonByName<AtkUnitBase>("RetainerList", out var addon) && addon->IsVisible)
@@ -72,7 +75,8 @@ internal unsafe static class SchedulerMain
 
                                     var adata = Utils.GetAdditionalData(Svc.ClientState.LocalContentId, ret.Name.ToString());
                                     VentureOverride = 0;
-                                    Svc.PluginInterface.GetIpcProvider<string, object>("AutoRetainer.OnSendRetainerToVenture").SendMessage(retainer);
+
+                                    IPC.FireSendRetainerToVentureEvent(retainer);
 
                                     if(VentureOverride > 0)
                                     {
@@ -85,7 +89,7 @@ internal unsafe static class SchedulerMain
 
                                         if (ret.VentureID != 0)
                                         {
-                                            if (P.config.DontReassign)
+                                            if (C.DontReassign)
                                             {
                                                 TaskCollectVenture.Enqueue();
                                             }
@@ -170,16 +174,19 @@ internal unsafe static class SchedulerMain
                                         }
                                     }
 
-                                    if (P.config.RetainerMenuDelay > 0)
+                                    //fire event, let other plugins deal with retainer
+                                    TaskPostprocessIPC.Enqueue(retainer);
+
+                                    if (C.RetainerMenuDelay > 0)
                                     {
-                                        TaskWaitSelectString.Enqueue(P.config.RetainerMenuDelay);
+                                        TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
                                     }
                                     P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
                                 }
                             }
                             else
                             {
-                                if ((P.config.Stay5 || MultiMode.Active) && !Utils.IsAllCurrentCharacterRetainersHaveMoreThan5Mins())
+                                if ((C.Stay5 || MultiMode.Active) && !Utils.IsAllCurrentCharacterRetainersHaveMoreThan5Mins())
                                 {
                                     //nothing
                                 }
@@ -216,15 +223,15 @@ internal unsafe static class SchedulerMain
 
                                         if (Reason == PluginEnableReason.Auto)
                                         {
-                                            Process(P.config.TaskCompletedBehaviorAuto);
+                                            Process(C.TaskCompletedBehaviorAuto);
                                         }
                                         else if (Reason == PluginEnableReason.Manual)
                                         {
-                                            Process(P.config.TaskCompletedBehaviorManual);
+                                            Process(C.TaskCompletedBehaviorManual);
                                         }
                                         else if (Reason == PluginEnableReason.Access)
                                         {
-                                            Process(P.config.TaskCompletedBehaviorAccess);
+                                            Process(C.TaskCompletedBehaviorAccess);
                                         }
                                     }
                                 }
@@ -254,15 +261,15 @@ internal unsafe static class SchedulerMain
 
                                     if (Reason == PluginEnableReason.Auto)
                                     {
-                                        Process(P.config.TaskCompletedBehaviorAuto);
+                                        Process(C.TaskCompletedBehaviorAuto);
                                     }
                                     else if (Reason == PluginEnableReason.Manual)
                                     {
-                                        Process(P.config.TaskCompletedBehaviorManual);
+                                        Process(C.TaskCompletedBehaviorManual);
                                     }
                                     else if (Reason == PluginEnableReason.Access)
                                     {
-                                        Process(P.config.TaskCompletedBehaviorAccess);
+                                        Process(C.TaskCompletedBehaviorAccess);
                                     }
                                 }
                                 DisablePlugin();
@@ -274,7 +281,7 @@ internal unsafe static class SchedulerMain
             else
             {
                 //DuoLog.Information($"123");
-                if(P.config.OldRetainerSense || SchedulerMain.Reason == PluginEnableReason.Artisan)
+                if(C.OldRetainerSense || SchedulerMain.Reason == PluginEnableReason.Artisan)
                 {
                     if (Utils.AnyRetainersAvailableCurrentChara())
                     {
@@ -305,7 +312,7 @@ internal unsafe static class SchedulerMain
                 var rname = r.Name.ToString();
                 var adata = Utils.GetAdditionalData(Svc.ClientState.LocalContentId, rname);
                 if (P.GetSelectedRetainers(Svc.ClientState.LocalContentId).Contains(rname)
-                    && r.GetVentureSecondsRemaining() <= P.config.UnsyncCompensation && (r.VentureID != 0 || CanAssignQuickExploration || (adata.EnablePlanner && adata.VenturePlan.ListUnwrapped.Count > 0)))
+                    && r.GetVentureSecondsRemaining() <= C.UnsyncCompensation && (r.VentureID != 0 || CanAssignQuickExploration || (adata.EnablePlanner && adata.VenturePlan.ListUnwrapped.Count > 0)))
                 {
                     return rname;
                 }
