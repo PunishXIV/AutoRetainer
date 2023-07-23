@@ -1,7 +1,6 @@
 ﻿using AutoRetainerAPI.Configuration;
 using ECommons;
 using ECommons.DalamudServices;
-using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Generic;
 
@@ -27,11 +26,26 @@ namespace AutoRetainerAPI
         /// </summary>
         public event OnRetainerReadyToPostprocessDelegate OnRetainerReadyToPostprocess;
 
+        public delegate void OnRetainerSettingsDrawDelegate(ulong CID, string retainerName);
+        /// <summary>
+        /// Event which is fired every time retainer's settings are displayed
+        /// </summary>
+        public event OnRetainerSettingsDrawDelegate OnRetainerSettingsDraw;
+
         public AutoRetainerApi()
         {
             Svc.PluginInterface.GetIpcSubscriber<string, object>(ApiConsts.OnSendRetainerToVenture).Subscribe(OnSendRetainerToVentureAction);
             Svc.PluginInterface.GetIpcSubscriber<string, object>(ApiConsts.OnRetainerAdditionalTask).Subscribe(OnRetainerAdditionalTask);
             Svc.PluginInterface.GetIpcSubscriber<string, string, object>(ApiConsts.OnRetainerReadyForPostprocess).Subscribe(OnRetainerReadyForPostprocessIntl);
+            Svc.PluginInterface.GetIpcSubscriber<ulong, string, object>(ApiConsts.OnRetainerSettingsDraw).Subscribe(OnRetainerSettingsDrawAction);
+        }
+
+        private void OnRetainerSettingsDrawAction(ulong cid, string retainer)
+        {
+            if (OnRetainerSettingsDraw != null)
+            {
+                GenericHelpers.Safe(() => OnRetainerSettingsDraw(cid, retainer));
+            }
         }
 
         /// <summary>
@@ -116,6 +130,7 @@ namespace AutoRetainerAPI
             Svc.PluginInterface.GetIpcSubscriber<string, object>(ApiConsts.OnSendRetainerToVenture).Unsubscribe(OnSendRetainerToVentureAction);
             Svc.PluginInterface.GetIpcSubscriber<string, object>(ApiConsts.OnRetainerAdditionalTask).Unsubscribe(OnRetainerAdditionalTask);
             Svc.PluginInterface.GetIpcSubscriber<string, string, object>(ApiConsts.OnRetainerReadyForPostprocess).Unsubscribe(OnRetainerReadyForPostprocessIntl);
+            Svc.PluginInterface.GetIpcSubscriber<ulong, string, object>(ApiConsts.OnRetainerSettingsDraw).Unsubscribe(OnRetainerSettingsDrawAction);
         }
 
         /// <summary>
