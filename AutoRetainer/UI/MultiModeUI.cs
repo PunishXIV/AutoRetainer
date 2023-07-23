@@ -1,4 +1,5 @@
-﻿using AutoRetainerAPI.Configuration;
+﻿using AutoRetainerAPI;
+using AutoRetainerAPI.Configuration;
 using Dalamud.Interface.Components;
 using ECommons;
 using ECommons.GameHelpers;
@@ -268,6 +269,7 @@ internal unsafe static class MultiModeUI
                             ImGuiEx.Text(Lang.IconGil);
                             ImGui.PopFont();
                         }
+                        Svc.PluginInterface.GetIpcProvider<ulong, string, object>(ApiConsts.OnRetainerPostVentureTaskDraw).SendMessage(data.CID, ret.Name);
                         if (adata.IsVenturePlannerActive())
                         {
                             ImGui.SameLine();
@@ -365,6 +367,8 @@ internal unsafe static class MultiModeUI
                                 ImGui.SetNextItemWidth(200f);
                                 ImGui.InputInt($"Amount, %", ref adata.WithdrawGilPercent.ValidateRange(1, 100), 1, 10);
                             }
+                            ImGui.Separator();
+                            Svc.PluginInterface.GetIpcProvider<ulong, string, object>(ApiConsts.OnRetainerSettingsDraw).SendMessage(data.CID, ret.Name);
                             ImGui.EndPopup();
                         }
                         ImGui.SameLine();
