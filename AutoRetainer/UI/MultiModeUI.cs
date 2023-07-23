@@ -269,6 +269,7 @@ internal unsafe static class MultiModeUI
                             ImGuiEx.Text(Lang.IconGil);
                             ImGui.PopFont();
                         }
+                        Svc.PluginInterface.GetIpcProvider<ulong, string, object>(ApiConsts.OnRetainerPostVentureTaskDraw).SendMessage(data.CID, ret.Name);
                         if (adata.IsVenturePlannerActive())
                         {
                             ImGui.SameLine();

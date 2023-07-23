@@ -12,5 +12,7 @@ namespace AutoRetainerAPI
         public const string OnRetainerAdditionalTask = "AutoRetainer.OnRetainerAdditionalTask";
         public const string OnRetainerReadyForPostprocess = "AutoRetainer.OnRetainerReadyForPostprocess";
         public const string OnRetainerSettingsDraw = "AutoRetainer.OnRetainerSettingsDraw";
+        public const string OnRetainerPostVentureTaskDraw = "AutoRetainer.OnRetainerPostVentureTaskDraw";
+
     }
 }
