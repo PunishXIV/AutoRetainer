@@ -56,6 +56,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
     internal StyleModel Style;
     internal bool StylePushed = false;
+    internal RetainerListOverlay RetainerListOverlay;
 
     public AutoRetainer(DalamudPluginInterface pi)
     {
@@ -96,7 +97,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 Utils.FixKeys();
 
                 ws.AddWindow(new MultiModeOverlay());
-                ws.AddWindow(new RetainerListOverlay());
+                RetainerListOverlay = new RetainerListOverlay();
+                ws.AddWindow(RetainerListOverlay);
                 LoginOverlay = (new LoginOverlay());
                 ws.AddWindow(LoginOverlay);
                 MultiMode.Init();

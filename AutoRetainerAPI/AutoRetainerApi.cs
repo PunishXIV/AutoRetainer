@@ -41,7 +41,7 @@ namespace AutoRetainerAPI
 
         public delegate void OnRetainerListTaskButtonsDrawDelegate();
         /// <summary>
-        /// Event which is fired every time task buttons are displayed
+        /// Event which is fired every time task buttons are displayed in retainer list
         /// </summary>
         public event OnRetainerListTaskButtonsDrawDelegate OnRetainerListTaskButtonsDraw;
 
@@ -53,6 +53,14 @@ namespace AutoRetainerAPI
             Svc.PluginInterface.GetIpcSubscriber<ulong, string, object>(ApiConsts.OnRetainerSettingsDraw).Subscribe(OnRetainerSettingsDrawAction);
             Svc.PluginInterface.GetIpcSubscriber<ulong, string, object>(ApiConsts.OnRetainerPostVentureTaskDraw).Subscribe(OnRetainerPostVentureTaskDrawAction);
             Svc.PluginInterface.GetIpcSubscriber<object>(ApiConsts.OnRetainerListTaskButtonsDraw).Subscribe(OnRetainerListTaskButtonsDrawAction);
+        }
+
+        /// <summary>
+        /// Request that AutoRetainer should go through all retainers in list and execute an IPC task from current plugin. Tasks from another plugins won't be executed. Only use this method from inside <see cref="OnRetainerListTaskButtonsDraw"/> event.
+        /// </summary>
+        public void ProcessIPCTaskFromOverlay()
+        {
+            Svc.PluginInterface.GetIpcSubscriber<string, object>(ApiConsts.OnRetainerListCustomTask).InvokeAction(ECommonsMain.Instance.Name);
         }
 
         private void OnRetainerListTaskButtonsDrawAction()

@@ -10,6 +10,7 @@ namespace AutoRetainer.UI.Overlays;
 internal unsafe class RetainerListOverlay : Window
 {
     float height;
+    internal volatile string PluginToProcess = null;
 
     public RetainerListOverlay() : base("AutoRetainer retainerlist overlay", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize, true)
     {
@@ -125,8 +126,26 @@ internal unsafe class RetainerListOverlay : Window
             }
             ImGuiEx.Tooltip("Quick Withdraw Gil");
 
-
+            PluginToProcess = null;
             Svc.PluginInterface.GetIpcProvider<object>(ApiConsts.OnRetainerListTaskButtonsDraw).SendMessage();
+            if(PluginToProcess != null)
+            {
+                for (var i = 0; i < P.retainerManager.Count; i++)
+                {
+                    var ret = P.retainerManager.Retainer(i);
+                    if (ret.Available)
+                    {
+                        P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
+                        TaskPostprocessIPC.Enqueue(ret.Name.ToString(), PluginToProcess);
+
+                        if (C.RetainerMenuDelay > 0)
+                        {
+                            TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
+                        }
+                        P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
+                    }
+                }
+            }
         }
         height = ImGui.GetWindowSize().Y;
     }
