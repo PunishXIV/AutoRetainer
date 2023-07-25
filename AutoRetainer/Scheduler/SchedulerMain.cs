@@ -22,7 +22,7 @@ internal unsafe static class SchedulerMain
         } 
     }
 
-    internal static bool CanAssignQuickExploration => C.EnableAssigningQuickExploration && !C.DontReassign;
+    internal static bool CanAssignQuickExploration => C.EnableAssigningQuickExploration && !C.DontReassign && Utils.GetVenturesAmount() > 1;
     internal static volatile uint VentureOverride = 0;
     internal static volatile bool PostProcessLocked = false;
     internal static ImmutableList<string> RetainerPostprocess = Array.Empty<string>().ToImmutableList();
@@ -89,7 +89,7 @@ internal unsafe static class SchedulerMain
 
                                         if (ret.VentureID != 0)
                                         {
-                                            if (C.DontReassign)
+                                            if (C.DontReassign || Utils.GetVenturesAmount() < 2)
                                             {
                                                 TaskCollectVenture.Enqueue();
                                             }
