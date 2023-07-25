@@ -17,5 +17,6 @@ namespace AutoRetainerAPI
         public const string OnRetainerListCustomTask = "AutoRetainer.OnRetainerListCustomTask";
         public const string OnUITabDraw = "AutoRetainer.OnUITabDraw";
         public const string DrawTab = "AutoRetainer.DrawTab";
+        public const string OnMainControlsDraw = "AutoRetainer.OnMainControlsDraw";
     }
 }

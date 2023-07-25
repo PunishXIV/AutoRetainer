@@ -40,6 +40,11 @@ namespace AutoRetainerAPI
         /// </summary>
         public event OnRetainerListTaskButtonsDrawDelegate OnRetainerListTaskButtonsDraw;
 
+        /// <summary>
+        /// Event which is fired every time when main controls are being drawn
+        /// </summary>
+        public event OnMainControlsDrawDelegate OnMainControlsDraw;
+
         public AutoRetainerApi()
         {
             Svc.PluginInterface.GetIpcSubscriber<string, object>(ApiConsts.OnSendRetainerToVenture).Subscribe(OnSendRetainerToVentureAction);
@@ -48,6 +53,7 @@ namespace AutoRetainerAPI
             Svc.PluginInterface.GetIpcSubscriber<ulong, string, object>(ApiConsts.OnRetainerSettingsDraw).Subscribe(OnRetainerSettingsDrawAction);
             Svc.PluginInterface.GetIpcSubscriber<ulong, string, object>(ApiConsts.OnRetainerPostVentureTaskDraw).Subscribe(OnRetainerPostVentureTaskDrawAction);
             Svc.PluginInterface.GetIpcSubscriber<object>(ApiConsts.OnRetainerListTaskButtonsDraw).Subscribe(OnRetainerListTaskButtonsDrawAction);
+            Svc.PluginInterface.GetIpcSubscriber<object>(ApiConsts.OnMainControlsDraw).Subscribe(OnMainControlsDrawAction);
         }
 
         /// <summary>
@@ -118,6 +124,7 @@ namespace AutoRetainerAPI
             Svc.PluginInterface.GetIpcSubscriber<ulong, string, object>(ApiConsts.OnRetainerSettingsDraw).Unsubscribe(OnRetainerSettingsDrawAction);
             Svc.PluginInterface.GetIpcSubscriber<ulong, string, object>(ApiConsts.OnRetainerPostVentureTaskDraw).Unsubscribe(OnRetainerPostVentureTaskDrawAction);
             Svc.PluginInterface.GetIpcSubscriber<object>(ApiConsts.OnRetainerListTaskButtonsDraw).Unsubscribe(OnRetainerListTaskButtonsDrawAction);
+            Svc.PluginInterface.GetIpcSubscriber<object>(ApiConsts.OnMainControlsDraw).Unsubscribe(OnMainControlsDrawAction);
         }
 
         /// <summary>

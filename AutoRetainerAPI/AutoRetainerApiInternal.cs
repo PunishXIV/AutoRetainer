@@ -17,6 +17,14 @@ namespace AutoRetainerAPI
             }
         }
 
+        private void OnMainControlsDrawAction()
+        {
+            if (OnMainControlsDraw != null)
+            {
+                GenericHelpers.Safe(() => OnMainControlsDraw());
+            }
+        }
+
         private void OnRetainerPostVentureTaskDrawAction(ulong cid, string retainer)
         {
             if (OnRetainerPostVentureTaskDraw != null)
