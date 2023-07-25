@@ -14,5 +14,6 @@ namespace AutoRetainerAPI
         public delegate void OnRetainerSettingsDrawDelegate(ulong CID, string retainerName);
         public delegate void OnRetainerPostVentureTaskDrawDelegate(ulong CID, string retainerName);
         public delegate void OnRetainerListTaskButtonsDrawDelegate();
+        public delegate void OnUITabDrawDelegate();
     }
 }
