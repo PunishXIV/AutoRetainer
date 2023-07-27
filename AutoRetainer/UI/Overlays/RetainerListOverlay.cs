@@ -64,9 +64,9 @@ internal unsafe class RetainerListOverlay : Window
             ImGui.SameLine();
             ImGuiEx.Text(GradientColor.Get(ImGuiColors.DalamudGrey, ImGuiColors.DalamudGrey3, 500), $"Paused");
         }
-        ImGui.SameLine();
         if (C.MultiModeUIBar)
         {
+            ImGui.SameLine();
             if (ImGui.Checkbox("MultiMode", ref MultiMode.Enabled))
             {
                 MultiMode.OnMultiModeEnabled();
@@ -75,8 +75,12 @@ internal unsafe class RetainerListOverlay : Window
                     SchedulerMain.EnablePlugin(PluginEnableReason.MultiMode);
                 }
             }
-            ImGui.SameLine();
         }
+
+        Svc.PluginInterface.GetIpcProvider<object>(ApiConsts.OnMainControlsDraw).SendMessage();
+
+        ImGui.SameLine();
+
         if (ImGuiEx.IconButton($"{Lang.IconSettings}##Open plugin interface"))
         {
             Svc.Commands.ProcessCommand("/ays");
