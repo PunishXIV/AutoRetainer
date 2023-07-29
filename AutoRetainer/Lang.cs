@@ -42,7 +42,11 @@ internal static class Lang
         "Exploration en plaine (2 jetons)",
         "Exploration en montagne (2 jetons)",
         "Exploration en forêt (2 jetons)",
-        "Exploration en rivage (2 jetons)"
+        "Exploration en rivage (2 jetons)",
+        "平地探索委托（需要2枚探险币）",
+        "山岳探索委托（需要2枚探险币）",
+        "森林探索委托（需要2枚探险币）",
+        "水岸探索委托（需要2枚探险币）"
     };
 
     internal static readonly string[] HuntingVentureNames = new string[]
@@ -62,7 +66,11 @@ internal static class Lang
         "Travail de chasse (1 jeton)",
         "Travail de mineur (1 jeton)",
         "Travail de botaniste (1 jeton)",
-        "Travail de pêche (1 jeton)"
+        "Travail de pêche (1 jeton)",
+        "狩猎筹集委托（需要1枚探险币）",
+        "采矿筹集委托（需要1枚探险币）",
+        "采伐筹集委托（需要1枚探险币）",
+        "捕鱼筹集委托（需要1枚探险币）",
     };
 
     internal static readonly string[] QuickExploration = new string[]
@@ -70,7 +78,8 @@ internal static class Lang
         "Quick Exploration.",
         "ほりだしもの依頼　（必要ベンチャースクリップ：2枚）",
         "Schneller Streifzug (2 Wertmarken)",
-        "Tâche improvisée (2 jetons)"
+        "Tâche improvisée (2 jetons)",
+        "自由探索委托（需要2枚探险币）"
     };
 
     internal static readonly string[] Entrance = new string[]
@@ -78,7 +87,7 @@ internal static class Lang
         "ハウスへ入る",
         "Eingang",
         "Entrée",
-        "Entrance"
+        "Entrance",
     };
 
     internal static string ApartmentEntrance => Svc.Data.GetExcelSheet<EObjName>().GetRow(2007402).Singular.ToString();
