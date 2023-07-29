@@ -81,6 +81,8 @@ internal static class Lang
         "Entrance"
     };
 
+    internal static string ApartmentEntrance => Svc.Data.GetExcelSheet<EObjName>().GetRow(2007402).Singular.ToString();
+
     internal static readonly string[] ConfirmHouseEntrance = new string[]
     {
         "「ハウス」へ入りますか？",
@@ -101,4 +103,17 @@ internal static class Lang
     {
         get => Svc.Data.GetExcelSheet<EObjName>().GetRow(2000401).Singular.ToString();
     }
+
+    //0	TEXT_HOUFIXMANSIONENTRANCE_00359_HOUSINGAREA_MENU_ENTER_MYROOM	Go to your apartment
+    //0	TEXT_HOUFIXMANSIONENTRANCE_00359_HOUSINGAREA_MENU_ENTER_MYROOM	自分の部屋に移動する
+    //0	TEXT_HOUFIXMANSIONENTRANCE_00359_HOUSINGAREA_MENU_ENTER_MYROOM	Die eigene Wohnung betreten
+    //0	TEXT_HOUFIXMANSIONENTRANCE_00359_HOUSINGAREA_MENU_ENTER_MYROOM	Aller dans votre appartement
+
+    internal static readonly string[] GoToYourApartment = new string[]
+    {
+        "Go to your apartment",
+        "自分の部屋に移動する",
+        "Die eigene Wohnung betreten",
+        "Aller dans votre appartement"
+    };
 }

@@ -292,12 +292,12 @@ internal static unsafe class Utils
     internal static void RethrottleGeneric(int num) => EzThrottler.Throttle("AutoRetainerGenericThrottle", num, true);
     internal static void RethrottleGeneric() => EzThrottler.Throttle("AutoRetainerGenericThrottle", C.Delay, true);
 
-    internal static bool TrySelectSpecificEntry(string text)
+    internal static bool TrySelectSpecificEntry(string text, Func<bool> Throttler = null)
     {
-        return TrySelectSpecificEntry(new string[] { text });
+        return TrySelectSpecificEntry(new string[] { text }, Throttler);
     }
 
-    internal static bool TrySelectSpecificEntry(IEnumerable<string> text)
+    internal static bool TrySelectSpecificEntry(IEnumerable<string> text, Func<bool> Throttler = null)
     {
         if (TryGetAddonByName<AddonSelectString>("SelectString", out var addon) && IsAddonReady(&addon->AtkUnitBase))
         {
@@ -305,10 +305,10 @@ internal static unsafe class Utils
             if (entry != null)
             {
                 var index = GetEntries(addon).IndexOf(entry);
-                if (index >= 0 && IsSelectItemEnabled(addon, index) && GenericThrottle)
+                if (index >= 0 && IsSelectItemEnabled(addon, index) && (Throttler?.Invoke() ?? GenericThrottle))
                 {
                     ClickSelectString.Using((nint)addon).SelectItem((ushort)index);
-                    P.DebugLog($"SelectAssignVenture: selecting {entry}/{index} as requested by {text.Print()}");
+                    P.DebugLog($"TrySelectSpecificEntry: selecting {entry}/{index} as requested by {text.Print()}");
                     return true;
                 }
             }
@@ -371,13 +371,18 @@ internal static unsafe class Utils
         return (MathHelper.GetRelativeAngle(Svc.ClientState.LocalPlayer.Position.ToVector2(), pos) + Svc.ClientState.LocalPlayer.Rotation.RadToDeg()) % 360;
     }
 
+    internal static bool IsApartmentEntrance(this GameObject obj)
+    {
+        return obj.Name.ToString().EqualsIgnoreCase(Lang.ApartmentEntrance);
+    }
+
     internal static GameObject GetNearestEntrance(out float Distance)
     {
         var currentDistance = float.MaxValue;
         GameObject currentObject = null;
         foreach (var x in Svc.Objects)
         {
-            if (x.IsTargetable() && x.Name.ToString().EqualsAny(Lang.Entrance))
+            if (x.IsTargetable() && x.Name.ToString().EqualsIgnoreCaseAny(Lang.Entrance.Together(Lang.ApartmentEntrance)))
             {
                 var distance = Vector3.Distance(Svc.ClientState.LocalPlayer.Position, x.Position);
                 if (distance < currentDistance)
