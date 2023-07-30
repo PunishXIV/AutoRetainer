@@ -4,40 +4,46 @@ using ECommons.DalamudServices;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using static AutoRetainerAPI.Delegates;
 
 namespace AutoRetainerAPI
 {
-    public class AutoRetainerApi : IDisposable
+    public partial class AutoRetainerApi : IDisposable
     {
-        public delegate void OnSendRetainerToVentureDelegate(string retainerName);
         /// <summary>
         /// Event which is fired when a retainer is about to be sent to a venture.
         /// </summary>
         public event OnSendRetainerToVentureDelegate OnSendRetainerToVenture;
 
-        public delegate void OnRetainerPostprocessTaskDelegate(string retainerName);
         /// <summary>
         /// Event which is fired when a retainer is processed and ready to receive additional postprocess tasks
         /// </summary>
         public event OnRetainerPostprocessTaskDelegate OnRetainerPostprocessStep;
 
-        public delegate void OnRetainerReadyToPostprocessDelegate(string retainerName);
         /// <summary>
         /// Event which is fired when your plugin should do additional post-process tasks. You must return game UI into the state from where you picked it up.
         /// </summary>
         public event OnRetainerReadyToPostprocessDelegate OnRetainerReadyToPostprocess;
 
-        public delegate void OnRetainerSettingsDrawDelegate(ulong CID, string retainerName);
         /// <summary>
         /// Event which is fired every time retainer's settings are displayed
         /// </summary>
         public event OnRetainerSettingsDrawDelegate OnRetainerSettingsDraw;
 
-        public delegate void OnRetainerPostVentureTaskDrawDelegate(ulong CID, string retainerName);
         /// <summary>
         /// Event which is fired every time post-venture tasks are displayed
         /// </summary>
         public event OnRetainerPostVentureTaskDrawDelegate OnRetainerPostVentureTaskDraw;
+
+        /// <summary>
+        /// Event which is fired every time task buttons are displayed in retainer list
+        /// </summary>
+        public event OnRetainerListTaskButtonsDrawDelegate OnRetainerListTaskButtonsDraw;
+
+        /// <summary>
+        /// Event which is fired every time when main controls are being drawn
+        /// </summary>
+        public event OnMainControlsDrawDelegate OnMainControlsDraw;
 
         public AutoRetainerApi()
         {
@@ -46,23 +52,18 @@ namespace AutoRetainerAPI
             Svc.PluginInterface.GetIpcSubscriber<string, string, object>(ApiConsts.OnRetainerReadyForPostprocess).Subscribe(OnRetainerReadyForPostprocessIntl);
             Svc.PluginInterface.GetIpcSubscriber<ulong, string, object>(ApiConsts.OnRetainerSettingsDraw).Subscribe(OnRetainerSettingsDrawAction);
             Svc.PluginInterface.GetIpcSubscriber<ulong, string, object>(ApiConsts.OnRetainerPostVentureTaskDraw).Subscribe(OnRetainerPostVentureTaskDrawAction);
+            Svc.PluginInterface.GetIpcSubscriber<object>(ApiConsts.OnRetainerListTaskButtonsDraw).Subscribe(OnRetainerListTaskButtonsDrawAction);
+            Svc.PluginInterface.GetIpcSubscriber<object>(ApiConsts.OnMainControlsDraw).Subscribe(OnMainControlsDrawAction);
         }
 
-        private void OnRetainerPostVentureTaskDrawAction(ulong cid, string retainer)
+        /// <summary>
+        /// Request that AutoRetainer should go through all retainers in list and execute an IPC task from current plugin. Tasks from another plugins won't be executed. Only use this method from inside <see cref="OnRetainerListTaskButtonsDraw"/> event.
+        /// </summary>
+        public void ProcessIPCTaskFromOverlay()
         {
-            if (OnRetainerPostVentureTaskDraw != null)
-            {
-                GenericHelpers.Safe(() => OnRetainerPostVentureTaskDraw(cid, retainer));
-            }
+            Svc.PluginInterface.GetIpcSubscriber<string, object>(ApiConsts.OnRetainerListCustomTask).InvokeAction(ECommonsMain.Instance.Name);
         }
 
-        private void OnRetainerSettingsDrawAction(ulong cid, string retainer)
-        {
-            if (OnRetainerSettingsDraw != null)
-            {
-                GenericHelpers.Safe(() => OnRetainerSettingsDraw(cid, retainer));
-            }
-        }
 
         /// <summary>
         /// Fire inside <see cref="OnRetainerPostprocessStep"/> event to indicate that you want to do the postprocessing of a retainer.
@@ -77,32 +78,6 @@ namespace AutoRetainerAPI
         /// </summary>
         public void FinishPostProcess() => Svc.PluginInterface.GetIpcSubscriber<object>("AutoRetainer.FinishPostprocessRequest").InvokeAction();
 
-        private void OnRetainerReadyForPostprocessIntl(string plugin, string retainer)
-        {
-            if(ECommonsMain.Instance.Name == plugin)
-            {
-                if (OnRetainerReadyToPostprocess != null)
-                {
-                    GenericHelpers.Safe(() => OnRetainerReadyToPostprocess(retainer));
-                }
-            }
-        }
-
-        void OnSendRetainerToVentureAction(string n)
-        {
-            if (OnSendRetainerToVenture != null)
-            {
-                GenericHelpers.Safe(() => OnSendRetainerToVenture(n));
-            }
-        }
-
-        void OnRetainerAdditionalTask(string n)
-        {
-            if (OnRetainerPostprocessStep != null)
-            {
-                GenericHelpers.Safe(() => OnRetainerPostprocessStep(n));
-            }
-        }
 
         /// <summary>
         /// Indicates whether AutoRetainer's API has been initialized and is ready to use.
@@ -148,6 +123,8 @@ namespace AutoRetainerAPI
             Svc.PluginInterface.GetIpcSubscriber<string, string, object>(ApiConsts.OnRetainerReadyForPostprocess).Unsubscribe(OnRetainerReadyForPostprocessIntl);
             Svc.PluginInterface.GetIpcSubscriber<ulong, string, object>(ApiConsts.OnRetainerSettingsDraw).Unsubscribe(OnRetainerSettingsDrawAction);
             Svc.PluginInterface.GetIpcSubscriber<ulong, string, object>(ApiConsts.OnRetainerPostVentureTaskDraw).Unsubscribe(OnRetainerPostVentureTaskDrawAction);
+            Svc.PluginInterface.GetIpcSubscriber<object>(ApiConsts.OnRetainerListTaskButtonsDraw).Unsubscribe(OnRetainerListTaskButtonsDrawAction);
+            Svc.PluginInterface.GetIpcSubscriber<object>(ApiConsts.OnMainControlsDraw).Unsubscribe(OnMainControlsDrawAction);
         }
 
         /// <summary>

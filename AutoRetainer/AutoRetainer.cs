@@ -56,6 +56,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
     internal StyleModel Style;
     internal bool StylePushed = false;
+    internal RetainerListOverlay RetainerListOverlay;
 
     public AutoRetainer(DalamudPluginInterface pi)
     {
@@ -96,7 +97,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 Utils.FixKeys();
 
                 ws.AddWindow(new MultiModeOverlay());
-                ws.AddWindow(new RetainerListOverlay());
+                RetainerListOverlay = new RetainerListOverlay();
+                ws.AddWindow(RetainerListOverlay);
                 LoginOverlay = (new LoginOverlay());
                 ws.AddWindow(LoginOverlay);
                 MultiMode.Init();
@@ -223,6 +225,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         NotificationHandler.Tick();
         YesAlready.Tick();
         Artisan.ArtisanTick();
+        FPSManager.Tick();
         //if(C.RetryItemSearch) RetryItemSearch.Tick();
         if (SchedulerMain.PluginEnabled || MultiMode.Enabled || TaskManager.IsBusy)
         {
@@ -316,6 +319,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             Safe(Memory.Dispose);
             Safe(IPC.Shutdown);
             Safe(API.Dispose);
+            Safe(FPSManager.ForceRestore);
             PunishLibMain.Dispose();
             ECommonsMain.Dispose();
         }

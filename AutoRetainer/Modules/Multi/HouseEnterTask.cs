@@ -4,6 +4,7 @@ using ECommons.Events;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
+using FFXIVClientStructs.FFXIV.Client.UI;
 
 namespace AutoRetainer.Modules.Multi;
 
@@ -17,9 +18,11 @@ internal unsafe static class HouseEnterTask
         {
             if(Utils.GetReachableRetainerBell() == null)
             {
-                if (Utils.GetNearestEntrance(out var d) != null && d > 4f)
+                var entrance = Utils.GetNearestEntrance(out var d);
+                var validDistance = entrance.IsApartmentEntrance() ? 4.85f : 4f;
+                if (entrance != null && d > validDistance)
                 {
-                    P.TaskManager.EnqueueImmediate(() => SetTarget(20f));
+                    P.TaskManager.EnqueueImmediate(() => SetTarget(40f));
                     P.TaskManager.EnqueueImmediate(Lockon);
                     P.TaskManager.EnqueueImmediate(Approach);
                     P.TaskManager.EnqueueImmediate(AutorunOff);
@@ -46,8 +49,8 @@ internal unsafe static class HouseEnterTask
 
     internal static bool? Lockon()
     {
-        var entrance = Utils.GetNearestEntrance(out var d);
-        if (entrance != null && d < 20f && EzThrottler.Throttle("HET.Lockon"))
+        var entrance = Utils.GetNearestEntrance(out _);
+        if (entrance != null && Svc.Targets.Target?.Address == entrance.Address && EzThrottler.Throttle("HET.Lockon"))
         {
             /*if(Utils.GetAngleTo(entrance.Position.ToVector2()).InRange(178, 183))
             {
@@ -92,7 +95,7 @@ internal unsafe static class HouseEnterTask
         if (entrance != null && d < distance && EzThrottler.Throttle("HET.SetTarget", 200))
         {
             P.DebugLog($"Setting entrance target ({distance})");
-            Svc.Targets.SetTarget(entrance);
+            Svc.Targets.Target = (entrance);
             return true;
         }
         return false;
@@ -117,11 +120,22 @@ internal unsafe static class HouseEnterTask
             return null;
         }
         var addon = Utils.GetSpecificYesno(Lang.ConfirmHouseEntrance);
-        if (addon != null && IsAddonReady(addon) && EzThrottler.Throttle("HET.SelectYesno"))
+        if (addon != null)
         {
-            P.DebugLog("Select yes");
-            ClickSelectYesNo.Using((nint)addon).Yes();
-            return true;
+            if (IsAddonReady(addon) && EzThrottler.Throttle("HET.SelectYesno"))
+            {
+                P.DebugLog("Select yes");
+                ClickSelectYesNo.Using((nint)addon).Yes();
+                return true;
+            }
+        }
+        else
+        {
+            if (Utils.TrySelectSpecificEntry(Lang.GoToYourApartment, () => EzThrottler.Throttle("HET.SelectYesno")))
+            {
+                P.DebugLog("Confirmed going to apartment");
+                return true;
+            }
         }
         return false;
     }

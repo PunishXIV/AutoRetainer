@@ -9,7 +9,7 @@ namespace AutoRetainer.Scheduler.Tasks
 {
     internal static class TaskPostprocessIPC
     {
-        internal static void Enqueue(string retainer)
+        internal static void Enqueue(string retainer, string pluginToProcess = null)
         {
             P.TaskManager.Enqueue(() =>
             {
@@ -18,8 +18,8 @@ namespace AutoRetainer.Scheduler.Tasks
             }, "TaskPostprocessIPCEnqueue");
             P.TaskManager.Enqueue(() =>
             {
-                P.DebugLog($"SchedulerMain.RetainerPostprocess contains: {SchedulerMain.RetainerPostprocess.Print()}");
-                foreach (var x in SchedulerMain.RetainerPostprocess)
+                P.DebugLog($"SchedulerMain.RetainerPostprocess contains: {SchedulerMain.RetainerPostprocess.Print()}, pluginToProcess = {pluginToProcess}");
+                foreach (var x in SchedulerMain.RetainerPostprocess.Where(x => pluginToProcess == null || x == pluginToProcess))
                 {
                     P.TaskManager.EnqueueImmediate(() =>
                     {
