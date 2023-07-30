@@ -225,6 +225,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         NotificationHandler.Tick();
         YesAlready.Tick();
         Artisan.ArtisanTick();
+        FPSManager.Tick();
         //if(C.RetryItemSearch) RetryItemSearch.Tick();
         if (SchedulerMain.PluginEnabled || MultiMode.Enabled || TaskManager.IsBusy)
         {
@@ -318,6 +319,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             Safe(Memory.Dispose);
             Safe(IPC.Shutdown);
             Safe(API.Dispose);
+            Safe(FPSManager.ForceRestore);
             PunishLibMain.Dispose();
             ECommonsMain.Dispose();
         }
