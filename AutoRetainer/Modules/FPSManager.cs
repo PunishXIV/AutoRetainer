@@ -11,7 +11,7 @@ namespace AutoRetainer.Modules
         static bool WasChanged = false;
         static uint FPSInactiveValue = 0;
         static uint FPSValue = 0;
-        static bool IsBusy => P.TaskManager.IsBusy || AutoGCHandin.Operation || AutoLogin.Instance.IsRunning;
+        internal static bool IsBusy => P.TaskManager.IsBusy || AutoGCHandin.Operation || AutoLogin.Instance.IsRunning;
         internal static void Tick()
         {
             if (WasChanged)
