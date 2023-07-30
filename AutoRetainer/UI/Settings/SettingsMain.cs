@@ -38,6 +38,7 @@ internal static class SettingsMain
             ImGui.Checkbox($"Artisan integration", ref C.ArtisanIntegration);
             ImGuiComponents.HelpMarker($"Automatically enables AutoRetainer while Artisan is Pauses Artisan operation when ventures are ready to be collected and a retainer bell is within range. Once ventures have been dealt with Artisan will be enabled and resume whatever it was doing.");
             ImGui.Checkbox($"Remove FPS restrictions while plugin is operating", ref C.UnlockFPS);
+            ImGuiEx.RadioButtonBool("Unrestrict FPS completely", "Unrestrict minimized FPS only", ref C.UnlockFPSUnlimited, true);
         });
         InfoBox.DrawBox("Operation", delegate
         {

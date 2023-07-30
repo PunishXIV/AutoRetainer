@@ -18,8 +18,9 @@ namespace AutoRetainer.Modules
             {
                 if(!IsBusy)
                 {
+                    WasChanged = false;
                     Svc.GameConfig.System.Set("FPSInActive", FPSInactiveValue);
-                    Svc.GameConfig.System.Set("Fps", FPSValue);
+                    if (C.UnlockFPSUnlimited) Svc.GameConfig.System.Set("Fps", FPSValue);
                     PluginLog.Debug($"FPS restrictions restored");
                 }
             }
@@ -31,7 +32,7 @@ namespace AutoRetainer.Modules
                     FPSInactiveValue = Svc.GameConfig.System.GetUInt("FPSInActive");
                     FPSValue = Svc.GameConfig.System.GetUInt("Fps");
                     Svc.GameConfig.System.Set("FPSInActive", 0);
-                    Svc.GameConfig.System.Set("Fps", 0);
+                    if (C.UnlockFPSUnlimited) Svc.GameConfig.System.Set("Fps", 0);
                     PluginLog.Debug($"FPS restrictions removed");
                 }
             }
