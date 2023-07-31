@@ -47,7 +47,7 @@ namespace AutoRetainer.UI.Dbg
                 }
                 catch (Exception e)
                 {
-                    ImGuiEx.Text(Colors.Red, $"{e.Message}");
+                    ImGuiEx.Text(EColor.Red, $"{e.Message}");
                 }
             }
         }

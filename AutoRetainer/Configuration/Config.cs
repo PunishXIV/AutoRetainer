@@ -100,4 +100,5 @@ internal unsafe class Config : IEzConfig
     public bool NotifyNoToastWhenRunning = true;
     public bool UnlockFPS = true;
     public bool UnlockFPSUnlimited = false;
+    public bool UnlockFPSChillFrames = false;
 }
