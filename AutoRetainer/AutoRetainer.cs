@@ -109,6 +109,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
                 API = new();
                 ApiTest.Init();
+                FPSManager.UnlockChillFrames();
             });
         }
         //);
