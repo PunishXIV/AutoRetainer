@@ -434,13 +434,12 @@ internal unsafe static class RetainerHandlers
     {
         if (TryGetAddonByName<AddonRetainerTaskAsk>("RetainerTaskAsk", out var addon) && IsAddonReady(&addon->AtkUnitBase))
         {
-            P.DebugLog($"Checking error");
             if (addon->AtkUnitBase.UldManager.NodeList[6]->IsVisible)
             {
                 //An Error is on screen.
                 ClickRetainerTaskAsk.Using((IntPtr)addon).Return();
                 P.DebugLog($"Clicked cancel");
-                P.TaskManager.EnqueueImmediate(() => SelectSpecificVenture(ventureID), "SelectSpecificVenture");
+                P.TaskManager.EnqueueImmediate(() => SelectSpecificVentureByName(ventureID), "SelectSpecificVenture");
                 P.TaskManager.DelayNextImmediate(10, false);
                 P.TaskManager.EnqueueImmediate(() => CheckForErrorAssignedVenture(ventureID), 500, false, "RedoErrorCheck");
                 return true;
