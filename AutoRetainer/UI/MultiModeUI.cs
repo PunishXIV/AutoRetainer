@@ -206,11 +206,16 @@ internal unsafe static class MultiModeUI
                 ImGui.PushID(data.CID.ToString());
 
                 var storePos = ImGui.GetCursorPos();
-                for (var i = 0; i < data.RetainerData.Count; i++)
+                var retainerData = data.RetainerData;
+                if (data.ShowRetainersInDisplayOrder)
                 {
-                    if (bars.TryGetValue($"{data.CID}{data.RetainerData[i].Name}", out var v))
+                    retainerData = retainerData.OrderBy(x => x.DisplayOrder).ToList();
+                }
+                for (var i = 0; i < retainerData.Count; i++)
+                {
+                    if (bars.TryGetValue($"{data.CID}{retainerData[i].Name}", out var v))
                     {
-                        var ret = data.RetainerData[i];
+                        var ret = retainerData[i];
                         if (!ret.HasVenture || ret.Level == 0 || ret.Name.ToString().IsNullOrEmpty()) continue;
                         ImGui.SetCursorPos(v.start - ImGui.GetStyle().CellPadding with { Y = 0 });
                         ImGui.PushStyleColor(ImGuiCol.PlotHistogram, 0xbb500000);
@@ -229,11 +234,6 @@ internal unsafe static class MultiModeUI
                     ImGui.TableSetupColumn("");
                     ImGui.TableHeadersRow();
                     var retainers = P.GetSelectedRetainers(data.CID);
-                    var retainerData = data.RetainerData;
-                    if (data.ShowRetainersInDisplayOrder)
-                    {
-                        retainerData = retainerData.OrderBy(x => x.DisplayOrder).ToList();
-                    }
                     for (var i = 0; i < retainerData.Count; i++)
                     {
                         var ret = retainerData[i];
@@ -299,7 +299,7 @@ internal unsafe static class MultiModeUI
                             }
                         }
                         var end = ImGui.GetCursorPos();
-                        bars[$"{data.CID}{data.RetainerData[i].Name}"] = (start, end);
+                        bars[$"{data.CID}{retainerData[i].Name}"] = (start, end);
                         ImGui.TableNextColumn();
                         ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
 
