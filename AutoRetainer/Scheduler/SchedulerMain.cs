@@ -109,7 +109,7 @@ internal unsafe static class SchedulerMain
                                     else
                                     {
                                         var next = adata.GetNextPlannedVenture();
-                                        P.DebugLog($"Next planned venture: {next}");
+                                        P.DebugLog($"Next planned venture: {next}, current venture: {ret.VentureID}");
                                         var completed = adata.IsLastPlannedVenture();
                                         P.DebugLog($"Is last planned venture: {completed}");
                                         if(next == 0)

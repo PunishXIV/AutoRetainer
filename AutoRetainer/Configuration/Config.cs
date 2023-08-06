@@ -101,4 +101,6 @@ internal unsafe class Config : IEzConfig
     public bool UnlockFPS = true;
     public bool UnlockFPSUnlimited = false;
     public bool UnlockFPSChillFrames = false;
+
+    public bool ManipulatePriority = false;
 }

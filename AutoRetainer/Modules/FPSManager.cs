@@ -11,12 +11,11 @@ namespace AutoRetainer.Modules
         static bool WasChanged = false;
         static uint FPSInactiveValue = 0;
         static uint FPSValue = 0;
-        internal static bool IsBusy => P.TaskManager.IsBusy || AutoGCHandin.Operation || AutoLogin.Instance.IsRunning;
         internal static void Tick()
         {
             if (WasChanged)
             {
-                if(!IsBusy)
+                if(!Utils.IsBusy)
                 {
                     WasChanged = false;
                     Svc.GameConfig.System.Set("FPSInActive", FPSInactiveValue);
@@ -27,7 +26,7 @@ namespace AutoRetainer.Modules
             }
             else if(C.UnlockFPS)
             {
-                if (IsBusy)
+                if (Utils.IsBusy)
                 {
                     WasChanged = true;
                     FPSInactiveValue = Svc.GameConfig.System.GetUInt("FPSInActive");

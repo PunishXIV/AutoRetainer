@@ -37,11 +37,13 @@ internal static class SettingsMain
             ImGuiComponents.HelpMarker("Displays retainer item level/gathering/perception and the name of their current venture in the main UI.");
             ImGui.Checkbox($"Artisan integration", ref C.ArtisanIntegration);
             ImGuiComponents.HelpMarker($"Automatically enables AutoRetainer while Artisan is Pauses Artisan operation when ventures are ready to be collected and a retainer bell is within range. Once ventures have been dealt with Artisan will be enabled and resume whatever it was doing.");
-            if (FPSManager.IsBusy) ImGui.BeginDisabled();
+            if (Utils.IsBusy) ImGui.BeginDisabled();
             ImGui.Checkbox($"Remove minimized FPS restrictions while plugin is operating", ref C.UnlockFPS);
             ImGui.Checkbox($"- Also remove general FPS restriction", ref C.UnlockFPSUnlimited);
             ImGui.Checkbox($"- Also pause ChillFrames plugin", ref C.UnlockFPSChillFrames);
-            if (FPSManager.IsBusy) ImGui.EndDisabled();
+            ImGui.Checkbox($"Raise FFXIV process priority while plugin is operating", ref C.ManipulatePriority);
+            ImGuiComponents.HelpMarker("May result other programs slowdown");
+            if (Utils.IsBusy) ImGui.EndDisabled();
         });
         InfoBox.DrawBox("Operation", delegate
         {

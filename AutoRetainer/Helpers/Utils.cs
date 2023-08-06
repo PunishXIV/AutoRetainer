@@ -22,6 +22,7 @@ using Lumina.Excel.GeneratedSheets;
 using PInvoke;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using static System.Net.Mime.MediaTypeNames;
 using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
 
 namespace AutoRetainer.Helpers;
@@ -29,7 +30,7 @@ namespace AutoRetainer.Helpers;
 internal static unsafe class Utils
 {
     internal static bool MultiModeOrArtisan => MultiMode.Active || (SchedulerMain.PluginEnabled && SchedulerMain.Reason == PluginEnableReason.Artisan);
-
+    internal static bool IsBusy => P.TaskManager.IsBusy || AutoGCHandin.Operation || AutoLogin.Instance.IsRunning;
     internal static void FixKeys()
     {
         Fix(ref C.EntrustKey);
@@ -299,7 +300,8 @@ internal static unsafe class Utils
 
     internal static bool TrySelectSpecificEntry(IEnumerable<string> text, Func<bool> Throttler = null)
     {
-        if (TryGetAddonByName<AddonSelectString>("SelectString", out var addon) && IsAddonReady(&addon->AtkUnitBase))
+        return TrySelectSpecificEntry((x) => x.EqualsAny(text), Throttler);
+        /*if (TryGetAddonByName<AddonSelectString>("SelectString", out var addon) && IsAddonReady(&addon->AtkUnitBase))
         {
             var entry = GetEntries(addon).FirstOrDefault(x => x.EqualsAny(text));
             if (entry != null)
@@ -309,6 +311,29 @@ internal static unsafe class Utils
                 {
                     ClickSelectString.Using((nint)addon).SelectItem((ushort)index);
                     P.DebugLog($"TrySelectSpecificEntry: selecting {entry}/{index} as requested by {text.Print()}");
+                    return true;
+                }
+            }
+        }
+        else
+        {
+            RethrottleGeneric();
+        }
+        return false;*/
+    }
+
+    internal static bool TrySelectSpecificEntry(Func<string, bool> inputTextTest, Func<bool> Throttler = null)
+    {
+        if (TryGetAddonByName<AddonSelectString>("SelectString", out var addon) && IsAddonReady(&addon->AtkUnitBase))
+        {
+            var entry = GetEntries(addon).FirstOrDefault(inputTextTest);
+            if (entry != null)
+            {
+                var index = GetEntries(addon).IndexOf(entry);
+                if (index >= 0 && IsSelectItemEnabled(addon, index) && (Throttler?.Invoke() ?? GenericThrottle))
+                {
+                    ClickSelectString.Using((nint)addon).SelectItem((ushort)index);
+                    P.DebugLog($"TrySelectSpecificEntry: selecting {entry}/{index}");
                     return true;
                 }
             }

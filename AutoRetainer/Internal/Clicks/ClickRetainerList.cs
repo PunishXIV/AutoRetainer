@@ -16,7 +16,7 @@ internal unsafe class ClickRetainerList : ClickLib.Bases.ClickBase<ClickRetainer
 
     public void Select(void* list, AtkComponentNode* target, uint index)
     {
-        var data = InputData.Empty();
+        var data = ClickLib.Structures.InputData.Empty();
         data.Data[0] = target;
         data.Data[2] = (void*)(index | (ulong)index << 48);
         ClickAddonComponent(target, 1, EventType.LIST_INDEX_CHANGE, null, data);
