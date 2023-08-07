@@ -140,6 +140,10 @@ namespace AutoRetainer.Scheduler
             {
                 return true;
             }
+            else
+            {
+                Utils.RethrottleGeneric();
+            }
             return false;
         }
 
@@ -149,6 +153,10 @@ namespace AutoRetainer.Scheduler
             {
                 return true;
             }
+            else
+            {
+                Utils.RethrottleGeneric();
+            }
             return false;
         }
 
@@ -157,6 +165,10 @@ namespace AutoRetainer.Scheduler
             if (Utils.TrySelectSpecificEntry((x) => x.StartsWith($"{name}."), () => EzThrottler.Throttle("Voyage.SelectSubjectByName", 1000)))
             {
                 return true;
+            }
+            else
+            {
+                Utils.RethrottleGeneric();
             }
             return false;
         }
@@ -171,6 +183,10 @@ namespace AutoRetainer.Scheduler
                     return true;
                 }
             }
+            else
+            {
+                Utils.RethrottleGeneric();
+            }
             return false;
         }
 
@@ -183,6 +199,10 @@ namespace AutoRetainer.Scheduler
                     Callback.Fire(addon, true, (int)0);
                     return true;
                 }
+            }
+            else
+            {
+                Utils.RethrottleGeneric();
             }
             return false;
         }

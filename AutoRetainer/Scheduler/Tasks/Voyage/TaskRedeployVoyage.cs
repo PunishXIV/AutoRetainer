@@ -8,7 +8,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AutoRetainer.Scheduler.Tasks.Voyage
 {
-    internal static class TaskCollectVoyage
+    internal static class TaskRedeployVoyage
     {
         internal static void Enqueue(string name)
         {

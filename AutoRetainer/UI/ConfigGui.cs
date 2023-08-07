@@ -5,6 +5,7 @@ using AutoRetainer.UI.Settings;
 using Dalamud.Interface.Style;
 using AutoRetainerAPI.Configuration;
 using AutoRetainerAPI;
+using ECommons.ChatMethods;
 
 namespace AutoRetainer.UI;
 
@@ -103,7 +104,7 @@ unsafe internal class ConfigGui : Window
                 (C.RecordStats ? "Statistics" : null, StatisticsUI.Draw, null, true),
                 ("Settings", SettingsMain.Draw, null, true),
                 (C.Expert?"Expert":null, Expert.Draw, null, true),
-                ("Beta", Beta.Draw, null, true),
+                //("Beta", Beta.Draw, null, true),
                 ("About", delegate { AboutTab.Draw(P); }, null, true),
                 (C.Verbose ? "Dev" : null, delegate
                 {

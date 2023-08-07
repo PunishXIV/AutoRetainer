@@ -16,22 +16,26 @@ namespace AutoRetainer.UI.Dbg
         {
             if (ImGui.CollapsingHeader("data"))
             {
-                ImGuiEx.Text($"Completed airships: \n{VoyageUtils.GetCompletedAirships().Print()}");
-                ImGuiEx.Text($"Completed subs: \n{VoyageUtils.GetCompletedSubs().Print()}");
+                ImGuiEx.Text($"HID: {HousingManager.Instance()->GetCurrentHouseId()}");
+                if (HousingManager.Instance()->WorkshopTerritory != null)
                 {
-                    var data = HousingManager.Instance()->WorkshopTerritory->Airship.DataListSpan;
-                    for (int i = 0; i < data.Length; i++)
+                    ImGuiEx.Text($"Num air: {HousingManager.Instance()->WorkshopTerritory->Airship.AirshipCount}");
+                    //ImGuiEx.Text($"Num w: {HousingManager.Instance()->WorkshopTerritory->Submersible.DataList}");
                     {
-                        var d = data[i];
-                        ImGuiEx.Text($"Air: {MemoryHelper.ReadSeStringNullTerminated((nint)d.Name).ExtractText()}, returns at {d.GetReturnTime()}, current: {d.CurrentExp}");
+                        var data = HousingManager.Instance()->WorkshopTerritory->Airship.DataListSpan;
+                        for (int i = 0; i < data.Length; i++)
+                        {
+                            var d = data[i];
+                            ImGuiEx.Text($"Air: {MemoryHelper.ReadSeStringNullTerminated((nint)d.Name).ExtractText()}, returns at {d.GetReturnTime()}, current: {d.CurrentExp}");
+                        }
                     }
-                }
-                {
-                    var data = HousingManager.Instance()->WorkshopTerritory->Submersible.DataListSpan;
-                    for (int i = 0; i < data.Length; i++)
                     {
-                        var d = data[i];
-                        ImGuiEx.Text($"Sub: {MemoryHelper.ReadSeStringNullTerminated((nint)d.Name).ExtractText()}, returns at {d.GetReturnTime()}, current: {d.CurrentExp}");
+                        var data = HousingManager.Instance()->WorkshopTerritory->Submersible.DataListSpan;
+                        for (int i = 0; i < data.Length; i++)
+                        {
+                            var d = data[i];
+                            ImGuiEx.Text($"Sub: {MemoryHelper.ReadSeStringNullTerminated((nint)d.Name).ExtractText()}, returns at {d.GetReturnTime()}, current: {d.CurrentExp}");
+                        }
                     }
                 }
             }

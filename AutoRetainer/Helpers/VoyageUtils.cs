@@ -1,7 +1,11 @@
 ﻿using AutoRetainer.Internal;
+using AutoRetainerAPI.Configuration;
+using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Memory;
+using ECommons.GameHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using System;
 using System.Collections.Generic;
@@ -14,6 +18,26 @@ namespace AutoRetainer.Helpers
     internal unsafe static class VoyageUtils
     {
         internal static string[] PanelName = new string[] { "Voyage Control Panel" };
+
+        internal static bool IsVoyagePanel(this GameObject obj)
+        {
+            return obj?.Name.ToString().EqualsAny(PanelName) == true;
+        }
+
+        internal static bool IsVoyageCondition()
+        {
+            return Svc.Condition[ConditionFlag.OccupiedInEvent] || Svc.Condition[ConditionFlag.OccupiedInQuestEvent];
+        }
+
+        internal static bool IsInVoyagePanel()
+        {
+            if (IsVoyageCondition() && Svc.Targets.Target.IsVoyagePanel())
+            {
+                return true;
+            }
+            return false;
+        }
+
         internal static bool TryGetNearestVoyagePanel(out GameObject obj)
         {
             //Data ID: 2007820
@@ -57,32 +81,63 @@ namespace AutoRetainer.Helpers
             }
         }
 
-        internal static List<string> GetCompletedAirships()
+        public static long GetRemainingSeconds(this VoyageOfflineData data)
         {
-            var list = new List<string>();
-            var data = HousingManager.Instance()->WorkshopTerritory->Airship.DataListSpan;
-            for (int i = 0; i < data.Length; i++)
-            {
-                var d = data[i];
-                var name = MemoryHelper.ReadSeStringNullTerminated((nint)d.Name).ExtractText();
-                if (name == "") continue;
-                if (d.ReturnTime < P.Time + C.UnsyncCompensation) list.Add(name);
-            }
-            return list;
+            return data.ReturnTime - P.Time;
         }
 
-        internal static List<string> GetCompletedSubs()
+        internal static void WriteOfflineData()
         {
-            var list = new List<string>();
-            var data = HousingManager.Instance()->WorkshopTerritory->Submersible.DataListSpan;
-            for (int i = 0; i < data.Length; i++)
+            if (HousingManager.Instance()->WorkshopTerritory != null && C.OfflineData.TryGetFirst(x => x.CID == Player.CID, out var ocd))
             {
-                var d = data[i];
-                var name = MemoryHelper.ReadSeStringNullTerminated((nint)d.Name).ExtractText();
-                if (name == "") continue;
-                if (d.ReturnTime < P.Time + C.UnsyncCompensation) list.Add(name);
+                {
+                    var vessels = HousingManager.Instance()->WorkshopTerritory->Airship;
+                    var temp = new List<VoyageOfflineData>();
+                    foreach (var x in vessels.DataListSpan)
+                    {
+                        var name = MemoryHelper.ReadSeStringNullTerminated((nint)x.Name).ExtractText();
+                        if (name != "")
+                        {
+                            temp.Add(new() { Name = name, ReturnTime = x.ReturnTime });
+                        }
+                    }
+                    if (temp.Count > 0)
+                    {
+                        Utils.GetCurrentCharacterData().OfflineAirshipData = temp;
+                    }
+                }
+                {
+                    var vessels = HousingManager.Instance()->WorkshopTerritory->Submersible;
+                    var temp = new List<VoyageOfflineData>();
+                    foreach (var x in vessels.DataListSpan)
+                    {
+                        var name = MemoryHelper.ReadSeStringNullTerminated((nint)x.Name).ExtractText();
+                        if (name != "")
+                        {
+                            temp.Add(new() { Name = name, ReturnTime = x.ReturnTime });
+                        }
+                    }
+                    if (temp.Count > 0)
+                    {
+                        Utils.GetCurrentCharacterData().OfflineSubmarineData = temp;
+                    }
+                }
             }
-            return list;
+        }
+
+        internal static VoyageType? DetectAddonType(AtkUnitBase* addon)
+        {
+            var textptr = addon->UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText;
+            var text = MemoryHelper.ReadSeString(&textptr).ExtractText();
+            if(text.Contains("Select an airship."))
+            {
+                return VoyageType.Airship;
+            }
+            if(text.Contains("Select a submersible."))
+            {
+                return VoyageType.Submersible;
+            }
+            return null;
         }
     }
 }

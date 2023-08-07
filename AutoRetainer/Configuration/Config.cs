@@ -2,6 +2,7 @@
 using ECommons.Configuration;
 using ECommons.Interop;
 using ECommons.MathHelpers;
+using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using PInvoke;
 using System.Windows.Forms;
 
@@ -105,4 +106,5 @@ internal unsafe class Config : IEzConfig
     public bool UnlockFPSChillFrames = false;
 
     public bool ManipulatePriority = false;
+
 }

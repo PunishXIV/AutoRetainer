@@ -23,6 +23,11 @@ internal unsafe static class RetainerHandlers
 
     internal static bool? SelectQuit()
     {
+        if(TryGetAddonByName<AtkUnitBase>("RetainerTaskSupply", out var addon) && IsAddonReady(addon) && Utils.GenericThrottle)
+        {
+            addon->Close(true);
+            return false;
+        }
         var text = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(2383).Text.ToDalamudString().ExtractText();
         return Utils.TrySelectSpecificEntry(text);
     }

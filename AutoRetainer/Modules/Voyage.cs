@@ -1,6 +1,9 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainer.Scheduler.Tasks.Voyage;
 using Dalamud.Game.ClientState.Conditions;
+using ECommons.ExcelServices.TerritoryEnumeration;
+using ECommons.Throttlers;
+using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,41 +12,70 @@ using System.Threading.Tasks;
 
 namespace AutoRetainer.Modules
 {
-    internal static class Voyage
+    internal static unsafe class Voyage
     {
-        static bool WasRun = false;
-        internal static void Tick()
+        static bool IsInVoyagePanel = false;
+
+        internal static void Init()
         {
-            if (C.AutoResendSubs && Svc.Condition[ConditionFlag.OccupiedInEvent] && Svc.Targets.Target?.Name.ToString().EqualsAny(VoyageUtils.PanelName) == true) 
+            Svc.Framework.Update += Tick;
+        }
+
+        internal static void Shutdown()
+        {
+            Svc.Framework.Update -= Tick;
+        }
+
+        internal static void Tick(object _)
+        {
+            if (VoyageUtils.IsVoyageCondition())
             {
-                if (!WasRun) 
+                if (Svc.Targets.Target.IsVoyagePanel())
                 {
-                    WasRun = true;
-                    if (VoyageUtils.GetCompletedAirships().Count > 0)
+                    if (!IsInVoyagePanel)
                     {
-                        TaskEnterMenu.Enqueue(VoyageType.Airship);
-                        foreach (var name in VoyageUtils.GetCompletedAirships())
+                        IsInVoyagePanel = true;
+                        Notify.Info($"Entered voyage panel");
+                        if (C.AutoResendSubs)
                         {
-                            TaskCollectVoyage.Enqueue(name);
+                            var air = Utils.GetCurrentCharacterData().OfflineAirshipData.Where(x => x.GetRemainingSeconds() < C.UnsyncCompensation);
+                            var sub = Utils.GetCurrentCharacterData().OfflineSubmarineData.Where(x => x.GetRemainingSeconds() < C.UnsyncCompensation);
+                            if (air.Count() > 0)
+                            {
+                                TaskEnterMenu.Enqueue(VoyageType.Airship);
+                                foreach (var x in air)
+                                {
+                                    TaskRedeployVoyage.Enqueue(x.Name);
+                                }
+                                TaskQuitMenu.Enqueue();
+                            }
+                            if (sub.Count() > 0)
+                            {
+                                TaskEnterMenu.Enqueue(VoyageType.Submersible);
+                                foreach (var x in sub)
+                                {
+                                    TaskRedeployVoyage.Enqueue(x.Name);
+                                }
+                                TaskQuitMenu.Enqueue();
+                            }
                         }
-                        TaskQuitMenu.Enqueue();
-                    }
-                    if (VoyageUtils.GetCompletedSubs().Count > 0)
-                    {
-                        TaskEnterMenu.Enqueue(VoyageType.Submersible);
-                        foreach (var name in VoyageUtils.GetCompletedSubs())
-                        {
-                            TaskCollectVoyage.Enqueue(name);
-                        }
-                        TaskQuitMenu.Enqueue();
                     }
                 }
             }
             else
             {
-                if (WasRun)
+                if (IsInVoyagePanel)
                 {
-                    WasRun = false;
+                    IsInVoyagePanel = false;
+                    Notify.Info("Closed voyage panel");
+                }
+            }
+
+            if(VoyageUtils.IsInVoyagePanel())
+            {
+                if (EzThrottler.Throttle("Voyage.WriteOfflineData", 100))
+                {
+                    VoyageUtils.WriteOfflineData();
                 }
             }
         }

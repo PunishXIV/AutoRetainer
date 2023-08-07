@@ -95,6 +95,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 AutoGCHandin.Init();
                 IPC.Init();
                 Utils.FixKeys();
+                Voyage.Init();
 
                 ws.AddWindow(new MultiModeOverlay());
                 RetainerListOverlay = new RetainerListOverlay();
@@ -228,7 +229,6 @@ public unsafe class AutoRetainer : IDalamudPlugin
         Artisan.ArtisanTick();
         FPSManager.Tick();
         PriorityManager.Tick();
-        Voyage.Tick();
         //if(C.RetryItemSearch) RetryItemSearch.Tick();
         if (SchedulerMain.PluginEnabled || MultiMode.Enabled || TaskManager.IsBusy)
         {
@@ -324,6 +324,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             Safe(API.Dispose);
             Safe(FPSManager.ForceRestore);
             Safe(PriorityManager.RestorePriority);
+            Safe(Voyage.Shutdown);
             PunishLibMain.Dispose();
             ECommonsMain.Dispose();
         }
