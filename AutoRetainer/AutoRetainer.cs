@@ -228,6 +228,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         Artisan.ArtisanTick();
         FPSManager.Tick();
         PriorityManager.Tick();
+        Voyage.Tick();
         //if(C.RetryItemSearch) RetryItemSearch.Tick();
         if (SchedulerMain.PluginEnabled || MultiMode.Enabled || TaskManager.IsBusy)
         {

@@ -116,7 +116,7 @@ internal unsafe class Memory : IDisposable
     }
 
     internal delegate void Del(nint a1, nint a2, Str1* a3);
-    [Signature("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 48 83 EC 20 41 8B 78 10", DetourName = nameof(Detour))]
+    //[Signature("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 48 83 EC 20 41 8B 78 10", DetourName = nameof(Detour))]
     internal Hook<Del> Hook;
 
     internal void Detour(nint a1, nint a2, Str1* a3)
@@ -143,7 +143,7 @@ internal unsafe class Memory : IDisposable
         if (TryGetAddonByName<AtkUnitBase>("AirShipExploration", out var addon) && IsAddonReady(addon))
         {
             var dummyEvent = stackalloc AtkEvent[] { new() };
-            var str3 = stackalloc Str3[] { new() { Unk0 = 0x02330000 } };
+            var str3 = stackalloc Str3[] { new() { Unk0 = 0x0FFFFFFF } };
             var str2 = stackalloc Str2[] { new() { Unk0 = str3 } };
             var inputData = stackalloc Str1[] {
                 new()

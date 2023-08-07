@@ -1,6 +1,7 @@
 ﻿using AutoRetainer.Scheduler.Handlers;
 using AutoRetainer.Scheduler.Tasks;
 using Dalamud.Memory;
+using FFXIVClientStructs.FFXIV.Client.UI;
 
 namespace AutoRetainer.UI.Dbg;
 
@@ -10,7 +11,12 @@ internal static unsafe class DebugVenture
     internal static string VentureName = "";
     internal static void Draw()
     {
-        foreach(var x in C.OfflineData)
+        if (TryGetAddonByName<AddonRetainerTaskAsk>("RetainerTaskAsk", out var addon) && IsAddonReady(&addon->AtkUnitBase))
+        {
+            ImGuiEx.Text($"Enabled: {addon->AssignButton->IsEnabled}");
+        }
+        
+        foreach (var x in C.OfflineData)
         {
             foreach(var r in x.RetainerData)
             {

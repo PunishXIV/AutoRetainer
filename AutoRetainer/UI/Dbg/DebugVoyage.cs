@@ -14,12 +14,25 @@ namespace AutoRetainer.UI.Dbg
         static int r1, r2, r3, r4, r5 = -1;
         internal static void Draw()
         {
-            if (ImGui.CollapsingHeader("data")) {
-                var data = HousingManager.Instance()->WorkshopTerritory->Submersible.DataListSpan;
-                for (int i = 0; i < data.Length; i++)
+            if (ImGui.CollapsingHeader("data"))
+            {
+                ImGuiEx.Text($"Completed airships: \n{VoyageUtils.GetCompletedAirships().Print()}");
+                ImGuiEx.Text($"Completed subs: \n{VoyageUtils.GetCompletedSubs().Print()}");
                 {
-                    var d = data[i];
-                    ImGuiEx.Text($"Sub: {MemoryHelper.ReadSeStringNullTerminated((nint)d.Name).ExtractText()}, returns at {d.GetReturnTime()}, current: {d.CurrentExp}");
+                    var data = HousingManager.Instance()->WorkshopTerritory->Airship.DataListSpan;
+                    for (int i = 0; i < data.Length; i++)
+                    {
+                        var d = data[i];
+                        ImGuiEx.Text($"Air: {MemoryHelper.ReadSeStringNullTerminated((nint)d.Name).ExtractText()}, returns at {d.GetReturnTime()}, current: {d.CurrentExp}");
+                    }
+                }
+                {
+                    var data = HousingManager.Instance()->WorkshopTerritory->Submersible.DataListSpan;
+                    for (int i = 0; i < data.Length; i++)
+                    {
+                        var d = data[i];
+                        ImGuiEx.Text($"Sub: {MemoryHelper.ReadSeStringNullTerminated((nint)d.Name).ExtractText()}, returns at {d.GetReturnTime()}, current: {d.CurrentExp}");
+                    }
                 }
             }
             if (ImGui.CollapsingHeader("utils"))

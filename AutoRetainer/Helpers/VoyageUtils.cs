@@ -1,5 +1,7 @@
 ﻿using AutoRetainer.Internal;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Memory;
+using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using System;
 using System.Collections.Generic;
@@ -11,10 +13,11 @@ namespace AutoRetainer.Helpers
 {
     internal unsafe static class VoyageUtils
     {
+        internal static string[] PanelName = new string[] { "Voyage Control Panel" };
         internal static bool TryGetNearestVoyagePanel(out GameObject obj)
         {
             //Data ID: 2007820
-            if(Svc.Objects.TryGetFirst(x => x.DataId == 2007820 && x.IsTargetable, out var o))
+            if(Svc.Objects.TryGetFirst(x => x.Name.ToString().EqualsAny(PanelName) && x.IsTargetable, out var o))
             {
                 obj = o;
                 return true;
@@ -52,6 +55,34 @@ namespace AutoRetainer.Helpers
                 };
                 //P.Memory.Detour((nint)addon, 0x23, 0, Event, Data);
             }
+        }
+
+        internal static List<string> GetCompletedAirships()
+        {
+            var list = new List<string>();
+            var data = HousingManager.Instance()->WorkshopTerritory->Airship.DataListSpan;
+            for (int i = 0; i < data.Length; i++)
+            {
+                var d = data[i];
+                var name = MemoryHelper.ReadSeStringNullTerminated((nint)d.Name).ExtractText();
+                if (name == "") continue;
+                if (d.ReturnTime < P.Time + C.UnsyncCompensation) list.Add(name);
+            }
+            return list;
+        }
+
+        internal static List<string> GetCompletedSubs()
+        {
+            var list = new List<string>();
+            var data = HousingManager.Instance()->WorkshopTerritory->Submersible.DataListSpan;
+            for (int i = 0; i < data.Length; i++)
+            {
+                var d = data[i];
+                var name = MemoryHelper.ReadSeStringNullTerminated((nint)d.Name).ExtractText();
+                if (name == "") continue;
+                if (d.ReturnTime < P.Time + C.UnsyncCompensation) list.Add(name);
+            }
+            return list;
         }
     }
 }

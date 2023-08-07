@@ -1,20 +1,74 @@
-﻿using ECommons.Automation;
+﻿using ClickLib.Clicks;
+using Dalamud.Game.ClientState.Conditions;
+using ECommons.Automation;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;
+using ECommons.Interop;
 using ECommons.MathHelpers;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace AutoRetainer.Scheduler
 {
     internal unsafe static class SchedulerVoyage
     {
+        internal static bool? WaitForCutscene()
+        {
+            return Svc.Condition[ConditionFlag.OccupiedInCutSceneEvent]
+                || Svc.Condition[ConditionFlag.WatchingCutscene78];
+        }
+
+        internal static bool? PressEsc()
+        {
+            var nLoading = Svc.GameGui.GetAddonByName("NowLoading", 1);
+            if (nLoading != IntPtr.Zero)
+            {
+                var nowLoading = (AtkUnitBase*)nLoading;
+                if (nowLoading->IsVisible)
+                {
+                    //pi.Framework.Gui.Chat.Print(Environment.TickCount + " Now loading visible");
+                }
+                else
+                {
+                    //pi.Framework.Gui.Chat.Print(Environment.TickCount + " Now loading not visible");
+                    if (WindowsKeypress.SendKeypress(Keys.Escape))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        internal static bool? ConfirmSkip()
+        {
+            string[] SkipCutsceneStr = { "Skip cutscene?", "要跳过这段过场动画吗？", "要跳過這段過場動畫嗎？", "Videosequenz überspringen?", "Passer la scène cinématique ?", "このカットシーンをスキップしますか？" };
+            var addon = Svc.GameGui.GetAddonByName("SelectString", 1);
+            if (addon == IntPtr.Zero) return false;
+            var selectStrAddon = (AddonSelectString*)addon;
+            if (!IsAddonReady(&selectStrAddon->AtkUnitBase))
+            {
+                return false;
+            }
+            PluginLog.Debug($"1: {selectStrAddon->AtkUnitBase.UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText.ToString()}");
+            if (!SkipCutsceneStr.Contains(selectStrAddon->AtkUnitBase.UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText.ToString())) return false;
+            if(Utils.GenericThrottle && EzThrottler.Throttle("Voyage.CutsceneSkip"))
+            {
+                PluginLog.Debug("Selecting cutscene skipping");
+                ClickSelectString.Using(addon).SelectItem(0);
+                return true;
+            }
+            return false;
+        }
+
         internal static bool? Lockon()
         {
             if(VoyageUtils.TryGetNearestVoyagePanel(out var obj))
@@ -132,5 +186,15 @@ namespace AutoRetainer.Scheduler
             }
             return false;
         }
+
+        internal static bool? Quit()
+        {
+            if (Utils.TrySelectSpecificEntry("Nothing.", () => EzThrottler.Throttle("Voyage.Quit", 1000)))
+            {
+                return true;
+            }
+            return false;
+        }
+
     }
 }
