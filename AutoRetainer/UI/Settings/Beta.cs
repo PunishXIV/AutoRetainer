@@ -1,3 +1,4 @@
+using AutoRetainer.Modules.Voyage;
 using Dalamud.Interface.Components;
 using PunishLib.ImGuiMethods;
 

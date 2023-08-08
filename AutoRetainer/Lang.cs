@@ -125,4 +125,18 @@ internal static class Lang
         "Die eigene Wohnung betreten",
         "Aller dans votre appartement"
     };
+
+    internal static readonly string[] SkipCutsceneStr =
+    {
+        "Skip cutscene?",
+        "要跳过这段过场动画吗？",
+        "要跳過這段過場動畫嗎？",
+        "Videosequenz überspringen?",
+        "Passer la scène cinématique ?",
+        "このカットシーンをスキップしますか？"
+    };
+
+    internal static readonly string AirshipManagement = "Airship Management";
+    internal static readonly string SubmarineManagement = "Submersible Management";
+    internal static readonly string NothingVoyage = "Nothing.";
 }

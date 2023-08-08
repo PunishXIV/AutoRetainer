@@ -13,7 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AutoRetainer.Helpers
+namespace AutoRetainer.Modules.Voyage
 {
     internal unsafe static class VoyageUtils
     {
@@ -41,7 +41,7 @@ namespace AutoRetainer.Helpers
         internal static bool TryGetNearestVoyagePanel(out GameObject obj)
         {
             //Data ID: 2007820
-            if(Svc.Objects.TryGetFirst(x => x.Name.ToString().EqualsAny(PanelName) && x.IsTargetable, out var o))
+            if (Svc.Objects.TryGetFirst(x => x.Name.ToString().EqualsAny(PanelName) && x.IsTargetable, out var o))
             {
                 obj = o;
                 return true;
@@ -81,7 +81,7 @@ namespace AutoRetainer.Helpers
             }
         }
 
-        public static long GetRemainingSeconds(this VoyageOfflineData data)
+        public static long GetRemainingSeconds(this OfflineVesselData data)
         {
             return data.ReturnTime - P.Time;
         }
@@ -92,7 +92,7 @@ namespace AutoRetainer.Helpers
             {
                 {
                     var vessels = HousingManager.Instance()->WorkshopTerritory->Airship;
-                    var temp = new List<VoyageOfflineData>();
+                    var temp = new List<OfflineVesselData>();
                     foreach (var x in vessels.DataListSpan)
                     {
                         var name = MemoryHelper.ReadSeStringNullTerminated((nint)x.Name).ExtractText();
@@ -108,7 +108,7 @@ namespace AutoRetainer.Helpers
                 }
                 {
                     var vessels = HousingManager.Instance()->WorkshopTerritory->Submersible;
-                    var temp = new List<VoyageOfflineData>();
+                    var temp = new List<OfflineVesselData>();
                     foreach (var x in vessels.DataListSpan)
                     {
                         var name = MemoryHelper.ReadSeStringNullTerminated((nint)x.Name).ExtractText();
@@ -129,11 +129,11 @@ namespace AutoRetainer.Helpers
         {
             var textptr = addon->UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText;
             var text = MemoryHelper.ReadSeString(&textptr).ExtractText();
-            if(text.Contains("Select an airship."))
+            if (text.Contains("Select an airship."))
             {
                 return VoyageType.Airship;
             }
-            if(text.Contains("Select a submersible."))
+            if (text.Contains("Select a submersible."))
             {
                 return VoyageType.Submersible;
             }

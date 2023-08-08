@@ -1,11 +1,12 @@
 ﻿using AutoRetainer.Internal;
+using AutoRetainer.Modules.Voyage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AutoRetainer.Scheduler.Tasks.Voyage
+namespace AutoRetainer.Modules.Voyage.Tasks
 {
     internal static class TaskEnterMenu
     {

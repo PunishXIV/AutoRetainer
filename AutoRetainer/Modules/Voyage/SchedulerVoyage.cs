@@ -3,20 +3,14 @@ using Dalamud.Game.ClientState.Conditions;
 using ECommons.Automation;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;
-using ECommons.Interop;
 using ECommons.MathHelpers;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace AutoRetainer.Scheduler
+namespace AutoRetainer.Modules.Voyage
 {
     internal unsafe static class SchedulerVoyage
     {
@@ -29,7 +23,7 @@ namespace AutoRetainer.Scheduler
         internal static bool? PressEsc()
         {
             var nLoading = Svc.GameGui.GetAddonByName("NowLoading", 1);
-            if (nLoading != IntPtr.Zero)
+            if (nLoading != nint.Zero)
             {
                 var nowLoading = (AtkUnitBase*)nLoading;
                 if (nowLoading->IsVisible)
@@ -50,17 +44,17 @@ namespace AutoRetainer.Scheduler
 
         internal static bool? ConfirmSkip()
         {
-            string[] SkipCutsceneStr = { "Skip cutscene?", "要跳过这段过场动画吗？", "要跳過這段過場動畫嗎？", "Videosequenz überspringen?", "Passer la scène cinématique ?", "このカットシーンをスキップしますか？" };
+            
             var addon = Svc.GameGui.GetAddonByName("SelectString", 1);
-            if (addon == IntPtr.Zero) return false;
+            if (addon == nint.Zero) return false;
             var selectStrAddon = (AddonSelectString*)addon;
             if (!IsAddonReady(&selectStrAddon->AtkUnitBase))
             {
                 return false;
             }
-            PluginLog.Debug($"1: {selectStrAddon->AtkUnitBase.UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText.ToString()}");
-            if (!SkipCutsceneStr.Contains(selectStrAddon->AtkUnitBase.UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText.ToString())) return false;
-            if(Utils.GenericThrottle && EzThrottler.Throttle("Voyage.CutsceneSkip"))
+            //PluginLog.Debug($"1: {selectStrAddon->AtkUnitBase.UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText.ToString()}");
+            if (!Lang.SkipCutsceneStr.Contains(selectStrAddon->AtkUnitBase.UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText.ToString())) return false;
+            if (Utils.GenericThrottle && EzThrottler.Throttle("Voyage.CutsceneSkip"))
             {
                 PluginLog.Debug("Selecting cutscene skipping");
                 ClickSelectString.Using(addon).SelectItem(0);
@@ -71,9 +65,9 @@ namespace AutoRetainer.Scheduler
 
         internal static bool? Lockon()
         {
-            if(VoyageUtils.TryGetNearestVoyagePanel(out var obj))
+            if (VoyageUtils.TryGetNearestVoyagePanel(out var obj))
             {
-                if(Svc.Targets.Target?.Address != obj.Address)
+                if (Svc.Targets.Target?.Address != obj.Address)
                 {
                     if (Utils.GenericThrottle)
                     {
@@ -109,7 +103,7 @@ namespace AutoRetainer.Scheduler
         {
             if (VoyageUtils.TryGetNearestVoyagePanel(out var obj) && Svc.Targets.Target?.Address == obj.Address)
             {
-                if(Vector2.Distance(obj.Position.ToVector2(), Player.Object.Position.ToVector2()) < 2f)
+                if (Vector2.Distance(obj.Position.ToVector2(), Player.Object.Position.ToVector2()) < 2f)
                 {
                     if (Utils.GenericThrottle)
                     {
@@ -136,7 +130,7 @@ namespace AutoRetainer.Scheduler
 
         internal static bool? SelectAirshipManagement()
         {
-            if (Utils.TrySelectSpecificEntry("Airship Management", () => EzThrottler.Throttle("Voyage.SelectManagement", 1000)))
+            if (Utils.TrySelectSpecificEntry(Lang.AirshipManagement, () => Utils.GenericThrottle && EzThrottler.Throttle("Voyage.SelectManagement", 1000)))
             {
                 return true;
             }
@@ -149,7 +143,7 @@ namespace AutoRetainer.Scheduler
 
         internal static bool? SelectSubManagement()
         {
-            if (Utils.TrySelectSpecificEntry("Submersible Management", () => EzThrottler.Throttle("Voyage.SelectManagement", 1000)))
+            if (Utils.TrySelectSpecificEntry(Lang.SubmarineManagement, () => Utils.GenericThrottle && EzThrottler.Throttle("Voyage.SelectManagement", 1000)))
             {
                 return true;
             }
@@ -160,9 +154,9 @@ namespace AutoRetainer.Scheduler
             return false;
         }
 
-        internal static bool? SelectSubjectByName(string name)
+        internal static bool? SelectVesselByName(string name)
         {
-            if (Utils.TrySelectSpecificEntry((x) => x.StartsWith($"{name}."), () => EzThrottler.Throttle("Voyage.SelectSubjectByName", 1000)))
+            if (Utils.TrySelectSpecificEntry((x) => x.StartsWith($"{name}."), () => EzThrottler.Throttle("Voyage.SelectVesselByName", 1000)))
             {
                 return true;
             }
@@ -173,13 +167,13 @@ namespace AutoRetainer.Scheduler
             return false;
         }
 
-        internal static bool? Redeploy()
+        internal static bool? RedeployVessel()
         {
-            if(TryGetAddonByName<AtkUnitBase>("AirShipExplorationResult", out var addon) && IsAddonReady(addon))
+            if (TryGetAddonByName<AtkUnitBase>("AirShipExplorationResult", out var addon) && IsAddonReady(addon))
             {
-                if(Utils.GenericThrottle && EzThrottler.Throttle("Voyage.Redeploy"))
+                if (Utils.GenericThrottle && EzThrottler.Throttle("Voyage.Redeploy"))
                 {
-                    Callback.Fire(addon, true, (int)1);
+                    Callback.Fire(addon, true, 1);
                     return true;
                 }
             }
@@ -190,13 +184,13 @@ namespace AutoRetainer.Scheduler
             return false;
         }
 
-        internal static bool? Deploy()
+        internal static bool? DeployVessel()
         {
             if (TryGetAddonByName<AtkUnitBase>("AirShipExplorationDetail", out var addon) && IsAddonReady(addon))
             {
                 if (Utils.GenericThrottle && EzThrottler.Throttle("Voyage.Deploy"))
                 {
-                    Callback.Fire(addon, true, (int)0);
+                    Callback.Fire(addon, true, 0);
                     return true;
                 }
             }
@@ -207,9 +201,9 @@ namespace AutoRetainer.Scheduler
             return false;
         }
 
-        internal static bool? Quit()
+        internal static bool? QuitVesselMenu()
         {
-            if (Utils.TrySelectSpecificEntry("Nothing.", () => EzThrottler.Throttle("Voyage.Quit", 1000)))
+            if (Utils.TrySelectSpecificEntry(Lang.NothingVoyage, () => EzThrottler.Throttle("Voyage.Quit", 1000)))
             {
                 return true;
             }

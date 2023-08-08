@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AutoRetainerAPI.Configuration
 {
-    public class VoyageOfflineData
+    public class OfflineVesselData
     {
         public uint ReturnTime;
         public string Name;

@@ -1,4 +1,5 @@
-﻿using Dalamud.Memory;
+﻿using AutoRetainer.Modules.Voyage;
+using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using System;
 using System.Collections.Generic;
@@ -56,9 +57,9 @@ namespace AutoRetainer.UI.Dbg
                 if (ImGui.Button($"{nameof(SchedulerVoyage.SelectAirshipManagement)}")) DuoLog.Information($"{SchedulerVoyage.SelectAirshipManagement}");
                 if (ImGui.Button($"{nameof(SchedulerVoyage.SelectSubManagement)}")) DuoLog.Information($"{SchedulerVoyage.SelectSubManagement}");
                 ImGui.InputText("subject name", ref data1, 100);
-                if (ImGui.Button($"{nameof(SchedulerVoyage.SelectSubjectByName)}")) DuoLog.Information($"{SchedulerVoyage.SelectSubjectByName(data1)}");
-                if (ImGui.Button($"{nameof(SchedulerVoyage.Redeploy)}")) DuoLog.Information($"{SchedulerVoyage.Redeploy}");
-                if (ImGui.Button($"{nameof(SchedulerVoyage.Deploy)}")) DuoLog.Information($"{SchedulerVoyage.Deploy}");
+                if (ImGui.Button($"{nameof(SchedulerVoyage.SelectVesselByName)}")) DuoLog.Information($"{SchedulerVoyage.SelectVesselByName(data1)}");
+                if (ImGui.Button($"{nameof(SchedulerVoyage.RedeployVessel)}")) DuoLog.Information($"{SchedulerVoyage.RedeployVessel}");
+                if (ImGui.Button($"{nameof(SchedulerVoyage.DeployVessel)}")) DuoLog.Information($"{SchedulerVoyage.DeployVessel}");
                 if (ImGui.Button($"{nameof(SchedulerVoyage.Approach)}")) DuoLog.Information($"{SchedulerVoyage.Approach}");
                 if (ImGui.Button($"{nameof(SchedulerVoyage.Approach)}")) DuoLog.Information($"{SchedulerVoyage.Approach}");
                 if (ImGui.Button($"{nameof(SchedulerVoyage.Approach)}")) DuoLog.Information($"{SchedulerVoyage.Approach}");
@@ -72,9 +73,9 @@ namespace AutoRetainer.UI.Dbg
                     P.TaskManager.Enqueue(SchedulerVoyage.AutomoveOff);
                     P.TaskManager.Enqueue(SchedulerVoyage.InteractWithVoyagePanel);
                     P.TaskManager.Enqueue(SchedulerVoyage.SelectAirshipManagement);
-                    P.TaskManager.Enqueue(() => SchedulerVoyage.SelectSubjectByName(data1));
-                    P.TaskManager.Enqueue(SchedulerVoyage.Redeploy);
-                    P.TaskManager.Enqueue(SchedulerVoyage.Deploy);
+                    P.TaskManager.Enqueue(() => SchedulerVoyage.SelectVesselByName(data1));
+                    P.TaskManager.Enqueue(SchedulerVoyage.RedeployVessel);
+                    P.TaskManager.Enqueue(SchedulerVoyage.DeployVessel);
                 }
             }
         }

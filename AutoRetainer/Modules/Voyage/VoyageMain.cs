@@ -1,5 +1,5 @@
 ﻿using AutoRetainer.Internal;
-using AutoRetainer.Scheduler.Tasks.Voyage;
+using AutoRetainer.Modules.Voyage.Tasks;
 using Dalamud.Game.ClientState.Conditions;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.Throttlers;
@@ -10,9 +10,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AutoRetainer.Modules
+namespace AutoRetainer.Modules.Voyage
 {
-    internal static unsafe class Voyage
+    internal static unsafe class VoyageMain
     {
         static bool IsInVoyagePanel = false;
 
@@ -45,7 +45,7 @@ namespace AutoRetainer.Modules
                                 TaskEnterMenu.Enqueue(VoyageType.Airship);
                                 foreach (var x in air)
                                 {
-                                    TaskRedeployVoyage.Enqueue(x.Name);
+                                    TaskRedeployVessel.Enqueue(x.Name);
                                 }
                                 TaskQuitMenu.Enqueue();
                             }
@@ -54,7 +54,7 @@ namespace AutoRetainer.Modules
                                 TaskEnterMenu.Enqueue(VoyageType.Submersible);
                                 foreach (var x in sub)
                                 {
-                                    TaskRedeployVoyage.Enqueue(x.Name);
+                                    TaskRedeployVessel.Enqueue(x.Name);
                                 }
                                 TaskQuitMenu.Enqueue();
                             }
@@ -71,7 +71,7 @@ namespace AutoRetainer.Modules
                 }
             }
 
-            if(VoyageUtils.IsInVoyagePanel())
+            if (VoyageUtils.IsInVoyagePanel())
             {
                 if (EzThrottler.Throttle("Voyage.WriteOfflineData", 100))
                 {

@@ -29,8 +29,8 @@ public class OfflineCharacterData
     public HashSet<uint> UnlockedGatheringItems = new();
     public short[] ClassJobLevelArray = new short[30];
     public uint Gil = 0;
-    public List<VoyageOfflineData> OfflineAirshipData = new();
-    public List<VoyageOfflineData> OfflineSubmarineData = new();
+    public List<OfflineVesselData> OfflineAirshipData = new();
+    public List<OfflineVesselData> OfflineSubmarineData = new();
 
     public string Identity => $"{CID}";
     public bool ShouldSerializeIdentity() => false;

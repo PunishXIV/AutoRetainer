@@ -19,11 +19,11 @@ using AutoRetainer.Modules.Statistics;
 using AutoRetainer.Internal;
 using AutoRetainer.UI.Overlays;
 using ECommons.Throttlers;
-using AutoRetainer.Modules;
 using AutoRetainerAPI.Configuration;
 using AutoRetainerAPI;
 using ECommons.GameHelpers;
 using System.Xml.Linq;
+using AutoRetainer.Modules.Voyage;
 
 namespace AutoRetainer;
 
@@ -95,7 +95,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 AutoGCHandin.Init();
                 IPC.Init();
                 Utils.FixKeys();
-                Voyage.Init();
+                VoyageMain.Init();
 
                 ws.AddWindow(new MultiModeOverlay());
                 RetainerListOverlay = new RetainerListOverlay();
@@ -324,7 +324,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             Safe(API.Dispose);
             Safe(FPSManager.ForceRestore);
             Safe(PriorityManager.RestorePriority);
-            Safe(Voyage.Shutdown);
+            Safe(VoyageMain.Shutdown);
             PunishLibMain.Dispose();
             ECommonsMain.Dispose();
         }
