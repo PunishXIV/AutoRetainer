@@ -24,6 +24,7 @@ using AutoRetainerAPI;
 using ECommons.GameHelpers;
 using System.Xml.Linq;
 using AutoRetainer.Modules.Voyage;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace AutoRetainer;
 

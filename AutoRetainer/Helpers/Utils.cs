@@ -31,6 +31,8 @@ internal static unsafe class Utils
 {
     internal static bool MultiModeOrArtisan => MultiMode.Active || (SchedulerMain.PluginEnabled && SchedulerMain.Reason == PluginEnableReason.Artisan);
     internal static bool IsBusy => P.TaskManager.IsBusy || AutoGCHandin.Operation || AutoLogin.Instance.IsRunning;
+    internal static AtkValue ZeroAtkValue = new() { Type = 0, Int = 0 };
+
     internal static void FixKeys()
     {
         Fix(ref C.EntrustKey);

@@ -19,6 +19,7 @@ namespace AutoRetainer.Modules.Voyage
     {
         internal static string[] PanelName = new string[] { "Voyage Control Panel" };
 
+
         internal static bool IsVoyagePanel(this GameObject obj)
         {
             return obj?.Name.ToString().EqualsAny(PanelName) == true;
@@ -50,37 +51,6 @@ namespace AutoRetainer.Modules.Voyage
             return false;
         }
 
-        internal static void PickRoutePoint(int which)
-        {
-            if (TryGetAddonByName<AtkUnitBase>("AirShipExploration", out var addon) && IsAddonReady(addon))
-            {
-                var Event = stackalloc AtkEvent[1]
-                {
-                    new AtkEvent()
-                    {
-                        Node = null,
-                        Target = (AtkEventTarget*)addon->UldManager.NodeList[132],
-                        Listener = &addon->AtkEventListener,
-                        Param = 0,
-                        NextEvent = null,
-                        Type = AtkEventType.ListItemToggle,
-                        Unk29 = 0,
-                        Flags = 206,
-                    }
-                };
-                var Data = stackalloc VoyageInputData[1]
-                {
-                    new VoyageInputData()
-                    {
-                        unk_16 = which,
-                        unk_24 = 0,
-                        unk_168 = 0
-                    }
-                };
-                //P.Memory.Detour((nint)addon, 0x23, 0, Event, Data);
-            }
-        }
-
         public static long GetRemainingSeconds(this OfflineVesselData data)
         {
             return data.ReturnTime - P.Time;
@@ -98,7 +68,7 @@ namespace AutoRetainer.Modules.Voyage
                         var name = MemoryHelper.ReadSeStringNullTerminated((nint)x.Name).ExtractText();
                         if (name != "")
                         {
-                            temp.Add(new() { Name = name, ReturnTime = x.ReturnTime });
+                            temp.Add(new(name, x.ReturnTime));
                         }
                     }
                     if (temp.Count > 0)
@@ -114,7 +84,7 @@ namespace AutoRetainer.Modules.Voyage
                         var name = MemoryHelper.ReadSeStringNullTerminated((nint)x.Name).ExtractText();
                         if (name != "")
                         {
-                            temp.Add(new() { Name = name, ReturnTime = x.ReturnTime });
+                            temp.Add(new(name, x.ReturnTime));
                         }
                     }
                     if (temp.Count > 0)

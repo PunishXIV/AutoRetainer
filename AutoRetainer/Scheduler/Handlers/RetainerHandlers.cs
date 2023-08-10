@@ -65,9 +65,9 @@ internal unsafe static class RetainerHandlers
             const string thrName = "ClickResultReassign.WaitForButtonEnabled";
             if (!addon->ReassignButton->IsEnabled)
             {
-                EzThrottler.Throttle(thrName, 500, true);
+                FrameThrottler.Throttle(thrName, 5, true);
             }
-            if (EzThrottler.Check(thrName) && addon->ReassignButton->IsEnabled && Utils.GenericThrottle)
+            if (FrameThrottler.Check(thrName) && addon->ReassignButton->IsEnabled && Utils.GenericThrottle)
             {
                 ClickRetainerTaskResult.Using((IntPtr)addon).Reassign();
                 P.DebugLog($"Clicked reassign");
@@ -88,9 +88,9 @@ internal unsafe static class RetainerHandlers
             const string thrName = "RetainerTaskResult.WaitForButtonEnabled";
             if (!addon->ConfirmButton->IsEnabled)
             {
-                EzThrottler.Throttle(thrName, 500, true);
+                FrameThrottler.Throttle(thrName, 5, true);
             }
-            if (EzThrottler.Check(thrName) && addon->ConfirmButton->IsEnabled && Utils.GenericThrottle)
+            if (FrameThrottler.Check(thrName) && addon->ConfirmButton->IsEnabled && Utils.GenericThrottle)
             {
                 ClickRetainerTaskResult.Using((IntPtr)addon).Confirm();
                 P.DebugLog($"Clicked confirm");
@@ -111,9 +111,9 @@ internal unsafe static class RetainerHandlers
             const string thrName = "ClickAskAssign.WaitForButtonEnabled";
             if (!addon->AssignButton->IsEnabled)
             {
-                EzThrottler.Throttle(thrName, 500, true);
+                FrameThrottler.Throttle(thrName, 5, true);
             }
-            if (EzThrottler.Check(thrName) && addon->AssignButton->IsEnabled && Utils.GenericThrottle)
+            if (FrameThrottler.Check(thrName) && addon->AssignButton->IsEnabled && Utils.GenericThrottle)
             {
                 ClickRetainerTaskAsk.Using((IntPtr)addon).Assign();
                 P.DebugLog("Clicked assign");
@@ -134,9 +134,9 @@ internal unsafe static class RetainerHandlers
             const string thrName = "ClickAskReturn.WaitForButtonEnabled";
             if (!addon->ReturnButton->IsEnabled)
             {
-                EzThrottler.Throttle(thrName, 500, true);
+                FrameThrottler.Throttle(thrName, 5, true);
             }
-            if (EzThrottler.Check(thrName) && addon->ReturnButton->IsEnabled && Utils.GenericThrottle)
+            if (FrameThrottler.Check(thrName) && addon->ReturnButton->IsEnabled && Utils.GenericThrottle)
             {
                 ClickRetainerTaskAsk.Using((IntPtr)addon).Return();
                 P.DebugLog("Clicked return");
@@ -500,9 +500,17 @@ internal unsafe static class RetainerHandlers
 
     public static bool? SelectSpecificVentureByName(string name)
     {
-        if (TryGetAddonByName<AtkUnitBase>("RetainerTaskSupply", out var addon) && IsAddonReady(addon))
+        if (TryGetAddonByName<AtkUnitBase>("RetainerTaskSupply", out var addon) && IsAddonReady(addon) && addon->AtkValuesCount > 2)
         {
-            if (Utils.GenericThrottle)
+            var state = addon->AtkValues[3];
+            if (state.Type == 0)
+            {
+                FrameThrottler.Throttle("RetainerTaskSupply.InitWait", 5, true);
+                PluginLog.Debug($"RetainerTaskSupply waiting...");
+                return false;
+            }
+            
+            if (FrameThrottler.Check("RetainerTaskSupply.InitWait") && Utils.GenericThrottle)
             {
                 if (addon->UldManager.NodeList[3]->IsVisible)
                 {
@@ -527,6 +535,7 @@ internal unsafe static class RetainerHandlers
                 else
                 {
                     Callback.Fire(addon, true, 2, new AtkValue() { Type = 0, Int = 0 }, name);
+                    Utils.RethrottleGeneric();
                     return false;
                 }
             }

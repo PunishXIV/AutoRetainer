@@ -74,8 +74,6 @@ internal unsafe class Config : IEzConfig
     public bool RetryItemSearch = false;
     public bool ArtisanIntegration = false;
 
-    public bool AutoResendSubs = false;
-
     internal bool DontReassign
     {
         get
@@ -106,5 +104,9 @@ internal unsafe class Config : IEzConfig
     public bool UnlockFPSChillFrames = false;
 
     public bool ManipulatePriority = false;
+
+    public bool SubsAutoResend = false;
+    public bool SubsAutoRepair = false;
+    public bool SubsOnlyFinalize = false;
 
 }

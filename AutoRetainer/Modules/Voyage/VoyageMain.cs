@@ -19,11 +19,13 @@ namespace AutoRetainer.Modules.Voyage
         internal static void Init()
         {
             Svc.Framework.Update += Tick;
+            VoyageMemory.Init();
         }
 
         internal static void Shutdown()
         {
             Svc.Framework.Update -= Tick;
+            VoyageMemory.Dispose();
         }
 
         internal static void Tick(object _)
@@ -36,16 +38,24 @@ namespace AutoRetainer.Modules.Voyage
                     {
                         IsInVoyagePanel = true;
                         Notify.Info($"Entered voyage panel");
-                        if (C.AutoResendSubs)
+                        if (C.SubsAutoResend)
                         {
-                            var air = Utils.GetCurrentCharacterData().OfflineAirshipData.Where(x => x.GetRemainingSeconds() < C.UnsyncCompensation);
-                            var sub = Utils.GetCurrentCharacterData().OfflineSubmarineData.Where(x => x.GetRemainingSeconds() < C.UnsyncCompensation);
+                            var data = Utils.GetCurrentCharacterData();
+                            var air = data.OfflineAirshipData.Where(x => x.ReturnTime != 0 && x.GetRemainingSeconds() < C.UnsyncCompensation && data.EnabledAirships.Contains(x.Name));
+                            var sub = data.OfflineSubmarineData.Where(x => x.ReturnTime != 0 && x.GetRemainingSeconds() < C.UnsyncCompensation && data.EnabledSubs.Contains(x.Name));
                             if (air.Count() > 0)
                             {
                                 TaskEnterMenu.Enqueue(VoyageType.Airship);
                                 foreach (var x in air)
                                 {
-                                    TaskRedeployVessel.Enqueue(x.Name);
+                                    if (C.SubsOnlyFinalize)
+                                    {
+                                        TaskFinalizeVessel.Enqueue(x.Name);
+                                    }
+                                    else
+                                    {
+                                        TaskRedeployVessel.Enqueue(x.Name);
+                                    }
                                 }
                                 TaskQuitMenu.Enqueue();
                             }
@@ -54,7 +64,14 @@ namespace AutoRetainer.Modules.Voyage
                                 TaskEnterMenu.Enqueue(VoyageType.Submersible);
                                 foreach (var x in sub)
                                 {
-                                    TaskRedeployVessel.Enqueue(x.Name);
+                                    if (C.SubsOnlyFinalize)
+                                    {
+                                        TaskFinalizeVessel.Enqueue(x.Name);
+                                    }
+                                    else
+                                    {
+                                        TaskRedeployVessel.Enqueue(x.Name);
+                                    }
                                 }
                                 TaskQuitMenu.Enqueue();
                             }

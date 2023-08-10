@@ -1,8 +1,12 @@
 ﻿using AutoRetainer.Helpers;
 using Dalamud.Utility;
+using ECommons.Automation;
 using ECommons.GameHelpers;
 using ECommons.MathHelpers;
+using ECommons.ObjectLifeTracker;
 using ECommons.Reflection;
+using FFXIVClientStructs.FFXIV.Client.Game.Control;
+using FFXIVClientStructs.FFXIV.Client.Game.MJI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
 using PInvoke;
@@ -17,6 +21,7 @@ internal static unsafe class DebugMisc
 
     internal static void Draw()
     {
+        ImGuiEx.Text($"Lockon: {*(byte*)(((nint)TargetSystem.Instance()) + 309)}");
         if (ImGui.Button("Chill frames lock"))
         {
             FPSManager.LockChillFrames();

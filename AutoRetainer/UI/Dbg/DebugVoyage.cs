@@ -45,7 +45,7 @@ namespace AutoRetainer.UI.Dbg
                 ImGui.InputInt("r1", ref r1);
                 if (ImGui.Button("Pick"))
                 {
-                    P.Memory.Use(r1);
+                    
                 }
             }
             if (ImGui.CollapsingHeader("control"))
