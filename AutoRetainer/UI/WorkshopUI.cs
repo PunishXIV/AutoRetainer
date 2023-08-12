@@ -1,4 +1,5 @@
-﻿using AutoRetainer.Modules.Voyage;
+﻿using AutoRetainer.Internal;
+using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainerAPI.Configuration;
 using ECommons.GameHelpers;
@@ -60,7 +61,7 @@ namespace AutoRetainer.UI
             {
                 ImGui.Checkbox($"Resend airships and submarines on voyage CP access", ref C.SubsAutoResend);
                 ImGui.Checkbox($"Only finalize reports", ref C.SubsOnlyFinalize);
-                //ImGui.Checkbox($"When resending, auto-repair vessels", ref C.SubsAutoRepair);
+                ImGui.Checkbox($"When resending, auto-repair vessels", ref C.SubsAutoRepair);
             }
 
             if (ImGui.CollapsingHeader("Debug"))
@@ -76,7 +77,22 @@ namespace AutoRetainer.UI
                 if (ImGui.Button("Repair 4")) SchedulerVoyage.TryRepair(3);
                 if (ImGui.Button("Close repair")) SchedulerVoyage.CloseRepair();
                 if (ImGui.Button("Trigger auto repair")) TaskRepairAll.EnqueueImmediate();
+                ImGui.InputText("data1", ref data1, 50);
+                ImGuiEx.EnumCombo("data2", ref data2);
+                if (ImGui.Button("IsVesselNeedsRepair"))
+                {
+                    try
+                    {
+                        DuoLog.Information($"{VoyageUtils.IsVesselNeedsRepair(data1, data2)}");
+                    }
+                    catch(Exception e)
+                    {
+                        e.LogDuo();
+                    }
+                }
             }
         }
+        static string data1 = "";
+        static VoyageType data2 = VoyageType.Airship;
     }
 }

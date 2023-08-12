@@ -1,6 +1,7 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage.Tasks;
 using Dalamud.Game.ClientState.Conditions;
+using ECommons.Automation;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
@@ -38,42 +39,49 @@ namespace AutoRetainer.Modules.Voyage
                     {
                         IsInVoyagePanel = true;
                         Notify.Info($"Entered voyage panel");
-                        if (C.SubsAutoResend)
+                        if (IsKeyPressed(C.Suppress))
                         {
-                            var data = Utils.GetCurrentCharacterData();
-                            var air = data.OfflineAirshipData.Where(x => x.ReturnTime != 0 && x.GetRemainingSeconds() < C.UnsyncCompensation && data.EnabledAirships.Contains(x.Name));
-                            var sub = data.OfflineSubmarineData.Where(x => x.ReturnTime != 0 && x.GetRemainingSeconds() < C.UnsyncCompensation && data.EnabledSubs.Contains(x.Name));
-                            if (air.Count() > 0)
+                            Notify.Warning("No operation was requested by user");
+                        }
+                        else
+                        {
+                            if (C.SubsAutoResend)
                             {
-                                TaskEnterMenu.Enqueue(VoyageType.Airship);
-                                foreach (var x in air)
+                                var data = Utils.GetCurrentCharacterData();
+                                var air = data.OfflineAirshipData.Where(x => x.ReturnTime != 0 && x.GetRemainingSeconds() < C.UnsyncCompensation && data.EnabledAirships.Contains(x.Name));
+                                var sub = data.OfflineSubmarineData.Where(x => x.ReturnTime != 0 && x.GetRemainingSeconds() < C.UnsyncCompensation && data.EnabledSubs.Contains(x.Name));
+                                if (air.Count() > 0)
                                 {
-                                    if (C.SubsOnlyFinalize)
+                                    TaskEnterMenu.Enqueue(VoyageType.Airship);
+                                    foreach (var x in air)
                                     {
-                                        TaskFinalizeVessel.Enqueue(x.Name);
+                                        if (C.SubsOnlyFinalize || C.DontReassign)
+                                        {
+                                            TaskFinalizeVessel.Enqueue(x.Name);
+                                        }
+                                        else
+                                        {
+                                            TaskRedeployVessel.Enqueue(x.Name, VoyageType.Airship);
+                                        }
                                     }
-                                    else
-                                    {
-                                        TaskRedeployVessel.Enqueue(x.Name);
-                                    }
+                                    TaskQuitMenu.Enqueue();
                                 }
-                                TaskQuitMenu.Enqueue();
-                            }
-                            if (sub.Count() > 0)
-                            {
-                                TaskEnterMenu.Enqueue(VoyageType.Submersible);
-                                foreach (var x in sub)
+                                if (sub.Count() > 0)
                                 {
-                                    if (C.SubsOnlyFinalize)
+                                    TaskEnterMenu.Enqueue(VoyageType.Submersible);
+                                    foreach (var x in sub)
                                     {
-                                        TaskFinalizeVessel.Enqueue(x.Name);
+                                        if (C.SubsOnlyFinalize || C.DontReassign)
+                                        {
+                                            TaskFinalizeVessel.Enqueue(x.Name);
+                                        }
+                                        else
+                                        {
+                                            TaskRedeployVessel.Enqueue(x.Name, VoyageType.Submersible);
+                                        }
                                     }
-                                    else
-                                    {
-                                        TaskRedeployVessel.Enqueue(x.Name);
-                                    }
+                                    TaskQuitMenu.Enqueue();
                                 }
-                                TaskQuitMenu.Enqueue();
                             }
                         }
                     }

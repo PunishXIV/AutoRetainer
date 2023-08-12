@@ -202,6 +202,11 @@ namespace AutoRetainer.Modules.Voyage
             return Utils.TrySelectSpecificEntry((x) => x.StartsWith($"{name}."), () => EzThrottler.Throttle("Voyage.SelectVesselByName", 1000));
         }
 
+        internal static bool? SelectViewPreviousLog()
+        {
+            return Utils.TrySelectSpecificEntry("View previous voyage log", () => Utils.GenericThrottle && EzThrottler.Throttle("Voyage.SelectViewPreviousLog", 1000));
+        }
+
         internal static bool? RedeployVessel()
         {
             if (TryGetAddonByName<AtkUnitBase>("AirShipExplorationResult", out var addon) && IsAddonReady(addon))

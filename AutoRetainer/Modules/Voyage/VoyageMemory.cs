@@ -43,6 +43,8 @@ namespace AutoRetainer.Modules.Voyage
         }
 
         internal static VoyageMemory Instance { get; private set; }
+        public int LastAirshipData { get; private set; }
+        public int LastSubmarineData { get; private set; }
 
         public static void Init()
         {
@@ -106,6 +108,7 @@ namespace AutoRetainer.Modules.Voyage
                 {
                     Utils.GetCurrentCharacterData().OfflineSubmarineData = temp;
                     Notify.Info($"Updated airship data from SubmersibleStatus");
+                    LastSubmarineData = ImGui.GetFrameCount();
                 }
             }
             catch (Exception e)
@@ -155,6 +158,7 @@ namespace AutoRetainer.Modules.Voyage
                 {
                     Utils.GetCurrentCharacterData().OfflineAirshipData = temp;
                     Notify.Info($"Updated airship data from AirshipStatus");
+                    LastAirshipData = ImGui.GetFrameCount();
                 }
             }
             catch (Exception e)
