@@ -2,7 +2,9 @@
 using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainerAPI.Configuration;
+using Dalamud.Utility;
 using ECommons.GameHelpers;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using PunishLib.ImGuiMethods;
 using System;
 using System.Collections.Generic;
@@ -101,9 +103,47 @@ namespace AutoRetainer.UI
                 ImGui.Checkbox($"Resend airships and submarines on voyage CP access", ref C.SubsAutoResend);
                 ImGui.Checkbox($"Only finalize reports", ref C.SubsOnlyFinalize);
                 ImGui.Checkbox($"When resending, auto-repair vessels", ref C.SubsAutoRepair);
+                ImGui.Checkbox($"Even when only finalizing, repair vessels", ref C.SubsRepairFinalize);
                 //ImGui.Checkbox($"On house enter task, enter workshop if possible", ref C.EnterWorkshop);
             }
 
+            if (ImGui.CollapsingHeader("Public debug"))
+            {
+                try
+                {
+                    if (!P.TaskManager.IsBusy)
+                    {
+                        if (ImGui.Button("Resend currently selected submarine on previous voyage"))
+                        {
+                            TaskDeployOnPreviousVoyage.Enqueue();
+                        }
+                        foreach (var x in Data.OfflineSubmarineData)
+                        {
+                            if (ImGui.Button($"Repair {x.Name} submarine's broken components"))
+                            {
+                                if (VoyageUtils.GetCurrentWorkshopPanelType() == PanelType.Submersible)
+                                {
+                                    TaskSelectVesselByName.Enqueue(x.Name);
+                                    TaskIntelligentRepair.Enqueue(x.Name, VoyageType.Submersible);
+                                    P.TaskManager.Enqueue(VoyageScheduler.SelectVesselQuit);
+                                }
+                                else
+                                {
+                                    Notify.Error("You are not in a submersible menu");
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        ImGuiEx.Text(EColor.RedBright, $"Currently executing: {P.TaskManager.CurrentTaskName}");
+                    }
+                }
+                catch(Exception e)
+                {
+                    ImGuiEx.TextWrapped(e.ToString());
+                }
+            }
             if (ImGui.CollapsingHeader("Debug"))
             {
                 if (ImGui.Button("Erase offline data"))
@@ -111,11 +151,11 @@ namespace AutoRetainer.UI
                     Utils.GetCurrentCharacterData().OfflineAirshipData.Clear();
                     Utils.GetCurrentCharacterData().OfflineSubmarineData.Clear();
                 }
-                if (ImGui.Button("Repair 1")) SchedulerVoyage.TryRepair(0);
-                if (ImGui.Button("Repair 2")) SchedulerVoyage.TryRepair(1);
-                if (ImGui.Button("Repair 3")) SchedulerVoyage.TryRepair(2);
-                if (ImGui.Button("Repair 4")) SchedulerVoyage.TryRepair(3);
-                if (ImGui.Button("Close repair")) SchedulerVoyage.CloseRepair();
+                if (ImGui.Button("Repair 1")) VoyageScheduler.TryRepair(0);
+                if (ImGui.Button("Repair 2")) VoyageScheduler.TryRepair(1);
+                if (ImGui.Button("Repair 3")) VoyageScheduler.TryRepair(2);
+                if (ImGui.Button("Repair 4")) VoyageScheduler.TryRepair(3);
+                if (ImGui.Button("Close repair")) VoyageScheduler.CloseRepair();
                 //if (ImGui.Button("Trigger auto repair")) TaskRepairAll.EnqueueImmediate();
                 ImGui.InputText("data1", ref data1, 50);
                 ImGuiEx.EnumCombo("data2", ref data2);
@@ -125,7 +165,7 @@ namespace AutoRetainer.UI
                     {
                         DuoLog.Information($"{VoyageUtils.IsVesselNeedsRepair(data1, data2, out var log).Print()}\n{log.Join("\n")}");
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         e.LogDuo();
                     }
@@ -142,6 +182,14 @@ namespace AutoRetainer.UI
                     }
                 }
                 ImGuiEx.Text($"Bell: {Utils.GetReachableRetainerBell()}");
+                ImGuiEx.TextWrapped($"Enabled subs: {VoyageUtils.GetVesselData(Data, VoyageType.Submersible).Select(x => $"{x.Name}, {x.GetRemainingSeconds()}").Print()}");
+                ImGuiEx.Text($"AnyEnabledVesselsAvailable: {VoyageUtils.AnyEnabledVesselsAvailable(Data)}");
+                ImGuiEx.Text($"Panel type: {VoyageUtils.GetCurrentWorkshopPanelType()}");
+                if (TryGetAddonByName<AtkUnitBase>("AirShipExplorationResult", out var addon) && IsAddonReady(addon))
+                {
+                    var button = addon->UldManager.NodeList[3]->GetAsAtkComponentButton();
+                    ImGuiEx.Text($"Button: {button->IsEnabled}");
+                }
             }
         }
         static string data1 = "";

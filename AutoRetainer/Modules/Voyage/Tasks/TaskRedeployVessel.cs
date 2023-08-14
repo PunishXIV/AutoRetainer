@@ -15,23 +15,15 @@ namespace AutoRetainer.Modules.Voyage.Tasks
         internal static void Enqueue(string name, VoyageType type)
         {
             TaskSelectVesselByName.Enqueue(name);
-            P.TaskManager.Enqueue(SchedulerVoyage.FinalizeVessel);
+            P.TaskManager.Enqueue(VoyageScheduler.FinalizeVessel);
             P.TaskManager.Enqueue(() => TryGetAddonByName<AtkUnitBase>("SelectString", out var addon) && IsAddonReady(addon), "WaitForSelectStringAddon");
-            P.TaskManager.Enqueue(() =>
-            {
-                var rep = VoyageUtils.IsVesselNeedsRepair(name, type, out var log);
-                if (C.SubsAutoRepair && rep.Count > 0)
-                {
-                    TaskRepairAll.EnqueueImmediate(rep);
-                }
-                PluginLog.Debug($"Repair check log: {log.Join(", ")}");
-            }, "IntelligentRepairTask");
-            P.TaskManager.Enqueue(SchedulerVoyage.SelectViewPreviousLog);
-            P.TaskManager.Enqueue(SchedulerVoyage.RedeployVessel);
-            P.TaskManager.Enqueue(SchedulerVoyage.DeployVessel);
-            P.TaskManager.Enqueue(SchedulerVoyage.WaitForCutscene);
-            P.TaskManager.Enqueue(SchedulerVoyage.PressEsc);
-            P.TaskManager.Enqueue(SchedulerVoyage.ConfirmSkip);
+            TaskIntelligentRepair.Enqueue(name, type);
+            P.TaskManager.Enqueue(VoyageScheduler.SelectViewPreviousLog);
+            P.TaskManager.Enqueue(VoyageScheduler.RedeployVessel);
+            P.TaskManager.Enqueue(VoyageScheduler.DeployVessel);
+            P.TaskManager.Enqueue(VoyageScheduler.WaitForCutscene);
+            P.TaskManager.Enqueue(VoyageScheduler.PressEsc);
+            P.TaskManager.Enqueue(VoyageScheduler.ConfirmSkip);
         }
     }
 }

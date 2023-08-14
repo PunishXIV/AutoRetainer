@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AutoRetainer.Modules.Voyage;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,11 +10,12 @@ namespace AutoRetainer.Modules
     internal static class TextAdvanceManager
     {
         static bool WasChanged = false;
+        static bool IsBusy => Utils.IsBusy || VoyageScheduler.Enabled;
         internal static void Tick()
         {
             if (WasChanged)
             {
-                if (!Utils.IsBusy)
+                if (!IsBusy)
                 {
                     WasChanged = false;
                     UnlockTA();
@@ -22,7 +24,7 @@ namespace AutoRetainer.Modules
             }
             else if (C.UnlockFPS)
             {
-                if (Utils.IsBusy)
+                if (IsBusy)
                 {
                     WasChanged = true;
                     LockTA();

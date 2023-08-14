@@ -10,6 +10,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,53 @@ namespace AutoRetainer.Modules.Voyage
         internal static string[] PanelName = new string[] { "Voyage Control Panel" };
         internal static uint[] Workshops = new uint[] { Houses.Company_Workshop_Empyreum, Houses.Company_Workshop_The_Goblet, Houses.Company_Workshop_Mist, Houses.Company_Workshop_Shirogane, Houses.Company_Workshop_The_Lavender_Beds };
 
+        internal static PanelType GetCurrentWorkshopPanelType()
+        {
+            if (TryGetAddonByName<AtkUnitBase>("SelectString", out var addon) && IsAddonReady(addon))
+            {
+                if (Utils.GetEntries((AddonSelectString*)addon).Contains("Submersible Management"))
+                {
+                    return PanelType.TypeSelector;
+                }
+                var text = MemoryHelper.ReadSeString(&addon->UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText).ExtractText();
+                if (text.Contains("Select a submersible."))
+                {
+                    return PanelType.Submersible;
+                }
+                if (text.Contains("Select an airship."))
+                {
+                    return PanelType.Airship;
+                }
+                return PanelType.Unknown;
+            }
+            return PanelType.None;
+        }
+
+        internal static void Log(string text)
+        {
+            P.DebugLog($"[Voyage] {text}");
+        }
+
+        internal static List<OfflineVesselData> GetVesselData(this OfflineCharacterData data, VoyageType type)
+        {
+            if (type == VoyageType.Airship) return data.OfflineAirshipData;
+            if (type == VoyageType.Submersible) return data.OfflineSubmarineData;
+            throw new ArgumentOutOfRangeException(nameof(type));
+        }
+
+        internal static HashSet<string> GetEnabledVesselsData(this OfflineCharacterData data, VoyageType type)
+        {
+            if (type == VoyageType.Airship) return data.EnabledAirships;
+            if (type == VoyageType.Submersible) return data.EnabledSubs;
+            throw new ArgumentOutOfRangeException(nameof(type));
+        }
+
+        internal static HashSet<string> GetFinalizeVesselsData(this OfflineCharacterData data, VoyageType type)
+        {
+            if (type == VoyageType.Airship) return data.FinalizeAirships;
+            if (type == VoyageType.Submersible) return data.FinalizeSubs;
+            throw new ArgumentOutOfRangeException(nameof(type));
+        }
 
         internal static bool IsVoyagePanel(this GameObject obj)
         {
@@ -221,10 +269,38 @@ namespace AutoRetainer.Modules.Voyage
                 return $"{t.Hours:D2}{dlm}{t.Minutes:D2}{dlm}{t.Seconds:D2}";
             }
         }
-        
+
         internal static bool AnyEnabledVesselsAvailable(this OfflineCharacterData data)
         {
-            return data.OfflineAirshipData.Any(x => data.EnabledAirships.Contains(x.Name) && x.ReturnTime != 0 && x.GetRemainingSeconds() == 0) || data.OfflineSubmarineData.Any(x => data.EnabledSubs.Contains(x.Name) && x.ReturnTime != 0 && x.GetRemainingSeconds() < C.UnsyncCompensation);
+            return data.AnyEnabledVesselsAvailable(VoyageType.Airship) || data.AnyEnabledVesselsAvailable(VoyageType.Submersible);
+        }
+
+        internal static bool AnyEnabledVesselsAvailable(this OfflineCharacterData data, VoyageType type)
+        {
+            return data.GetVesselData(type).Any(x => data.GetEnabledVesselsData(type).Contains(x.Name) && x.ReturnTime != 0 && x.GetRemainingSeconds() < C.UnsyncCompensation);
+        }
+
+        internal static string GetNextCompletedVessel(VoyageType type)
+        {
+            var data = Utils.GetCurrentCharacterData();
+            var v = data.GetVesselData(type).Where(x => x.ReturnTime != 0 && x.GetRemainingSeconds() < C.UnsyncCompensation && data.GetEnabledVesselsData(type).Contains(x.Name));
+            if (v.Any())
+            {
+                return v.First().Name;
+            }
+            return null;
+        }
+
+        internal static bool AreAnyVesselsReturnInNext(this OfflineCharacterData data, int minutes) => data.AreAnyVesselsReturnInNext(VoyageType.Airship, minutes) || data.AreAnyVesselsReturnInNext(VoyageType.Submersible, minutes);
+
+        internal static bool AreAnyVesselsReturnInNext(this OfflineCharacterData data, VoyageType type, int minutes)
+        {
+            var v = data.GetVesselData(type).Where(x => x.ReturnTime != 0 && x.GetRemainingSeconds() < minutes * 60 && data.GetEnabledVesselsData(type).Contains(x.Name));
+            if (v.Any())
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

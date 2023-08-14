@@ -16,10 +16,11 @@ namespace AutoRetainer.Modules.Voyage.Tasks
             foreach(int index in indexes)
             {
                 if(index < 0 || index > 3) throw new ArgumentOutOfRangeException(nameof(index));
-                P.TaskManager.EnqueueImmediate(() => SchedulerVoyage.TryRepair(index), $"Repair {index}");
-                P.TaskManager.EnqueueImmediate(SchedulerVoyage.ConfirmRepair, 5000, false);
+                P.TaskManager.EnqueueImmediate(() => VoyageScheduler.TryRepair(index), $"Repair {index}");
+                P.TaskManager.EnqueueImmediate(VoyageScheduler.ConfirmRepair, 5000, false);
+                P.TaskManager.EnqueueImmediate(VoyageScheduler.WaitForYesNoDisappear, 5000, false);
             }
-            P.TaskManager.EnqueueImmediate(SchedulerVoyage.CloseRepair);
+            P.TaskManager.EnqueueImmediate(VoyageScheduler.CloseRepair);
         }
     }
 }

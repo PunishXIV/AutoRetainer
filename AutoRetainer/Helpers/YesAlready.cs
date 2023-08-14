@@ -1,10 +1,12 @@
-﻿using ECommons.Reflection;
+﻿using AutoRetainer.Modules.Voyage;
+using ECommons.Reflection;
 
 namespace AutoRetainer.Helpers;
 
 internal static class YesAlready
 {
     internal static bool Reenable = false;
+    static bool IsBusy => Utils.IsBusy || VoyageScheduler.Enabled;
     internal static void DisableIfNeeded()
     {
         if (DalamudReflector.TryGetDalamudPlugin("Yes Already", out var pl, false, true))
@@ -36,7 +38,7 @@ internal static class YesAlready
 
     internal static void Tick()
     {
-        if (P.TaskManager.IsBusy || AutoLogin.Instance.IsRunning || AutoGCHandin.Operation)
+        if (IsBusy)
         {
             if (IsEnabled())
             {

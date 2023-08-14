@@ -58,6 +58,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal StyleModel Style;
     internal bool StylePushed = false;
     internal RetainerListOverlay RetainerListOverlay;
+    internal uint LastVentureID = 0;
+    internal static OfflineCharacterData Data => Utils.GetCurrentCharacterData();
 
     public AutoRetainer(DalamudPluginInterface pi)
     {
@@ -241,6 +243,22 @@ public unsafe class AutoRetainer : IDalamudPlugin
         FPSManager.Tick();
         PriorityManager.Tick();
         TextAdvanceManager.Tick();
+        if (Svc.Condition[ConditionFlag.OccupiedSummoningBell] && Utils.TryGetCurrentRetainer(out var name) && Utils.TryGetRetainerByName(name, out var retainer))
+        {
+            if(!retainer.VentureID.EqualsAny(0u, LastVentureID))
+            {
+                LastVentureID = retainer.VentureID;
+                PluginLog.Debug($"Retainer {retainer.Name} current venture={LastVentureID}");
+            }
+        }
+        else
+        {
+            if (LastVentureID != 0)
+            {
+                LastVentureID = 0;
+                PluginLog.Debug($"Last venture ID reset");
+            }
+        }
         //if(C.RetryItemSearch) RetryItemSearch.Tick();
         if (SchedulerMain.PluginEnabled || MultiMode.Enabled || TaskManager.IsBusy)
         {

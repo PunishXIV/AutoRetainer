@@ -104,20 +104,6 @@ internal unsafe static class MultiModeUI
                 {
                     ImGui.CloseCurrentPopup();
                 }
-                /*ImGuiEx.TextV("Character index:");
-                ImGui.SameLine();
-                ImGui.SetNextItemWidth(100);
-                if (ImGui.BeginCombo("##index", data.Index == 0 ? "n/a" : data.Index.ToString()))
-                {
-                    for (var i = 1; i <= 8; i++)
-                    {
-                        if (ImGui.Selectable($"{i}"))
-                        {
-                            data.Index = i;
-                        }
-                    }
-                    ImGui.EndCombo();
-                }*/
 
                 //if (C.MultipleServiceAccounts)
                 {
@@ -178,8 +164,10 @@ internal unsafe static class MultiModeUI
             var lowestRetainer = C.MultiWaitForAll? data.GetEnabledRetainers().OrderBy(z => z.GetVentureSecondsRemaining()).LastOrDefault() : data.GetEnabledRetainers().OrderBy(z => z.GetVentureSecondsRemaining()).FirstOrDefault();
             if (lowestRetainer != default)
             {
-                ImGui.PushStyleColor(ImGuiCol.PlotHistogram, 0xbb500000);
-                ImGui.ProgressBar(Math.Max(0, (float)(3600 - lowestRetainer.GetVentureSecondsRemaining(false)) / 3600f), new(ImGui.GetContentRegionAvail().X, ImGui.CalcTextSize("A").Y + ImGui.GetStyle().FramePadding.Y*2), "");
+                var prog = Math.Max(0, (float)(3600 - lowestRetainer.GetVentureSecondsRemaining(false)) / 3600f);
+                var pcol = prog == 1f ? GradientColor.Get(0xbb500000.ToVector4(), 0xbb005000.ToVector4()) : 0xbb500000.ToVector4();
+                ImGui.PushStyleColor(ImGuiCol.PlotHistogram, pcol);
+                ImGui.ProgressBar(prog, new(ImGui.GetContentRegionAvail().X, ImGui.CalcTextSize("A").Y + ImGui.GetStyle().FramePadding.Y*2), "");
                 ImGui.PopStyleColor();
                 ImGui.SetCursorPos(initCurpos);
             }

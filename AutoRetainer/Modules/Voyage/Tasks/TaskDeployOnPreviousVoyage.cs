@@ -11,12 +11,12 @@ namespace AutoRetainer.Modules.Voyage.Tasks
     {
         internal static void Enqueue()
         {
-            P.TaskManager.Enqueue(SchedulerVoyage.SelectViewPreviousLog);
-            P.TaskManager.Enqueue(SchedulerVoyage.RedeployVessel);
-            P.TaskManager.Enqueue(SchedulerVoyage.DeployVessel);
-            P.TaskManager.Enqueue(SchedulerVoyage.WaitForCutscene);
-            P.TaskManager.Enqueue(SchedulerVoyage.PressEsc);
-            P.TaskManager.Enqueue(SchedulerVoyage.ConfirmSkip);
+            P.TaskManager.Enqueue(VoyageScheduler.SelectViewPreviousLog);
+            P.TaskManager.Enqueue(VoyageScheduler.RedeployVessel);
+            P.TaskManager.Enqueue(VoyageScheduler.DeployVessel);
+            P.TaskManager.Enqueue(VoyageScheduler.WaitForCutscene);
+            P.TaskManager.Enqueue(VoyageScheduler.PressEsc);
+            P.TaskManager.Enqueue(VoyageScheduler.ConfirmSkip);
         }
     }
 }

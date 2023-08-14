@@ -109,5 +109,7 @@ internal unsafe class Config : IEzConfig
     public bool SubsAutoResend = false;
     public bool SubsAutoRepair = false;
     public bool SubsOnlyFinalize = false;
+    public bool SubsAutoEnable = false;
+    public bool SubsRepairFinalize = false;
 
 }

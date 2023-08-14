@@ -50,32 +50,32 @@ namespace AutoRetainer.UI.Dbg
             }
             if (ImGui.CollapsingHeader("control"))
             {
-                if (ImGui.Button($"{nameof(SchedulerVoyage.Lockon)}")) DuoLog.Information($"{SchedulerVoyage.Lockon}");
-                if (ImGui.Button($"{nameof(SchedulerVoyage.Approach)}")) DuoLog.Information($"{SchedulerVoyage.Approach}");
-                if (ImGui.Button($"{nameof(SchedulerVoyage.AutomoveOff)}")) DuoLog.Information($"{SchedulerVoyage.AutomoveOff}");
-                if (ImGui.Button($"{nameof(SchedulerVoyage.InteractWithVoyagePanel)}")) DuoLog.Information($"{SchedulerVoyage.InteractWithVoyagePanel}");
-                if (ImGui.Button($"{nameof(SchedulerVoyage.SelectAirshipManagement)}")) DuoLog.Information($"{SchedulerVoyage.SelectAirshipManagement}");
-                if (ImGui.Button($"{nameof(SchedulerVoyage.SelectSubManagement)}")) DuoLog.Information($"{SchedulerVoyage.SelectSubManagement}");
+                if (ImGui.Button($"{nameof(VoyageScheduler.Lockon)}")) DuoLog.Information($"{VoyageScheduler.Lockon}");
+                if (ImGui.Button($"{nameof(VoyageScheduler.Approach)}")) DuoLog.Information($"{VoyageScheduler.Approach}");
+                if (ImGui.Button($"{nameof(VoyageScheduler.AutomoveOff)}")) DuoLog.Information($"{VoyageScheduler.AutomoveOff}");
+                if (ImGui.Button($"{nameof(VoyageScheduler.InteractWithVoyagePanel)}")) DuoLog.Information($"{VoyageScheduler.InteractWithVoyagePanel}");
+                if (ImGui.Button($"{nameof(VoyageScheduler.SelectAirshipManagement)}")) DuoLog.Information($"{VoyageScheduler.SelectAirshipManagement}");
+                if (ImGui.Button($"{nameof(VoyageScheduler.SelectSubManagement)}")) DuoLog.Information($"{VoyageScheduler.SelectSubManagement}");
                 ImGui.InputText("subject name", ref data1, 100);
-                if (ImGui.Button($"{nameof(SchedulerVoyage.SelectVesselByName)}")) DuoLog.Information($"{SchedulerVoyage.SelectVesselByName(data1)}");
-                if (ImGui.Button($"{nameof(SchedulerVoyage.RedeployVessel)}")) DuoLog.Information($"{SchedulerVoyage.RedeployVessel}");
-                if (ImGui.Button($"{nameof(SchedulerVoyage.DeployVessel)}")) DuoLog.Information($"{SchedulerVoyage.DeployVessel}");
-                if (ImGui.Button($"{nameof(SchedulerVoyage.Approach)}")) DuoLog.Information($"{SchedulerVoyage.Approach}");
-                if (ImGui.Button($"{nameof(SchedulerVoyage.Approach)}")) DuoLog.Information($"{SchedulerVoyage.Approach}");
-                if (ImGui.Button($"{nameof(SchedulerVoyage.Approach)}")) DuoLog.Information($"{SchedulerVoyage.Approach}");
+                if (ImGui.Button($"{nameof(VoyageScheduler.SelectVesselByName)}")) DuoLog.Information($"{VoyageScheduler.SelectVesselByName(data1)}");
+                if (ImGui.Button($"{nameof(VoyageScheduler.RedeployVessel)}")) DuoLog.Information($"{VoyageScheduler.RedeployVessel}");
+                if (ImGui.Button($"{nameof(VoyageScheduler.DeployVessel)}")) DuoLog.Information($"{VoyageScheduler.DeployVessel}");
+                if (ImGui.Button($"{nameof(VoyageScheduler.Approach)}")) DuoLog.Information($"{VoyageScheduler.Approach}");
+                if (ImGui.Button($"{nameof(VoyageScheduler.Approach)}")) DuoLog.Information($"{VoyageScheduler.Approach}");
+                if (ImGui.Button($"{nameof(VoyageScheduler.Approach)}")) DuoLog.Information($"{VoyageScheduler.Approach}");
             }
             if(ImGui.CollapsingHeader("Test task manager"))
             {
                 if(ImGui.Button("Test redeploy airship"))
                 {
-                    P.TaskManager.Enqueue(SchedulerVoyage.Lockon);
-                    P.TaskManager.Enqueue(SchedulerVoyage.Approach);
-                    P.TaskManager.Enqueue(SchedulerVoyage.AutomoveOff);
-                    P.TaskManager.Enqueue(SchedulerVoyage.InteractWithVoyagePanel);
-                    P.TaskManager.Enqueue(SchedulerVoyage.SelectAirshipManagement);
-                    P.TaskManager.Enqueue(() => SchedulerVoyage.SelectVesselByName(data1));
-                    P.TaskManager.Enqueue(SchedulerVoyage.RedeployVessel);
-                    P.TaskManager.Enqueue(SchedulerVoyage.DeployVessel);
+                    P.TaskManager.Enqueue(VoyageScheduler.Lockon);
+                    P.TaskManager.Enqueue(VoyageScheduler.Approach);
+                    P.TaskManager.Enqueue(VoyageScheduler.AutomoveOff);
+                    P.TaskManager.Enqueue(VoyageScheduler.InteractWithVoyagePanel);
+                    P.TaskManager.Enqueue(VoyageScheduler.SelectAirshipManagement);
+                    P.TaskManager.Enqueue(() => VoyageScheduler.SelectVesselByName(data1));
+                    P.TaskManager.Enqueue(VoyageScheduler.RedeployVessel);
+                    P.TaskManager.Enqueue(VoyageScheduler.DeployVessel);
                 }
             }
         }

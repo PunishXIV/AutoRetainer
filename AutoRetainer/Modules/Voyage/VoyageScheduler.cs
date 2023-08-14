@@ -12,15 +12,18 @@ using System.Windows.Forms;
 
 namespace AutoRetainer.Modules.Voyage
 {
-    internal unsafe static class SchedulerVoyage
+    internal unsafe static class VoyageScheduler
     {
+        internal static void Log(string t) => VoyageUtils.Log(t);
+        internal static bool Enabled = false;
         internal static bool? SelectVesselQuit() => Utils.TrySelectSpecificEntry("Quit");
 
         internal static bool? ConfirmRepair()
         {
-            var x = Utils.GetSpecificYesno((s) => s.ContainsAny(StringComparison.OrdinalIgnoreCase, "magitekrepairmaterials"));
+            var x = Utils.GetSpecificYesno((s) => s.ContainsAny(StringComparison.OrdinalIgnoreCase, "repair"));
             if(x != null && Utils.GenericThrottle)
             {
+                Log("Confirming repair");
                 ClickSelectYesNo.Using((nint)x).Yes();
                 return true;
             }
@@ -33,6 +36,7 @@ namespace AutoRetainer.Modules.Voyage
             {
                 if (Utils.GenericThrottle)
                 {
+                    Log("Closing repair window (CompanyCraftSupply)");
                     Callback.Fire(addon, true, 5);
                     return true;
                 }
@@ -41,6 +45,7 @@ namespace AutoRetainer.Modules.Voyage
             {
                 if (Utils.GenericThrottle)
                 {
+                    Log("Closing repair window (AirShipPartsMenu)");
                     Callback.Fire(addon2, true, 5);
                     return true;
                 }
@@ -50,27 +55,45 @@ namespace AutoRetainer.Modules.Voyage
 
         internal static bool? TryRepair(int slot)
         {
-            if (TryGetAddonByName<AtkUnitBase>("CompanyCraftSupply", out var addon) && IsAddonReady(addon))
+            var t = $"VoyageScheduler.TryRepair{slot}";
+            if (TryGetAddonByName<AtkUnitBase>("SelectYesno", out var _))
             {
-                if (Utils.GenericThrottle)
-                {
-                    Callback.Fire(addon, true, (int)3, Utils.ZeroAtkValue, (int)slot, Utils.ZeroAtkValue, Utils.ZeroAtkValue, Utils.ZeroAtkValue);
-                    return true;
-                }
+                Log("Found yesno, repair request success");
+                return true;
             }
-            else if (TryGetAddonByName<AtkUnitBase>("AirShipPartsMenu", out var addon2) && IsAddonReady(addon2))
+            if (EzThrottler.Check(t))
             {
-                if (Utils.GenericThrottle)
+                if (TryGetAddonByName<AtkUnitBase>("CompanyCraftSupply", out var addon) && IsAddonReady(addon))
                 {
-                    Callback.Fire(addon2, true, (int)3, Utils.ZeroAtkValue, (int)slot, Utils.ZeroAtkValue, Utils.ZeroAtkValue, Utils.ZeroAtkValue);
-                    return true;
+                    if (Utils.GenericThrottle)
+                    {
+                        Callback.Fire(addon, true, (int)3, Utils.ZeroAtkValue, (int)slot, Utils.ZeroAtkValue, Utils.ZeroAtkValue, Utils.ZeroAtkValue);
+                        EzThrottler.Throttle(t, 1000, true);
+                        Log($"Executing CompanyCraftSupply repair request on slot {slot} ");
+                        return false;
+                    }
                 }
-            }
-            else
-            {
-                Utils.RethrottleGeneric();
+                else if (TryGetAddonByName<AtkUnitBase>("AirShipPartsMenu", out var addon2) && IsAddonReady(addon2))
+                {
+                    if (Utils.GenericThrottle)
+                    {
+                        Callback.Fire(addon2, true, (int)3, Utils.ZeroAtkValue, (int)slot, Utils.ZeroAtkValue, Utils.ZeroAtkValue, Utils.ZeroAtkValue);
+                        EzThrottler.Throttle(t, 1000, true);
+                        Log($"Executing AirShipPartsMenu repair request on slot {slot} ");
+                        return false;
+                    }
+                }
+                else
+                {
+                    Utils.RethrottleGeneric();
+                }
             }
             return false;
+        }
+
+        internal static bool? WaitForYesNoDisappear()
+        {
+            return !TryGetAddonByName<AtkUnitBase>("SelectYesno", out _);
         }
 
         internal static bool? WaitForCutscene()
@@ -115,7 +138,7 @@ namespace AutoRetainer.Modules.Voyage
             if (!Lang.SkipCutsceneStr.Contains(selectStrAddon->AtkUnitBase.UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText.ToString())) return false;
             if (Utils.GenericThrottle && EzThrottler.Throttle("Voyage.CutsceneSkip"))
             {
-                PluginLog.Debug("Selecting cutscene skipping");
+                Log("Selecting cutscene skipping");
                 ClickSelectString.Using(addon).SelectItem(0);
                 return true;
             }
@@ -130,6 +153,7 @@ namespace AutoRetainer.Modules.Voyage
                 {
                     if (Utils.GenericThrottle)
                     {
+                        Log("Targeting workshop CP");
                         Svc.Targets.Target = obj;
                     }
                 }
@@ -137,6 +161,7 @@ namespace AutoRetainer.Modules.Voyage
                 {
                     if (Utils.GenericThrottle)
                     {
+                        Log("Locking on workshop CP");
                         Chat.Instance.SendMessage("/lockon");
                         return true;
                     }
@@ -178,8 +203,9 @@ namespace AutoRetainer.Modules.Voyage
         {
             if (VoyageUtils.TryGetNearestVoyagePanel(out var obj) && Svc.Targets.Target?.Address == obj.Address)
             {
-                if (Utils.GenericThrottle && EzThrottler.Throttle("Voyage.Interact", 1000))
+                if (Utils.GenericThrottle && EzThrottler.Throttle("Voyage.Interact", 2000))
                 {
+                    Log("Interacting with workshop CP");
                     TargetSystem.Instance()->InteractWithObject(obj.Struct(), false);
                     return true;
                 }
@@ -197,6 +223,11 @@ namespace AutoRetainer.Modules.Voyage
             return Utils.TrySelectSpecificEntry(Lang.SubmarineManagement, () => Utils.GenericThrottle && EzThrottler.Throttle("Voyage.SelectManagement", 1000));
         }
 
+        internal static bool? ExitMainPanel()
+        {
+            return Utils.TrySelectSpecificEntry("Cancel", () => Utils.GenericThrottle && EzThrottler.Throttle("Voyage.ExitMainPanel", 1000));
+        }
+
         internal static bool? SelectVesselByName(string name)
         {
             return Utils.TrySelectSpecificEntry((x) => x.StartsWith($"{name}."), () => EzThrottler.Throttle("Voyage.SelectVesselByName", 1000));
@@ -211,10 +242,19 @@ namespace AutoRetainer.Modules.Voyage
         {
             if (TryGetAddonByName<AtkUnitBase>("AirShipExplorationResult", out var addon) && IsAddonReady(addon))
             {
-                if (Utils.GenericThrottle && EzThrottler.Throttle("Voyage.Redeploy"))
+                var button = addon->UldManager.NodeList[3]->GetAsAtkComponentButton();
+                if (!button->IsEnabled)
                 {
-                    Callback.Fire(addon, true, 1);
-                    return true;
+                    EzThrottler.Throttle("Voyage.Redeploy", 500, true);
+                    return false;
+                }
+                else
+                {
+                    if (Utils.GenericThrottle && EzThrottler.Throttle("Voyage.Redeploy"))
+                    {
+                        Callback.Fire(addon, true, 1);
+                        return true;
+                    }
                 }
             }
             else

@@ -1,5 +1,6 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage.Tasks;
+using AutoRetainerAPI.Configuration;
 using Dalamud.Game.ClientState.Conditions;
 using ECommons.Automation;
 using ECommons.ExcelServices.TerritoryEnumeration;
@@ -10,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AutoRetainer.Modules.Voyage
 {
@@ -47,40 +49,13 @@ namespace AutoRetainer.Modules.Voyage
                         {
                             if (C.SubsAutoResend)
                             {
-                                var data = Utils.GetCurrentCharacterData();
-                                var air = data.OfflineAirshipData.Where(x => x.ReturnTime != 0 && x.GetRemainingSeconds() < C.UnsyncCompensation && data.EnabledAirships.Contains(x.Name));
-                                var sub = data.OfflineSubmarineData.Where(x => x.ReturnTime != 0 && x.GetRemainingSeconds() < C.UnsyncCompensation && data.EnabledSubs.Contains(x.Name));
-                                if (air.Any())
+                                if (Data.AnyEnabledVesselsAvailable())
                                 {
-                                    TaskEnterMenu.Enqueue(VoyageType.Airship);
-                                    foreach (var x in air)
-                                    {
-                                        if (C.SubsOnlyFinalize || C.DontReassign || data.FinalizeAirships.Contains(x.Name))
-                                        {
-                                            TaskFinalizeVessel.Enqueue(x.Name);
-                                        }
-                                        else
-                                        {
-                                            TaskRedeployVessel.Enqueue(x.Name, VoyageType.Airship);
-                                        }
-                                    }
-                                    TaskQuitMenu.Enqueue();
+                                    VoyageScheduler.Enabled = true;
                                 }
-                                if (sub.Any())
+                                else
                                 {
-                                    TaskEnterMenu.Enqueue(VoyageType.Submersible);
-                                    foreach (var x in sub)
-                                    {
-                                        if (C.SubsOnlyFinalize || C.DontReassign || data.FinalizeSubs.Contains(x.Name))
-                                        {
-                                            TaskFinalizeVessel.Enqueue(x.Name);
-                                        }
-                                        else
-                                        {
-                                            TaskRedeployVessel.Enqueue(x.Name, VoyageType.Submersible);
-                                        }
-                                    }
-                                    TaskQuitMenu.Enqueue();
+                                    Notify.Warning($"Warning!\nDeployables were not enabled as there are nothing to process yet");
                                 }
                             }
                         }
@@ -93,6 +68,7 @@ namespace AutoRetainer.Modules.Voyage
                 {
                     IsInVoyagePanel = false;
                     Notify.Info("Closed voyage panel");
+                    VoyageScheduler.Enabled = false;
                 }
             }
 
@@ -101,6 +77,84 @@ namespace AutoRetainer.Modules.Voyage
                 if (EzThrottler.Throttle("Voyage.WriteOfflineData", 100))
                 {
                     VoyageUtils.WriteOfflineData();
+                }
+            }
+
+            if (VoyageScheduler.Enabled)
+            {
+                DoWorkshopPanelTick();
+            }
+        }
+
+        static void DoWorkshopPanelTick()
+        {
+            if (!P.TaskManager.IsBusy)
+            {
+                var data = Utils.GetCurrentCharacterData();
+                var panel = VoyageUtils.GetCurrentWorkshopPanelType();
+                if (panel == PanelType.TypeSelector)
+                {
+                    if (data.AnyEnabledVesselsAvailable(VoyageType.Airship))
+                    {
+                        if(EzThrottler.Throttle("DoWorkshopPanelTick.EnqueuePanelSelector", 1000))
+                        {
+                            P.TaskManager.Enqueue(VoyageScheduler.SelectAirshipManagement);
+                        }
+                    }
+                    else if (data.AnyEnabledVesselsAvailable(VoyageType.Submersible))
+                    {
+                        if (EzThrottler.Throttle("DoWorkshopPanelTick.EnqueuePanelSelector", 1000))
+                        {
+                            P.TaskManager.Enqueue(VoyageScheduler.SelectSubManagement);
+                        }
+                    }
+                    else if (!data.AreAnyVesselsReturnInNext(5))
+                    {
+                        if (EzThrottler.Throttle("DoWorkshopPanelTick.EnqueuePanelSelector", 1000))
+                        {
+                            P.TaskManager.Enqueue(VoyageScheduler.ExitMainPanel);
+                        }
+                    }
+                }
+                else if (panel == PanelType.Submersible)
+                {
+                    ScheduleResend(VoyageType.Submersible);
+                }
+                else if (panel == PanelType.Airship)
+                {
+                    ScheduleResend(VoyageType.Airship);
+                }
+            }
+        }
+
+        static void ScheduleResend(VoyageType type)
+        {
+            var next = VoyageUtils.GetNextCompletedVessel(type);
+            if (next != null)
+            {
+                if (C.SubsOnlyFinalize || C.DontReassign || Data.GetFinalizeVesselsData(type).Contains(next))
+                {
+                    if (EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResend", 1000))
+                    {
+                        TaskFinalizeVessel.Enqueue(next, type);
+                    }
+                }
+                else
+                {
+                    if (EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResend", 1000))
+                    {
+                        TaskRedeployVessel.Enqueue(next, type);
+                    }
+                }
+            }
+            else
+            {
+                if (!Data.AreAnyVesselsReturnInNext(1))
+                {
+                    if (EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResendQuitPanel", 1000))
+                    {
+                        TaskQuitMenu.Enqueue();
+                    }
                 }
             }
         }

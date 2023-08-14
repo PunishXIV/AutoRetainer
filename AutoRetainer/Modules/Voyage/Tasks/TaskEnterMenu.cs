@@ -14,11 +14,11 @@ namespace AutoRetainer.Modules.Voyage.Tasks
         {
             if (type == VoyageType.Airship)
             {
-                P.TaskManager.Enqueue(SchedulerVoyage.SelectAirshipManagement);
+                P.TaskManager.Enqueue(VoyageScheduler.SelectAirshipManagement);
             }
             else if (type == VoyageType.Submersible)
             {
-                P.TaskManager.Enqueue(SchedulerVoyage.SelectSubManagement);
+                P.TaskManager.Enqueue(VoyageScheduler.SelectSubManagement);
             }
             else
             {

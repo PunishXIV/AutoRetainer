@@ -6,6 +6,7 @@ using Dalamud.Interface.Style;
 using AutoRetainerAPI.Configuration;
 using AutoRetainerAPI;
 using ECommons.ChatMethods;
+using AutoRetainer.Modules.Voyage;
 
 namespace AutoRetainer.UI;
 
@@ -62,6 +63,12 @@ unsafe internal class ConfigGui : Window
         {
             ImGui.SameLine();
             ImGuiEx.Text(GradientColor.Get(ImGuiColors.DalamudGrey, ImGuiColors.DalamudGrey3, 500), $"Paused");
+        }
+
+        if (VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType) || VoyageScheduler.Enabled)
+        {
+            ImGui.SameLine();
+            ImGui.Checkbox($"Enable Deployables", ref VoyageScheduler.Enabled);
         }
         ImGui.SameLine();
         if(ImGui.Checkbox("Multi", ref MultiMode.Enabled))

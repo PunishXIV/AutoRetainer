@@ -58,8 +58,9 @@ internal static class StatisticsManager
                             ItemId = p.ItemId,
                             IsHQ = p.IsHQ,
                             Timestamp = P.Time,
-                            Amount = amount
-                        });
+                            Amount = amount,
+                            VentureID = P.LastVentureID
+                        }) ;
                         break;
                     }
                 }
