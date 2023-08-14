@@ -190,7 +190,7 @@ internal unsafe static class MultiMode
                         }
                     }
                 }
-                else if (!IsOccupied() && AnyRetainersAvailable())
+                else if (!IsOccupied() && AnyRetainersAvailable() && !P.TaskManager.IsBusy)
                 {
                     //DuoLog.Information($"1234");
                     EnsureCharacterValidity();

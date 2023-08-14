@@ -255,7 +255,7 @@ internal static unsafe class Utils
         {
             if ((x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName, "リテイナーベル"))
             {
-                if (Vector3.Distance(x.Position, Svc.ClientState.LocalPlayer.Position) < GetValidInteractionDistance(x) && x.IsTargetable())
+                if (Vector3.Distance(x.Position, Svc.ClientState.LocalPlayer.Position) < GetValidInteractionDistance(x) && x.IsTargetable)
                 {
                     return x;
                 }
@@ -629,5 +629,25 @@ internal static unsafe class Utils
         {
             return source.Contains($"Retainer: {name}");
         }
+    }
+
+    internal static GameObject GetNearestWorkshopEntrance(out float Distance)
+    {
+        var currentDistance = float.MaxValue;
+        GameObject currentObject = null;
+        foreach (var x in Svc.Objects)
+        {
+            if (x.IsTargetable && x.Name.ToString().EqualsIgnoreCaseAny("Entrance to Additional Chambers"))
+            {
+                var distance = Vector3.Distance(Svc.ClientState.LocalPlayer.Position, x.Position);
+                if (distance < currentDistance)
+                {
+                    currentDistance = distance;
+                    currentObject = x;
+                }
+            }
+        }
+        Distance = currentDistance;
+        return currentObject;
     }
 }

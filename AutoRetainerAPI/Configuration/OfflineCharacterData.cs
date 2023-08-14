@@ -33,6 +33,8 @@ public class OfflineCharacterData
     public List<OfflineVesselData> OfflineSubmarineData = new();
     public HashSet<string> EnabledAirships = new();
     public HashSet<string> EnabledSubs = new();
+    public HashSet<string> FinalizeAirships = new();
+    public HashSet<string> FinalizeSubs = new();
 
     public string Identity => $"{CID}";
     public bool ShouldSerializeIdentity() => false;

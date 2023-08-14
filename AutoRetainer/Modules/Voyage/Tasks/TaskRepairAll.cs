@@ -1,5 +1,6 @@
 ﻿using ECommons.Throttlers;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,17 +10,15 @@ namespace AutoRetainer.Modules.Voyage.Tasks
 {
     internal unsafe static class TaskRepairAll
     {
-        internal static void EnqueueImmediate()
+        internal static void EnqueueImmediate(List<int> indexes)
         {
             P.TaskManager.EnqueueImmediate(() => Utils.TrySelectSpecificEntry(new string[] { "Repair submersible components" , "Repair airship components"}, () => EzThrottler.Throttle("RepairAllSelectRepair")), "RepairAllSelectRepair");
-            P.TaskManager.EnqueueImmediate(() => SchedulerVoyage.TryRepair(0), "Repair 0");
-            P.TaskManager.EnqueueImmediate(SchedulerVoyage.ConfirmRepair, 1000, false);
-            P.TaskManager.EnqueueImmediate(() => SchedulerVoyage.TryRepair(1), "Repair 1");
-            P.TaskManager.EnqueueImmediate(SchedulerVoyage.ConfirmRepair, 1000, false);
-            P.TaskManager.EnqueueImmediate(() => SchedulerVoyage.TryRepair(2), "Repair 2");
-            P.TaskManager.EnqueueImmediate(SchedulerVoyage.ConfirmRepair, 1000, false);
-            P.TaskManager.EnqueueImmediate(() => SchedulerVoyage.TryRepair(3), "Repair 3");
-            P.TaskManager.EnqueueImmediate(SchedulerVoyage.ConfirmRepair, 1000, false);
+            foreach(int index in indexes)
+            {
+                if(index < 0 || index > 3) throw new ArgumentOutOfRangeException(nameof(index));
+                P.TaskManager.EnqueueImmediate(() => SchedulerVoyage.TryRepair(index), $"Repair {index}");
+                P.TaskManager.EnqueueImmediate(SchedulerVoyage.ConfirmRepair, 5000, false);
+            }
             P.TaskManager.EnqueueImmediate(SchedulerVoyage.CloseRepair);
         }
     }

@@ -3,6 +3,7 @@ using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainerAPI.Configuration;
 using ECommons.GameHelpers;
+using PunishLib.ImGuiMethods;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,41 +19,79 @@ namespace AutoRetainer.UI
             foreach (var data in C.OfflineData.Where(x => x.OfflineAirshipData.Count + x.OfflineSubmarineData.Count > 0).OrderBy(x => x.CID == Player.CID ? 1 : 0))
             {
                 ImGui.PushID($"Player{data.CID}");
-                if (ImGui.CollapsingHeader(Censor.Character(data.Name, data.World)))
+                if (ImGuiEx.IconButton(FontAwesomeIcon.DoorOpen))
                 {
-                    foreach (var x in data.OfflineAirshipData)
+                    if (MultiMode.Active)
                     {
-                        ImGuiEx.CollectionCheckbox($"Airship {x.Name}", x.Name, data.EnabledAirships);
-                        string rightText;
-                        if (x.ReturnTime != 0)
+                        foreach (var z in C.OfflineData)
                         {
-                            rightText = x.GetRemainingSeconds() > 0 ? $"returns in {x.GetRemainingSeconds()} seconds" : "Exploration completed";
+                            z.Preferred = false;
                         }
-                        else
-                        {
-                            rightText = $"Not occupied";
-                        }
-                        ImGui.SameLine();
-                        ImGui.SetCursorPosX(ImGui.GetContentRegionMax().X - ImGui.CalcTextSize(rightText).X);
-                        ImGuiEx.TextV($"{rightText}");
-                        ImGui.Separator();
+                        Notify.Warning("Preferred character has been reset");
                     }
-                    foreach (var x in data.OfflineSubmarineData)
+                    if (MultiMode.Relog(data, out var error))
                     {
-                        ImGuiEx.CollectionCheckbox($"Submarine {x.Name}", x.Name, data.EnabledSubs);
-                        var rightText = "";
-                        if (x.ReturnTime != 0)
+                        Notify.Success("Relogging...");
+                    }
+                    else
+                    {
+                        Notify.Error(error);
+                    }
+                }
+                ImGui.SameLine(0, 3);
+                if (ImGuiEx.CollapsingHeader(Censor.Character(data.Name, data.World), data.AnyEnabledVesselsAvailable()?ImGuiColors.ParsedGreen:null))
+                {
+                    if (data.OfflineAirshipData.Any())
+                    {
+                        ImGuiGroup.BeginGroupBox("Airships");
+                        foreach (var x in data.OfflineAirshipData)
                         {
-                            rightText = x.GetRemainingSeconds() > 0 ? $"returns in {x.GetRemainingSeconds()} seconds" : "Voyage completed";
+                            ImGui.PushFont(UiBuilder.IconFont);
+                            ImGuiEx.CollectionButtonCheckbox($"\uf13d##{x.Name}", x.Name, data.FinalizeAirships, EColor.Green);
+                            ImGui.PopFont();
+                            ImGui.SameLine(0, 3);
+                            ImGuiEx.CollectionCheckbox($"Airship {x.Name}", x.Name, data.EnabledAirships);
+                            string rightText;
+                            if (x.ReturnTime != 0)
+                            {
+                                rightText = x.GetRemainingSeconds() > 0 ? $"Returns in {VoyageUtils.Seconds2Time(x.GetRemainingSeconds())}" : "Exploration completed";
+                            }
+                            else
+                            {
+                                rightText = $"Not occupied";
+                            }
+                            ImGui.SameLine();
+                            ImGui.SetCursorPosX(ImGui.GetContentRegionMax().X - ImGui.CalcTextSize(rightText).X - 20);
+                            ImGuiEx.TextV($"{rightText}");
+                            if(x.Name != data.OfflineAirshipData.Last().Name) ImGui.Separator();
                         }
-                        else
+                        ImGuiGroup.EndGroupBox();
+                    }
+                    if (data.OfflineSubmarineData.Any())
+                    {
+                        ImGuiGroup.BeginGroupBox("Submarines");
+                        foreach (var x in data.OfflineSubmarineData)
                         {
-                            rightText = $"Not occupied";
+                            ImGui.PushFont(UiBuilder.IconFont);
+                            ImGuiEx.CollectionButtonCheckbox($"\uf13d##{x.Name}", x.Name, data.FinalizeSubs, EColor.Green);
+                            ImGui.PopFont();
+                            ImGui.SameLine(0, 3);
+                            ImGuiEx.CollectionCheckbox($"Submarine {x.Name}", x.Name, data.EnabledSubs);
+                            var rightText = "";
+                            if (x.ReturnTime != 0)
+                            {
+                                rightText = x.GetRemainingSeconds() > 0 ? $"Returns in {VoyageUtils.Seconds2Time(x.GetRemainingSeconds())}" : "Voyage completed";
+                            }
+                            else
+                            {
+                                rightText = $"Not occupied";
+                            }
+                            ImGui.SameLine();
+                            ImGui.SetCursorPosX(ImGui.GetContentRegionMax().X - ImGui.CalcTextSize(rightText).X - 20);
+                            ImGuiEx.TextV($"{rightText}");
+                            if (x.Name != data.OfflineSubmarineData.Last().Name) ImGui.Separator();
                         }
-                        ImGui.SameLine();
-                        ImGui.SetCursorPosX(ImGui.GetContentRegionMax().X - ImGui.CalcTextSize(rightText).X);
-                        ImGuiEx.TextV($"{rightText}");
-                        ImGui.Separator();
+                        ImGuiGroup.EndGroupBox();
                     }
                 }
                 ImGui.PopID();
@@ -62,6 +101,7 @@ namespace AutoRetainer.UI
                 ImGui.Checkbox($"Resend airships and submarines on voyage CP access", ref C.SubsAutoResend);
                 ImGui.Checkbox($"Only finalize reports", ref C.SubsOnlyFinalize);
                 ImGui.Checkbox($"When resending, auto-repair vessels", ref C.SubsAutoRepair);
+                //ImGui.Checkbox($"On house enter task, enter workshop if possible", ref C.EnterWorkshop);
             }
 
             if (ImGui.CollapsingHeader("Debug"))
@@ -76,20 +116,32 @@ namespace AutoRetainer.UI
                 if (ImGui.Button("Repair 3")) SchedulerVoyage.TryRepair(2);
                 if (ImGui.Button("Repair 4")) SchedulerVoyage.TryRepair(3);
                 if (ImGui.Button("Close repair")) SchedulerVoyage.CloseRepair();
-                if (ImGui.Button("Trigger auto repair")) TaskRepairAll.EnqueueImmediate();
+                //if (ImGui.Button("Trigger auto repair")) TaskRepairAll.EnqueueImmediate();
                 ImGui.InputText("data1", ref data1, 50);
                 ImGuiEx.EnumCombo("data2", ref data2);
                 if (ImGui.Button("IsVesselNeedsRepair"))
                 {
                     try
                     {
-                        DuoLog.Information($"{VoyageUtils.IsVesselNeedsRepair(data1, data2)}");
+                        DuoLog.Information($"{VoyageUtils.IsVesselNeedsRepair(data1, data2, out var log).Print()}\n{log.Join("\n")}");
                     }
                     catch(Exception e)
                     {
                         e.LogDuo();
                     }
                 }
+                if (ImGui.Button("GetSubmarineIndexByName"))
+                {
+                    try
+                    {
+                        DuoLog.Information($"{VoyageUtils.GetSubmarineIndexByName(data1)}");
+                    }
+                    catch (Exception e)
+                    {
+                        e.LogDuo();
+                    }
+                }
+                ImGuiEx.Text($"Bell: {Utils.GetReachableRetainerBell()}");
             }
         }
         static string data1 = "";

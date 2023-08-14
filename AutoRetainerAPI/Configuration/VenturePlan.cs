@@ -29,5 +29,7 @@ namespace AutoRetainerAPI.Configuration
                 return ret;
             }
         }
+
+        public bool ShouldSerializeListUnwrapped() => false;
     }
 }

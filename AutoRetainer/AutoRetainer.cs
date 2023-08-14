@@ -185,7 +185,17 @@ public unsafe class AutoRetainer : IDalamudPlugin
             var target = C.OfflineData.Where(x => $"{x.Name}@{x.World}" == arguments[6..]).FirstOrDefault();
             if (target != null)
             {
-                if (!AutoLogin.Instance.IsRunning) AutoLogin.Instance.SwapCharacter(target.WorldOverride ?? target.World, target.Name, target.ServiceAccount);
+                if (!AutoLogin.Instance.IsRunning)
+                {
+                    if (Svc.ClientState.IsLoggedIn)
+                    {
+                        AutoLogin.Instance.SwapCharacter(target.WorldOverride ?? target.World, target.Name, target.ServiceAccount);
+                    }
+                    else
+                    {
+                        AutoLogin.Instance.Login(target.WorldOverride ?? target.World, target.Name, target.ServiceAccount);
+                    }
+                }
             }
             else
             {
@@ -230,6 +240,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         Artisan.ArtisanTick();
         FPSManager.Tick();
         PriorityManager.Tick();
+        TextAdvanceManager.Tick();
         //if(C.RetryItemSearch) RetryItemSearch.Tick();
         if (SchedulerMain.PluginEnabled || MultiMode.Enabled || TaskManager.IsBusy)
         {

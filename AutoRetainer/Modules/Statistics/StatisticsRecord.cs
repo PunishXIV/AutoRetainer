@@ -22,4 +22,5 @@ public class StatisticsRecord
     [JsonProperty("H")][DefaultValue(0)] public int IsHQInt = 0;
     [JsonProperty("T")] public long Timestamp;
     [JsonProperty("A")][DefaultValue(1)] public uint Amount = 1;
+    [JsonProperty("V")][DefaultValue(0)] public uint VentureID = 0;
 }

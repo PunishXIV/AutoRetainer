@@ -101,7 +101,7 @@ unsafe internal class ConfigGui : Window
 
         ImGuiEx.EzTabBar("tabbar",
                 ("Retainers", MultiModeUI.Draw, null, true),
-                ("Workshop", WorkshopUI.Draw, null, true),
+                ("Deployables", WorkshopUI.Draw, null, true),
                 (C.RecordStats ? "Statistics" : null, StatisticsUI.Draw, null, true),
                 ("Settings", SettingsMain.Draw, null, true),
                 (C.Expert?"Expert":null, Expert.Draw, null, true),

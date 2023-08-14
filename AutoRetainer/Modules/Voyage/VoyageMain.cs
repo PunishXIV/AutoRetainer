@@ -50,12 +50,12 @@ namespace AutoRetainer.Modules.Voyage
                                 var data = Utils.GetCurrentCharacterData();
                                 var air = data.OfflineAirshipData.Where(x => x.ReturnTime != 0 && x.GetRemainingSeconds() < C.UnsyncCompensation && data.EnabledAirships.Contains(x.Name));
                                 var sub = data.OfflineSubmarineData.Where(x => x.ReturnTime != 0 && x.GetRemainingSeconds() < C.UnsyncCompensation && data.EnabledSubs.Contains(x.Name));
-                                if (air.Count() > 0)
+                                if (air.Any())
                                 {
                                     TaskEnterMenu.Enqueue(VoyageType.Airship);
                                     foreach (var x in air)
                                     {
-                                        if (C.SubsOnlyFinalize || C.DontReassign)
+                                        if (C.SubsOnlyFinalize || C.DontReassign || data.FinalizeAirships.Contains(x.Name))
                                         {
                                             TaskFinalizeVessel.Enqueue(x.Name);
                                         }
@@ -66,12 +66,12 @@ namespace AutoRetainer.Modules.Voyage
                                     }
                                     TaskQuitMenu.Enqueue();
                                 }
-                                if (sub.Count() > 0)
+                                if (sub.Any())
                                 {
                                     TaskEnterMenu.Enqueue(VoyageType.Submersible);
                                     foreach (var x in sub)
                                     {
-                                        if (C.SubsOnlyFinalize || C.DontReassign)
+                                        if (C.SubsOnlyFinalize || C.DontReassign || data.FinalizeSubs.Contains(x.Name))
                                         {
                                             TaskFinalizeVessel.Enqueue(x.Name);
                                         }

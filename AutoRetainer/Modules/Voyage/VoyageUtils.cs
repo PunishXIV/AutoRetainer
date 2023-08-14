@@ -3,6 +3,7 @@ using AutoRetainerAPI.Configuration;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Memory;
+using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
@@ -19,6 +20,7 @@ namespace AutoRetainer.Modules.Voyage
     internal unsafe static class VoyageUtils
     {
         internal static string[] PanelName = new string[] { "Voyage Control Panel" };
+        internal static uint[] Workshops = new uint[] { Houses.Company_Workshop_Empyreum, Houses.Company_Workshop_The_Goblet, Houses.Company_Workshop_Mist, Houses.Company_Workshop_Shirogane, Houses.Company_Workshop_The_Lavender_Beds };
 
 
         internal static bool IsVoyagePanel(this GameObject obj)
@@ -111,34 +113,50 @@ namespace AutoRetainer.Modules.Voyage
             return null;
         }
 
-        internal static bool GetAirshipNeedsRepair(int index)
+        internal static List<int> GetAirshipNeedsRepair(int num, out List<string> log)
         {
-            for (var i = 30 + index * 5; i < 4; i++)
+            log = new();
+            var ret = new List<int>();
+            var begin = 30 + num * 5;
+            for (var i = 0; i < 4; i++)
             {
-                var slot = InventoryManager.Instance()->GetInventoryContainer(InventoryType.HousingInteriorPlacedItems1)->GetInventorySlot(i);
+                var index = begin + i;
+                var slot = InventoryManager.Instance()->GetInventoryContainer(InventoryType.HousingInteriorPlacedItems1)->GetInventorySlot(index);
+                log.Add($"index: {index} id: {slot->ItemID}, cond: {slot->Condition}");
                 if (slot->ItemID == 0)
                 {
-                    PluginLog.Warning($"Item id for airship component was 0 ({i})");
-                    return false;
+                    PluginLog.Warning($"Item id for airship component was 0 ({index})");
+                    continue;
                 }
-                if (slot->Condition == 0) return true;
+                if (slot->Condition == 0)
+                {
+                    ret.Add(i);
+                }
             }
-            return false;
+            return ret;
         }
 
-        internal static bool GetSubmarineNeedsRepair(int index)
+        internal static List<int> GetSubmarineNeedsRepair(int num, out List<string> log)
         {
-            for (var i = index * 5; i < 4; i++)
+            log = new();
+            var ret = new List<int>();
+            var begin = num * 5;
+            for (var i = 0; i < 4; i++)
             {
-                var slot = InventoryManager.Instance()->GetInventoryContainer(InventoryType.HousingInteriorPlacedItems2)->GetInventorySlot(i);
+                var index = begin + i;
+                var slot = InventoryManager.Instance()->GetInventoryContainer(InventoryType.HousingInteriorPlacedItems2)->GetInventorySlot(index);
+                log.Add($"index: {index} id: {slot->ItemID}, cond: {slot->Condition}");
                 if (slot->ItemID == 0)
                 {
-                    PluginLog.Warning($"Item id for submarine component was 0 ({i})");
-                    return false;
+                    PluginLog.Warning($"Item id for submarine component was 0 ({index})");
+                    continue;
                 }
-                if (slot->Condition == 0) return true;
+                if (slot->Condition == 0)
+                {
+                    ret.Add(i);
+                }
             }
-            return false;
+            return ret;
         }
 
         internal static int GetAirshipIndexByName(string name)
@@ -183,11 +201,30 @@ namespace AutoRetainer.Modules.Voyage
             throw new Exception($"Could not retrieve submarine's index: {name}");
         }
 
-        internal static bool IsVesselNeedsRepair(string name, VoyageType type)
+        internal static List<int> IsVesselNeedsRepair(string name, VoyageType type, out List<string> log)
         {
-            if (type == VoyageType.Airship) return GetAirshipNeedsRepair(GetAirshipIndexByName(name));
-            if (type == VoyageType.Submersible) return GetSubmarineNeedsRepair(GetSubmarineIndexByName(name));
+            if (type == VoyageType.Airship) return GetAirshipNeedsRepair(GetAirshipIndexByName(name), out log);
+            if (type == VoyageType.Submersible) return GetSubmarineNeedsRepair(GetSubmarineIndexByName(name), out log);
             throw new ArgumentOutOfRangeException(nameof(type));
+        }
+
+        internal static string Seconds2Time(long seconds)
+        {
+            var t = TimeSpan.FromSeconds(seconds);
+            var dlm = ":";
+            if (t.Days > 0)
+            {
+                return $"{t.Days} days {t.Hours:D2}{dlm}{t.Minutes:D2}{dlm}{t.Seconds:D2}";
+            }
+            else
+            {
+                return $"{t.Hours:D2}{dlm}{t.Minutes:D2}{dlm}{t.Seconds:D2}";
+            }
+        }
+        
+        internal static bool AnyEnabledVesselsAvailable(this OfflineCharacterData data)
+        {
+            return data.OfflineAirshipData.Any(x => data.EnabledAirships.Contains(x.Name) && x.ReturnTime != 0 && x.GetRemainingSeconds() == 0) || data.OfflineSubmarineData.Any(x => data.EnabledSubs.Contains(x.Name) && x.ReturnTime != 0 && x.GetRemainingSeconds() < C.UnsyncCompensation);
         }
     }
 }
