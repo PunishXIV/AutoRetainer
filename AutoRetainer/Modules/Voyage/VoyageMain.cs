@@ -149,7 +149,7 @@ namespace AutoRetainer.Modules.Voyage
             }
             else
             {
-                if (!Data.AreAnyVesselsReturnInNext(1))
+                if (!Data.AreAnyVesselsReturnInNext(type, 1))
                 {
                     if (EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResendQuitPanel", 1000))
                     {

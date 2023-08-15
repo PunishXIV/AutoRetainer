@@ -399,7 +399,6 @@ internal unsafe static class MultiModeUI
             ImGuiEx.Text($"IsCurrentCharacterDone: {MultiMode.IsCurrentCharacterDone()}");
             ImGuiEx.Text($"NextInteraction: {Math.Max(0, MultiMode.NextInteractionAt - Environment.TickCount64)}");
             ImGuiEx.Text($"EnsureCharacterValidity: {MultiMode.EnsureCharacterValidity(true)}");
-            ImGuiEx.Text($"GetNearbyBell: {MultiMode.GetNearbyBell()}");
             ImGuiEx.Text($"IsInteractionAllowed: {MultiMode.IsInteractionAllowed()}");
             ImGuiEx.Text($"GetPreferredCharacter: {MultiMode.GetPreferredCharacter()}");
             ImGuiEx.Text($"IsAllRetainersHaveMoreThan15Mins: {MultiMode.IsAllRetainersHaveMoreThan15Mins()}");

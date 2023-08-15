@@ -12,7 +12,7 @@ internal unsafe static class PlayerWorldHandlers
     {
         if (!IsOccupied())
         {
-            var x = Utils.GetReachableRetainerBell();
+            var x = Utils.GetReachableRetainerBell(false);
             if(x != null)
             {
                 if (Utils.GenericThrottle)

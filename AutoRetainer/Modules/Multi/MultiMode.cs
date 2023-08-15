@@ -1,4 +1,5 @@
-﻿using AutoRetainer.Scheduler.Tasks;
+﻿using AutoRetainer.Modules.Voyage;
+using AutoRetainer.Scheduler.Tasks;
 using AutoRetainer.UI;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game.ClientState.Conditions;
@@ -17,6 +18,7 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using static AutoRetainer.Modules.OfflineDataManager;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AutoRetainer.Modules.Multi;
 
@@ -159,6 +161,7 @@ internal unsafe static class MultiMode
                         P.DebugLog($"Enqueueing relog");
                         BlockInteraction(20);
                         EnsureCharacterValidity();
+                        RestoreValidityInWorkshop();
                         if (!Relog(next, out var error))
                         {
                             DuoLog.Error(error);
@@ -177,6 +180,7 @@ internal unsafe static class MultiMode
                             P.DebugLog($"Enqueueing logoff");
                             BlockInteraction(20);
                             EnsureCharacterValidity();
+                            RestoreValidityInWorkshop();
                             if (!Relog(null, out var error))
                             {
                                 DuoLog.Error(error);
@@ -194,6 +198,7 @@ internal unsafe static class MultiMode
                 {
                     //DuoLog.Information($"1234");
                     EnsureCharacterValidity();
+                    RestoreValidityInWorkshop();
                     if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data) && data.Enabled)
                     {
                         P.DebugLog($"Enqueueing interaction with bell");
@@ -206,6 +211,25 @@ internal unsafe static class MultiMode
                 }
             }
         }
+    }
+
+    internal static bool CheckInventoryValidity() => Svc.ClientState.LocalPlayer.HomeWorld.Id == Svc.ClientState.LocalPlayer.CurrentWorld.Id && Utils.GetVenturesAmount() >= Data.GetNeededVentureAmount() && Utils.IsInventoryFree();
+    internal static void RestoreValidityInWorkshop()
+    {
+        return;
+        if (VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType))
+        {
+            if (!ProperOnLogin.PlayerPresent) return;
+            if (Data != null)
+            {
+                if (CheckInventoryValidity())
+                {
+                    Data.Enabled = true;
+                    return;
+                }
+            }
+        }
+        return;
     }
 
     internal static IEnumerable<OfflineCharacterData> GetEnabledOfflineData()
@@ -369,7 +393,7 @@ internal unsafe static class MultiMode
         if (!ProperOnLogin.PlayerPresent) return false;
         if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
         {
-            if (Svc.ClientState.LocalPlayer.HomeWorld.Id == Svc.ClientState.LocalPlayer.CurrentWorld.Id && Utils.GetVenturesAmount() >= data.GetNeededVentureAmount() && Utils.IsInventoryFree() && GetNearbyBell() != null)
+            if (Svc.ClientState.LocalPlayer.HomeWorld.Id == Svc.ClientState.LocalPlayer.CurrentWorld.Id && Utils.GetVenturesAmount() >= data.GetNeededVentureAmount() && Utils.IsInventoryFree() && Utils.GetReachableRetainerBell(true) != null)
             {
                 return true;
             }
@@ -381,7 +405,7 @@ internal unsafe static class MultiMode
         return false;
     }
 
-    internal static GameObject GetNearbyBell()
+    /*internal static GameObject GetNearbyBell()
     {
         if (!ProperOnLogin.PlayerPresent) return null;
         foreach (var x in Svc.Objects)
@@ -395,11 +419,10 @@ internal unsafe static class MultiMode
             }
         }
         return null;
-    }
+    }*/
 
     internal static int GetNeededVentureAmount(this OfflineCharacterData data)
     {
         return data.GetEnabledRetainers().Length * 2;
     }
-
 }

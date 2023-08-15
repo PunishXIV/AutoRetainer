@@ -1,4 +1,5 @@
-﻿using ECommons.Throttlers;
+﻿using AutoRetainer.Internal;
+using ECommons.Throttlers;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
@@ -10,8 +11,9 @@ namespace AutoRetainer.Modules.Voyage.Tasks
 {
     internal unsafe static class TaskRepairAll
     {
-        internal static void EnqueueImmediate(List<int> indexes)
+        internal static void EnqueueImmediate(List<int> indexes, string vesselName, VoyageType type)
         {
+            var vesselIndex = VoyageUtils.GetVesselIndexByName(vesselName, type);
             P.TaskManager.EnqueueImmediate(() => Utils.TrySelectSpecificEntry(new string[] { "Repair submersible components" , "Repair airship components"}, () => EzThrottler.Throttle("RepairAllSelectRepair")), "RepairAllSelectRepair");
             foreach(int index in indexes)
             {
@@ -19,6 +21,7 @@ namespace AutoRetainer.Modules.Voyage.Tasks
                 P.TaskManager.EnqueueImmediate(() => VoyageScheduler.TryRepair(index), $"Repair {index}");
                 P.TaskManager.EnqueueImmediate(VoyageScheduler.ConfirmRepair, 5000, false);
                 P.TaskManager.EnqueueImmediate(VoyageScheduler.WaitForYesNoDisappear, 5000, false);
+                P.TaskManager.EnqueueImmediate(() => VoyageUtils.GetVesselComponent(vesselIndex, type, index)->Condition > 0, "WaitUntilRepairComplete");
             }
             P.TaskManager.EnqueueImmediate(VoyageScheduler.CloseRepair);
         }

@@ -280,7 +280,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         {
             if(!IPC.Suppressed && !IsOccupied() && !C.OldRetainerSense && !TaskManager.IsBusy && !Utils.MultiModeOrArtisan && !Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BoundByDuty] && Utils.IsAnyRetainersCompletedVenture())
             {
-                var bell = Utils.GetReachableRetainerBell();
+                var bell = Utils.GetReachableRetainerBell(true);
                 if (bell == null || LastPosition != Svc.ClientState.LocalPlayer.Position)
                 {
                     LastPosition = Svc.ClientState.LocalPlayer.Position;

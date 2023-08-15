@@ -161,19 +161,20 @@ namespace AutoRetainer.Modules.Voyage
             return null;
         }
 
-        internal static List<int> GetAirshipNeedsRepair(int num, out List<string> log)
+        internal static List<int> GetIsVesselNeedsRepair(string name, VoyageType type, out List<string> log) => GetIsVesselNeedsRepair(GetVesselIndexByName(name, type), type, out log);
+
+        internal static List<int> GetIsVesselNeedsRepair(int num, VoyageType type, out List<string> log)
         {
             log = new();
             var ret = new List<int>();
-            var begin = 30 + num * 5;
+            
             for (var i = 0; i < 4; i++)
             {
-                var index = begin + i;
-                var slot = InventoryManager.Instance()->GetInventoryContainer(InventoryType.HousingInteriorPlacedItems1)->GetInventorySlot(index);
-                log.Add($"index: {index} id: {slot->ItemID}, cond: {slot->Condition}");
+                var slot = GetVesselComponent(num, type, i);
+                log.Add($"index: {i}, id: {slot->ItemID}, cond: {slot->Condition}");
                 if (slot->ItemID == 0)
                 {
-                    PluginLog.Warning($"Item id for airship component was 0 ({index})");
+                    PluginLog.Warning($"Item id for airship component was 0 ({i})");
                     continue;
                 }
                 if (slot->Condition == 0)
@@ -184,76 +185,69 @@ namespace AutoRetainer.Modules.Voyage
             return ret;
         }
 
-        internal static List<int> GetSubmarineNeedsRepair(int num, out List<string> log)
+        internal static InventoryItem* GetVesselComponent(int vesselIndex, VoyageType type, int slotIndex)
         {
-            log = new();
-            var ret = new List<int>();
-            var begin = num * 5;
-            for (var i = 0; i < 4; i++)
+            int begin;
+            InventoryType itype;
+            if (type == VoyageType.Airship)
             {
-                var index = begin + i;
-                var slot = InventoryManager.Instance()->GetInventoryContainer(InventoryType.HousingInteriorPlacedItems2)->GetInventorySlot(index);
-                log.Add($"index: {index} id: {slot->ItemID}, cond: {slot->Condition}");
-                if (slot->ItemID == 0)
-                {
-                    PluginLog.Warning($"Item id for submarine component was 0 ({index})");
-                    continue;
-                }
-                if (slot->Condition == 0)
-                {
-                    ret.Add(i);
-                }
+                begin = 30 + vesselIndex * 5;
+                itype = InventoryType.HousingInteriorPlacedItems1;
             }
-            return ret;
+            else if (type == VoyageType.Submersible)
+            {
+                begin = vesselIndex * 5;
+                itype = InventoryType.HousingInteriorPlacedItems2;
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(type));
+            }
+            var index = begin + slotIndex;
+            var slot = InventoryManager.Instance()->GetInventoryContainer(itype)->GetInventorySlot(index);
+            return slot;
         }
 
-        internal static int GetAirshipIndexByName(string name)
+        internal static int GetVesselIndexByName(string name, VoyageType type)
         {
+            var index = 0;
             var h = HousingManager.Instance()->WorkshopTerritory;
             if (h != null)
             {
-                var index = 0;
-                foreach (var x in h->Airship.DataListSpan)
+                if (type == VoyageType.Airship)
                 {
-                    if (MemoryHelper.ReadStringNullTerminated((nint)x.Name) == name)
+                    foreach (var x in h->Airship.DataListSpan)
                     {
-                        return index;
+                        if (MemoryHelper.ReadStringNullTerminated((nint)x.Name) == name)
+                        {
+                            return index;
+                        }
+                        else
+                        {
+                            index++;
+                        }
                     }
-                    else
+                }
+                else if (type == VoyageType.Submersible)
+                {
+                    foreach (var x in h->Submersible.DataListSpan)
                     {
-                        index++;
+                        if (MemoryHelper.ReadStringNullTerminated((nint)x.Name) == name)
+                        {
+                            return index;
+                        }
+                        else
+                        {
+                            index++;
+                        }
                     }
+                }
+                else
+                {
+                    throw new ArgumentOutOfRangeException(nameof(type));
                 }
             }
             throw new Exception($"Could not retrieve airship's index: {name}");
-        }
-
-        internal static int GetSubmarineIndexByName(string name)
-        {
-            var h = HousingManager.Instance()->WorkshopTerritory;
-            if (h != null)
-            {
-                var index = 0;
-                foreach (var x in h->Submersible.DataListSpan)
-                {
-                    if (MemoryHelper.ReadStringNullTerminated((nint)x.Name) == name)
-                    {
-                        return index;
-                    }
-                    else
-                    {
-                        index++;
-                    }
-                }
-            }
-            throw new Exception($"Could not retrieve submarine's index: {name}");
-        }
-
-        internal static List<int> IsVesselNeedsRepair(string name, VoyageType type, out List<string> log)
-        {
-            if (type == VoyageType.Airship) return GetAirshipNeedsRepair(GetAirshipIndexByName(name), out log);
-            if (type == VoyageType.Submersible) return GetSubmarineNeedsRepair(GetSubmarineIndexByName(name), out log);
-            throw new ArgumentOutOfRangeException(nameof(type));
         }
 
         internal static string Seconds2Time(long seconds)

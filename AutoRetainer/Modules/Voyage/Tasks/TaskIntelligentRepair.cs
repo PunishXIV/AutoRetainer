@@ -14,10 +14,10 @@ namespace AutoRetainer.Modules.Voyage.Tasks
         {
             P.TaskManager.Enqueue(() =>
             {
-                var rep = VoyageUtils.IsVesselNeedsRepair(name, type, out var log);
+                var rep = VoyageUtils.GetIsVesselNeedsRepair(name, type, out var log);
                 if (C.SubsAutoRepair && rep.Count > 0)
                 {
-                    TaskRepairAll.EnqueueImmediate(rep);
+                    TaskRepairAll.EnqueueImmediate(rep, name, type);
                 }
                 PluginLog.Debug($"Repair check log: {log.Join(", ")}");
             }, "IntelligentRepairTask");

@@ -119,7 +119,7 @@ internal class MultiModeOverlay : Window
         }
         else if (SchedulerMain.PluginEnabled)
         {
-            if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", Utils.GetReachableRetainerBell() == null ? "bellcrossed.png" : "bell.png"), out var t))
+            if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", Utils.GetReachableRetainerBell(false) == null ? "bellcrossed.png" : "bell.png"), out var t))
             {
                 ImGui.Image(t.ImGuiHandle, new(128, 128));
                 if (ImGui.IsItemHovered())

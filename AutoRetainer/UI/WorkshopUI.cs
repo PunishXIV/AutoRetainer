@@ -1,6 +1,7 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Modules.Voyage.Tasks;
+using AutoRetainer.Scheduler.Tasks;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Utility;
 using ECommons.GameHelpers;
@@ -104,7 +105,7 @@ namespace AutoRetainer.UI
                 ImGui.Checkbox($"Only finalize reports", ref C.SubsOnlyFinalize);
                 ImGui.Checkbox($"When resending, auto-repair vessels", ref C.SubsAutoRepair);
                 ImGui.Checkbox($"Even when only finalizing, repair vessels", ref C.SubsRepairFinalize);
-                //ImGui.Checkbox($"On house enter task, enter workshop if possible", ref C.EnterWorkshop);
+                ImGui.Checkbox($"On house enter task, enter workshop if possible", ref C.EnterWorkshop);
             }
 
             if (ImGui.CollapsingHeader("Public debug"))
@@ -163,7 +164,7 @@ namespace AutoRetainer.UI
                 {
                     try
                     {
-                        DuoLog.Information($"{VoyageUtils.IsVesselNeedsRepair(data1, data2, out var log).Print()}\n{log.Join("\n")}");
+                        DuoLog.Information($"{VoyageUtils.GetIsVesselNeedsRepair(data1, data2, out var log).Print()}\n{log.Join("\n")}");
                     }
                     catch (Exception e)
                     {
@@ -174,14 +175,15 @@ namespace AutoRetainer.UI
                 {
                     try
                     {
-                        DuoLog.Information($"{VoyageUtils.GetSubmarineIndexByName(data1)}");
+                        DuoLog.Information($"{VoyageUtils.GetVesselIndexByName(data1, VoyageType.Submersible)}");
                     }
                     catch (Exception e)
                     {
                         e.LogDuo();
                     }
                 }
-                ImGuiEx.Text($"Bell: {Utils.GetReachableRetainerBell()}");
+                ImGuiEx.Text($"Bell: {Utils.GetReachableRetainerBell(false)}");
+                ImGuiEx.Text($"Bell(true): {Utils.GetReachableRetainerBell(true)}");
                 ImGuiEx.TextWrapped($"Enabled subs: {VoyageUtils.GetVesselData(Data, VoyageType.Submersible).Select(x => $"{x.Name}, {x.GetRemainingSeconds()}").Print()}");
                 ImGuiEx.Text($"AnyEnabledVesselsAvailable: {VoyageUtils.AnyEnabledVesselsAvailable(Data)}");
                 ImGuiEx.Text($"Panel type: {VoyageUtils.GetCurrentWorkshopPanelType()}");
@@ -189,6 +191,10 @@ namespace AutoRetainer.UI
                 {
                     var button = addon->UldManager.NodeList[3]->GetAsAtkComponentButton();
                     ImGuiEx.Text($"Button: {button->IsEnabled}");
+                }
+                if(ImGui.Button("Interact with nearest bell"))
+                {
+                    TaskInteractWithNearestBell.Enqueue();
                 }
             }
         }

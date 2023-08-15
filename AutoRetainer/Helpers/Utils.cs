@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.Configuration;
+using AutoRetainer.Modules.Voyage;
 using AutoRetainerAPI.Configuration;
 using ClickLib.Clicks;
 using Dalamud;
@@ -29,6 +30,14 @@ namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
+
+    internal static float Random { get; private set; } = 1f;
+    internal static void RegenerateRandom()
+    {
+        Random = (float)new Random().NextDouble();
+        P.DebugLog($"Random regenerated: {Random}");
+    }
+
     internal static bool MultiModeOrArtisan => MultiMode.Active || (SchedulerMain.PluginEnabled && SchedulerMain.Reason == PluginEnableReason.Artisan);
     internal static bool IsBusy => P.TaskManager.IsBusy || AutoGCHandin.Operation || AutoLogin.Instance.IsRunning;
     internal static AtkValue ZeroAtkValue = new() { Type = 0, Int = 0 };
@@ -249,13 +258,34 @@ internal static unsafe class Utils
         return ("InventoryRetainer", 5);
     }
 
-    internal static GameObject GetReachableRetainerBell()
+    internal static GameObject GetNearestRetainerBell(out float Distance)
+    {
+        var currentDistance = float.MaxValue;
+        GameObject currentObject = null;
+        foreach (var x in Svc.Objects)
+        {
+            if (x.IsTargetable && (x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName, "リテイナーベル"))
+            {
+                var distance = Vector3.Distance(Svc.ClientState.LocalPlayer.Position, x.Position);
+                if (distance < currentDistance)
+                {
+                    currentDistance = distance;
+                    currentObject = x;
+                }
+            }
+        }
+        Distance = currentDistance;
+        return currentObject;
+    } 
+
+    internal static GameObject GetReachableRetainerBell(bool extend)
     {
         foreach (var x in Svc.Objects)
         {
             if ((x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName, "リテイナーベル"))
             {
-                if (Vector3.Distance(x.Position, Svc.ClientState.LocalPlayer.Position) < GetValidInteractionDistance(x) && x.IsTargetable)
+                var distance = extend && VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType) ? 20f : GetValidInteractionDistance(x);
+                if (Vector3.Distance(x.Position, Svc.ClientState.LocalPlayer.Position) < distance && x.IsTargetable)
                 {
                     return x;
                 }
