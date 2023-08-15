@@ -52,7 +52,7 @@ namespace AutoRetainer.UI.Dbg
             {
                 if (ImGui.Button($"{nameof(VoyageScheduler.Lockon)}")) DuoLog.Information($"{VoyageScheduler.Lockon}");
                 if (ImGui.Button($"{nameof(VoyageScheduler.Approach)}")) DuoLog.Information($"{VoyageScheduler.Approach}");
-                if (ImGui.Button($"{nameof(VoyageScheduler.AutomoveOff)}")) DuoLog.Information($"{VoyageScheduler.AutomoveOff}");
+                if (ImGui.Button($"{nameof(VoyageScheduler.AutomoveOffPanel)}")) DuoLog.Information($"{VoyageScheduler.AutomoveOffPanel}");
                 if (ImGui.Button($"{nameof(VoyageScheduler.InteractWithVoyagePanel)}")) DuoLog.Information($"{VoyageScheduler.InteractWithVoyagePanel}");
                 if (ImGui.Button($"{nameof(VoyageScheduler.SelectAirshipManagement)}")) DuoLog.Information($"{VoyageScheduler.SelectAirshipManagement}");
                 if (ImGui.Button($"{nameof(VoyageScheduler.SelectSubManagement)}")) DuoLog.Information($"{VoyageScheduler.SelectSubManagement}");
@@ -70,7 +70,7 @@ namespace AutoRetainer.UI.Dbg
                 {
                     P.TaskManager.Enqueue(VoyageScheduler.Lockon);
                     P.TaskManager.Enqueue(VoyageScheduler.Approach);
-                    P.TaskManager.Enqueue(VoyageScheduler.AutomoveOff);
+                    P.TaskManager.Enqueue(VoyageScheduler.AutomoveOffPanel);
                     P.TaskManager.Enqueue(VoyageScheduler.InteractWithVoyagePanel);
                     P.TaskManager.Enqueue(VoyageScheduler.SelectAirshipManagement);
                     P.TaskManager.Enqueue(() => VoyageScheduler.SelectVesselByName(data1));

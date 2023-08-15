@@ -34,7 +34,7 @@ internal unsafe static class HouseEnterTask
                 P.TaskManager.EnqueueImmediate(Interact);
                 P.TaskManager.EnqueueImmediate(SelectYesno);
                 P.TaskManager.EnqueueImmediate(WaitUntilLeavingZone);
-                if (C.EnterWorkshop)
+                if (MultiMode.EnabledSubmarines)
                 {
                     P.TaskManager.EnqueueImmediate(() => !IsOccupied(), 180 * 1000, "WaitUntilNotOccupied");
                     P.TaskManager.EnqueueImmediate(LockonAdditionalChambers, 1000, true);
@@ -226,7 +226,7 @@ internal unsafe static class HouseEnterTask
     {
         var bell = Utils.GetReachableRetainerBell(false);
         if(bell != null) PluginLog.Information($"Dist {Vector3.Distance(Player.Object.Position, bell.Position)}");
-        if (bell != null && Vector3.Distance(Player.Object.Position, bell.Position) < 3f + Utils.Random)
+        if (bell != null && Vector3.Distance(Player.Object.Position, bell.Position) < 4f + Utils.Random * 0.25f)
         {
             P.DebugLog($"Disabling automove");
             Chat.Instance.SendMessage("/automove off");

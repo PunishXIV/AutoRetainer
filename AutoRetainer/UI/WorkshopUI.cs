@@ -19,9 +19,35 @@ namespace AutoRetainer.UI
     {
         internal static void Draw()
         {
-            foreach (var data in C.OfflineData.Where(x => x.OfflineAirshipData.Count + x.OfflineSubmarineData.Count > 0).OrderBy(x => x.CID == Player.CID ? 1 : 0))
+            var sortedData = new List<OfflineCharacterData>();
+            if (C.NoCurrentCharaOnTop)
+            {
+                sortedData = C.OfflineData;
+            }
+            else
+            {
+                if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var cdata))
+                {
+                    sortedData.Add(cdata);
+                }
+                foreach (var x in C.OfflineData)
+                {
+                    if (x.CID != Svc.ClientState.LocalContentId)
+                    {
+                        sortedData.Add(x);
+                    }
+                }
+            }
+            foreach (var data in sortedData.Where(x => x.OfflineAirshipData.Count + x.OfflineSubmarineData.Count > 0))
             {
                 ImGui.PushID($"Player{data.CID}");
+                var rCurPos = ImGui.GetCursorPos();
+                float pad = 0;
+                ImGui.PushFont(UiBuilder.IconFont);
+                ImGuiEx.ButtonCheckbox($"\uf21a##{data.CID}", ref data.WorkshopEnabled, EColor.Green);
+                ImGui.PopFont();
+                ImGuiEx.Tooltip($"Enable submersibles in multi mode on this character");
+                ImGui.SameLine(0,3);
                 if (ImGuiEx.IconButton(FontAwesomeIcon.DoorOpen))
                 {
                     if (MultiMode.Active)
@@ -44,28 +70,30 @@ namespace AutoRetainer.UI
                 ImGui.SameLine(0, 3);
                 if (ImGuiEx.CollapsingHeader(Censor.Character(data.Name, data.World), data.AnyEnabledVesselsAvailable()?ImGuiColors.ParsedGreen:null))
                 {
+                    pad = ImGui.GetStyle().FramePadding.Y;
                     if (data.OfflineAirshipData.Any())
                     {
                         ImGuiGroup.BeginGroupBox("Airships");
                         foreach (var x in data.OfflineAirshipData)
                         {
                             ImGui.PushFont(UiBuilder.IconFont);
-                            ImGuiEx.CollectionButtonCheckbox($"\uf13d##{x.Name}", x.Name, data.FinalizeAirships, EColor.Green);
+                            ImGuiEx.CollectionButtonCheckbox($"\uf13d##{x.Name}", x.Name, data.FinalizeAirships, EColor.BlueSea);
                             ImGui.PopFont();
+                            ImGuiEx.Tooltip("Enable this to only finalize this vessel");
                             ImGui.SameLine(0, 3);
-                            ImGuiEx.CollectionCheckbox($"Airship {x.Name}", x.Name, data.EnabledAirships);
-                            string rightText;
+                            ImGuiEx.CollectionCheckbox($"{x.Name}##airsh", x.Name, data.EnabledAirships);
+                            string rightTextV;
                             if (x.ReturnTime != 0)
                             {
-                                rightText = x.GetRemainingSeconds() > 0 ? $"Returns in {VoyageUtils.Seconds2Time(x.GetRemainingSeconds())}" : "Exploration completed";
+                                rightTextV = x.GetRemainingSeconds() > 0 ? $"{VoyageUtils.Seconds2Time(x.GetRemainingSeconds())}" : "Exploration completed";
                             }
                             else
                             {
-                                rightText = $"Not occupied";
+                                rightTextV = $"Not occupied";
                             }
                             ImGui.SameLine();
-                            ImGui.SetCursorPosX(ImGui.GetContentRegionMax().X - ImGui.CalcTextSize(rightText).X - 20);
-                            ImGuiEx.TextV($"{rightText}");
+                            ImGui.SetCursorPosX(ImGui.GetContentRegionMax().X - ImGui.CalcTextSize(rightTextV).X - 20);
+                            ImGuiEx.TextV($"{rightTextV}");
                             if(x.Name != data.OfflineAirshipData.Last().Name) ImGui.Separator();
                         }
                         ImGuiGroup.EndGroupBox();
@@ -76,27 +104,35 @@ namespace AutoRetainer.UI
                         foreach (var x in data.OfflineSubmarineData)
                         {
                             ImGui.PushFont(UiBuilder.IconFont);
-                            ImGuiEx.CollectionButtonCheckbox($"\uf13d##{x.Name}", x.Name, data.FinalizeSubs, EColor.Green);
+                            ImGuiEx.CollectionButtonCheckbox($"\uf13d##{x.Name}", x.Name, data.FinalizeSubs, EColor.BlueSea);
                             ImGui.PopFont();
+                            ImGuiEx.Tooltip("Enable this to only finalize this vessel");
                             ImGui.SameLine(0, 3);
-                            ImGuiEx.CollectionCheckbox($"Submarine {x.Name}", x.Name, data.EnabledSubs);
-                            var rightText = "";
+                            ImGuiEx.CollectionCheckbox($"{x.Name}##sub", x.Name, data.EnabledSubs);
+                            var rightTextV = "";
                             if (x.ReturnTime != 0)
                             {
-                                rightText = x.GetRemainingSeconds() > 0 ? $"Returns in {VoyageUtils.Seconds2Time(x.GetRemainingSeconds())}" : "Voyage completed";
+                                rightTextV = x.GetRemainingSeconds() > 0 ? $"{VoyageUtils.Seconds2Time(x.GetRemainingSeconds())}" : "Voyage completed";
                             }
                             else
                             {
-                                rightText = $"Not occupied";
+                                rightTextV = $"Not occupied";
                             }
                             ImGui.SameLine();
-                            ImGui.SetCursorPosX(ImGui.GetContentRegionMax().X - ImGui.CalcTextSize(rightText).X - 20);
-                            ImGuiEx.TextV($"{rightText}");
+                            ImGui.SetCursorPosX(ImGui.GetContentRegionMax().X - ImGui.CalcTextSize(rightTextV).X - 20);
+                            ImGuiEx.TextV($"{rightTextV}");
                             if (x.Name != data.OfflineSubmarineData.Last().Name) ImGui.Separator();
                         }
                         ImGuiGroup.EndGroupBox();
                     }
                 }
+
+                var rightText = $"R: {data.RepairKits} | C: {data.Ceruleum} | I: {data.InventorySpace}";
+                var cur = ImGui.GetCursorPos();
+                ImGui.SameLine();
+                ImGui.SetCursorPos(new(ImGui.GetContentRegionMax().X - ImGui.CalcTextSize(rightText).X - ImGui.GetStyle().FramePadding.X, rCurPos.Y + pad));
+                ImGuiEx.Text(rightText);
+
                 ImGui.PopID();
             }
             if (ImGui.CollapsingHeader("Settings"))
@@ -105,7 +141,6 @@ namespace AutoRetainer.UI
                 ImGui.Checkbox($"Only finalize reports", ref C.SubsOnlyFinalize);
                 ImGui.Checkbox($"When resending, auto-repair vessels", ref C.SubsAutoRepair);
                 ImGui.Checkbox($"Even when only finalizing, repair vessels", ref C.SubsRepairFinalize);
-                ImGui.Checkbox($"On house enter task, enter workshop if possible", ref C.EnterWorkshop);
             }
 
             if (ImGui.CollapsingHeader("Public debug"))
@@ -134,6 +169,16 @@ namespace AutoRetainer.UI
                                 }
                             }
                         }
+                        if (ImGui.Button("Approach bell"))
+                        {
+                            TaskInteractWithNearestBell.Enqueue(false);
+                        }
+
+                        if (ImGui.Button("Approach panel"))
+                        {
+                            TaskInteractWithNearestPanel.Enqueue(false);
+                        }
+
                     }
                     else
                     {
@@ -194,7 +239,7 @@ namespace AutoRetainer.UI
                 }
                 if(ImGui.Button("Interact with nearest bell"))
                 {
-                    TaskInteractWithNearestBell.Enqueue();
+                    TaskInteractWithNearestPanel.Enqueue();
                 }
             }
         }

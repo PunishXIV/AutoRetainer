@@ -37,6 +37,12 @@ unsafe internal class ConfigGui : Window
     {
         var e = SchedulerMain.PluginEnabledInternal;
         var disabled = MultiMode.Active && !ImGui.GetIO().KeyCtrl;
+
+        ImGuiEx.ImGuiLineCentered("warning", () =>
+        {
+            ImGuiEx.Text(GradientColor.Get(EColor.RedBright, EColor.YellowBright), $"Do not run this version unattended!");
+        });
+
         if (disabled)
         {
             ImGui.BeginDisabled();
@@ -71,11 +77,14 @@ unsafe internal class ConfigGui : Window
             ImGui.Checkbox($"Enable Deployables", ref VoyageScheduler.Enabled);
         }
         ImGui.SameLine();
-        if(ImGui.Checkbox("Multi", ref MultiMode.Enabled))
+        if (ImGui.Checkbox("Multi", ref MultiMode.Enabled))
         {
             MultiMode.OnMultiModeEnabled();
         }
-        if(C.CharEqualize && MultiMode.Enabled)
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(100f);
+        ImGuiEx.EnumCombo("##mode", ref C.MultiModeType);
+        if (C.CharEqualize && MultiMode.Enabled)
         {
             ImGui.SameLine();
             if(ImGui.Button("Reset counters"))

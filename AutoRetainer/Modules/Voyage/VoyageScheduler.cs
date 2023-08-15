@@ -177,17 +177,18 @@ namespace AutoRetainer.Modules.Voyage
                 if (Utils.GenericThrottle)
                 {
                     Chat.Instance.SendMessage("/automove on");
+                    Utils.RegenerateRandom();
                     return true;
                 }
             }
             return false;
         }
 
-        internal static bool? AutomoveOff()
+        internal static bool? AutomoveOffPanel()
         {
             if (VoyageUtils.TryGetNearestVoyagePanel(out var obj) && Svc.Targets.Target?.Address == obj.Address)
             {
-                if (Vector2.Distance(obj.Position.ToVector2(), Player.Object.Position.ToVector2()) < 2f)
+                if (Vector3.Distance(obj.Position, Player.Object.Position) < 4f + Utils.Random*0.25f)
                 {
                     if (Utils.GenericThrottle)
                     {

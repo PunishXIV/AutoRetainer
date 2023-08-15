@@ -73,7 +73,6 @@ internal unsafe class Config : IEzConfig
     public bool ShowAdditionalInfo = true;
     public bool RetryItemSearch = false;
     public bool ArtisanIntegration = false;
-    public bool EnterWorkshop = false;
 
     internal bool DontReassign
     {
@@ -111,5 +110,5 @@ internal unsafe class Config : IEzConfig
     public bool SubsOnlyFinalize = false;
     public bool SubsAutoEnable = false;
     public bool SubsRepairFinalize = false;
-
+    public MultiModeType MultiModeType = MultiModeType.Everything;
 }
