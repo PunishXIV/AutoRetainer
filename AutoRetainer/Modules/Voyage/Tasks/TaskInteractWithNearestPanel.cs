@@ -10,6 +10,10 @@ namespace AutoRetainer.Modules.Voyage.Tasks
     {
         internal static void Enqueue(bool interact = true)
         {
+            if (!VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType))
+            {
+                TaskEnterWorkshop.EnqueueEnterWorkshop();
+            }
             P.TaskManager.Enqueue(VoyageScheduler.Lockon);
             P.TaskManager.Enqueue(VoyageScheduler.Approach);
             P.TaskManager.Enqueue(VoyageScheduler.AutomoveOffPanel);

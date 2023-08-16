@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.Modules.Voyage;
+using AutoRetainer.Modules.Voyage.Tasks;
 using ClickLib.Clicks;
 using ECommons.Automation;
 using ECommons.Events;
@@ -34,20 +35,11 @@ internal unsafe static class HouseEnterTask
                 P.TaskManager.EnqueueImmediate(Interact);
                 P.TaskManager.EnqueueImmediate(SelectYesno);
                 P.TaskManager.EnqueueImmediate(WaitUntilLeavingZone);
-                if (MultiMode.EnabledSubmarines)
-                {
-                    P.TaskManager.EnqueueImmediate(() => !IsOccupied(), 180 * 1000, "WaitUntilNotOccupied");
-                    P.TaskManager.EnqueueImmediate(LockonAdditionalChambers, 1000, true);
-                    P.TaskManager.EnqueueImmediate(Approach);
-                    P.TaskManager.EnqueueImmediate(AutorunOffAdd);
-                    P.TaskManager.EnqueueImmediate(() => { Chat.Instance.SendMessage("/automove off"); });
-                    P.TaskManager.EnqueueImmediate(InteractAdd);
-                    P.TaskManager.EnqueueImmediate(SelectEnterWorkshop);
-                    P.TaskManager.EnqueueImmediate(() => VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType), "Wait Until entered workshop");
-                }
+                P.TaskManager.DelayNextImmediate(60, true);
             }
             return true;
-        });
+        }, "Master HET");
+        TaskEnterWorkshop.Enqueue();
     }
 
     internal static bool? WaitUntilNotBusy()
@@ -116,17 +108,6 @@ internal unsafe static class HouseEnterTask
         return false;
     }
 
-    internal static bool? InteractAdd()
-    {
-        var entrance = Utils.GetNearestWorkshopEntrance(out var d);
-        if (entrance != null && Svc.Targets.Target?.Address == entrance.Address && EzThrottler.Throttle("HET.InteractAdd", 1000))
-        {
-            P.DebugLog($"Interacting with entrance");
-            TargetSystem.Instance()->InteractWithObject((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)entrance.Address, false);
-            return true;
-        }
-        return false;
-    }
 
     internal static bool? SelectYesno()
     {
@@ -160,31 +141,6 @@ internal unsafe static class HouseEnterTask
         return !ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType);
     }
 
-    internal static bool? LockonAdditionalChambers()
-    {
-        var entrance = Utils.GetNearestWorkshopEntrance(out _);
-        if (entrance != null)
-        {
-            if (Svc.Targets.Target?.Address == entrance.Address)
-            {
-                if (EzThrottler.Throttle("HET.LockonAdd"))
-                {
-                    Chat.Instance.SendMessage("/lockon");
-                    return true;
-                }
-            }
-            else
-            {
-                if (EzThrottler.Throttle("HET.SetTargetAdd", 200))
-                {
-                    P.DebugLog($"Setting entrance target ({entrance})");
-                    Svc.Targets.Target = entrance;
-                }
-            }
-        }
-        return false;
-    }
-
     internal static bool? LockonBell()
     {
         var bell = Utils.GetNearestRetainerBell(out var d);
@@ -210,17 +166,6 @@ internal unsafe static class HouseEnterTask
         return false;
     }
 
-    internal static bool? AutorunOffAdd()
-    {
-        var entrance = Utils.GetNearestWorkshopEntrance(out var d);
-        if (entrance != null && d < 3f + Utils.Random && EzThrottler.Throttle("HET.DisableAutomoveAdd"))
-        {
-            P.DebugLog($"Disabling automove");
-            Chat.Instance.SendMessage("/automove off");
-            return true;
-        }
-        return false;
-    }
 
     internal static bool? AutorunOffBell()
     {
@@ -230,16 +175,6 @@ internal unsafe static class HouseEnterTask
         {
             P.DebugLog($"Disabling automove");
             Chat.Instance.SendMessage("/automove off");
-            return true;
-        }
-        return false;
-    }
-
-    internal static bool? SelectEnterWorkshop()
-    {
-        if (Utils.TrySelectSpecificEntry("Move to the company workshop", () => EzThrottler.Throttle("HET.SelectEnterWorkshop")))
-        {
-            P.DebugLog("Confirmed going to apartment");
             return true;
         }
         return false;

@@ -31,7 +31,7 @@ internal unsafe static class MultiMode
     internal static bool Enabled = false;
 
     internal static bool EnabledRetainers => C.MultiModeType.EqualsAny(MultiModeType.Retainers, MultiModeType.Everything);
-    internal static bool EnabledSubmarines => C.MultiModeType.EqualsAny(MultiModeType.Retainers, MultiModeType.Everything);
+    internal static bool EnabledSubmarines => C.MultiModeType.EqualsAny(MultiModeType.Submersibles, MultiModeType.Everything);
 
     internal static bool Synchronize = false;
     internal static long NextInteractionAt { get; private set; } = 0;

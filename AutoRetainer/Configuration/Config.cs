@@ -111,4 +111,5 @@ internal unsafe class Config : IEzConfig
     public bool SubsAutoEnable = false;
     public bool SubsRepairFinalize = false;
     public MultiModeType MultiModeType = MultiModeType.Everything;
+    public bool NoErrorCheckPlanner = false;
 }
