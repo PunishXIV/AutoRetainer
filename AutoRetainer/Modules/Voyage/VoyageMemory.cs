@@ -104,7 +104,7 @@ namespace AutoRetainer.Modules.Voyage
                     if (status[i].RawName[0] == 0) break;
                     temp.Add(new(status[i].TimeStamp, status[i].Name));
                 }
-                if (temp.Count > 0)
+                //if (temp.Count > 0)
                 {
                     Utils.GetCurrentCharacterData().OfflineSubmarineData = temp;
                     Notify.Info($"Updated airship data from SubmersibleStatus");
@@ -154,7 +154,7 @@ namespace AutoRetainer.Modules.Voyage
                     if (status[i].RawName[0] == 0) break;
                     temp.Add(new(status[i].TimeStamp, status[i].Name));
                 }
-                if (temp.Count > 0)
+                //if (temp.Count > 0)
                 {
                     Utils.GetCurrentCharacterData().OfflineAirshipData = temp;
                     Notify.Info($"Updated airship data from AirshipStatus");

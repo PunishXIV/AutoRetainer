@@ -14,6 +14,7 @@ internal static class SettingsMain
         ImGuiEx.EzTabBar("GeneralSettings",
             ("General", TabGeneral, null, true),
             ("Multi Mode", TabMulti, null, true),
+            ("Exclusions", TabExclusions, null, true),
             ("Other", TabOther, null, true)
             );
     }
@@ -133,25 +134,6 @@ internal static class SettingsMain
             ImGuiEx.TextV(Censor.Character(C.OfflineData[index].Name, C.OfflineData[index].World));
             ImGui.PopID();
         }
-
-        if (C.Blacklist.Any())
-        {
-            InfoBox.DrawBox("Excluded Characters", delegate
-            {
-                for (int i = 0; i < C.Blacklist.Count; i++)
-                {
-                    var d = C.Blacklist[i];
-                    ImGuiEx.TextV($"{d.Name} ({d.CID:X16})");
-                    ImGui.SameLine();
-                    if (ImGui.Button($"Delete##bl{i}"))
-                    {
-                        C.Blacklist.RemoveAt(i);
-                        C.SelectedRetainers.Remove(d.CID);
-                        break;
-                    }
-                }
-            });
-        }
     }
 
     static void TabOther()
@@ -242,5 +224,61 @@ internal static class SettingsMain
         }
         ImGui.PopID();
         return ret;
+    }
+
+    static void TabExclusions()
+    {
+        if (C.Blacklist.Any())
+        {
+            foreach(var x in C.OfflineData)
+            {
+                if (ImGui.BeginTable("##excl", 5, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.BordersInnerH))
+                {
+                    ImGui.TableSetupColumn("1", ImGuiTableColumnFlags.WidthStretch);
+                    ImGui.TableSetupColumn("2");
+                    ImGui.TableSetupColumn("3");
+                    ImGui.TableSetupColumn("4");
+                    ImGui.TableSetupColumn("5");
+                    ImGui.TableNextRow();
+                    ImGui.TableNextColumn();
+                    ImGuiEx.TextV($"{Censor.Character(x.Name, x.World)}:");
+                    ImGui.TableNextColumn();
+                    if(ImGui.Checkbox("Retainers", ref x.ExcludeRetainer))
+                    {
+                        x.Enabled = false;
+                    }
+                    ImGui.TableNextColumn();
+                    if(ImGui.Checkbox("Deployables", ref x.ExcludeWorkshop))
+                    {
+                        x.WorkshopEnabled = false;
+                    }
+                    ImGui.TableNextColumn();
+                    ImGui.Checkbox("Login overlay", ref x.ExcludeOverlay);
+                    ImGui.TableNextColumn();
+                    if (ImGuiEx.IconButton(FontAwesomeIcon.Cross))
+                    {
+                        C.Blacklist.Add((x.CID, x.Name));
+                    }
+                    ImGuiEx.Tooltip($"This will delete stored character data and prevent it from being ever created again, effectively excluding it from all current and future functions.");
+                }
+                ImGui.EndTable();
+            }
+
+            InfoBox.DrawBox("Excluded Characters", delegate
+            {
+                for (int i = 0; i < C.Blacklist.Count; i++)
+                {
+                    var d = C.Blacklist[i];
+                    ImGuiEx.TextV($"{d.Name} ({d.CID:X16})");
+                    ImGui.SameLine();
+                    if (ImGui.Button($"Delete##bl{i}"))
+                    {
+                        C.Blacklist.RemoveAt(i);
+                        C.SelectedRetainers.Remove(d.CID);
+                        break;
+                    }
+                }
+            });
+        }
     }
 }

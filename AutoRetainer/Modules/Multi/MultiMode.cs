@@ -78,6 +78,10 @@ internal unsafe static class MultiMode
         {
             HouseEnterTask.EnqueueTask();
         }
+        if(Utils.GetNearestWorkshopEntrance(out _) && Utils.GetReachableRetainerBell(false) == null)
+        {
+            TaskEnterWorkshop.Enqueue();
+        }
     }
 
     internal static int GetAutoAfkOpt()

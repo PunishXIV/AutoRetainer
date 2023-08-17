@@ -43,7 +43,7 @@ internal unsafe static class MultiModeUI
         for (var index = 0; index < sortedData.Count; index++)
         {
             var data = sortedData[index];
-            if (data.World.IsNullOrEmpty()) continue;
+            if (data.World.IsNullOrEmpty() || data.ExcludeRetainer) continue;
             ImGui.PushID(data.CID.ToString());
             var rCurPos = ImGui.GetCursorPos();
             var colen = false;
@@ -55,11 +55,6 @@ internal unsafe static class MultiModeUI
             if (ImGuiEx.IconButton(Lang.IconMultiMode))
             {
                 data.Enabled = !data.Enabled;
-                /*if (data.Enabled && !data.Index.InRange(1, 9))
-                {
-                    data.Enabled = false;
-                    Svc.Chat.PrintError("[AutoRetainer] Error: Please set the character index and service account for this character before enabling multi mode.");
-                }*/
             }
             if (colen) ImGui.PopStyleColor();
             ImGuiEx.Tooltip($"Enable multi-mode for this character");

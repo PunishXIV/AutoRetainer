@@ -36,8 +36,13 @@ public class OfflineCharacterData
     public HashSet<string> EnabledSubs = new();
     public HashSet<string> FinalizeAirships = new();
     public HashSet<string> FinalizeSubs = new();
+    public Dictionary<string, AdditionalVesselData> AdditionalAirshipData = new();
+    public Dictionary<string, AdditionalVesselData> AdditionalSubmarineData = new();
     public int Ceruleum = 0;
     public int RepairKits = 0;
+    public bool ExcludeRetainer = false;
+    public bool ExcludeWorkshop = false;
+    public bool ExcludeOverlay = false;
 
     public string Identity => $"{CID}";
     public bool ShouldSerializeIdentity() => false;

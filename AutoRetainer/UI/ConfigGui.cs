@@ -38,11 +38,6 @@ unsafe internal class ConfigGui : Window
         var e = SchedulerMain.PluginEnabledInternal;
         var disabled = MultiMode.Active && !ImGui.GetIO().KeyCtrl;
 
-        ImGuiEx.ImGuiLineCentered("warning", () =>
-        {
-            ImGuiEx.Text(GradientColor.Get(EColor.RedBright, EColor.YellowBright), $"Do not run this version unattended!");
-        });
-
         if (disabled)
         {
             ImGui.BeginDisabled();

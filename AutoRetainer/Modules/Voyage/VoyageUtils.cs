@@ -107,6 +107,21 @@ namespace AutoRetainer.Modules.Voyage
             return data.ReturnTime - P.Time;
         }
 
+        internal static AdditionalVesselData GetAdditionalVesselData(this OfflineCharacterData data,  string name, VoyageType type)
+        {
+            if (type == VoyageType.Airship)
+            {
+                if (!data.AdditionalAirshipData.ContainsKey(name)) data.AdditionalAirshipData[name] = new();
+                return data.AdditionalAirshipData[name];
+            }
+            if (type == VoyageType.Submersible)
+            {
+                if (!data.AdditionalSubmarineData.ContainsKey(name)) data.AdditionalSubmarineData[name] = new();
+                return data.AdditionalSubmarineData[name];
+            }
+            throw new ArgumentOutOfRangeException(nameof(type));
+        }
+
         internal static void WriteOfflineData()
         {
             if (HousingManager.Instance()->WorkshopTerritory != null && C.OfflineData.TryGetFirst(x => x.CID == Player.CID, out var ocd))
@@ -120,6 +135,8 @@ namespace AutoRetainer.Modules.Voyage
                         if (name != "")
                         {
                             temp.Add(new(name, x.ReturnTime));
+                            var adata = Data.GetAdditionalVesselData(name, VoyageType.Airship);
+                            adata.Level = x.RankId;
                         }
                     }
                     if (temp.Count > 0)
@@ -136,6 +153,8 @@ namespace AutoRetainer.Modules.Voyage
                         if (name != "")
                         {
                             temp.Add(new(name, x.ReturnTime));
+                            var adata = Data.GetAdditionalVesselData(name, VoyageType.Submersible);
+                            adata.Level = x.RankId;
                         }
                     }
                     if (temp.Count > 0)
