@@ -31,7 +31,7 @@ namespace AutoRetainer.Modules.Voyage.Tasks
                 P.TaskManager.EnqueueImmediate(() => Abort || VoyageUtils.GetVesselComponent(vesselIndex, type, index)->Condition > 0, "WaitUntilRepairComplete");
             }
             P.TaskManager.EnqueueImmediate(VoyageScheduler.CloseRepair);
-            P.TaskManager.Enqueue(() => Abort ? VoyageScheduler.SelectQuitVesselMenu() : true, "SelectQuitVesselMenu failed repair");
+            //P.TaskManager.Enqueue(() => Abort ? VoyageScheduler.SelectQuitVesselMenu() : true, "SelectQuitVesselMenu failed repair");
         }
     }
 }

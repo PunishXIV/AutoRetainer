@@ -2,24 +2,10 @@
 using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainer.Scheduler.Tasks;
-using AutoRetainerAPI;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Memory;
-using Dalamud.Plugin.Ipc.Exceptions;
-using Dalamud.Utility;
-using ECommons.GameHelpers;
-using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using Lumina.Excel.GeneratedSheets;
-using PunishLib.ImGuiMethods;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AutoRetainer.UI
 {
@@ -83,7 +69,7 @@ namespace AutoRetainer.UI
                     .Union(data.GetVesselData(VoyageType.Submersible).Where(x => data.GetEnabledVesselsData(VoyageType.Submersible).Contains(x.Name)))
                     .Where(x => x.ReturnTime != 0).OrderBy(z => z.GetRemainingSeconds());
                 //if (EzThrottler.Throttle("log")) PluginLog.Information($"{lst.Select(x => x.Name).Print()}");
-                var lowestRetainer = lst.FirstOrDefault();
+                var lowestRetainer = C.MultiWaitForAll?lst.LastOrDefault():lst.FirstOrDefault();
                 if (lowestRetainer != default)
                 {
                     var prog = 1f - ((float)lowestRetainer.GetRemainingSeconds() / (60f * 60f * 24f));

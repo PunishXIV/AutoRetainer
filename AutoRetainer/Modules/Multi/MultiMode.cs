@@ -396,7 +396,7 @@ internal unsafe static class MultiMode
                 if (x.CID == Player.CID) continue;
                 if (x.WorkshopEnabled && x.GetEnabledVesselsData(VoyageType.Airship).Count + x.GetEnabledVesselsData(VoyageType.Submersible).Count > 0)
                 {
-                    if (x.AreAnyVesselsReturnInNext(2))
+                    if (x.AreAnyVesselsReturnInNext(2, C.MultiWaitForAll))
                     {
                         return x;
                     }

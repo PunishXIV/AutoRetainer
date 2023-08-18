@@ -1,4 +1,5 @@
-﻿using Dalamud.Interface.Components;
+﻿using AutoRetainerAPI.Configuration;
+using Dalamud.Interface.Components;
 using ECommons.Interop;
 using ECommons.MathHelpers;
 using PInvoke;
@@ -9,14 +10,42 @@ namespace AutoRetainer.UI.Settings;
 
 internal static class SettingsMain
 {
+    static Dictionary<WorkshopFailAction, string> WorkshopFailActionNames = new()
+    {
+        {WorkshopFailAction.StopPlugin, "Halt all plugin operation" },
+        {WorkshopFailAction.ExcludeVessel, "Exclude deployable from operation" },
+        {WorkshopFailAction.ExcludeChar, "Exclude captain from multi mode rotation" },
+    };
+
     internal static void Draw()
     {
         ImGuiEx.EzTabBar("GeneralSettings",
             ("General", TabGeneral, null, true),
             ("Multi Mode", TabMulti, null, true),
+            ("Contingency", TabCont, null, true),
             ("Exclusions", TabExclusions, null, true),
             ("Other", TabOther, null, true)
             );
+    }
+
+    static void TabCont()
+    {
+        ImGuiEx.TextWrapped("Here you can apply various fallback actions to perform in the case of some common failure states or potential operation errors.");
+        ImGui.SetNextItemWidth(250f);
+        ImGuiEx.EnumCombo("Ceruleum Tanks Expended", ref C.FailureNoFuel, (x) => x != WorkshopFailAction.ExcludeVessel, WorkshopFailActionNames);
+        ImGuiComponents.HelpMarker("Applies selected fallback action in the case of insufficient Ceruleum Tanks to deploy vessel on a new voyage.");
+
+        ImGui.SetNextItemWidth(250f);
+        ImGuiEx.EnumCombo("Unable to Repair Deployable", ref C.FailureNoRepair, WorkshopFailActionNames);
+        ImGuiComponents.HelpMarker("Applies selected fallback action in the case of insufficient Magitek Repair Materials to repair a vessel.");
+
+        ImGui.SetNextItemWidth(250f);
+        ImGuiEx.EnumCombo("Inventory at Capacity", ref C.FailureNoFuel, (x) => x != WorkshopFailAction.ExcludeVessel, WorkshopFailActionNames);
+        ImGuiComponents.HelpMarker("Applies selected fallback action in the case of the captain's inventory having insufficient space to receive voyage rewards.");
+
+        ImGui.SetNextItemWidth(250f);
+        ImGuiEx.EnumCombo("Critical Operation Failure", ref C.FailureGeneric, (x) => x != WorkshopFailAction.ExcludeVessel, WorkshopFailActionNames);
+        ImGuiComponents.HelpMarker("Applies selected fallback action in the case of any unknown or miscellaneous error.");
     }
 
     static void TabGeneral()
@@ -259,7 +288,7 @@ internal static class SettingsMain
                     ImGui.TableNextColumn();
                     ImGui.Checkbox("Login overlay", ref x.ExcludeOverlay);
                     ImGui.TableNextColumn();
-                    if (ImGuiEx.IconButton(FontAwesomeIcon.Cross))
+                    if (ImGuiEx.IconButton("\uf057"))
                     {
                         C.Blacklist.Add((x.CID, x.Name));
                     }

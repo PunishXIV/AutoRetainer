@@ -1,4 +1,5 @@
-﻿using Dalamud.Memory;
+﻿using AutoRetainerAPI.Configuration;
+using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using System;
 using System.Collections.Generic;
@@ -36,7 +37,15 @@ namespace AutoRetainer.Modules.Voyage.Tasks
                         {
                             P.TaskManager.Abort();
                             DuoLog.Warning($"[Voyage] You are out of fuel!");
-                            Data.WorkshopEnabled = false;
+                            if (C.FailureNoFuel == WorkshopFailAction.ExcludeChar)
+                            {
+                                Data.WorkshopEnabled = false;
+                            }
+                            else if (C.FailureNoFuel == WorkshopFailAction.StopPlugin)
+                            {
+                                MultiMode.Enabled = false;
+                                VoyageScheduler.Enabled = false;
+                            }
                             P.TaskManager.EnqueueImmediate(VoyageScheduler.CancelDeployVessel);
                             P.TaskManager.EnqueueImmediate(VoyageScheduler.FinalizeVessel);
                             P.TaskManager.EnqueueImmediate(VoyageScheduler.SelectQuitVesselMenu);

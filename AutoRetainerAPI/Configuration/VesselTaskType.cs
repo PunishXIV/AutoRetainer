@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AutoRetainer.Configuration
+namespace AutoRetainerAPI.Configuration
 {
-    public enum MultiModeType
+    public enum VesselTaskType
     {
-        Retainers, Submersibles, Everything
     }
 }

@@ -34,17 +34,37 @@ namespace AutoRetainer.Modules.Voyage
                 if (txt == Lang.VoyageInventoryError)
                 {
                     DuoLog.Warning($"[Voyage] Your inventory is full!");
-                    Data.WorkshopEnabled = false;
                     VoyageScheduler.Enabled = false;
                     P.TaskManager.Abort();
                     P.TaskManager.Enqueue(VoyageScheduler.SelectQuitVesselSelectorMenu);
                     P.TaskManager.Enqueue(VoyageScheduler.SelectExitMainPanel);
+                    if(C.FailureNoInventory == WorkshopFailAction.StopPlugin)
+                    {
+                        MultiMode.Enabled = false;
+                        VoyageScheduler.Enabled = false;
+                    }
+                    else if (C.FailureNoInventory == WorkshopFailAction.ExcludeChar)
+                    {
+                        Data.WorkshopEnabled = false;
+                    }
                 }
                 if (txt.Contains("Unable to repair vessel."))
                 {
                     TaskRepairAll.Abort = true;
                     DuoLog.Warning($"[Voyage] You are out of repair components!");
-                    Data.GetEnabledVesselsData(TaskRepairAll.Type).Remove(TaskRepairAll.Name);
+                    if (C.FailureNoRepair == WorkshopFailAction.ExcludeVessel)
+                    {
+                        Data.GetEnabledVesselsData(TaskRepairAll.Type).Remove(TaskRepairAll.Name);
+                    }
+                    else if (C.FailureNoRepair == WorkshopFailAction.ExcludeChar)
+                    {
+                        Data.WorkshopEnabled = false;
+                    }
+                    else if (C.FailureNoRepair == WorkshopFailAction.StopPlugin)
+                    {
+                        MultiMode.Enabled = false;
+                        VoyageScheduler.Enabled = false;
+                    }
                 }
             }
         }
@@ -113,41 +133,44 @@ namespace AutoRetainer.Modules.Voyage
 
         static void DoWorkshopPanelTick()
         {
-            if (!P.TaskManager.IsBusy && FrameThrottler.Check("SchedulerRestartCooldown"))
+            if (!P.TaskManager.IsBusy)
             {
-                var data = Utils.GetCurrentCharacterData();
-                var panel = VoyageUtils.GetCurrentWorkshopPanelType();
-                if (panel == PanelType.TypeSelector)
+                if (FrameThrottler.Check("SchedulerRestartCooldown"))
                 {
-                    if (data.AnyEnabledVesselsAvailable(VoyageType.Airship))
+                    var data = Utils.GetCurrentCharacterData();
+                    var panel = VoyageUtils.GetCurrentWorkshopPanelType();
+                    if (panel == PanelType.TypeSelector)
                     {
-                        if(EzThrottler.Throttle("DoWorkshopPanelTick.EnqueuePanelSelector", 1000))
+                        if (data.AnyEnabledVesselsAvailable(VoyageType.Airship))
                         {
-                            P.TaskManager.Enqueue(VoyageScheduler.SelectAirshipManagement);
+                            if (EzThrottler.Throttle("DoWorkshopPanelTick.EnqueuePanelSelector", 1000))
+                            {
+                                P.TaskManager.Enqueue(VoyageScheduler.SelectAirshipManagement);
+                            }
+                        }
+                        else if (data.AnyEnabledVesselsAvailable(VoyageType.Submersible))
+                        {
+                            if (EzThrottler.Throttle("DoWorkshopPanelTick.EnqueuePanelSelector", 1000))
+                            {
+                                P.TaskManager.Enqueue(VoyageScheduler.SelectSubManagement);
+                            }
+                        }
+                        else if (!data.AreAnyVesselsReturnInNext(5))
+                        {
+                            if (EzThrottler.Throttle("DoWorkshopPanelTick.EnqueuePanelSelector", 1000))
+                            {
+                                P.TaskManager.Enqueue(VoyageScheduler.SelectExitMainPanel);
+                            }
                         }
                     }
-                    else if (data.AnyEnabledVesselsAvailable(VoyageType.Submersible))
+                    else if (panel == PanelType.Submersible)
                     {
-                        if (EzThrottler.Throttle("DoWorkshopPanelTick.EnqueuePanelSelector", 1000))
-                        {
-                            P.TaskManager.Enqueue(VoyageScheduler.SelectSubManagement);
-                        }
+                        ScheduleResend(VoyageType.Submersible);
                     }
-                    else if (!data.AreAnyVesselsReturnInNext(5))
+                    else if (panel == PanelType.Airship)
                     {
-                        if (EzThrottler.Throttle("DoWorkshopPanelTick.EnqueuePanelSelector", 1000))
-                        {
-                            P.TaskManager.Enqueue(VoyageScheduler.SelectExitMainPanel);
-                        }
+                        ScheduleResend(VoyageType.Airship);
                     }
-                }
-                else if (panel == PanelType.Submersible)
-                {
-                    ScheduleResend(VoyageType.Submersible);
-                }
-                else if (panel == PanelType.Airship)
-                {
-                    ScheduleResend(VoyageType.Airship);
                 }
             }
             else

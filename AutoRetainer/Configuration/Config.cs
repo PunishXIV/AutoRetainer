@@ -73,6 +73,7 @@ internal unsafe class Config : IEzConfig
     public bool ShowAdditionalInfo = true;
     public bool RetryItemSearch = false;
     public bool ArtisanIntegration = false;
+    public bool DisplayMMType = false;
 
     internal bool DontReassign
     {
@@ -112,4 +113,8 @@ internal unsafe class Config : IEzConfig
     public bool SubsRepairFinalize = false;
     public MultiModeType MultiModeType = MultiModeType.Everything;
     public bool NoErrorCheckPlanner = false;
+    public WorkshopFailAction FailureNoFuel = WorkshopFailAction.ExcludeChar;
+    public WorkshopFailAction FailureNoRepair = WorkshopFailAction.ExcludeVessel;
+    public WorkshopFailAction FailureNoInventory = WorkshopFailAction.ExcludeChar;
+    public WorkshopFailAction FailureGeneric = WorkshopFailAction.StopPlugin;
 }

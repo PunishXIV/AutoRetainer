@@ -76,9 +76,12 @@ unsafe internal class ConfigGui : Window
         {
             MultiMode.OnMultiModeEnabled();
         }
-        ImGui.SameLine();
-        ImGui.SetNextItemWidth(100f);
-        ImGuiEx.EnumCombo("##mode", ref C.MultiModeType);
+        if (C.DisplayMMType)
+        {
+            ImGui.SameLine();
+            ImGui.SetNextItemWidth(100f);
+            ImGuiEx.EnumCombo("##mode", ref C.MultiModeType);
+        }
         if (C.CharEqualize && MultiMode.Enabled)
         {
             ImGui.SameLine();

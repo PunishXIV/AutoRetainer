@@ -38,6 +38,8 @@ internal static class Expert
             ImGui.Checkbox($"Auto-disable plugin when closing retainer list", ref C.AutoDisable);
             ImGuiEx.TextWrapped($"Only applies when you exit menu by yourself. Otherwise, settings above apply.");
             ImGui.Checkbox($"Do not show plugin status icons", ref C.HideOverlayIcons);
+
+            ImGui.Checkbox($"Display multi mode type selector", ref C.DisplayMMType);
         });
 
         InfoBox.DrawBox("Settings##expert", delegate

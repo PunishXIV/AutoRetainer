@@ -304,14 +304,23 @@ namespace AutoRetainer.Modules.Voyage
             return null;
         }
 
-        internal static bool AreAnyVesselsReturnInNext(this OfflineCharacterData data, int minutes) => data.AreAnyVesselsReturnInNext(VoyageType.Airship, minutes) || data.AreAnyVesselsReturnInNext(VoyageType.Submersible, minutes);
+        internal static bool AreAnyVesselsReturnInNext(this OfflineCharacterData data, int minutes, bool all = false) => data.AreAnyVesselsReturnInNext(VoyageType.Airship, minutes, all) || data.AreAnyVesselsReturnInNext(VoyageType.Submersible, minutes, all);
 
-        internal static bool AreAnyVesselsReturnInNext(this OfflineCharacterData data, VoyageType type, int minutes)
+        internal static bool AreAnyVesselsReturnInNext(this OfflineCharacterData data, VoyageType type, int minutes, bool all = false)
         {
-            var v = data.GetVesselData(type).Where(x => x.ReturnTime != 0 && x.GetRemainingSeconds() < minutes * 60 && data.GetEnabledVesselsData(type).Contains(x.Name));
-            if (v.Any())
+            
+            if (all)
             {
-                return true;
+                var v = data.GetVesselData(type).Where(x => data.GetEnabledVesselsData(type).Contains(x.Name)).All(x => x.ReturnTime != 0 && x.GetRemainingSeconds() < minutes * 60);
+                return v;
+            }
+            else
+            {
+                var v = data.GetVesselData(type).Where(x => x.ReturnTime != 0 && x.GetRemainingSeconds() < minutes * 60 && data.GetEnabledVesselsData(type).Contains(x.Name));
+                if (v.Any())
+                {
+                    return true;
+                }
             }
             return false;
         }
