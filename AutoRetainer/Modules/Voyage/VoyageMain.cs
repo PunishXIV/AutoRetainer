@@ -22,12 +22,37 @@ namespace AutoRetainer.Modules.Voyage
         internal static void Init()
         {
             Svc.Framework.Update += Tick;
+            Svc.Toasts.ErrorToast += Toasts_ErrorToast;
             VoyageMemory.Init();
+        }
+
+        private static void Toasts_ErrorToast(ref Dalamud.Game.Text.SeStringHandling.SeString message, ref bool isHandled)
+        {
+            if (MultiMode.Active || P.TaskManager.IsBusy)
+            {
+                var txt = message.ExtractText();
+                if (txt == Lang.VoyageInventoryError)
+                {
+                    DuoLog.Warning($"[Voyage] Your inventory is full!");
+                    Data.WorkshopEnabled = false;
+                    VoyageScheduler.Enabled = false;
+                    P.TaskManager.Abort();
+                    P.TaskManager.Enqueue(VoyageScheduler.SelectQuitVesselSelectorMenu);
+                    P.TaskManager.Enqueue(VoyageScheduler.SelectExitMainPanel);
+                }
+                if (txt.Contains("Unable to repair vessel."))
+                {
+                    TaskRepairAll.Abort = true;
+                    DuoLog.Warning($"[Voyage] You are out of repair components!");
+                    Data.GetEnabledVesselsData(TaskRepairAll.Type).Remove(TaskRepairAll.Name);
+                }
+            }
         }
 
         internal static void Shutdown()
         {
             Svc.Framework.Update -= Tick;
+            Svc.Toasts.ErrorToast -= Toasts_ErrorToast;
             VoyageMemory.Dispose();
         }
 
@@ -88,7 +113,7 @@ namespace AutoRetainer.Modules.Voyage
 
         static void DoWorkshopPanelTick()
         {
-            if (!P.TaskManager.IsBusy)
+            if (!P.TaskManager.IsBusy && FrameThrottler.Check("SchedulerRestartCooldown"))
             {
                 var data = Utils.GetCurrentCharacterData();
                 var panel = VoyageUtils.GetCurrentWorkshopPanelType();
@@ -112,7 +137,7 @@ namespace AutoRetainer.Modules.Voyage
                     {
                         if (EzThrottler.Throttle("DoWorkshopPanelTick.EnqueuePanelSelector", 1000))
                         {
-                            P.TaskManager.Enqueue(VoyageScheduler.ExitMainPanel);
+                            P.TaskManager.Enqueue(VoyageScheduler.SelectExitMainPanel);
                         }
                     }
                 }
@@ -124,6 +149,10 @@ namespace AutoRetainer.Modules.Voyage
                 {
                     ScheduleResend(VoyageType.Airship);
                 }
+            }
+            else
+            {
+                FrameThrottler.Throttle("SchedulerRestartCooldown", 10, true);
             }
         }
 

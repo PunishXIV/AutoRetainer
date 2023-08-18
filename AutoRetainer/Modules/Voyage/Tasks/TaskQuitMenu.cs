@@ -11,7 +11,7 @@ namespace AutoRetainer.Modules.Voyage.Tasks
     {
         internal static void Enqueue()
         {
-            P.TaskManager.Enqueue(VoyageScheduler.QuitVesselMenu);
+            P.TaskManager.Enqueue(VoyageScheduler.SelectQuitVesselSelectorMenu);
         }
     }
 }

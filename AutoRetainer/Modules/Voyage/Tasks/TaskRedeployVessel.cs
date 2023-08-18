@@ -1,5 +1,6 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage;
+using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using System;
 using System.Collections.Generic;
@@ -18,12 +19,7 @@ namespace AutoRetainer.Modules.Voyage.Tasks
             P.TaskManager.Enqueue(VoyageScheduler.FinalizeVessel);
             P.TaskManager.Enqueue(() => TryGetAddonByName<AtkUnitBase>("SelectString", out var addon) && IsAddonReady(addon), "WaitForSelectStringAddon");
             TaskIntelligentRepair.Enqueue(name, type);
-            P.TaskManager.Enqueue(VoyageScheduler.SelectViewPreviousLog);
-            P.TaskManager.Enqueue(VoyageScheduler.RedeployVessel);
-            P.TaskManager.Enqueue(VoyageScheduler.DeployVessel);
-            P.TaskManager.Enqueue(VoyageScheduler.WaitForCutscene);
-            P.TaskManager.Enqueue(VoyageScheduler.PressEsc);
-            P.TaskManager.Enqueue(VoyageScheduler.ConfirmSkip);
+            TaskRedeployPreviousLog.Enqueue();
         }
     }
 }

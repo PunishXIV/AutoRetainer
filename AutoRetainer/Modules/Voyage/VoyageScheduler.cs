@@ -1,4 +1,5 @@
-﻿using ClickLib.Clicks;
+﻿using AutoRetainer.Modules.Voyage.Tasks;
+using ClickLib.Clicks;
 using Dalamud.Game.ClientState.Conditions;
 using ECommons.Automation;
 using ECommons.GameFunctions;
@@ -16,10 +17,11 @@ namespace AutoRetainer.Modules.Voyage
     {
         internal static void Log(string t) => VoyageUtils.Log(t);
         internal static bool Enabled = false;
-        internal static bool? SelectVesselQuit() => Utils.TrySelectSpecificEntry("Quit");
+        internal static bool? SelectQuitVesselMenu() => Utils.TrySelectSpecificEntry("Quit");
 
         internal static bool? ConfirmRepair()
         {
+            if (TaskRepairAll.Abort) return true;
             var x = Utils.GetSpecificYesno((s) => s.ContainsAny(StringComparison.OrdinalIgnoreCase, "repair"));
             if(x != null && Utils.GenericThrottle)
             {
@@ -55,6 +57,7 @@ namespace AutoRetainer.Modules.Voyage
 
         internal static bool? TryRepair(int slot)
         {
+            if (TaskRepairAll.Abort) return true;
             var t = $"VoyageScheduler.TryRepair{slot}";
             if (TryGetAddonByName<AtkUnitBase>("SelectYesno", out var _))
             {
@@ -202,13 +205,23 @@ namespace AutoRetainer.Modules.Voyage
 
         internal static bool? InteractWithVoyagePanel()
         {
-            if (VoyageUtils.TryGetNearestVoyagePanel(out var obj) && Svc.Targets.Target?.Address == obj.Address)
+            if (VoyageUtils.TryGetNearestVoyagePanel(out var obj))
             {
-                if (Utils.GenericThrottle && EzThrottler.Throttle("Voyage.Interact", 2000))
+                if (Svc.Targets.Target?.Address == obj.Address)
                 {
-                    Log("Interacting with workshop CP");
-                    TargetSystem.Instance()->InteractWithObject(obj.Struct(), false);
-                    return true;
+                    if (Utils.GenericThrottle && EzThrottler.Throttle("Voyage.Interact", 2000))
+                    {
+                        Log("Interacting with workshop CP");
+                        TargetSystem.Instance()->InteractWithObject(obj.Struct(), false);
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (obj.IsTargetable && Utils.GenericThrottle)
+                    {
+                        Svc.Targets.Target = obj;
+                    }
                 }
             }
             return false;
@@ -224,7 +237,7 @@ namespace AutoRetainer.Modules.Voyage
             return Utils.TrySelectSpecificEntry(Lang.SubmarineManagement, () => Utils.GenericThrottle && EzThrottler.Throttle("Voyage.SelectManagement", 1000));
         }
 
-        internal static bool? ExitMainPanel()
+        internal static bool? SelectExitMainPanel()
         {
             return Utils.TrySelectSpecificEntry("Cancel", () => Utils.GenericThrottle && EzThrottler.Throttle("Voyage.ExitMainPanel", 1000));
         }
@@ -299,7 +312,24 @@ namespace AutoRetainer.Modules.Voyage
             return false;
         }
 
-        internal static bool? QuitVesselMenu()
+        internal static bool? CancelDeployVessel()
+        {
+            if (TryGetAddonByName<AtkUnitBase>("AirShipExplorationDetail", out var addon) && IsAddonReady(addon))
+            {
+                if (Utils.GenericThrottle && EzThrottler.Throttle("Voyage.CancelDeploy"))
+                {
+                    Callback.Fire(addon, true, -1);
+                    return true;
+                }
+            }
+            else
+            {
+                Utils.RethrottleGeneric();
+            }
+            return false;
+        }
+
+        internal static bool? SelectQuitVesselSelectorMenu()
         {
             return Utils.TrySelectSpecificEntry(Lang.NothingVoyage, () => EzThrottler.Throttle("Voyage.Quit", 1000));
         }

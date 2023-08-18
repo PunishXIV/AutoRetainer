@@ -136,7 +136,7 @@ namespace AutoRetainer.UI
                                 {
                                     TaskSelectVesselByName.Enqueue(x.Name);
                                     TaskIntelligentRepair.Enqueue(x.Name, VoyageType.Submersible);
-                                    P.TaskManager.Enqueue(VoyageScheduler.SelectVesselQuit);
+                                    P.TaskManager.Enqueue(VoyageScheduler.SelectQuitVesselMenu);
                                 }
                                 else
                                 {
@@ -152,6 +152,11 @@ namespace AutoRetainer.UI
                         if (ImGui.Button("Approach panel"))
                         {
                             TaskInteractWithNearestPanel.Enqueue(false);
+                        }
+
+                        if(ImGui.Button("Redeploy current vessel on previous voyage"))
+                        {
+                            TaskRedeployPreviousLog.Enqueue();
                         }
 
                     }

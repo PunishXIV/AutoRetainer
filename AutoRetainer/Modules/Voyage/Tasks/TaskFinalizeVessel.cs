@@ -19,7 +19,7 @@ namespace AutoRetainer.Modules.Voyage.Tasks
             {
                 TaskIntelligentRepair.Enqueue(name, type);
             }
-            P.TaskManager.Enqueue(VoyageScheduler.SelectVesselQuit);
+            P.TaskManager.Enqueue(VoyageScheduler.SelectQuitVesselMenu);
         }
     }
 }

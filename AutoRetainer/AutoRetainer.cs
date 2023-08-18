@@ -227,7 +227,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                     C.SelectedRetainers[Svc.ClientState.LocalContentId] = new();
                 }
             }
-            if (Svc.Condition[ConditionFlag.OccupiedSummoningBell] && (SchedulerMain.PluginEnabled || P.TaskManager.IsBusy || ConditionWasEnabled))
+            if (P.TaskManager.IsBusy || (Svc.Condition[ConditionFlag.OccupiedSummoningBell] && (SchedulerMain.PluginEnabled || P.TaskManager.IsBusy || ConditionWasEnabled)))
             {
                 if (TryGetAddonByName<AddonTalk>("Talk", out var addon) && addon->AtkUnitBase.IsVisible)
                 {

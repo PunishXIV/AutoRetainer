@@ -228,6 +228,7 @@ internal static class SettingsMain
 
     static void TabExclusions()
     {
+        C.OfflineData.RemoveAll(x => C.Blacklist.Any(z => z.CID == x.CID));
         if (C.Blacklist.Any())
         {
             foreach(var x in C.OfflineData)
@@ -246,11 +247,14 @@ internal static class SettingsMain
                     if(ImGui.Checkbox("Retainers", ref x.ExcludeRetainer))
                     {
                         x.Enabled = false;
+                        C.SelectedRetainers.Remove(x.CID);
                     }
                     ImGui.TableNextColumn();
                     if(ImGui.Checkbox("Deployables", ref x.ExcludeWorkshop))
                     {
                         x.WorkshopEnabled = false;
+                        x.EnabledSubs.Clear();
+                        x.EnabledAirships.Clear();
                     }
                     ImGui.TableNextColumn();
                     ImGui.Checkbox("Login overlay", ref x.ExcludeOverlay);

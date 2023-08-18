@@ -1,4 +1,5 @@
 ﻿using Dalamud;
+using Dalamud.Utility;
 using Lumina.Excel.GeneratedSheets;
 
 namespace AutoRetainer;
@@ -139,4 +140,7 @@ internal static class Lang
     internal static readonly string AirshipManagement = "Airship Management";
     internal static readonly string SubmarineManagement = "Submersible Management";
     internal static readonly string NothingVoyage = "Nothing.";
+
+    //4160	60	9	0	False	Unable to retrieve extracted items. Insufficient inventory/crystal inventory space.
+    internal static string VoyageInventoryError => Svc.Data.GetExcelSheet<LogMessage>().GetRow(4160).Text.ToDalamudString().ExtractText();
 }
