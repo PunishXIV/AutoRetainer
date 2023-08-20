@@ -155,7 +155,7 @@ namespace AutoRetainer.Modules.Voyage
                                 P.TaskManager.Enqueue(VoyageScheduler.SelectSubManagement);
                             }
                         }
-                        else if (!data.AreAnyVesselsReturnInNext(5))
+                        else if (!data.AreAnyVesselsReturnInNext(5 * 60))
                         {
                             if (EzThrottler.Throttle("DoWorkshopPanelTick.EnqueuePanelSelector", 1000))
                             {
@@ -201,7 +201,7 @@ namespace AutoRetainer.Modules.Voyage
             }
             else
             {
-                if (!Data.AreAnyVesselsReturnInNext(type, 1))
+                if (!Data.AreAnyVesselsReturnInNext(type, 1 * 60))
                 {
                     if (EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResendQuitPanel", 1000))
                     {

@@ -56,7 +56,7 @@ internal unsafe static class MultiMode
             Interactions.Clear();
             if (CanHET)
             {
-                P.DebugLog($"ProperOnLogin: {Svc.ClientState.LocalPlayer}, residential area, scheduling HET");
+                DebugLog($"ProperOnLogin: {Svc.ClientState.LocalPlayer}, residential area, scheduling HET");
                 HouseEnterTask.EnqueueTask();
             }
             MultiModeUI.JustRelogged = true;
@@ -170,7 +170,7 @@ internal unsafe static class MultiMode
                     }
                     if (next != null)
                     {
-                        P.DebugLog($"Enqueueing relog");
+                        DebugLog($"Enqueueing relog");
                         BlockInteraction(20);
                         EnsureCharacterValidity();
                         RestoreValidityInWorkshop();
@@ -180,16 +180,16 @@ internal unsafe static class MultiMode
                         }
                         else
                         {
-                            P.DebugLog($"Relog command success");
+                            DebugLog($"Relog command success");
                         }
                         Interactions.PushBack(Environment.TickCount64);
-                        P.DebugLog($"Added interaction because of relogging (state: {Interactions.Print()})");
+                        DebugLog($"Added interaction because of relogging (state: {Interactions.Print()})");
                     }
                     else
                     {
                         if(C.MultiWaitOnLoginScreen)
                         {
-                            P.DebugLog($"Enqueueing logoff");
+                            DebugLog($"Enqueueing logoff");
                             BlockInteraction(20);
                             EnsureCharacterValidity();
                             RestoreValidityInWorkshop();
@@ -199,10 +199,10 @@ internal unsafe static class MultiMode
                             }
                             else
                             {
-                                P.DebugLog($"Logoff command success");
+                                DebugLog($"Logoff command success");
                             }
                             Interactions.PushBack(Environment.TickCount64);
-                            P.DebugLog($"Added interaction because of logging off (state: {Interactions.Print()})");
+                            DebugLog($"Added interaction because of logging off (state: {Interactions.Print()})");
                         }
                     }
                 }
@@ -215,22 +215,22 @@ internal unsafe static class MultiMode
                         RestoreValidityInWorkshop();
                         if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data) && data.Enabled)
                         {
-                            P.DebugLog($"Enqueueing interaction with bell");
+                            DebugLog($"Enqueueing interaction with bell");
                             TaskInteractWithNearestBell.Enqueue();
                             P.TaskManager.Enqueue(() => { SchedulerMain.EnablePlugin(PluginEnableReason.MultiMode); return true; });
                             BlockInteraction(10);
                             Interactions.PushBack(Environment.TickCount64);
-                            P.DebugLog($"Added interaction because of interacting (state: {Interactions.Print()})");
+                            DebugLog($"Added interaction because of interacting (state: {Interactions.Print()})");
                         }
                     }
                     else if(Data.AnyEnabledVesselsAvailable() && MultiMode.EnabledSubmarines)
                     {
-                        P.DebugLog($"Enqueueing interaction with panel");
+                        DebugLog($"Enqueueing interaction with panel");
                         BlockInteraction(10);
                         TaskInteractWithNearestPanel.Enqueue();
                         P.TaskManager.Enqueue(() => { VoyageScheduler.Enabled = true; }) ;
                         Interactions.PushBack(Environment.TickCount64);
-                        P.DebugLog($"Added interaction because of interacting (state: {Interactions.Print()})");
+                        DebugLog($"Added interaction because of interacting (state: {Interactions.Print()})");
                     }
                 }
             }
@@ -382,7 +382,7 @@ internal unsafe static class MultiMode
                 {
                     var selectedRetainers = x.GetEnabledRetainers().Where(z => z.HasVenture);
                     if (selectedRetainers.Any() &&
-                        C.MultiWaitForAll ? selectedRetainers.All(z => z.GetVentureSecondsRemaining() <= C.AdvanceTimer) : selectedRetainers.Any(z => z.GetVentureSecondsRemaining() <= C.AdvanceTimer))
+                        C.MultiModeRetainerConfiguration.MultiWaitForAll ? selectedRetainers.All(z => z.GetVentureSecondsRemaining() <= C.MultiModeRetainerConfiguration.AdvanceTimer) : selectedRetainers.Any(z => z.GetVentureSecondsRemaining() <= C.MultiModeRetainerConfiguration.AdvanceTimer))
                     {
                         return x;
                     }
@@ -396,7 +396,7 @@ internal unsafe static class MultiMode
                 if (x.CID == Player.CID) continue;
                 if (x.WorkshopEnabled && x.GetEnabledVesselsData(VoyageType.Airship).Count + x.GetEnabledVesselsData(VoyageType.Submersible).Count > 0)
                 {
-                    if (x.AreAnyVesselsReturnInNext(2, C.MultiWaitForAll))
+                    if (x.AreAnyVesselsReturnInNext(C.MultiModeWorkshopConfiguration.AdvanceTimer, C.MultiModeWorkshopConfiguration.MultiWaitForAll))
                     {
                         return x;
                     }
@@ -425,7 +425,7 @@ internal unsafe static class MultiMode
     {
         if (!EnabledSubmarines) return true;
         if(!Data.WorkshopEnabled) return true;
-        return !Data.AreAnyVesselsReturnInNext(5);
+        return !Data.AreAnyVesselsReturnInNext(5 * 60);
     }
 
     internal static bool IsAnySelectedRetainerFinishesWithin(int seconds)

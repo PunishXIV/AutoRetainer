@@ -30,7 +30,7 @@ namespace AutoRetainer.Scheduler
                     if(!SchedulerMain.PluginEnabled || SchedulerMain.Reason != PluginEnableReason.Artisan)
                     {
                         SchedulerMain.EnablePlugin(PluginEnableReason.Artisan);
-                        P.DebugLog($"Enabling AutoRetainer because of Artisan integration");
+                        DebugLog($"Enabling AutoRetainer because of Artisan integration");
                     }
                     try
                     {

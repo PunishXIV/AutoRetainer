@@ -16,7 +16,7 @@ namespace AutoRetainer.Modules.Voyage.Tasks
             P.TaskManager.Enqueue(() => !IsOccupied(), 180 * 1000, "WaitUntilNotOccupied1");
             P.TaskManager.Enqueue(() =>
             {
-                if(Data.AreAnyVesselsReturnInNext(5) || (Utils.GetNearestRetainerBell(out _) == null && Utils.GetNearestWorkshopEntrance(out _) != null))
+                if(Data.AreAnyVesselsReturnInNext(5 * 60) || (Utils.GetNearestRetainerBell(out _) == null && Utils.GetNearestWorkshopEntrance(out _) != null))
                 {
                     EnqueueImmediateEnterWorkshop();
                 }
@@ -53,7 +53,7 @@ namespace AutoRetainer.Modules.Voyage.Tasks
         {
             if (Utils.TrySelectSpecificEntry("Move to the company workshop", () => EzThrottler.Throttle("HET.SelectEnterWorkshop")))
             {
-                P.DebugLog("Confirmed going to apartment");
+                DebugLog("Confirmed going to apartment");
                 return true;
             }
             return false;
@@ -64,7 +64,7 @@ namespace AutoRetainer.Modules.Voyage.Tasks
             var entrance = Utils.GetNearestWorkshopEntrance(out var d);
             if (entrance != null && Svc.Targets.Target?.Address == entrance.Address && EzThrottler.Throttle("HET.InteractAdd", 1000))
             {
-                P.DebugLog($"Interacting with entrance");
+                DebugLog($"Interacting with entrance");
                 TargetSystem.Instance()->InteractWithObject((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)entrance.Address, false);
                 return true;
             }
@@ -75,7 +75,7 @@ namespace AutoRetainer.Modules.Voyage.Tasks
             var entrance = Utils.GetNearestWorkshopEntrance(out var d);
             if (entrance != null && d < 3f + Utils.Random && EzThrottler.Throttle("HET.DisableAutomoveAdd"))
             {
-                P.DebugLog($"Disabling automove");
+                DebugLog($"Disabling automove");
                 Chat.Instance.SendMessage("/automove off");
                 return true;
             }
@@ -99,7 +99,7 @@ namespace AutoRetainer.Modules.Voyage.Tasks
                 {
                     if (EzThrottler.Throttle("HET.SetTargetAdd", 200))
                     {
-                        P.DebugLog($"Setting entrance target ({entrance})");
+                        DebugLog($"Setting entrance target ({entrance})");
                         Svc.Targets.Target = entrance;
                     }
                 }

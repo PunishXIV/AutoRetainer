@@ -18,7 +18,7 @@ namespace AutoRetainer.Scheduler.Tasks
             }, "TaskPostprocessIPCEnqueue");
             P.TaskManager.Enqueue(() =>
             {
-                P.DebugLog($"SchedulerMain.RetainerPostprocess contains: {SchedulerMain.RetainerPostprocess.Print()}, pluginToProcess = {pluginToProcess}");
+                DebugLog($"SchedulerMain.RetainerPostprocess contains: {SchedulerMain.RetainerPostprocess.Print()}, pluginToProcess = {pluginToProcess}");
                 foreach (var x in SchedulerMain.RetainerPostprocess.Where(x => pluginToProcess == null || x == pluginToProcess))
                 {
                     P.TaskManager.EnqueueImmediate(() =>

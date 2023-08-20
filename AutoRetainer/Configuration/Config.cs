@@ -16,11 +16,9 @@ internal unsafe class Config : IEzConfig
     public bool EnableAssigningQuickExploration = false;
     public bool Verbose = false;
     public List<OfflineCharacterData> OfflineData = new();
-    public bool MultiWaitForAll = false;
     //public bool MultipleServiceAccounts = false;
     public bool NoNames = false;
     public int UnsyncCompensation = -5;
-    public int AdvanceTimer = 60;
     public bool StatsUnifyHQ = false;
     public bool RecordStats = true;
     public bool EnableAutoGCHandin = false; //todo: remove
@@ -117,4 +115,15 @@ internal unsafe class Config : IEzConfig
     public WorkshopFailAction FailureNoRepair = WorkshopFailAction.ExcludeVessel;
     public WorkshopFailAction FailureNoInventory = WorkshopFailAction.ExcludeChar;
     public WorkshopFailAction FailureGeneric = WorkshopFailAction.StopPlugin;
+
+    public MultiModeCommonConfiguration MultiModeRetainerConfiguration = new()
+    {
+        AdvanceTimer = 60,
+        MultiWaitForAll = false,
+    };
+    public MultiModeCommonConfiguration MultiModeWorkshopConfiguration = new()
+    {
+        MultiWaitForAll = false,
+        AdvanceTimer = 120,
+    };
 }

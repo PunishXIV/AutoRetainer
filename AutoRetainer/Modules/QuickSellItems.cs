@@ -145,13 +145,13 @@ public unsafe class QuickSellItems : IDisposable
                                 {
                                     if (Bitmask.IsBitSet(agent->ContextItemDisabledMask, i))
                                     {
-                                        P.DebugLog($"QRA found {i}:{contextItemName} but it's disabled");
+                                        DebugLog($"QRA found {i}:{contextItemName} but it's disabled");
                                         continue;
                                     }
                                     Common.GenerateCallback(addon, 0, i, 0U, 0, 0);
                                     agent->AgentInterface.Hide();
                                     UiHelper.Close(addon);
-                                    P.DebugLog($"QRA Selected {i}:{contextItemName}");
+                                    DebugLog($"QRA Selected {i}:{contextItemName}");
                                     return retVal;
                                 }
                             }

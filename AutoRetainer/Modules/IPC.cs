@@ -11,7 +11,7 @@ namespace AutoRetainer.Modules
 {
     internal static class IPC
     {
-        static void Log(string s) => P.DebugLog($"[IPC] {s}");
+        static void Log(string s) => DebugLog($"[IPC] {s}");
         internal static bool Suppressed = false;
 
         internal static void Init()
@@ -98,7 +98,7 @@ namespace AutoRetainer.Modules
         static void SetVenture(uint VentureID)
         {
             SchedulerMain.VentureOverride = VentureID;
-            P.DebugLog($"Received venture override to {VentureID} / {VentureUtils.GetVentureName(VentureID)} via IPC");
+            DebugLog($"Received venture override to {VentureID} / {VentureUtils.GetVentureName(VentureID)} via IPC");
         }
 
         static bool GetSuppressed()

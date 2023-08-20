@@ -35,7 +35,7 @@ internal static unsafe class Utils
     internal static void RegenerateRandom()
     {
         Random = (float)new Random().NextDouble();
-        P.DebugLog($"Random regenerated: {Random}");
+        DebugLog($"Random regenerated: {Random}");
     }
 
     internal static bool MultiModeOrArtisan => MultiMode.Active || (SchedulerMain.PluginEnabled && SchedulerMain.Reason == PluginEnableReason.Artisan);
@@ -342,7 +342,7 @@ internal static unsafe class Utils
                 if (index >= 0 && IsSelectItemEnabled(addon, index) && (Throttler?.Invoke() ?? GenericThrottle))
                 {
                     ClickSelectString.Using((nint)addon).SelectItem((ushort)index);
-                    P.DebugLog($"TrySelectSpecificEntry: selecting {entry}/{index} as requested by {text.Print()}");
+                    DebugLog($"TrySelectSpecificEntry: selecting {entry}/{index} as requested by {text.Print()}");
                     return true;
                 }
             }
@@ -365,7 +365,7 @@ internal static unsafe class Utils
                 if (index >= 0 && IsSelectItemEnabled(addon, index) && (Throttler?.Invoke() ?? GenericThrottle))
                 {
                     ClickSelectString.Using((nint)addon).SelectItem((ushort)index);
-                    P.DebugLog($"TrySelectSpecificEntry: selecting {entry}/{index}");
+                    DebugLog($"TrySelectSpecificEntry: selecting {entry}/{index}");
                     return true;
                 }
             }

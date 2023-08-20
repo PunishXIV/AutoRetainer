@@ -134,14 +134,14 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 && offlineData.RetainerData.TryGetFirst(x => x.Name == ret, out var offlineRetainerData))
             {
                 offlineRetainerData.VentureBeginsAt = P.Time;
-                P.DebugLog($"Recorded venture start time = {offlineRetainerData.VentureBeginsAt}");
+                DebugLog($"Recorded venture start time = {offlineRetainerData.VentureBeginsAt}");
             }
             //4578	57	33	0	False	Gil earned from market sales has been entrusted to your retainer.<If(Equal(IntegerParameter(1),1))>
             //The amount earned exceeded your retainer's gil limit. Excess gil has been discarded.<Else/></If>
             if (text.StartsWith(Svc.Data.GetExcelSheet<LogMessage>().GetRow(4578).Text.ToDalamudString().ExtractText(true)))
             {
                 TaskWithdrawGil.forceCheck = true;
-                P.DebugLog($"Forcing to check for gil");
+                DebugLog($"Forcing to check for gil");
             }
         }
     }
@@ -272,7 +272,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 if (!ConditionWasEnabled)
                 {
                     ConditionWasEnabled = true;
-                    P.DebugLog($"ConditionWasEnabled = true");
+                    DebugLog($"ConditionWasEnabled = true");
                 }
             }
         }
@@ -399,9 +399,13 @@ public unsafe class AutoRetainer : IDalamudPlugin
         return config.SelectedRetainers[cid];
     }
 
-    internal void DebugLog(string message)
+    internal static string LastLogMsg = string.Empty;
+    internal static void DebugLog(string message)
     {
-        PluginLog.Debug(message);
+        if (LastLogMsg != message)
+        {
+            PluginLog.Debug(message);
+        }
     }
 
     private void ConditionChange(ConditionFlag flag, bool value)
@@ -412,7 +416,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             if (!value)
             {
                 ConditionWasEnabled = false;
-                P.DebugLog("ConditionWasEnabled = false;");
+                DebugLog("ConditionWasEnabled = false;");
             }
             if (Svc.Targets.Target.IsRetainerBell()) {
                 if (value)
@@ -464,13 +468,13 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 {
                     if (WasEnabled)
                     {
-                        P.DebugLog($"Enabling plugin because WasEnabled is true");
+                        DebugLog($"Enabling plugin because WasEnabled is true");
                         SchedulerMain.EnablePlugin(PluginEnableReason.Auto);
                         WasEnabled = false;
                     }
                     else if(!IsCloseActionAutomatic && C.AutoDisable && !Utils.MultiModeOrArtisan)
                     {
-                        P.DebugLog($"Disabling plugin because AutoDisable is on");
+                        DebugLog($"Disabling plugin because AutoDisable is on");
                         SchedulerMain.DisablePlugin();
                     }
                 }

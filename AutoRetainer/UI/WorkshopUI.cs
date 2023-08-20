@@ -69,7 +69,7 @@ namespace AutoRetainer.UI
                     .Union(data.GetVesselData(VoyageType.Submersible).Where(x => data.GetEnabledVesselsData(VoyageType.Submersible).Contains(x.Name)))
                     .Where(x => x.ReturnTime != 0).OrderBy(z => z.GetRemainingSeconds());
                 //if (EzThrottler.Throttle("log")) PluginLog.Information($"{lst.Select(x => x.Name).Print()}");
-                var lowestRetainer = C.MultiWaitForAll?lst.LastOrDefault():lst.FirstOrDefault();
+                var lowestRetainer = C.MultiModeWorkshopConfiguration.MultiWaitForAll?lst.LastOrDefault():lst.FirstOrDefault();
                 if (lowestRetainer != default)
                 {
                     var prog = 1f - ((float)lowestRetainer.GetRemainingSeconds() / (60f * 60f * 24f));
@@ -277,7 +277,10 @@ namespace AutoRetainer.UI
             ImGuiEx.TextV(type == VoyageType.Airship ? "\ue22d" : "\uf21a");
             ImGui.PopFont();
             ImGui.SameLine();
+            var disabled = data.OfflineSubmarineData.Where(x => data.EnabledSubs.Contains(x.Name)).Count() + data.OfflineAirshipData.Where(x => data.EnabledAirships.Contains(x.Name)).Count() >= 4 && !enabled.Contains(vessel.Name);
+            if (disabled) ImGui.BeginDisabled();
             ImGuiEx.CollectionCheckbox($"{vessel.Name}##sub", vessel.Name, enabled);
+            if (disabled) ImGui.EndDisabled();
             if (finalize.Contains(vessel.Name))
             {
                 ImGui.SameLine();

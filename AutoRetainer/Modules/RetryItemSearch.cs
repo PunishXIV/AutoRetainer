@@ -24,7 +24,7 @@ namespace AutoRetainer.Modules
                         {
                             if (!P.TaskManager.IsBusy && EzThrottler.Throttle("RetrySearch", 1000))
                             {
-                                P.DebugLog("Enqueueing ItemSearchResult retry (retainer)");
+                                DebugLog("Enqueueing ItemSearchResult retry (retainer)");
                                 P.TaskManager.Enqueue(delegate
                                 {
                                     if (TryGetAddonByName<AtkUnitBase>("ItemSearchResult", out var a))
@@ -64,7 +64,7 @@ namespace AutoRetainer.Modules
                         {
                             if (!P.TaskManager.IsBusy && P.Memory.LastSearchItem != -1 && EzThrottler.Throttle("RetrySearch", 1500))
                             {
-                                P.DebugLog("Enqueueing ItemSearchResult retry (marketboard)");
+                                DebugLog("Enqueueing ItemSearchResult retry (marketboard)");
                                 P.TaskManager.Enqueue(delegate
                                 {
                                     if (TryGetAddonByName<AtkUnitBase>("ItemSearchResult", out var a))

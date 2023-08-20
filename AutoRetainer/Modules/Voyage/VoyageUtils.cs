@@ -47,7 +47,7 @@ namespace AutoRetainer.Modules.Voyage
 
         internal static void Log(string text)
         {
-            P.DebugLog($"[Voyage] {text}");
+            DebugLog($"[Voyage] {text}");
         }
 
         internal static List<OfflineVesselData> GetVesselData(this OfflineCharacterData data, VoyageType type)
@@ -304,19 +304,18 @@ namespace AutoRetainer.Modules.Voyage
             return null;
         }
 
-        internal static bool AreAnyVesselsReturnInNext(this OfflineCharacterData data, int minutes, bool all = false) => data.AreAnyVesselsReturnInNext(VoyageType.Airship, minutes, all) || data.AreAnyVesselsReturnInNext(VoyageType.Submersible, minutes, all);
+        internal static bool AreAnyVesselsReturnInNext(this OfflineCharacterData data, int seconds, bool all = false) => data.AreAnyVesselsReturnInNext(VoyageType.Airship, seconds, all) || data.AreAnyVesselsReturnInNext(VoyageType.Submersible, seconds, all);
 
-        internal static bool AreAnyVesselsReturnInNext(this OfflineCharacterData data, VoyageType type, int minutes, bool all = false)
+        internal static bool AreAnyVesselsReturnInNext(this OfflineCharacterData data, VoyageType type, int seconds, bool all = false)
         {
-            
             if (all)
             {
-                var v = data.GetVesselData(type).Where(x => data.GetEnabledVesselsData(type).Contains(x.Name)).All(x => x.ReturnTime != 0 && x.GetRemainingSeconds() < minutes * 60);
-                return v;
+                var v = data.GetVesselData(type).Where(x => data.GetEnabledVesselsData(type).Contains(x.Name));
+                return v.Any() && v.All(x => x.ReturnTime != 0 && x.GetRemainingSeconds() < seconds);
             }
             else
             {
-                var v = data.GetVesselData(type).Where(x => x.ReturnTime != 0 && x.GetRemainingSeconds() < minutes * 60 && data.GetEnabledVesselsData(type).Contains(x.Name));
+                var v = data.GetVesselData(type).Where(x => x.ReturnTime != 0 && x.GetRemainingSeconds() < seconds && data.GetEnabledVesselsData(type).Contains(x.Name));
                 if (v.Any())
                 {
                     return true;

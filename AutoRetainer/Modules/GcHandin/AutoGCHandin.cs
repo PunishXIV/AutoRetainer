@@ -74,12 +74,12 @@ internal unsafe static class AutoGCHandin
                 if (TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon) && IsAddonReady(addon) && EzThrottler.Throttle("CloseSupplyList", 200))
                 {
                     UiHelper.Close(addon);
-                    P.DebugLog($"Closing Supply List");
+                    DebugLog($"Closing Supply List");
                 }
                 if (EzThrottler.Throttle("Handin", 200) && addonGCSR->DeliverButton->IsEnabled)
                 {
                     ClickGrandCompanySupplyReward.Using((IntPtr)addonGCSR).Deliver();
-                    P.DebugLog($"Delivering Item");
+                    DebugLog($"Delivering Item");
                 }
             }
             else if (TryGetAddonByName<AddonSelectYesno>("SelectYesno", out var addonSS) && IsAddonReady(&addonSS->AtkUnitBase) && Operation)
@@ -87,12 +87,12 @@ internal unsafe static class AutoGCHandin
                 if (EzThrottler.Throttle("Yesno", 200) && addonSS->YesButton->IsEnabled)
                 {
                     var str = MemoryHelper.ReadSeString(&addonSS->PromptText->NodeText).ExtractText();
-                    P.DebugLog($"SelectYesno encountered: {str}");
+                    DebugLog($"SelectYesno encountered: {str}");
                     //102434	Do you really want to trade a high-quality item?
                     if (str.Equals(Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(102434).Text.ToDalamudString().ExtractText()))
                     {
                         ClickSelectYesNo.Using((IntPtr)addonSS).Yes();
-                        P.DebugLog($"Selecting yes");
+                        DebugLog($"Selecting yes");
                     }
                 }
             }
@@ -143,7 +143,7 @@ internal unsafe static class AutoGCHandin
                                 var step3 = step2->GetAsAtkComponentNode()->Component->UldManager.NodeList[5];
                                 var text = MemoryHelper.ReadSeString(&step3->GetAsAtkTextNode()->NodeText).ExtractText();
                                 var has = !text.IsNullOrWhitespace() && HasInInventory(text);
-                                P.DebugLog($"Seals: {seals}/{maxSeals}, for item {sealsForItem} | {text}: {has}");
+                                DebugLog($"Seals: {seals}/{maxSeals}, for item {sealsForItem} | {text}: {has}");
                                 EzThrottler.Throttle("AutoGCHandin", 500, true);
                                 if (!has)
                                 {
@@ -153,7 +153,7 @@ internal unsafe static class AutoGCHandin
                                 {
                                     throw new GCHandinInterruptedException($"Too many seals, please spend them");
                                 }
-                                P.DebugLog($"Handing in item {text} for {sealsForItem} seals");
+                                DebugLog($"Handing in item {text} for {sealsForItem} seals");
                                 InvokeHandin(addon);
                             }
                             catch (FormatException e)

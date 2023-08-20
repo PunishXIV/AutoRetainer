@@ -26,52 +26,52 @@ namespace AutoRetainer.Helpers
 
         internal static void ProcessVenturePlanner(this SeRetainer ret, uint next)
         {
-            P.DebugLog($"Not completed or restarting");
+            DebugLog($"Not completed or restarting");
             if (ret.VentureID != 0)
             {
-                P.DebugLog($"Venture id is not zero, next={next}, ventureID={ret.VentureID}");
+                DebugLog($"Venture id is not zero, next={next}, ventureID={ret.VentureID}");
                 if (next == ret.VentureID)
                 {
-                    P.DebugLog($"Reassigning");
+                    DebugLog($"Reassigning");
                     TaskReassignVenture.Enqueue();
                 }
                 else
                 {
-                    P.DebugLog($"Collecting");
+                    DebugLog($"Collecting");
                     TaskCollectVenture.Enqueue();
                     if (VentureUtils.GetVentureById(next).IsFieldExploration())
                     {
-                        P.DebugLog($"Assigning field exploration: {next}");
+                        DebugLog($"Assigning field exploration: {next}");
                         TaskAssignFieldExploration.Enqueue(next);
                     }
                     else if (VentureUtils.GetVentureById(next).IsQuickExploration())
                     {
-                        P.DebugLog($"Assigning quick: {next}");
+                        DebugLog($"Assigning quick: {next}");
                         TaskAssignQuickVenture.Enqueue();
                     }
                     else
                     {
-                        P.DebugLog($"Assigning hunt: {next}");
+                        DebugLog($"Assigning hunt: {next}");
                         TaskAssignHuntingVenture.Enqueue(next);
                     }
                 }
             }
             else
             {
-                P.DebugLog($"Venture not assigned");
+                DebugLog($"Venture not assigned");
                 if (VentureUtils.GetVentureById(next).IsFieldExploration())
                 {
-                    P.DebugLog($"Assigning field exploration: {next}");
+                    DebugLog($"Assigning field exploration: {next}");
                     TaskAssignFieldExploration.Enqueue(next);
                 }
                 else if (VentureUtils.GetVentureById(next).IsQuickExploration())
                 {
-                    P.DebugLog($"Assigning quick: {next}");
+                    DebugLog($"Assigning quick: {next}");
                     TaskAssignQuickVenture.Enqueue();
                 }
                 else
                 {
-                    P.DebugLog($"Assigning hunt: {next}");
+                    DebugLog($"Assigning hunt: {next}");
                     TaskAssignHuntingVenture.Enqueue(next);
                 }
             }

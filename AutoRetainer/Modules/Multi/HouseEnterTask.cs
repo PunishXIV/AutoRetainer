@@ -65,7 +65,7 @@ internal unsafe static class HouseEnterTask
 
     internal static bool? Approach()
     {
-        P.DebugLog($"Enabling automove");
+        DebugLog($"Enabling automove");
         Utils.RegenerateRandom();
         Chat.Instance.SendMessage("/automove on");
         return true;
@@ -76,7 +76,7 @@ internal unsafe static class HouseEnterTask
         var entrance = Utils.GetNearestEntrance(out var d);
         if (entrance != null && d < 3f + Utils.Random && EzThrottler.Throttle("HET.DisableAutomove"))
         {
-            P.DebugLog($"Disabling automove");
+            DebugLog($"Disabling automove");
             Chat.Instance.SendMessage("/automove off");
             return true;
         }
@@ -89,7 +89,7 @@ internal unsafe static class HouseEnterTask
         var entrance = Utils.GetNearestEntrance(out var d);
         if (entrance != null && d < distance && EzThrottler.Throttle("HET.SetTarget", 200))
         {
-            P.DebugLog($"Setting entrance target ({distance})");
+            DebugLog($"Setting entrance target ({distance})");
             Svc.Targets.Target = (entrance);
             return true;
         }
@@ -101,7 +101,7 @@ internal unsafe static class HouseEnterTask
         var entrance = Utils.GetNearestEntrance(out var d);
         if (entrance != null && Svc.Targets.Target?.Address == entrance.Address && EzThrottler.Throttle("HET.Interact", 1000))
         {
-            P.DebugLog($"Interacting with entrance");
+            DebugLog($"Interacting with entrance");
             TargetSystem.Instance()->InteractWithObject((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)entrance.Address, false);
             return true;
         }
@@ -120,7 +120,7 @@ internal unsafe static class HouseEnterTask
         {
             if (IsAddonReady(addon) && EzThrottler.Throttle("HET.SelectYesno"))
             {
-                P.DebugLog("Select yes");
+                DebugLog("Select yes");
                 ClickSelectYesNo.Using((nint)addon).Yes();
                 return true;
             }
@@ -129,7 +129,7 @@ internal unsafe static class HouseEnterTask
         {
             if (Utils.TrySelectSpecificEntry(Lang.GoToYourApartment, () => EzThrottler.Throttle("HET.SelectYesno")))
             {
-                P.DebugLog("Confirmed going to apartment");
+                DebugLog("Confirmed going to apartment");
                 return true;
             }
         }
@@ -158,7 +158,7 @@ internal unsafe static class HouseEnterTask
             {
                 if (EzThrottler.Throttle("HET.SetTargetBell", 200))
                 {
-                    P.DebugLog($"Setting bell target ({bell})");
+                    DebugLog($"Setting bell target ({bell})");
                     Svc.Targets.Target = bell;
                 }
             }
@@ -173,7 +173,7 @@ internal unsafe static class HouseEnterTask
         if(bell != null) PluginLog.Information($"Dist {Vector3.Distance(Player.Object.Position, bell.Position)}");
         if (bell != null && Vector3.Distance(Player.Object.Position, bell.Position) < 4f + Utils.Random * 0.25f)
         {
-            P.DebugLog($"Disabling automove");
+            DebugLog($"Disabling automove");
             Chat.Instance.SendMessage("/automove off");
             return true;
         }

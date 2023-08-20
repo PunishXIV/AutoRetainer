@@ -156,7 +156,7 @@ internal unsafe static class MultiModeUI
             }
 
             var initCurpos = ImGui.GetCursorPos();
-            var lowestRetainer = C.MultiWaitForAll? data.GetEnabledRetainers().OrderBy(z => z.GetVentureSecondsRemaining()).LastOrDefault() : data.GetEnabledRetainers().OrderBy(z => z.GetVentureSecondsRemaining()).FirstOrDefault();
+            var lowestRetainer = C.MultiModeRetainerConfiguration.MultiWaitForAll? data.GetEnabledRetainers().OrderBy(z => z.GetVentureSecondsRemaining()).LastOrDefault() : data.GetEnabledRetainers().OrderBy(z => z.GetVentureSecondsRemaining()).FirstOrDefault();
             if (lowestRetainer != default)
             {
                 var prog = Math.Max(0, (float)(3600 - lowestRetainer.GetVentureSecondsRemaining(false)) / 3600f);
