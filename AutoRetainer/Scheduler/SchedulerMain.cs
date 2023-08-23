@@ -4,6 +4,7 @@ using AutoRetainerAPI.Configuration;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using System.Collections.Immutable;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AutoRetainer.Scheduler;
 
@@ -306,15 +307,20 @@ internal unsafe static class SchedulerMain
     {
         if (P.retainerManager.Ready)
         {
-            for (var i = 0; i < P.retainerManager.Count; i++)
+            if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var cdata))
             {
-                var r = P.retainerManager.Retainer(i);
-                var rname = r.Name.ToString();
-                var adata = Utils.GetAdditionalData(Svc.ClientState.LocalContentId, rname);
-                if (P.GetSelectedRetainers(Svc.ClientState.LocalContentId).Contains(rname)
-                    && r.GetVentureSecondsRemaining() <= C.UnsyncCompensation && (r.VentureID != 0 || CanAssignQuickExploration || (adata.EnablePlanner && adata.VenturePlan.ListUnwrapped.Count > 0)))
+                var retainerData = cdata.ShowRetainersInDisplayOrder ? cdata.RetainerData.OrderBy(x => x.DisplayOrder).ToList() : cdata.RetainerData;
+
+                for (var i = 0; i < retainerData.Count; i++)
                 {
-                    return rname;
+                    var r = retainerData[i];
+                    var rname = r.Name.ToString();
+                    var adata = Utils.GetAdditionalData(Svc.ClientState.LocalContentId, rname);
+                    if (P.GetSelectedRetainers(Svc.ClientState.LocalContentId).Contains(rname)
+                        && r.GetVentureSecondsRemaining() <= C.UnsyncCompensation && (r.VentureID != 0 || CanAssignQuickExploration || (adata.EnablePlanner && adata.VenturePlan.ListUnwrapped.Count > 0)))
+                    {
+                        return rname;
+                    }
                 }
             }
         }
