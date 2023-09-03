@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.Modules.Voyage;
+using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using System;
@@ -17,6 +18,25 @@ namespace AutoRetainer.UI.Dbg
         {
             if (ImGui.CollapsingHeader("data"))
             {
+                ImGuiEx.Text($"Currnet: {(nint)CurrentSubmarine.Get()}");
+                if(CurrentSubmarine.Get() != null)
+                {
+                    ImGuiEx.Text($"Name: {MemoryHelper.ReadStringNullTerminated((nint)CurrentSubmarine.Get()->Name)}");
+                    ImGuiEx.Text($"Hull: {CurrentSubmarine.Get()->HullId}");
+                    ImGuiEx.Text($"->SternId: {CurrentSubmarine.Get()->SternId}");
+                    ImGuiEx.Text($"BridgeId: {CurrentSubmarine.Get()->BridgeId}");
+                    ImGuiEx.Text($"BowId: {CurrentSubmarine.Get()->BowId}");
+                    ImGuiEx.Text($"RankId: {CurrentSubmarine.Get()->RankId}");
+                    if (ImGui.Button("Print best exp"))
+                    {
+                        CurrentSubmarine.GetBestExps();
+                    }
+                    if(ImGui.Button("Select best path"))
+                    {
+                        CurrentSubmarine.Fill();
+                        
+                    }
+                }
                 ImGuiEx.Text($"HID: {HousingManager.Instance()->GetCurrentHouseId()}");
                 if (HousingManager.Instance()->WorkshopTerritory != null)
                 {
@@ -45,7 +65,7 @@ namespace AutoRetainer.UI.Dbg
                 ImGui.InputInt("r1", ref r1);
                 if (ImGui.Button("Pick"))
                 {
-                    
+                    P.Memory.SelectRoutePointUnsafe(r1);
                 }
             }
             if (ImGui.CollapsingHeader("control"))

@@ -1,5 +1,8 @@
 ﻿using AutoRetainer.Internal.Clicks;
 using AutoRetainer.Scheduler.Tasks;
+using ClickLib.Clicks;
+using ECommons.UIHelpers;
+using ECommons.UIHelpers.Implementations;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace AutoRetainer.Scheduler.Handlers;
@@ -15,19 +18,15 @@ internal unsafe static class RetainerListHandlers
         }
         if (TryGetAddonByName<AtkUnitBase>("RetainerList", out var retainerList) && IsAddonReady(retainerList))
         {
-            var list = (AtkComponentNode*)retainerList->UldManager.NodeList[2];
-            for (var i = 1u; i < P.retainerManager.Count + 1; i++)
+            var list = new ReaderRetainerList(retainerList);
+            for (int i = 0; i < list.Retainers.Count; i++)
             {
-                var retainerEntry = (AtkComponentNode*)list->Component->UldManager.NodeList[i];
-                var text = (AtkTextNode*)retainerEntry->Component->UldManager.NodeList[13];
-                var nodeName = text->NodeText.ToString();
-                //DebugLog($"Retainer {i} text {nodeName}");
-                if (name == nodeName)
+                if (list.Retainers[i].Name == name)
                 {
                     if (Utils.GenericThrottle)
                     {
-                        DebugLog($"Selecting {nodeName}");
-                        ClickRetainerList.Using((IntPtr)retainerList).Select(list, retainerEntry, i - 1);
+                        DebugLog($"Selecting retainer {list.Retainers[i].Name} with index {i}");
+                        ClickRetainerList.Using((IntPtr)retainerList).Retainer(i);
                         return true;
                     }
                 }

@@ -51,7 +51,9 @@ internal unsafe class Config : IEzConfig
     public bool Stay5 = true;
     public bool NoCurrentCharaOnTop = false;
 
+    public bool UseFrameDelay = true;
     public int Delay = 200;
+    public int FrameDelay = 4;
 
     public bool _dontReassign = false;
     public bool OldRetainerSense = false;

@@ -30,6 +30,10 @@ namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
+    public static bool ContainsAllItems<T>(this IEnumerable<T> a, IEnumerable<T> b)
+    {
+        return !b.Except(a).Any();
+    }
 
     internal static float Random { get; private set; } = 1f;
     internal static void RegenerateRandom()
@@ -321,9 +325,52 @@ internal static unsafe class Utils
         return key;
     }
 
-    internal static bool GenericThrottle => EzThrottler.Throttle("AutoRetainerGenericThrottle", C.Delay);
-    internal static void RethrottleGeneric(int num) => EzThrottler.Throttle("AutoRetainerGenericThrottle", num, true);
-    internal static void RethrottleGeneric() => EzThrottler.Throttle("AutoRetainerGenericThrottle", C.Delay, true);
+    public static string UpperCaseStr(Lumina.Text.SeString s, sbyte article = 0)
+    {
+        if (article == 1)
+            return s.ToDalamudString().ToString();
+
+        var sb = new StringBuilder(s.ToDalamudString().ToString());
+        var lastSpace = true;
+        for (var i = 0; i < sb.Length; ++i)
+        {
+            if (sb[i] == ' ')
+            {
+                lastSpace = true;
+            }
+            else if (lastSpace)
+            {
+                lastSpace = false;
+                sb[i] = char.ToUpperInvariant(sb[i]);
+            }
+        }
+
+        return sb.ToString();
+    }
+
+    internal static bool GenericThrottle => C.UseFrameDelay? FrameThrottler.Throttle("AutoRetainerGenericThrottle", C.FrameDelay): EzThrottler.Throttle("AutoRetainerGenericThrottle", C.Delay);
+    internal static void RethrottleGeneric(int num) 
+    {
+        if (C.UseFrameDelay)
+        {
+            FrameThrottler.Throttle("AutoRetainerGenericThrottle", num, true);
+        }
+        else 
+        {
+            EzThrottler.Throttle("AutoRetainerGenericThrottle", num, true);
+        }
+    }
+    internal static void RethrottleGeneric()
+    {
+        if (C.UseFrameDelay)
+        {
+            FrameThrottler.Throttle("AutoRetainerGenericThrottle", C.FrameDelay, true);
+        }
+        else
+        {
+            EzThrottler.Throttle("AutoRetainerGenericThrottle", C.Delay, true);
+        }
+    }
 
     internal static bool TrySelectSpecificEntry(string text, Func<bool> Throttler = null)
     {

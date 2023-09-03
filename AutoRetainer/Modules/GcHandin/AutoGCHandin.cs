@@ -71,12 +71,12 @@ internal unsafe static class AutoGCHandin
             }
             if (TryGetAddonByName<AddonGrandCompanySupplyReward>("GrandCompanySupplyReward", out var addonGCSR) && IsAddonReady(&addonGCSR->AtkUnitBase) && Operation)
             {
-                if (TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon) && IsAddonReady(addon) && EzThrottler.Throttle("CloseSupplyList", 200))
+                if (TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon) && IsAddonReady(addon) && FrameThrottler.Throttle("CloseSupplyList", 8))
                 {
                     UiHelper.Close(addon);
                     DebugLog($"Closing Supply List");
                 }
-                if (EzThrottler.Throttle("Handin", 200) && addonGCSR->DeliverButton->IsEnabled)
+                if (FrameThrottler.Throttle("Handin", 8) && addonGCSR->DeliverButton->IsEnabled)
                 {
                     ClickGrandCompanySupplyReward.Using((IntPtr)addonGCSR).Deliver();
                     DebugLog($"Delivering Item");
@@ -84,7 +84,7 @@ internal unsafe static class AutoGCHandin
             }
             else if (TryGetAddonByName<AddonSelectYesno>("SelectYesno", out var addonSS) && IsAddonReady(&addonSS->AtkUnitBase) && Operation)
             {
-                if (EzThrottler.Throttle("Yesno", 200) && addonSS->YesButton->IsEnabled)
+                if (FrameThrottler.Throttle("Yesno", 8) && addonSS->YesButton->IsEnabled)
                 {
                     var str = MemoryHelper.ReadSeString(&addonSS->PromptText->NodeText).ExtractText();
                     DebugLog($"SelectYesno encountered: {str}");
@@ -117,7 +117,7 @@ internal unsafe static class AutoGCHandin
                     else
                     {
                         Overlay.Allowed = true;
-                        if (EzThrottler.Check("AutoGCHandin"))
+                        if (FrameThrottler.Check("AutoGCHandin"))
                         {
                             try
                             {
@@ -144,7 +144,7 @@ internal unsafe static class AutoGCHandin
                                 var text = MemoryHelper.ReadSeString(&step3->GetAsAtkTextNode()->NodeText).ExtractText();
                                 var has = !text.IsNullOrWhitespace() && HasInInventory(text);
                                 DebugLog($"Seals: {seals}/{maxSeals}, for item {sealsForItem} | {text}: {has}");
-                                EzThrottler.Throttle("AutoGCHandin", 500, true);
+                                FrameThrottler.Throttle("AutoGCHandin", 10, true);
                                 if (!has)
                                 {
                                     throw new GCHandinInterruptedException($"Item {text} was not found in inventory");
@@ -259,7 +259,7 @@ internal unsafe static class AutoGCHandin
 
     internal static void InvokeHandin(AtkUnitBase* addon)
     {
-        EzThrottler.Throttle("AutoGCHandin", 500, true);
+        FrameThrottler.Throttle("AutoGCHandin", 10, true);
         var values = stackalloc AtkValue[]
         {
             new() { Type = ValueType.Int, Int = 1 },

@@ -505,8 +505,8 @@ internal unsafe static class RetainerHandlers
             var state = addon->AtkValues[3];
             if (state.Type == 0)
             {
-                FrameThrottler.Throttle("RetainerTaskSupply.InitWait", 5, true);
-                PluginLog.Debug($"RetainerTaskSupply waiting...");
+                FrameThrottler.Throttle("RetainerTaskSupply.InitWait", 10, true);
+                PluginLog.Debug($"RetainerTaskSupply waiting (2)...");
                 return false;
             }
             
@@ -539,6 +539,11 @@ internal unsafe static class RetainerHandlers
                     return false;
                 }
             }
+        }
+        else
+        {
+            FrameThrottler.Throttle("RetainerTaskSupply.InitWait", 10, true);
+            PluginLog.Debug($"RetainerTaskSupply waiting...");
         }
         return false;
     }

@@ -1,4 +1,5 @@
-﻿using ClickLib.Structures;
+﻿using AutoRetainer.Scheduler.Handlers;
+using ClickLib.Structures;
 using Dalamud.Hooking;
 using Dalamud.Memory;
 using Dalamud.Utility.Signatures;
@@ -12,6 +13,10 @@ namespace AutoRetainer.Internal;
 internal unsafe class Memory : IDisposable
 {
     internal int LastSearchItem = -1;
+
+    delegate byte sub_140EB1D00(nint a1, nint a2, nint a3);
+    [Signature("40 53 55 48 83 EC 28 F6 81 ?? ?? ?? ?? ?? 49 8B E8 48 8B D9 0F 84", DetourName =nameof(sub_140EB1D00Detour))]
+    Hook<sub_140EB1D00> sub_140EB1D00Hook;
 
     delegate ulong InteractWithObjectDelegate(TargetSystem* system, GameObject* obj, bool los);
     Hook<InteractWithObjectDelegate> InteractWithObjectHook;
@@ -29,6 +34,23 @@ internal unsafe class Memory : IDisposable
     internal Memory()
     {
         SignatureHelper.Initialise(this, true);
+        //sub_140EB1D00Hook?.Enable();
+    }
+
+    long tick1;
+
+    byte sub_140EB1D00Detour(nint a1, nint a2, nint a3)
+    {
+        var ret = sub_140EB1D00Hook.Original(a1,a2,a3);
+        var data = ((AtkValue*)(a3))->UInt;
+        PluginLog.Information($"{data} / {a1:X16}, {a2:X16}, {a3:X16} / {ret}");
+        if (data == 1) tick1 = Environment.TickCount64;
+        if (data == 15 && Environment.TickCount64 == tick1)
+        {
+            P.TaskManager.Enqueue(() => RetainerHandlers.SelectSpecificVentureByName("Yak Milk"));
+            P.TaskManager.Enqueue(RetainerHandlers.ClickAskAssign);
+        }
+        return ret;
     }
 
     internal byte FireCallbackDetour(AtkUnitBase* a1, int valueCount, AtkValue* values, byte updateState)
@@ -64,6 +86,8 @@ internal unsafe class Memory : IDisposable
         FireCallbackHook?.Dispose();
         AddonAirShipExploration_SelectDestinationHook?.Disable();
         AddonAirShipExploration_SelectDestinationHook?.Dispose();
+        sub_140EB1D00Hook?.Disable();
+        sub_140EB1D00Hook?.Dispose();
     }
 
     internal delegate void AddonAirShipExploration_SelectDestinationDelegate(nint a1, nint a2, AirshipExplorationInputData* a3);

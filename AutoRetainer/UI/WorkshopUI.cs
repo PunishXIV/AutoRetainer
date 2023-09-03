@@ -4,6 +4,7 @@ using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainer.Scheduler.Tasks;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Memory;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
@@ -205,8 +206,8 @@ namespace AutoRetainer.UI
                     }
                     ImGuiEx.Text($"Bell: {Utils.GetReachableRetainerBell(false)}");
                     ImGuiEx.Text($"Bell(true): {Utils.GetReachableRetainerBell(true)}");
-                    ImGuiEx.TextWrapped($"Enabled subs: {VoyageUtils.GetVesselData(Data, VoyageType.Submersible).Select(x => $"{x.Name}, {x.GetRemainingSeconds()}").Print()}");
-                    ImGuiEx.Text($"AnyEnabledVesselsAvailable: {VoyageUtils.AnyEnabledVesselsAvailable(Data)}");
+                    ImGuiEx.TextWrapped($"Enabled subs: {Data.GetVesselData(VoyageType.Submersible).Select(x => $"{x.Name}, {x.GetRemainingSeconds()}").Print()}");
+                    ImGuiEx.Text($"AnyEnabledVesselsAvailable: {Data.AnyEnabledVesselsAvailable()}");
                     ImGuiEx.Text($"Panel type: {VoyageUtils.GetCurrentWorkshopPanelType()}");
                     if (TryGetAddonByName<AtkUnitBase>("AirShipExplorationResult", out var addon) && IsAddonReady(addon))
                     {
@@ -277,7 +278,7 @@ namespace AutoRetainer.UI
             ImGuiEx.TextV(type == VoyageType.Airship ? "\ue22d" : "\uf21a");
             ImGui.PopFont();
             ImGui.SameLine();
-            var disabled = data.OfflineSubmarineData.Where(x => data.EnabledSubs.Contains(x.Name)).Count() + data.OfflineAirshipData.Where(x => data.EnabledAirships.Contains(x.Name)).Count() >= 4 && !enabled.Contains(vessel.Name);
+            var disabled = data.OfflineSubmarineData.Count(x => data.EnabledSubs.Contains(x.Name)) + data.OfflineAirshipData.Count(x => data.EnabledAirships.Contains(x.Name)) >= 4 && !enabled.Contains(vessel.Name);
             if (disabled) ImGui.BeginDisabled();
             ImGuiEx.CollectionCheckbox($"{vessel.Name}##sub", vessel.Name, enabled);
             if (disabled) ImGui.EndDisabled();

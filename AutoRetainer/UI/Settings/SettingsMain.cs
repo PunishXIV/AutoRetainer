@@ -125,8 +125,16 @@ internal static class SettingsMain
             ImGui.SetNextItemWidth(100f);
             ImGui.SliderInt("Time Desynchronization Compensation", ref C.UnsyncCompensation.ValidateRange(-60, 0), -10, 0);
             ImGuiComponents.HelpMarker("Additional amount of seconds that will be subtracted from venture ending time to help mitigate possible issues of time desynchronization between the game and your PC. ");
+            ImGui.Checkbox($"Enable SuperSonic(tm) Blazing fast operation speed", ref C.UseFrameDelay);
             ImGui.SetNextItemWidth(100f);
-            ImGuiEx.SliderIntAsFloat("Interaction Delay, seconds", ref C.Delay.ValidateRange(10, 1000), 20, 1000);
+            if (!C.UseFrameDelay)
+            {
+                ImGuiEx.SliderIntAsFloat("Interaction Delay, seconds", ref C.Delay.ValidateRange(10, 1000), 20, 1000);
+            }
+            else
+            {
+                ImGui.SliderInt("Interaction Delay, frames", ref C.FrameDelay.ValidateRange(2, 500), 2, 12);
+            }
             ImGuiComponents.HelpMarker("The lower this value is the faster plugin will use actions. When dealing with low FPS or high latency you may want to increase this value. If you want the plugin to operate faster you may decrease it. ");
             ImGuiGroup.EndGroupBox();
         };
