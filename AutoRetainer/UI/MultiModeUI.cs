@@ -129,7 +129,7 @@ internal unsafe static class MultiModeUI
                 }
                 ImGuiComponents.HelpMarker("When operating in multi mode, if there are no other characters with imminent ventures to collect, it will relog back to your preferred character.");
 
-                ImGui.Checkbox("Show Retainers in Display Order", ref data.ShowRetainersInDisplayOrder);
+                ImGui.Checkbox("Show & Process Retainers in Display Order", ref data.ShowRetainersInDisplayOrder);
 
                 ImGuiEx.Text($"Automatic Grand Company Expert Delivery:");
                 if (!AutoGCHandin.Operation)
