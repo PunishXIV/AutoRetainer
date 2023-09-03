@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.Modules.Voyage;
+using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
@@ -18,7 +19,7 @@ namespace AutoRetainer.UI.Dbg
         {
             if (ImGui.CollapsingHeader("data"))
             {
-                ImGuiEx.Text($"Currnet: {(nint)CurrentSubmarine.Get()}");
+                ImGuiEx.Text($"Curnet: {(nint)CurrentSubmarine.Get()}");
                 if(CurrentSubmarine.Get() != null)
                 {
                     ImGuiEx.Text($"Name: {MemoryHelper.ReadStringNullTerminated((nint)CurrentSubmarine.Get()->Name)}");
@@ -33,8 +34,7 @@ namespace AutoRetainer.UI.Dbg
                     }
                     if(ImGui.Button("Select best path"))
                     {
-                        CurrentSubmarine.Fill();
-                        
+                        TaskCalculateAndPickBestExpRoute.Enqueue();
                     }
                 }
                 ImGuiEx.Text($"HID: {HousingManager.Instance()->GetCurrentHouseId()}");
@@ -70,18 +70,18 @@ namespace AutoRetainer.UI.Dbg
             }
             if (ImGui.CollapsingHeader("control"))
             {
-                if (ImGui.Button($"{nameof(VoyageScheduler.Lockon)}")) DuoLog.Information($"{VoyageScheduler.Lockon}");
-                if (ImGui.Button($"{nameof(VoyageScheduler.Approach)}")) DuoLog.Information($"{VoyageScheduler.Approach}");
-                if (ImGui.Button($"{nameof(VoyageScheduler.AutomoveOffPanel)}")) DuoLog.Information($"{VoyageScheduler.AutomoveOffPanel}");
-                if (ImGui.Button($"{nameof(VoyageScheduler.InteractWithVoyagePanel)}")) DuoLog.Information($"{VoyageScheduler.InteractWithVoyagePanel}");
-                if (ImGui.Button($"{nameof(VoyageScheduler.SelectAirshipManagement)}")) DuoLog.Information($"{VoyageScheduler.SelectAirshipManagement}");
-                if (ImGui.Button($"{nameof(VoyageScheduler.SelectSubManagement)}")) DuoLog.Information($"{VoyageScheduler.SelectSubManagement}");
+                if (ImGui.Button($"{nameof(VoyageScheduler.Lockon)}")) DuoLog.Information($"{VoyageScheduler.Lockon()}");
+                if (ImGui.Button($"{nameof(VoyageScheduler.Approach)}")) DuoLog.Information($"{VoyageScheduler.Approach()}");
+                if (ImGui.Button($"{nameof(VoyageScheduler.AutomoveOffPanel)}")) DuoLog.Information($"{VoyageScheduler.AutomoveOffPanel()}");
+                if (ImGui.Button($"{nameof(VoyageScheduler.InteractWithVoyagePanel)}")) DuoLog.Information($"{VoyageScheduler.InteractWithVoyagePanel()}");
+                if (ImGui.Button($"{nameof(VoyageScheduler.SelectAirshipManagement)}")) DuoLog.Information($"{VoyageScheduler.SelectAirshipManagement()}");
+                if (ImGui.Button($"{nameof(VoyageScheduler.SelectSubManagement)}")) DuoLog.Information($"{VoyageScheduler.SelectSubManagement()}");
                 ImGui.InputText("subject name", ref data1, 100);
                 if (ImGui.Button($"{nameof(VoyageScheduler.SelectVesselByName)}")) DuoLog.Information($"{VoyageScheduler.SelectVesselByName(data1)}");
-                if (ImGui.Button($"{nameof(VoyageScheduler.RedeployVessel)}")) DuoLog.Information($"{VoyageScheduler.RedeployVessel}");
-                if (ImGui.Button($"{nameof(VoyageScheduler.DeployVessel)}")) DuoLog.Information($"{VoyageScheduler.DeployVessel}");
-                if (ImGui.Button($"{nameof(VoyageScheduler.Approach)}")) DuoLog.Information($"{VoyageScheduler.Approach}");
-                if (ImGui.Button($"{nameof(VoyageScheduler.Approach)}")) DuoLog.Information($"{VoyageScheduler.Approach}");
+                if (ImGui.Button($"{nameof(VoyageScheduler.RedeployVessel)}")) DuoLog.Information($"{VoyageScheduler.RedeployVessel()}");
+                if (ImGui.Button($"{nameof(VoyageScheduler.DeployVessel)}")) DuoLog.Information($"{VoyageScheduler.DeployVessel()}");
+                if (ImGui.Button($"{nameof(TaskDeployOnBestExpVoyage.Deploy)}")) DuoLog.Information($"{TaskDeployOnBestExpVoyage.Deploy()}");
+                if (ImGui.Button($"{nameof(TaskDeployOnBestExpVoyage)}")) TaskDeployOnBestExpVoyage.Enqueue();
                 if (ImGui.Button($"{nameof(VoyageScheduler.Approach)}")) DuoLog.Information($"{VoyageScheduler.Approach}");
             }
             if(ImGui.CollapsingHeader("Test task manager"))

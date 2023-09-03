@@ -57,35 +57,41 @@ namespace AutoRetainer.Modules.Voyage.VoyageCalculator
             var maps = GetMaps();
             Task.Run(() =>
             {
+                VoyageMain.WaitOverlay.IsProcessing = true;
                 foreach (var x in maps)
                 {
                     calc.RouteBuild.Value.ChangeMap((int)x);
                     var best = calc.FindBestPath(x);
                     if(best != null)
                     {
-                        DuoLog.Information($"Map {x}: {best.Value.path.Print()}, {best.Value.duration}, {best.Value.exp}");
+                        DuoLog.Information($"Map {x}: {best.Value.path.Select(z => $"{z}/{ExplorationSheet.GetRow(z).Location}").Print()}, {best.Value.duration}, {best.Value.exp} / ");
                     }
                 }
+                VoyageMain.WaitOverlay.IsProcessing = false;
             });
         }
 
         public static void Fill()
         {
+            return;
             var calc = new Calculator();
             Task.Run(() =>
             {
+                VoyageMain.WaitOverlay.IsProcessing = true;
                 calc.RouteBuild.Value.ChangeMap((int)1);
                 var best = calc.FindBestPath(1);
                 if (best != null)
                 {
-                    DuoLog.Information($"{best.Value.path.Print()}, {best.Value.duration}, {best.Value.exp}");
+                    DuoLog.Information($"{best.Value.path.Select(z => $"{z}/{ExplorationSheet.GetRow(z).Location}").Print()}, {best.Value.duration}, {best.Value.exp}");
                     new TickScheduler(delegate
                     {
-                        foreach (var x in best.Value.path) {
-                            P.TaskManager.Enqueue(() => P.Memory.SelectRoutePointUnsafe((int)(x - 1)));
-                            }
+                        foreach (var x in best.Value.path) 
+                        {
+                            P.TaskManager.Enqueue(() => P.Memory.SelectRoutePointUnsafe((int)(x)));
+                        }
                     });
                 }
+                VoyageMain.WaitOverlay.IsProcessing = false;
             });
         }
     }

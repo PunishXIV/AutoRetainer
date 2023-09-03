@@ -37,7 +37,7 @@ namespace AutoRetainer.Modules.Voyage.VoyageCalculator
                 var routeBuild = RouteBuild.Value;
                 if (CurrentBuild != null)
                 {
-                    DuoLog.Debug($"Starting to get best path for map {mapId}");
+                    VoyageUtils.Log($"Starting to get best path for map {mapId}");
                     var mapDictionary = new ConcurrentDictionary<int, (int, List<SubmarineExplorationPretty>)[]>();
 
                     List<SubmarineExplorationPretty> valid;

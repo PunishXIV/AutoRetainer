@@ -1,5 +1,6 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage.Tasks;
+using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game.ClientState.Conditions;
 using ECommons.Automation;
@@ -19,11 +20,15 @@ namespace AutoRetainer.Modules.Voyage
     {
         static bool IsInVoyagePanel = false;
 
+        internal static WaitOverlay WaitOverlay;
+
         internal static void Init()
         {
             Svc.Framework.Update += Tick;
             Svc.Toasts.ErrorToast += Toasts_ErrorToast;
             VoyageMemory.Init();
+            WaitOverlay = new();
+            P.ws.AddWindow(WaitOverlay);
         }
 
         private static void Toasts_ErrorToast(ref Dalamud.Game.Text.SeStringHandling.SeString message, ref bool isHandled)

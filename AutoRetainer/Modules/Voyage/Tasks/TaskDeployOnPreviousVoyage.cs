@@ -13,10 +13,7 @@ namespace AutoRetainer.Modules.Voyage.Tasks
         {
             P.TaskManager.Enqueue(VoyageScheduler.SelectViewPreviousLog);
             P.TaskManager.Enqueue(VoyageScheduler.RedeployVessel);
-            P.TaskManager.Enqueue(VoyageScheduler.DeployVessel);
-            P.TaskManager.Enqueue(VoyageScheduler.WaitForCutscene);
-            P.TaskManager.Enqueue(VoyageScheduler.PressEsc);
-            P.TaskManager.Enqueue(VoyageScheduler.ConfirmSkip);
+            TaskDeployAndSkipCutscene.Enqueue();
         }
     }
 }

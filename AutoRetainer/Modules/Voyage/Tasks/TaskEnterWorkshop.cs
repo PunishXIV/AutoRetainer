@@ -16,7 +16,7 @@ namespace AutoRetainer.Modules.Voyage.Tasks
             P.TaskManager.Enqueue(() => !IsOccupied(), 180 * 1000, "WaitUntilNotOccupied1");
             P.TaskManager.Enqueue(() =>
             {
-                if(Data.AreAnyVesselsReturnInNext(5 * 60) || (Utils.GetNearestRetainerBell(out _) == null && Utils.GetNearestWorkshopEntrance(out _) != null))
+                if(Data.AreAnyVesselsReturnInNext(5 * 60) || (Utils.GetReachableRetainerBell(false) == null && Utils.GetNearestWorkshopEntrance(out _) != null))
                 {
                     EnqueueImmediateEnterWorkshop();
                 }

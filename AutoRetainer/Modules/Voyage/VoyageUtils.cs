@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.Internal;
+using AutoRetainer.Modules.Voyage.Readers;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Types;
@@ -322,6 +323,59 @@ namespace AutoRetainer.Modules.Voyage
                 }
             }
             return false;
+        }
+
+        internal static bool? CanBeSelected(string FullName)
+        {
+            if (TryGetAddonByName<AtkUnitBase>("AirShipExploration", out var addon) && IsAddonReady(addon))
+            {
+                var reader = new ReaderAirShipExploration(addon);
+                for (int i = 0; i < reader.Destinations.Count; i++)
+                {
+                    var dest = reader.Destinations[i];
+                    if (dest.NameFull == FullName)
+                    {
+                        return dest.CanBeSelected;
+                    }
+                }
+            }
+            return null;
+        }
+
+        internal static void SelectRoutePointSafe(string FullOrShortName)
+        {
+            if (TryGetAddonByName<AtkUnitBase>("AirShipExploration", out var addon) && IsAddonReady(addon))
+            {
+                var reader = new ReaderAirShipExploration(addon);
+                for (int i = 0; i < reader.Destinations.Count; i++)
+                {
+                    var dest = reader.Destinations[i];
+                    if (FullOrShortName.EqualsIgnoreCaseAny(dest.NameFull, dest.NameShort))
+                    {
+                        Log($"Found {FullOrShortName}, CanBeSelected = {dest.CanBeSelected}");
+                        if (dest.CanBeSelected)
+                        {
+                            SelectRoutePointSafe(i);
+                        }
+                        return;
+                    }
+                }
+            }
+        }
+
+        internal static void SelectRoutePointSafe(int which)
+        {
+            if (TryGetAddonByName<AtkUnitBase>("AirShipExploration", out var addon) && IsAddonReady(addon))
+            {
+                var reader = new ReaderAirShipExploration(addon);
+                if(which >= reader.Destinations.Count) throw new ArgumentOutOfRangeException(nameof(which));
+                var dest = reader.Destinations[which];
+                if (dest.CanBeSelected)
+                {
+                    VoyageUtils.Log($"Selecting {dest.NameFull} / {which}");
+                    P.Memory.SelectRoutePointUnsafe(which);
+                }
+            }
         }
     }
 }
