@@ -13,5 +13,7 @@ namespace AutoRetainerAPI.Configuration
         public int Part2 = 0;
         public int Part3 = 0;
         public int Part4 = 0;
+
+        public VesselBehavior VesselBehavior = VesselBehavior.Redeploy;
     }
 }

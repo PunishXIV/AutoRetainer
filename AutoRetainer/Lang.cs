@@ -24,6 +24,10 @@ internal static class Lang
     internal const string IconSettings = "\uf013";
     internal const string IconWarning = "\uf071";
 
+    internal const string IconAnchor = "\uf13d";
+    internal const string IconLevelup = "\ue098";
+    internal const string IconResend = "\ue4bb";
+
     internal static readonly (string Normal, string GameFont) Digits = ("0123456789", "");
 
     internal static readonly string[] FieldExplorationNames = new string[]

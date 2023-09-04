@@ -34,8 +34,8 @@ public class OfflineCharacterData
     public List<OfflineVesselData> OfflineSubmarineData = new();
     public HashSet<string> EnabledAirships = new();
     public HashSet<string> EnabledSubs = new();
-    public HashSet<string> FinalizeAirships = new();
-    public HashSet<string> FinalizeSubs = new();
+    //public HashSet<string> FinalizeAirships = new();
+    //public HashSet<string> FinalizeSubs = new();
     public Dictionary<string, AdditionalVesselData> AdditionalAirshipData = new();
     public Dictionary<string, AdditionalVesselData> AdditionalSubmarineData = new();
     public int Ceruleum = 0;

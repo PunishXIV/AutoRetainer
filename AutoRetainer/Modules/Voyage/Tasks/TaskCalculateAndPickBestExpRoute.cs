@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace AutoRetainer.Modules.Voyage.Tasks
 {
@@ -13,8 +14,9 @@ namespace AutoRetainer.Modules.Voyage.Tasks
         static volatile bool Calculating = false;
         internal static void Enqueue()
         {
+            VoyageUtils.Log($"Task enqueued: {nameof(TaskCalculateAndPickBestExpRoute)}");
             P.TaskManager.Enqueue(Calculate);
-            P.TaskManager.Enqueue(WaitUntilCalculationStopped);
+            P.TaskManager.Enqueue(WaitUntilCalculationStopped, 60*60*1000);
         }
 
         internal static void Calculate()

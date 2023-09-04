@@ -16,7 +16,8 @@ namespace AutoRetainer.Modules.Voyage.Tasks
     {
         internal static void EnqueueImmediate(uint map, params uint[] points)
         {
-            if(points.Length < 1 || points.Length > 5) throw new ArgumentOutOfRangeException(nameof(points));
+            VoyageUtils.Log($"Task enqueued: {nameof(TaskPickSubmarineRoute)}, map={map}, points={points.Print()}");
+            if (points.Length < 1 || points.Length > 5) throw new ArgumentOutOfRangeException(nameof(points));
             P.TaskManager.EnqueueImmediate(() => PickMap(map), $"PickMap({map})");
             foreach( var point in points )
             {

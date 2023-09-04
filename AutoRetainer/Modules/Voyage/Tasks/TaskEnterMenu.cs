@@ -12,6 +12,7 @@ namespace AutoRetainer.Modules.Voyage.Tasks
     {
         internal static void Enqueue(VoyageType type)
         {
+            VoyageUtils.Log($"Task enqueued: {nameof(TaskEnterMenu)} type={type}");
             if (type == VoyageType.Airship)
             {
                 P.TaskManager.Enqueue(VoyageScheduler.SelectAirshipManagement);

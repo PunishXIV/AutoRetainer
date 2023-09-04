@@ -13,6 +13,7 @@ namespace AutoRetainer.Modules.Voyage.Tasks
     {
         internal static void Enqueue()
         {
+            VoyageUtils.Log($"Task enqueued: {nameof(TaskEnterWorkshop)}");
             P.TaskManager.Enqueue(() => !IsOccupied(), 180 * 1000, "WaitUntilNotOccupied1");
             P.TaskManager.Enqueue(() =>
             {

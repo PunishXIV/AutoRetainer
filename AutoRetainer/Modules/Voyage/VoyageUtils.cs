@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AutoRetainer.Modules.Voyage
 {
@@ -65,12 +66,12 @@ namespace AutoRetainer.Modules.Voyage
             throw new ArgumentOutOfRangeException(nameof(type));
         }
 
-        internal static HashSet<string> GetFinalizeVesselsData(this OfflineCharacterData data, VoyageType type)
+        /*internal static HashSet<string> GetFinalizeVesselsData(this OfflineCharacterData data, VoyageType type)
         {
             if (type == VoyageType.Airship) return data.FinalizeAirships;
             if (type == VoyageType.Submersible) return data.FinalizeSubs;
             throw new ArgumentOutOfRangeException(nameof(type));
-        }
+        }*/
 
         internal static bool IsVoyagePanel(this GameObject obj)
         {
@@ -291,13 +292,33 @@ namespace AutoRetainer.Modules.Voyage
 
         internal static bool AnyEnabledVesselsAvailable(this OfflineCharacterData data, VoyageType type)
         {
-            return data.GetVesselData(type).Any(x => data.GetEnabledVesselsData(type).Contains(x.Name) && x.ReturnTime != 0 && x.GetRemainingSeconds() < C.UnsyncCompensation);
+            return data.GetVesselData(type).Any(x => data.GetEnabledVesselsData(type).Contains(x.Name) && data.IsVesselAvailable(x, type));
+        }
+
+        internal static OfflineVesselData GetOfflineVesselData(this OfflineCharacterData data, string name, VoyageType type)
+        {
+            if (type == VoyageType.Submersible)
+            {
+                return data.OfflineSubmarineData.FirstOrDefault(x => x.Name == name);
+            }
+            else if (type == VoyageType.Airship)
+            {
+                return data.OfflineAirshipData.FirstOrDefault(x => x.Name == name);
+            }
+            return null;
+        }
+
+        internal static bool IsVesselAvailable(this OfflineCharacterData data, OfflineVesselData x, VoyageType type)
+        {
+            return (x.ReturnTime != 0 && x.GetRemainingSeconds() < C.UnsyncCompensation) 
+                ||
+                (x.ReturnTime == 0 && data.GetAdditionalVesselData(x.Name, type).VesselBehavior.EqualsAny(VesselBehavior.LevelUp));
         }
 
         internal static string GetNextCompletedVessel(VoyageType type)
         {
             var data = Utils.GetCurrentCharacterData();
-            var v = data.GetVesselData(type).Where(x => x.ReturnTime != 0 && x.GetRemainingSeconds() < C.UnsyncCompensation && data.GetEnabledVesselsData(type).Contains(x.Name));
+            var v = data.GetVesselData(type).Where(x => data.IsVesselAvailable(x, type) && data.GetEnabledVesselsData(type).Contains(x.Name));
             if (v.Any())
             {
                 return v.First().Name;
@@ -312,11 +333,11 @@ namespace AutoRetainer.Modules.Voyage
             if (all)
             {
                 var v = data.GetVesselData(type).Where(x => data.GetEnabledVesselsData(type).Contains(x.Name));
-                return v.Any() && v.All(x => x.ReturnTime != 0 && x.GetRemainingSeconds() < seconds);
+                return v.Any() && v.All(x => data.IsVesselAvailable(x, type));
             }
             else
             {
-                var v = data.GetVesselData(type).Where(x => x.ReturnTime != 0 && x.GetRemainingSeconds() < seconds && data.GetEnabledVesselsData(type).Contains(x.Name));
+                var v = data.GetVesselData(type).Where(x => data.IsVesselAvailable(x, type) && data.GetEnabledVesselsData(type).Contains(x.Name));
                 if (v.Any())
                 {
                     return true;

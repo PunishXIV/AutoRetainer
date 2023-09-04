@@ -146,6 +146,8 @@ namespace AutoRetainer.UI
                             TaskRedeployPreviousLog.Enqueue();
                         }
 
+                        if (ImGui.Button($"Deploy current submarine on best experience route")) TaskDeployOnBestExpVoyage.Enqueue();
+
                     }
                     else
                     {
@@ -268,7 +270,7 @@ namespace AutoRetainer.UI
         {
             ImGui.PushID($"{data.CID}/{vessel.Name}/{type}");
             var enabled = type == VoyageType.Airship ? data.EnabledAirships : data.EnabledSubs;
-            var finalize = type == VoyageType.Airship ? data.FinalizeAirships : data.FinalizeSubs;
+            var adata = data.GetAdditionalVesselData(vessel.Name, type);
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
@@ -282,19 +284,26 @@ namespace AutoRetainer.UI
             if (disabled) ImGui.BeginDisabled();
             ImGuiEx.CollectionCheckbox($"{vessel.Name}##sub", vessel.Name, enabled);
             if (disabled) ImGui.EndDisabled();
-            if (finalize.Contains(vessel.Name))
+            ImGui.SameLine();
+            ImGui.PushFont(UiBuilder.IconFont);
+            if (adata.VesselBehavior == VesselBehavior.Finalize)
             {
-                ImGui.SameLine();
-                ImGui.PushFont(UiBuilder.IconFont);
-                ImGuiEx.Text("\uf13d");
-                ImGui.PopFont();
+                ImGuiEx.Text(Lang.IconAnchor);
             }
+            else if (adata.VesselBehavior == VesselBehavior.Redeploy)
+            {
+                ImGuiEx.Text(Lang.IconResend);
+            }
+            else if (adata.VesselBehavior == VesselBehavior.LevelUp)
+            {
+                ImGuiEx.Text(Lang.IconLevelup);
+            }
+            ImGui.PopFont();
             var end = ImGui.GetCursorPos();
             var p = (float)vessel.GetRemainingSeconds() / (60f * 60f * 24f);
             if(vessel.ReturnTime != 0) bars.Add((data.CID, Svc.PluginInterface.UiBuilder.FrameCount, start, end, vessel.ReturnTime==0?0:p.ValidateRange(0f, 1f)));
             ImGui.TableNextColumn();
             ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
-            var adata = data.GetAdditionalVesselData(vessel.Name, type);
             if (adata.Level > 0)
             {
                 var level = $"{Lang.CharLevel}{adata.Level}";
@@ -321,7 +330,8 @@ namespace AutoRetainer.UI
             if (ImGuiEx.BeginPopupNextToElement(n))
             {
                 ImGui.CollapsingHeader($"{vessel.Name} - {Censor.Character(data.Name)} Configuration  ##conf", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.Bullet | ImGuiTreeNodeFlags.OpenOnArrow);
-                ImGuiEx.CollectionCheckbox($"Only finalize this vessel", vessel.Name, finalize);
+                ImGuiEx.Text($"Vessel behavior:");
+                ImGuiEx.EnumCombo("##vbeh", ref adata.VesselBehavior);
                 ImGui.EndPopup();
             }
             ImGui.PopID();

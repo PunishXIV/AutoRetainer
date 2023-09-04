@@ -12,10 +12,11 @@ namespace AutoRetainer.Modules.Voyage.Tasks
     {
         internal static void Enqueue()
         {
+            VoyageUtils.Log($"Task enqueued: {nameof(TaskCalculateAndPickBestExpRoute)}");
             P.TaskManager.Enqueue(SelectDeploy);
             TaskCalculateAndPickBestExpRoute.Enqueue();
             P.TaskManager.Enqueue(Deploy);
-            TaskDeployAndSkipCutscene.Enqueue();
+            TaskDeployAndSkipCutscene.Enqueue(true);
         }
 
         internal static bool? SelectDeploy()

@@ -13,6 +13,7 @@ namespace AutoRetainer.Modules.Voyage.Tasks
     {
         internal static void Enqueue()
         {
+            VoyageUtils.Log($"Task enqueued: {nameof(TaskRedeployPreviousLog)}");
             P.TaskManager.Enqueue(VoyageScheduler.SelectViewPreviousLog);
             P.TaskManager.Enqueue(VoyageScheduler.RedeployVessel);
             P.TaskManager.DelayNext(10, true);

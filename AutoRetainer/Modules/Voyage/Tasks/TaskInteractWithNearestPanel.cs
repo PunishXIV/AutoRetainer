@@ -11,6 +11,7 @@ namespace AutoRetainer.Modules.Voyage.Tasks
     {
         internal static void Enqueue(bool interact = true)
         {
+            VoyageUtils.Log($"Task enqueued: {nameof(TaskInteractWithNearestPanel)} interact={interact}");
             if (!VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType))
             {
                 TaskEnterWorkshop.EnqueueEnterWorkshop();

@@ -13,7 +13,8 @@ namespace AutoRetainer.Modules.Voyage.Tasks
     {
         internal static void Enqueue(bool validate = false)
         {
-            if(validate) P.TaskManager.Enqueue(ValidateDeployment);
+            VoyageUtils.Log($"Task enqueued: {nameof(TaskDeployAndSkipCutscene)} validate={validate}");
+            if (validate) P.TaskManager.Enqueue(ValidateDeployment);
             P.TaskManager.Enqueue(VoyageScheduler.DeployVessel);
             P.TaskManager.Enqueue(VoyageScheduler.WaitForCutscene);
             P.TaskManager.Enqueue(VoyageScheduler.PressEsc);

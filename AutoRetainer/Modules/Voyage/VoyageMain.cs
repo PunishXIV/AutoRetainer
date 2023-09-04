@@ -12,6 +12,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using static System.Net.Mime.MediaTypeNames;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AutoRetainer.Modules.Voyage
@@ -189,23 +191,52 @@ namespace AutoRetainer.Modules.Voyage
             var next = VoyageUtils.GetNextCompletedVessel(type);
             if (next != null)
             {
-                if (C.SubsOnlyFinalize || C.DontReassign || Data.GetFinalizeVesselsData(type).Contains(next))
+                var adata = Data.GetAdditionalVesselData(next, type);
+                var data = Data.GetOfflineVesselData(next, type);
+                if (C.SubsOnlyFinalize || C.DontReassign || adata.VesselBehavior == VesselBehavior.Finalize)
                 {
                     if (EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResend", 1000))
                     {
-                        TaskFinalizeVessel.Enqueue(next, type);
+                        TaskFinalizeVessel.Enqueue(next, type, false, true);
                     }
                 }
                 else
                 {
-                    if (EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResend", 1000))
+                    if (adata.VesselBehavior == VesselBehavior.LevelUp)
                     {
-                        TaskRedeployVessel.Enqueue(next, type);
+                        if (EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResend", 1000))
+                        {
+                            if (data?.ReturnTime != 0)
+                            {
+                                TaskFinalizeVessel.Enqueue(next, type, true, false);
+                            }
+                            else
+                            {
+                                TaskSelectVesselByName.Enqueue(next);
+                            }
+                            TaskDeployOnBestExpVoyage.Enqueue();
+                        }
+                    }
+                    else if (adata.VesselBehavior == VesselBehavior.Redeploy)
+                    {
+                        if (EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResend", 1000))
+                        {
+                            TaskRedeployVessel.Enqueue(next, type);
+                        }
                     }
                 }
             }
             else
             {
+                /*var nextl = VoyageUtils.GetNextEmptyLevellingVessel(type);
+                if (nextl != null)
+                {
+                    if (EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResend", 1000))
+                    {
+                        P.TaskManager.Enqueue(() => VoyageScheduler.SelectVesselByName(nextl), $"SelectVesselByName = {nextl}");
+                        TaskDeployOnBestExpVoyage.Enqueue();
+                    }
+                }*/
                 if (!Data.AreAnyVesselsReturnInNext(type, 1 * 60))
                 {
                     if (EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResendQuitPanel", 1000))

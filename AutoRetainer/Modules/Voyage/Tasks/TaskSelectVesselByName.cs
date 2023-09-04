@@ -10,6 +10,7 @@ namespace AutoRetainer.Modules.Voyage.Tasks
     {
         internal static void Enqueue(string name)
         {
+            VoyageUtils.Log($"Task enqueued: {nameof(TaskSelectVesselByName)} ({name})");
             P.TaskManager.Enqueue(() => VoyageScheduler.SelectVesselByName(name), $"TaskSelectVesselByName: {name}");
         }
     }

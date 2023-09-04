@@ -17,6 +17,7 @@ namespace AutoRetainer.Modules.Voyage.Tasks
         internal static VoyageType Type = 0;
         internal static void EnqueueImmediate(List<int> indexes, string vesselName, VoyageType type)
         {
+            VoyageUtils.Log($"Task enqueued: {nameof(TaskRepairAll)}");
             Name = vesselName;
             Type = type;
             Abort = false;
