@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace AutoRetainerAPI.Configuration
 {
-    public enum VesselBehavior
+    public enum UnlockMode
     {
-        Finalize, Redeploy, LevelUp, Unlock
+        WhileLevelling, SpamOne, MultiSelect
     }
 }

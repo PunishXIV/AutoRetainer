@@ -298,6 +298,31 @@ namespace AutoRetainer.UI
             {
                 ImGuiEx.Text(Lang.IconLevelup);
             }
+            else if (adata.VesselBehavior == VesselBehavior.Unlock)
+            {
+                ImGuiEx.Text(Lang.IconUnlock);
+                ImGui.SameLine();
+                if(adata.UnlockMode == UnlockMode.WhileLevelling)
+                {
+                    ImGuiEx.Text(Lang.IconLevelup);
+                }
+                else if (adata.UnlockMode == UnlockMode.SpamOne)
+                {
+                    ImGuiEx.Text(Lang.IconRepeat);
+                }
+                else if (adata.UnlockMode == UnlockMode.MultiSelect)
+                {
+                    ImGuiEx.Text(Lang.IconPath);
+                }
+                else
+                {
+                    ImGuiEx.Text(Lang.IconWarning);
+                }
+            }
+            else
+            {
+                ImGuiEx.Text(Lang.IconWarning);
+            }
             ImGui.PopFont();
             var end = ImGui.GetCursorPos();
             var p = (float)vessel.GetRemainingSeconds() / (60f * 60f * 24f);
@@ -332,6 +357,11 @@ namespace AutoRetainer.UI
                 ImGui.CollapsingHeader($"{vessel.Name} - {Censor.Character(data.Name)} Configuration  ##conf", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.Bullet | ImGuiTreeNodeFlags.OpenOnArrow);
                 ImGuiEx.Text($"Vessel behavior:");
                 ImGuiEx.EnumCombo("##vbeh", ref adata.VesselBehavior);
+                if(adata.VesselBehavior == VesselBehavior.Unlock)
+                {
+                    ImGuiEx.Text($"Unlock mode:");
+                    ImGuiEx.EnumCombo("##umode", ref adata.UnlockMode, Lang.UnlockModeNames);
+                }
                 ImGui.EndPopup();
             }
             ImGui.PopID();

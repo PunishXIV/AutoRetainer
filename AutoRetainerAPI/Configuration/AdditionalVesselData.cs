@@ -15,5 +15,6 @@ namespace AutoRetainerAPI.Configuration
         public int Part4 = 0;
 
         public VesselBehavior VesselBehavior = VesselBehavior.Redeploy;
+        public UnlockMode UnlockMode = UnlockMode.WhileLevelling;
     }
 }

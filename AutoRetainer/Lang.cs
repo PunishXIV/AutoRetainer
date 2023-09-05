@@ -1,6 +1,8 @@
-﻿using Dalamud;
+﻿using AutoRetainerAPI.Configuration;
+using Dalamud;
 using Dalamud.Utility;
 using Lumina.Excel.GeneratedSheets;
+using System.Collections.ObjectModel;
 
 namespace AutoRetainer;
 
@@ -27,6 +29,16 @@ internal static class Lang
     internal const string IconAnchor = "\uf13d";
     internal const string IconLevelup = "\ue098";
     internal const string IconResend = "\ue4bb";
+    internal const string IconUnlock = "\uf13e";
+    internal const string IconRepeat = "\uf363";
+    internal const string IconPath = "\uf55b";
+
+    internal static readonly ReadOnlyDictionary<UnlockMode, string> UnlockModeNames = new(new Dictionary<UnlockMode, string>()
+    {
+        { UnlockMode.MultiSelect, "Pick max amount of destinations" },
+        { UnlockMode.SpamOne, "Spam one destination" },
+        { UnlockMode.WhileLevelling, "Include one unlock destination while levelling" },
+    });
 
     internal static readonly (string Normal, string GameFont) Digits = ("0123456789", "");
 
