@@ -1,6 +1,7 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Modules.Voyage.Tasks;
+using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using AutoRetainer.Scheduler.Tasks;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Memory;
@@ -97,12 +98,26 @@ namespace AutoRetainer.UI
                 ImGui.PopID();
             }
             bars.RemoveAll(x => x.frame != Svc.PluginInterface.UiBuilder.FrameCount);
+
+            ImGuiEx.ImGuiLineCentered("WorkshopUI planner button", () =>
+            {
+                if(ImGui.Button("Open unlock plan editor"))
+                {
+                    P.SubmarineUnlockPlanUI.IsOpen = true;
+                }
+            });
+
             if (ImGui.CollapsingHeader("Settings"))
             {
                 ImGui.Checkbox($"Resend airships and submarines on voyage CP access", ref C.SubsAutoResend);
                 ImGui.Checkbox($"Only finalize reports", ref C.SubsOnlyFinalize);
                 ImGui.Checkbox($"When resending, auto-repair vessels", ref C.SubsAutoRepair);
                 ImGui.Checkbox($"Even when only finalizing, repair vessels", ref C.SubsRepairFinalize);
+                ImGui.Checkbox($"Experimental compatibility with SimpleTweaks destination letters tweak", ref C.SimpleTweaksCompat);
+                if (C.SimpleTweaksCompat)
+                {
+                    ImGuiEx.TextWrapped(ImGuiColors.DalamudOrange, $"Results of using this option are unpredictable.");
+                }
             }
 
             if (ImGui.CollapsingHeader("Public debug"))
@@ -114,6 +129,14 @@ namespace AutoRetainer.UI
                         if (ImGui.Button("Resend currently selected submarine on previous voyage"))
                         {
                             TaskDeployOnPreviousVoyage.Enqueue();
+                        }
+                        if (ImGui.Button("Select best path"))
+                        {
+                            TaskCalculateAndPickBestExpRoute.Enqueue();
+                        }
+                        if (ImGui.Button("Select best path with 1 unlock included"))
+                        {
+                            TaskCalculateAndPickBestExpRoute.Enqueue(VoyageUtils.GetSubmarineUnlockPlanByGuid(Data.GetAdditionalVesselData(Utils.Read(CurrentSubmarine.Get()->Name), VoyageType.Submersible).SelectedUnlockPlan) ?? new());
                         }
                         foreach (var x in Data.OfflineSubmarineData)
                         {
@@ -360,7 +383,30 @@ namespace AutoRetainer.UI
                 if(adata.VesselBehavior == VesselBehavior.Unlock)
                 {
                     ImGuiEx.Text($"Unlock mode:");
-                    ImGuiEx.EnumCombo("##umode", ref adata.UnlockMode, Lang.UnlockModeNames);
+                    ImGuiEx.EnumCombo("##umode", ref adata.UnlockMode, (x) => x == UnlockMode.WhileLevelling, Lang.UnlockModeNames);
+                    var currentPlan = VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan);
+                    var text = Environment.TickCount64 % 2000 > 1000 ? "Unlocking every point (default plan)" : "No or unknown plan selected";
+                    if (ImGui.BeginCombo("##uplan", currentPlan?.Name ?? text))
+                    {
+                        if(ImGui.Button("Open editor"))
+                        {
+                            P.SubmarineUnlockPlanUI.IsOpen = true;
+                            P.SubmarineUnlockPlanUI.SelectedPlanGuid = adata.SelectedUnlockPlan;
+                        }
+                        ImGui.SameLine();
+                        if(ImGui.Button("Clear plan"))
+                        {
+                            adata.SelectedUnlockPlan = Guid.Empty.ToString();
+                        }
+                        foreach(var x in C.SubmarineUnlockPlans)
+                        {
+                            if (ImGui.Selectable($"{x.Name}##{x.GUID}"))
+                            {
+                                adata.SelectedUnlockPlan = x.GUID;
+                            }
+                        }
+                        ImGui.EndCombo();
+                    }
                 }
                 ImGui.EndPopup();
             }

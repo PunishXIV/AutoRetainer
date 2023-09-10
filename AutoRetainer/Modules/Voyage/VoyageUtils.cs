@@ -1,5 +1,6 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage.Readers;
+using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Types;
@@ -24,6 +25,37 @@ namespace AutoRetainer.Modules.Voyage
     {
         internal static string[] PanelName = new string[] { "Voyage Control Panel" };
         internal static uint[] Workshops = new uint[] { Houses.Company_Workshop_Empyreum, Houses.Company_Workshop_The_Goblet, Houses.Company_Workshop_Mist, Houses.Company_Workshop_Shirogane, Houses.Company_Workshop_The_Lavender_Beds };
+
+
+
+        internal static List<uint> GetPrioritizedPointList(this SubmarineUnlockPlan plan)
+        {
+            var ret = new List<uint>();
+            if (plan.UnlockSubs)
+            {
+                foreach (var x in Unlocks.PointToUnlockPoint.Where(z => z.Value.Point < 9000 && z.Value.Sub))
+                {
+                    if (!P.SubmarineUnlockPlanUI.IsMapExplored(x.Key, true) && P.SubmarineUnlockPlanUI.IsMapUnlocked(x.Value.Point))
+                    {
+                        ret.Add(x.Value.Point);
+                    }
+                }
+            }
+
+            foreach (var x in Unlocks.PointToUnlockPoint.Where(z => z.Value.Point < 9000 && !plan.ExcludedRoutes.Contains(z.Key)))
+            {
+                if (ret.Count > 0 && Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(ret.First()).Map.Row != Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(x.Key).Map.Row) break;
+                if (!P.SubmarineUnlockPlanUI.IsMapUnlocked(x.Key, true) && P.SubmarineUnlockPlanUI.IsMapUnlocked(x.Value.Point) && !ret.Contains(x.Value.Point))
+                {
+                    ret.Add(x.Value.Point);
+                }
+            }
+            return ret;
+        }
+        internal static SubmarineUnlockPlan GetSubmarineUnlockPlanByGuid(string guid)
+        {
+            return C.SubmarineUnlockPlans.FirstOrDefault(x => x.GUID == guid);
+        }
 
         internal static PanelType GetCurrentWorkshopPanelType()
         {
@@ -312,7 +344,7 @@ namespace AutoRetainer.Modules.Voyage
         {
             return (x.ReturnTime != 0 && x.GetRemainingSeconds() < C.UnsyncCompensation) 
                 ||
-                (x.ReturnTime == 0 && data.GetAdditionalVesselData(x.Name, type).VesselBehavior.EqualsAny(VesselBehavior.LevelUp));
+                (x.ReturnTime == 0 && data.GetAdditionalVesselData(x.Name, type).VesselBehavior.EqualsAny(VesselBehavior.LevelUp, VesselBehavior.Unlock));
         }
 
         internal static string GetNextCompletedVessel(VoyageType type)
@@ -365,20 +397,27 @@ namespace AutoRetainer.Modules.Voyage
 
         internal static void SelectRoutePointSafe(string FullOrShortName)
         {
+            Log($"Requested selection of {FullOrShortName} point.");
             if (TryGetAddonByName<AtkUnitBase>("AirShipExploration", out var addon) && IsAddonReady(addon))
             {
                 var reader = new ReaderAirShipExploration(addon);
+                Log($"  Reader initialized with {reader.Destinations.Count} destinations: {reader.Destinations.Select(x => $"{x}").Join("\n")}");
                 for (int i = 0; i < reader.Destinations.Count; i++)
                 {
                     var dest = reader.Destinations[i];
+                    Log($"  Comparing {i} {dest} with {FullOrShortName}");
                     if (FullOrShortName.EqualsIgnoreCaseAny(dest.NameFull, dest.NameShort))
                     {
-                        Log($"Found {FullOrShortName}, CanBeSelected = {dest.CanBeSelected}");
+                        Log($"    Found {FullOrShortName}, CanBeSelected = {dest.CanBeSelected}");
                         if (dest.CanBeSelected)
                         {
                             SelectRoutePointSafe(i);
                         }
                         return;
+                    }
+                    else
+                    {
+                        Log($"    Negative comparison result");
                     }
                 }
             }
@@ -386,14 +425,17 @@ namespace AutoRetainer.Modules.Voyage
 
         internal static void SelectRoutePointSafe(int which)
         {
+            Log($"Requested selection of point by ID={which}.");
             if (TryGetAddonByName<AtkUnitBase>("AirShipExploration", out var addon) && IsAddonReady(addon))
             {
                 var reader = new ReaderAirShipExploration(addon);
-                if(which >= reader.Destinations.Count) throw new ArgumentOutOfRangeException(nameof(which));
+                Log($"  Reader initialized with {reader.Destinations.Count} destinations: {reader.Destinations.Select(x => $"{x}").Join("\n")}");
+                if (which >= reader.Destinations.Count) throw new ArgumentOutOfRangeException(nameof(which));
                 var dest = reader.Destinations[which];
+                Log($"  Destination {dest}");
                 if (dest.CanBeSelected)
                 {
-                    VoyageUtils.Log($"Selecting {dest.NameFull} / {which}");
+                    VoyageUtils.Log($"  Selecting {dest.NameFull} / {which}");
                     P.Memory.SelectRoutePointUnsafe(which);
                 }
             }

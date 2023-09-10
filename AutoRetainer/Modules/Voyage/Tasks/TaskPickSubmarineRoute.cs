@@ -21,7 +21,7 @@ namespace AutoRetainer.Modules.Voyage.Tasks
             P.TaskManager.EnqueueImmediate(() => PickMap(map), $"PickMap({map})");
             foreach( var point in points )
             {
-                var name = Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(point).Destination.ToDalamudString().ExtractText().Trim();
+                var name = C.SimpleTweaksCompat? Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(point).Location.ToDalamudString().ExtractText().Trim() : Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(point).Destination.ToDalamudString().ExtractText().Trim();
                 P.TaskManager.EnqueueImmediate(() => PickPoint(name), $"PickPoint({name})");
             }
         }

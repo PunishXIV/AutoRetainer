@@ -3,6 +3,7 @@ using ClickLib.Structures;
 using Dalamud.Hooking;
 using Dalamud.Memory;
 using Dalamud.Utility.Signatures;
+using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -14,10 +15,6 @@ internal unsafe class Memory : IDisposable
 {
     internal int LastSearchItem = -1;
 
-    delegate byte sub_140EB1D00(nint a1, nint a2, nint a3);
-    [Signature("40 53 55 48 83 EC 28 F6 81 ?? ?? ?? ?? ?? 49 8B E8 48 8B D9 0F 84", DetourName =nameof(sub_140EB1D00Detour))]
-    Hook<sub_140EB1D00> sub_140EB1D00Hook;
-
     delegate ulong InteractWithObjectDelegate(TargetSystem* system, GameObject* obj, bool los);
     Hook<InteractWithObjectDelegate> InteractWithObjectHook;
 
@@ -26,30 +23,26 @@ internal unsafe class Memory : IDisposable
     GetIsGatheringItemGatheredDelegate GetIsGatheringItemGathered;
 
     internal delegate byte AtkUnitBase_FireCallbackDelegate(AtkUnitBase* a1, int valueCount, AtkValue* values, byte updateState);
-    [Signature("E8 ?? ?? ?? ?? 8B 4C 24 20 0F B6 D8", DetourName = nameof(FireCallbackDetour))]
+    [Signature("E8 ?? ?? ?? ?? 8B 4C 24 20 0F B6 D8", DetourName = nameof(FireCallbackDetour), Fallibility =Fallibility.Fallible)]
     internal Hook<AtkUnitBase_FireCallbackDelegate> FireCallbackHook;
+
+
+    internal delegate nint OnReceiveMarketPricePacketDelegate(nint a1, nint data);
+    [Signature("48 89 5C 24 ?? 57 48 83 EC 40 48 8B 0D ?? ?? ?? ?? 48 8B DA E8 ?? ?? ?? ?? 48 8B F8", DetourName = nameof(AddonItemSearchResult_OnRequestedUpdateDelegateDetour), Fallibility =Fallibility.Fallible)]
+    internal Hook<OnReceiveMarketPricePacketDelegate> OnReceiveMarketPricePacketHook;
 
     internal bool IsGatheringItemGathered(uint item) => GetIsGatheringItemGathered((ushort)item) != 0;
 
     internal Memory()
     {
         SignatureHelper.Initialise(this, true);
-        //sub_140EB1D00Hook?.Enable();
+        if (C.MarketCooldownOverlay) OnReceiveMarketPricePacketHook?.Enable();
     }
 
-    long tick1;
-
-    byte sub_140EB1D00Detour(nint a1, nint a2, nint a3)
+    nint AddonItemSearchResult_OnRequestedUpdateDelegateDetour(nint a1, nint data)
     {
-        var ret = sub_140EB1D00Hook.Original(a1,a2,a3);
-        var data = ((AtkValue*)(a3))->UInt;
-        PluginLog.Information($"{data} / {a1:X16}, {a2:X16}, {a3:X16} / {ret}");
-        if (data == 1) tick1 = Environment.TickCount64;
-        if (data == 15 && Environment.TickCount64 == tick1)
-        {
-            P.TaskManager.Enqueue(() => RetainerHandlers.SelectSpecificVentureByName("Yak Milk"));
-            P.TaskManager.Enqueue(RetainerHandlers.ClickAskAssign);
-        }
+        var ret = OnReceiveMarketPricePacketHook.Original(a1, data);
+        P.MarketCooldownOverlay.UnlockAt = Environment.TickCount64 + 2000;
         return ret;
     }
 
@@ -80,14 +73,10 @@ internal unsafe class Memory : IDisposable
 
     public void Dispose()
     {
-        InteractWithObjectHook?.Disable();
         InteractWithObjectHook?.Dispose();
-        FireCallbackHook?.Disable();
         FireCallbackHook?.Dispose();
-        AddonAirShipExploration_SelectDestinationHook?.Disable();
         AddonAirShipExploration_SelectDestinationHook?.Dispose();
-        sub_140EB1D00Hook?.Disable();
-        sub_140EB1D00Hook?.Dispose();
+        OnReceiveMarketPricePacketHook?.Dispose();
     }
 
     internal delegate void AddonAirShipExploration_SelectDestinationDelegate(nint a1, nint a2, AirshipExplorationInputData* a3);

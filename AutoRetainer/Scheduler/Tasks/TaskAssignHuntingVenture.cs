@@ -24,7 +24,7 @@ namespace AutoRetainer.Scheduler.Tasks
             //P.TaskManager.Enqueue(() => RetainerHandlers.SearchVentureByName(VentureID));
             P.TaskManager.Enqueue(RetainerHandlers.ClearTaskSupplylist);
             P.TaskManager.Enqueue(() => RetainerHandlers.SelectSpecificVentureByName(VentureID));
-            if (!C.NoErrorCheckPlanner)
+            if (!C.NoErrorCheckPlanner2)
             {
                 P.TaskManager.DelayNext(10, true);
                 P.TaskManager.Enqueue(() => RetainerHandlers.CheckForErrorAssignedVenture(VentureID), 500, false, "FirstErrorCheck");

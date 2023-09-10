@@ -202,7 +202,7 @@ namespace AutoRetainer.Modules.Voyage
                 }
                 else
                 {
-                    if (adata.VesselBehavior == VesselBehavior.LevelUp)
+                    if (adata.VesselBehavior.EqualsAny(VesselBehavior.LevelUp, VesselBehavior.Unlock))
                     {
                         if (EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResend", 1000))
                         {
@@ -214,7 +214,17 @@ namespace AutoRetainer.Modules.Voyage
                             {
                                 TaskSelectVesselByName.Enqueue(next);
                             }
-                            TaskDeployOnBestExpVoyage.Enqueue();
+                            if (adata.VesselBehavior == VesselBehavior.LevelUp)
+                            {
+                                TaskDeployOnBestExpVoyage.Enqueue();
+                            }
+                            else if(adata.VesselBehavior == VesselBehavior.Unlock)
+                            {
+                                if(adata.UnlockMode == UnlockMode.WhileLevelling)
+                                {
+                                    TaskDeployOnBestExpVoyage.Enqueue(VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan) ?? new());
+                                }
+                            }
                         }
                     }
                     else if (adata.VesselBehavior == VesselBehavior.Redeploy)
@@ -228,15 +238,6 @@ namespace AutoRetainer.Modules.Voyage
             }
             else
             {
-                /*var nextl = VoyageUtils.GetNextEmptyLevellingVessel(type);
-                if (nextl != null)
-                {
-                    if (EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResend", 1000))
-                    {
-                        P.TaskManager.Enqueue(() => VoyageScheduler.SelectVesselByName(nextl), $"SelectVesselByName = {nextl}");
-                        TaskDeployOnBestExpVoyage.Enqueue();
-                    }
-                }*/
                 if (!Data.AreAnyVesselsReturnInNext(type, 1 * 60))
                 {
                     if (EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResendQuitPanel", 1000))

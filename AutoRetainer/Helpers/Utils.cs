@@ -30,9 +30,15 @@ namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
+
     public static bool ContainsAllItems<T>(this IEnumerable<T> a, IEnumerable<T> b)
     {
         return !b.Except(a).Any();
+    }
+
+    internal static string Read(byte* ptr)
+    {
+        return MemoryHelper.ReadStringNullTerminated((nint)ptr);
     }
 
     internal static float Random { get; private set; } = 1f;

@@ -21,6 +21,13 @@ internal static unsafe class DebugMisc
 
     internal static void Draw()
     {
+        if(ImGui.Button("Test entrust dup"))
+        {
+            if(TryGetAddonByName<AtkUnitBase>("RetainerItemTransferList", out var addon))
+            {
+                Callback.Fire(addon, true, 0, (uint)29);
+            }
+        }
         ImGuiEx.Text($"Lockon: {*(byte*)(((nint)TargetSystem.Instance()) + 309)}");
         if (ImGui.Button("Chill frames lock"))
         {

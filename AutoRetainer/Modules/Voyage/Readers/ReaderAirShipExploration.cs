@@ -28,6 +28,11 @@ namespace AutoRetainer.Modules.Voyage.Readers
             internal uint StatusFlag => ReadUInt(6) ?? uint.MaxValue;
 
             internal bool CanBeSelected => StatusFlag.EqualsAny<uint>(0,1);
+
+            public override string ToString()
+            {
+                return $"(\"{NameFull}\"/\"{NameShort}\", RequiredRank={RequiredRank}, StatusFlag={StatusFlag}, CanBeSelected={CanBeSelected})";
+            }
         }
     }
 }

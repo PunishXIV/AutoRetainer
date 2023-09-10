@@ -1,4 +1,5 @@
-﻿using ECommons.Throttlers;
+﻿using AutoRetainerAPI.Configuration;
+using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using System;
 using System.Collections.Generic;
@@ -10,11 +11,11 @@ namespace AutoRetainer.Modules.Voyage.Tasks
 {
     internal static unsafe class TaskDeployOnBestExpVoyage
     {
-        internal static void Enqueue()
+        internal static void Enqueue(SubmarineUnlockPlan unlock = null)
         {
             VoyageUtils.Log($"Task enqueued: {nameof(TaskCalculateAndPickBestExpRoute)}");
             P.TaskManager.Enqueue(SelectDeploy);
-            TaskCalculateAndPickBestExpRoute.Enqueue();
+            TaskCalculateAndPickBestExpRoute.Enqueue(unlock);
             P.TaskManager.Enqueue(Deploy);
             TaskDeployAndSkipCutscene.Enqueue(true);
         }

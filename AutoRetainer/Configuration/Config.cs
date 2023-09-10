@@ -37,6 +37,7 @@ internal unsafe class Config : IEzConfig
     public bool UnsafeProtection = false;
     public bool CharEqualize = false;
     public bool TimerAllowNegative = false;
+    public bool MarketCooldownOverlay = false;
 
     public bool LoginOverlay = false;
     public float LoginOverlayScale = 1f;
@@ -74,6 +75,7 @@ internal unsafe class Config : IEzConfig
     public bool RetryItemSearch = false;
     public bool ArtisanIntegration = false;
     public bool DisplayMMType = false;
+    public List<SubmarineUnlockPlan> SubmarineUnlockPlans = new();
 
     internal bool DontReassign
     {
@@ -112,11 +114,12 @@ internal unsafe class Config : IEzConfig
     public bool SubsAutoEnable = false;
     public bool SubsRepairFinalize = false;
     public MultiModeType MultiModeType = MultiModeType.Everything;
-    public bool NoErrorCheckPlanner = false;
+    public bool NoErrorCheckPlanner2 = true;
     public WorkshopFailAction FailureNoFuel = WorkshopFailAction.ExcludeChar;
     public WorkshopFailAction FailureNoRepair = WorkshopFailAction.ExcludeVessel;
     public WorkshopFailAction FailureNoInventory = WorkshopFailAction.ExcludeChar;
     public WorkshopFailAction FailureGeneric = WorkshopFailAction.StopPlugin;
+    public bool SimpleTweaksCompat = false;
 
     public MultiModeCommonConfiguration MultiModeRetainerConfiguration = new()
     {

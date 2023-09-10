@@ -11,8 +11,6 @@ using Dalamud.Utility;
 using AutoRetainer.Scheduler.Tasks;
 using ClickLib.Clicks;
 using FFXIVClientStructs.FFXIV.Client.UI;
-using ECommons.MathHelpers;
-using PInvoke;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using System.Diagnostics;
 using AutoRetainer.Modules.Statistics;
@@ -22,9 +20,7 @@ using ECommons.Throttlers;
 using AutoRetainerAPI.Configuration;
 using AutoRetainerAPI;
 using ECommons.GameHelpers;
-using System.Xml.Linq;
 using AutoRetainer.Modules.Voyage;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace AutoRetainer;
 
@@ -52,6 +48,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal LogWindow LogWindow;
     internal AutoRetainerApi API;
     internal LoginOverlay LoginOverlay;
+    internal MarketCooldownOverlay MarketCooldownOverlay;
+    internal SubmarineUnlockPlanUI SubmarineUnlockPlanUI;
 
     internal long Time => C.UseServerTime ? CSFramework.GetServerTime() : DateTimeOffset.Now.ToUnixTimeSeconds();
 
@@ -82,6 +80,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 LogWindow = new();
                 ws.AddWindow(LogWindow);
                 configGui = new();
+                MarketCooldownOverlay = new();
+                ws.AddWindow(MarketCooldownOverlay);
                 TaskManager = new() { AbortOnTimeout = true, TimeLimitMS = 20000 };
                 Memory = new();
                 Svc.PluginInterface.UiBuilder.Draw += ws.Draw;
@@ -105,6 +105,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 ws.AddWindow(RetainerListOverlay);
                 LoginOverlay = (new LoginOverlay());
                 ws.AddWindow(LoginOverlay);
+                SubmarineUnlockPlanUI = new();
+                ws.AddWindow(SubmarineUnlockPlanUI);
                 MultiMode.Init();
 
                 Safety.Check();

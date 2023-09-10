@@ -8,6 +8,8 @@ namespace AutoRetainerAPI.Configuration
 {
     public enum UnlockMode
     {
-        WhileLevelling, SpamOne, MultiSelect
+        WhileLevelling, 
+        SpamOne, 
+        MultiSelect
     }
 }
