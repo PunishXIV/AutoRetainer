@@ -141,13 +141,18 @@ internal unsafe static class MultiModeUI
                 {
                     ImGuiEx.Text($"Can't change this now");
                 }
+                if(ImGui.Button("Configure entrust duplicates exclusions"))
+                {
+                    P.DuplicateBlacklistSelector.IsOpen = true;
+                    P.DuplicateBlacklistSelector.SelectedData = data;
+                }
                 ImGui.Separator();
-                if (ImGui.Button("Exclude Character"))
+                if (ImGuiEx.ButtonCtrl("Exclude Character"))
                 {
                     C.Blacklist.Add((data.CID, data.Name));
                 }
                 ImGuiComponents.HelpMarker("Excluding this character will immediately reset it's settings, remove it from this list and exclude all retainers from being processed. You can still run manual tasks on it's retainers. You can cancel this action in settings.");
-                if (ImGui.Button("Reset character data"))
+                if (ImGuiEx.ButtonCtrl("Reset character data"))
                 {
                     deleteData = data.CID;
                 }

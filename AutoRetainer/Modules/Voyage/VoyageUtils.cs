@@ -11,6 +11,7 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using Lumina.Excel.GeneratedSheets;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
@@ -26,28 +27,41 @@ namespace AutoRetainer.Modules.Voyage
         internal static string[] PanelName = new string[] { "Voyage Control Panel" };
         internal static uint[] Workshops = new uint[] { Houses.Company_Workshop_Empyreum, Houses.Company_Workshop_The_Goblet, Houses.Company_Workshop_Mist, Houses.Company_Workshop_Shirogane, Houses.Company_Workshop_The_Lavender_Beds };
 
-
-
-        internal static List<uint> GetPrioritizedPointList(this SubmarineUnlockPlan plan)
+        internal static SubmarineExplorationPretty GetSubmarineExploration(uint id)
         {
-            var ret = new List<uint>();
+            return Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(id);
+        }
+
+        internal static string GetSubmarineExplorationName(uint id)
+        {
+            return GetSubmarineExploration(id)?.ConvertDestination();
+        }
+
+        internal static string GetMapName(uint id)
+        {
+            return Svc.Data.GetExcelSheet<SubmarineMap>().GetRow(id)?.Name.ToString();
+        }
+
+        internal static List<(uint point, string justification)> GetPrioritizedPointList(this SubmarineUnlockPlan plan)
+        {
+            var ret = new List<(uint point, string justification)>();
             if (plan.UnlockSubs)
             {
                 foreach (var x in Unlocks.PointToUnlockPoint.Where(z => z.Value.Point < 9000 && z.Value.Sub))
                 {
-                    if (!P.SubmarineUnlockPlanUI.IsMapExplored(x.Key, true) && P.SubmarineUnlockPlanUI.IsMapUnlocked(x.Value.Point))
+                    if (!P.SubmarineUnlockPlanUI.IsMapExplored(x.Key, true) && P.SubmarineUnlockPlanUI.IsMapUnlocked(x.Key))
                     {
-                        ret.Add(x.Value.Point);
+                        ret.Add((x.Key, $"submarine slot from {VoyageUtils.GetSubmarineExplorationName(x.Key)}"));
                     }
                 }
             }
 
             foreach (var x in Unlocks.PointToUnlockPoint.Where(z => z.Value.Point < 9000 && !plan.ExcludedRoutes.Contains(z.Key)))
             {
-                if (ret.Count > 0 && Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(ret.First()).Map.Row != Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(x.Key).Map.Row) break;
-                if (!P.SubmarineUnlockPlanUI.IsMapUnlocked(x.Key, true) && P.SubmarineUnlockPlanUI.IsMapUnlocked(x.Value.Point) && !ret.Contains(x.Value.Point))
+                if (ret.Count > 0 && Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(ret.First().point).Map.Row != Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(x.Key).Map.Row) break;
+                if (!P.SubmarineUnlockPlanUI.IsMapUnlocked(x.Key, true) && P.SubmarineUnlockPlanUI.IsMapUnlocked(x.Value.Point) && !ret.Any(z => z.point == x.Value.Point))
                 {
-                    ret.Add(x.Value.Point);
+                    ret.Add((x.Value.Point, $"{VoyageUtils.GetSubmarineExplorationName(x.Key)} not unlocked"));
                 }
             }
             return ret;

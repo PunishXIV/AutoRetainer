@@ -13,7 +13,7 @@ namespace AutoRetainer.Modules.Voyage.Tasks
     {
         internal static void Enqueue(SubmarineUnlockPlan unlock = null)
         {
-            VoyageUtils.Log($"Task enqueued: {nameof(TaskCalculateAndPickBestExpRoute)}");
+            VoyageUtils.Log($"Task enqueued: {nameof(TaskCalculateAndPickBestExpRoute)} (plan: {unlock})");
             P.TaskManager.Enqueue(SelectDeploy);
             TaskCalculateAndPickBestExpRoute.Enqueue(unlock);
             P.TaskManager.Enqueue(Deploy);

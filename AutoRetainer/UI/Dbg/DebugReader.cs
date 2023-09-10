@@ -1,4 +1,5 @@
-﻿using AutoRetainer.Modules.Voyage.Readers;
+﻿using AutoRetainer.Internal;
+using AutoRetainer.Modules.Voyage.Readers;
 using ECommons.UIHelpers;
 using ECommons.UIHelpers.Implementations;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -14,6 +15,16 @@ namespace AutoRetainer.UI.Dbg
     {
         internal static void Draw()
         {
+            {
+                if (TryGetAddonByName<AtkUnitBase>("RetainerItemTransferList", out var a) && IsAddonReady(a))
+                {
+                    var reader = new ReaderRetainerItemTransferList(a);
+                    foreach (var r in reader.Items)
+                    {
+                        ImGuiEx.Text($"Item {r.ItemID}, isHQ = {r.IsHQ}");
+                    }
+                }
+            }
             {
                 if (TryGetAddonByName<AtkUnitBase>("AirShipExploration", out var a) && IsAddonReady(a))
                 {

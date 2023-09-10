@@ -3,6 +3,7 @@ using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Interface.Components;
 using ECommons.GameHelpers;
+using ECommons.Reflection;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using Lumina.Excel.GeneratedSheets;
@@ -236,7 +237,7 @@ namespace AutoRetainer.UI
                     }
                     if (ImGui.CollapsingHeader("Display current point exploration order"))
                     {
-                        ImGuiEx.Text(SelectedPlan.GetPrioritizedPointList().Select(x => Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(x).Destination.ToString()).Join("\n"));
+                        ImGuiEx.Text(SelectedPlan.GetPrioritizedPointList().Select(x => $"{Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(x.point).Destination} ({x.justification})").Join("\n"));
                     }
                     ImGui.EndChild();
                 }

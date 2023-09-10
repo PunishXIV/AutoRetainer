@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,11 @@ namespace AutoRetainerAPI.Configuration
             this.Name = other.Name;
             this.ExcludedRoutes = other.ExcludedRoutes;
             this.UnlockSubs = other.UnlockSubs;
+        }
+
+        public override string ToString()
+        {
+            return JsonConvert.SerializeObject(this);
         }
     }
 }

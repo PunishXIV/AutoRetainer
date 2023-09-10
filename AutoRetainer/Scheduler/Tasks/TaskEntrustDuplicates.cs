@@ -1,9 +1,12 @@
-﻿using AutoRetainer.Scheduler.Handlers;
+﻿using AutoRetainer.Internal;
+using AutoRetainer.Internal.Clicks;
+using AutoRetainer.Scheduler.Handlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace AutoRetainer.Scheduler.Tasks;
 
-internal static class TaskEntrustDuplicates
+internal unsafe static class TaskEntrustDuplicates
 {
     internal static bool NoDuplicates = false;
 
@@ -14,8 +17,12 @@ internal static class TaskEntrustDuplicates
             for (var slot = 0; slot < inv->Size; slot++) {
                 var slotItem = inv->GetInventorySlot(slot);
                 if (slotItem == null) continue;
-                if (InventoryManager.Instance()->GetInventoryItemCount(slotItem->ItemID, slotItem->Flags.HasFlag(InventoryItem.ItemFlags.HQ)) > 0) {
-                    return false;
+                if (InventoryManager.Instance()->GetInventoryItemCount(slotItem->ItemID, slotItem->Flags.HasFlag(InventoryItem.ItemFlags.HQ)) > 0) 
+                {
+                    if (!Data.TransferItemsBlacklist.Contains(slotItem->ItemID))
+                    {
+                        return false;
+                    }
                 }
             }
         }
@@ -34,9 +41,44 @@ internal static class TaskEntrustDuplicates
         P.TaskManager.Enqueue(() => { if (NoDuplicates) return true; return RetainerHandlers.SelectEntrustItems(); });
         P.TaskManager.Enqueue(() => { if (NoDuplicates) return true; return RetainerHandlers.ClickEntrustDuplicates(); });
         TaskWait.Enqueue(500);
+        P.TaskManager.Enqueue(UncheckBlacklistedItems);
+        TaskWait.Enqueue(500);
         P.TaskManager.Enqueue(() => { if (NoDuplicates) return true; return RetainerHandlers.ClickEntrustDuplicatesConfirm(); }, 600 * 1000, false);
         TaskWait.Enqueue(500);
         P.TaskManager.Enqueue(() => { if (NoDuplicates) return true; return RetainerHandlers.ClickCloseEntrustWindow(); }, false);
         P.TaskManager.Enqueue(RetainerHandlers.CloseAgentRetainer);
+    }
+
+    internal static bool? UncheckBlacklistedItems()
+    {
+        if (NoDuplicates) return true;
+        if (TryGetAddonByName<AtkUnitBase>("RetainerItemTransferList", out var addon) && IsAddonReady(addon))
+        {
+            if (Utils.GenericThrottle)
+            {
+                var reader = new ReaderRetainerItemTransferList(addon);
+                var cnt = 0;
+                for (int i = 0; i < reader.Items.Count; i++)
+                {
+                    if (Data.TransferItemsBlacklist.Contains(reader.Items[i].ItemID))
+                    {
+                        cnt++;
+                        PluginLog.Debug($"Removing item {reader.Items[i].ItemID} at position {i} as it was in blacklist");
+                        Callback.Fire(addon, true, 0, (uint)i);
+                    }
+                }
+                if(cnt == reader.Items.Count)
+                {
+                    NoDuplicates = true;
+                    addon->Close(true);
+                }
+                return true;
+            }
+        }
+        else
+        {
+            Utils.RethrottleGeneric();
+        }
+        return false;
     }
 }
