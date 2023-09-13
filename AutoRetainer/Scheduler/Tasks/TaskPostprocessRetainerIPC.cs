@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 
 namespace AutoRetainer.Scheduler.Tasks
 {
-    internal static class TaskPostprocessIPC
+    internal static class TaskPostprocessRetainerIPC
     {
         internal static void Enqueue(string retainer, string pluginToProcess = null)
         {
             P.TaskManager.Enqueue(() =>
             {
                 SchedulerMain.RetainerPostprocess = SchedulerMain.RetainerPostprocess.Clear();
-                IPC.FirePostprocessTaskRequestEvent(retainer);
-            }, "TaskPostprocessIPCEnqueue");
+                IPC.FireRetainerPostprocessTaskRequestEvent(retainer);
+            }, "TaskRetainerPostprocessIPCEnqueue");
             P.TaskManager.Enqueue(() =>
             {
                 DebugLog($"SchedulerMain.RetainerPostprocess contains: {SchedulerMain.RetainerPostprocess.Print()}, pluginToProcess = {pluginToProcess}");
@@ -24,12 +24,12 @@ namespace AutoRetainer.Scheduler.Tasks
                     P.TaskManager.EnqueueImmediate(() =>
                     {
                         SchedulerMain.RetainerPostprocess = SchedulerMain.RetainerPostprocess.Remove(x);
-                        SchedulerMain.PostProcessLocked = true;
-                        IPC.FirePluginPostprocessEvent(x, retainer);
-                    }, $"Postprocess request from {x}");
-                    P.TaskManager.EnqueueImmediate(() => !SchedulerMain.PostProcessLocked, int.MaxValue, $"Postprocess task from {x}");
+                        SchedulerMain.RetainerPostProcessLocked = true;
+                        IPC.FireRetainerPostprocessEvent(x, retainer);
+                    }, $"Retainer Postprocess request from {x}");
+                    P.TaskManager.EnqueueImmediate(() => !SchedulerMain.RetainerPostProcessLocked, int.MaxValue, $"Retainer Postprocess task from {x}");
                 }
-            }, "TaskPostprocessProcessEntries");
+            }, "TaskRetainerPostprocessProcessEntries");
         }
     }
 }

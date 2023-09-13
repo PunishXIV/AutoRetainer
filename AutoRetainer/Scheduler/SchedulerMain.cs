@@ -25,8 +25,10 @@ internal unsafe static class SchedulerMain
 
     internal static bool CanAssignQuickExploration => C.EnableAssigningQuickExploration && !C.DontReassign && Utils.GetVenturesAmount() > 1;
     internal static volatile uint VentureOverride = 0;
-    internal static volatile bool PostProcessLocked = false;
+    internal static volatile bool RetainerPostProcessLocked = false;
+    internal static volatile bool CharacterPostProcessLocked = false;
     internal static ImmutableList<string> RetainerPostprocess = Array.Empty<string>().ToImmutableList();
+    internal static ImmutableList<string> CharacterPostprocess = Array.Empty<string>().ToImmutableList();
 
     internal static PluginEnableReason Reason { get; set; }
 
@@ -176,7 +178,7 @@ internal unsafe static class SchedulerMain
                                     }
 
                                     //fire event, let other plugins deal with retainer
-                                    TaskPostprocessIPC.Enqueue(retainer);
+                                    TaskPostprocessRetainerIPC.Enqueue(retainer);
 
                                     if (C.RetainerMenuDelay > 0)
                                     {

@@ -140,7 +140,7 @@ internal unsafe class RetainerListOverlay : Window
                     if (ret.Available)
                     {
                         P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
-                        TaskPostprocessIPC.Enqueue(ret.Name.ToString(), PluginToProcess);
+                        TaskPostprocessRetainerIPC.Enqueue(ret.Name.ToString(), PluginToProcess);
 
                         if (C.RetainerMenuDelay > 0)
                         {
