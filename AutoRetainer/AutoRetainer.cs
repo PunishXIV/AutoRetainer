@@ -21,6 +21,7 @@ using AutoRetainerAPI.Configuration;
 using AutoRetainerAPI;
 using ECommons.GameHelpers;
 using AutoRetainer.Modules.Voyage;
+using Dalamud.Game.Network;
 
 namespace AutoRetainer;
 
@@ -58,6 +59,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal bool StylePushed = false;
     internal RetainerListOverlay RetainerListOverlay;
     internal uint LastVentureID = 0;
+    internal uint ListUpdateFrame = 0;
     internal static OfflineCharacterData Data => Utils.GetCurrentCharacterData();
 
     public AutoRetainer(DalamudPluginInterface pi)
@@ -120,9 +122,15 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 ApiTest.Init();
                 FPSManager.UnlockChillFrames();
                 PluginLog.Information($"AutoRetainer v{P.GetType().Assembly.GetName().Version} is ready.");
+                //Svc.GameNetwork.NetworkMessage += GameNetwork_NetworkMessage;
             });
         }
         //);
+    }
+
+    private void GameNetwork_NetworkMessage(nint dataPtr, ushort opCode, uint sourceActorId, uint targetActorId, NetworkMessageDirection direction)
+    {
+        DuoLog.Information($"{opCode:X16}, {direction}");
     }
 
     private void Toasts_Toast(ref Dalamud.Game.Text.SeStringHandling.SeString message, ref Dalamud.Game.Gui.Toast.ToastOptions options, ref bool isHandled)
@@ -349,6 +357,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             Svc.Framework.Update -= Tick;
             Svc.Toasts.ErrorToast -= Toasts_ErrorToast;
             Svc.Toasts.Toast -= Toasts_Toast;
+            Svc.GameNetwork.NetworkMessage -= GameNetwork_NetworkMessage;
             Safe(delegate
             {
                 YesAlready.EnableIfNeeded();

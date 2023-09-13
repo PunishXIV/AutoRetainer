@@ -22,13 +22,15 @@ namespace AutoRetainer.Scheduler.Tasks
             //P.TaskManager.Enqueue(() => RetainerHandlers.GenericSelectByName(VentureUtils.GetVentureLevelCategory(VentureID)), $"GenericSelectByName(VentureUtils.GetVentureLevelCategory({VentureID})");
             //P.TaskManager.Enqueue(() => RetainerHandlers.SelectSpecificVenture(VentureID), $"SelectSpecificVenture({VentureID})");
             //P.TaskManager.Enqueue(() => RetainerHandlers.SearchVentureByName(VentureID));
+            P.TaskManager.Enqueue(RetainerHandlers.WaitForVentureListUpdate);
+            P.TaskManager.DelayNext(C.FrameDelay, true);
             P.TaskManager.Enqueue(RetainerHandlers.ClearTaskSupplylist);
             P.TaskManager.Enqueue(() => RetainerHandlers.SelectSpecificVentureByName(VentureID));
-            if (!C.NoErrorCheckPlanner2)
+            /*if (!C.NoErrorCheckPlanner2)
             {
                 P.TaskManager.DelayNext(10, true);
                 P.TaskManager.Enqueue(() => RetainerHandlers.CheckForErrorAssignedVenture(VentureID), 500, false, "FirstErrorCheck");
-            }
+            }*/
             P.TaskManager.Enqueue(RetainerHandlers.ClickAskAssign);
         }
     }

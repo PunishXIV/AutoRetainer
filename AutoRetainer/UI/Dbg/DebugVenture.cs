@@ -2,6 +2,7 @@
 using AutoRetainer.Scheduler.Tasks;
 using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Client.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
 namespace AutoRetainer.UI.Dbg;
 
@@ -11,6 +12,14 @@ internal static unsafe class DebugVenture
     internal static string VentureName = "";
     internal static void Draw()
     {
+        {
+            var agent = AgentModule.Instance()->GetAgentByInternalID(140);
+            if(agent != null && agent->IsAgentActive())
+            {
+                ImGuiEx.TextCopy($"{(nint)agent:X16}");
+                ImGuiEx.Text($"{*(ushort*)((uint)agent + 456)}");
+            }
+        }
         if (TryGetAddonByName<AddonRetainerTaskAsk>("RetainerTaskAsk", out var addon) && IsAddonReady(&addon->AtkUnitBase))
         {
             ImGuiEx.Text($"Enabled: {addon->AssignButton->IsEnabled}");

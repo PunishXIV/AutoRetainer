@@ -21,6 +21,7 @@ internal static unsafe class DebugMisc
 
     internal static void Draw()
     {
+        ImGuiEx.Text($"CSFramework.Instance()->FrameCounter: {CSFramework.Instance()->FrameCounter}");
         if(ImGui.Button("Test entrust dup"))
         {
             if(TryGetAddonByName<AtkUnitBase>("RetainerItemTransferList", out var addon))

@@ -41,5 +41,6 @@ namespace AutoRetainer.Modules.Voyage.VoyageCalculator
         }
 
         public string ConvertDestination() => Utils.UpperCaseStr(Destination);
+        public string FancyDestination() => $"[{Svc.Data.GetExcelSheet<SubmarineExplorationPretty>(Dalamud.ClientLanguage.Japanese).GetRow(this.RowId).Location}] " + Utils.UpperCaseStr(Destination);
     }
 }

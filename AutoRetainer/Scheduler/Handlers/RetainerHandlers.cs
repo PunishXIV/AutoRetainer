@@ -15,6 +15,12 @@ namespace AutoRetainer.Scheduler.Handlers;
 
 internal unsafe static class RetainerHandlers
 {
+    internal static bool? WaitForVentureListUpdate()
+    {
+        if (P.ListUpdateFrame > CSFramework.Instance()->FrameCounter - 10) return true;
+        return false;
+    }
+
     internal static bool? SelectAssignVenture()
     {
         var text = new string[] { Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(2386).Text.ToDalamudString().ExtractText(), Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(2387).Text.ToDalamudString().ExtractText() };

@@ -224,12 +224,12 @@ namespace AutoRetainer.UI
                                 ImGui.TableNextColumn();
                                 if (col) ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.ParsedGreen);
                                 var data = Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(x.Key);
-                                ImGuiEx.CollectionCheckbox($"{data?.ConvertDestination()}", x.Key, SelectedPlan.ExcludedRoutes, true);
+                                ImGuiEx.CollectionCheckbox($"{data?.FancyDestination()}", x.Key, SelectedPlan.ExcludedRoutes, true);
                                 if (col) ImGui.PopStyleColor();
                                     ImGui.TableNextColumn();
                                 ImGuiEx.TextV($"{data.Map?.Value?.Name}");
                                 ImGui.TableNextColumn();
-                                ImGuiEx.TextV($"{Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(x.Value.Point)?.ConvertDestination()}");
+                                ImGuiEx.TextV($"{Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(x.Value.Point)?.FancyDestination()}");
                                 ImGui.PopID();
                             }
                         }

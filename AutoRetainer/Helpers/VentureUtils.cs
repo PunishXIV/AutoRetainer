@@ -194,7 +194,7 @@ namespace AutoRetainer.Helpers
             var lvls = r.Level == 0 ? "" : $"{Lang.CharLevel}{r.Level} ";
             right = r.Yield == 0 ? "" : $"x{r.Yield} {r.YieldStars}";
             left = $"{left}{lvls}{r.Name}";
-            return left + " " + right;
+            return (C.Verbose ? $"#{Task.RowId}/{Task.ClassJobCategory.Value.Name} " : "") + left + " " + right;
         }
 
         internal static (string UnavailabilitySymbols, int Level, string Name, int Yield, int YieldRate, string YieldStars) GetFancyVentureNameParts(this RetainerTask Task, OfflineCharacterData data, OfflineRetainerData retainer, out bool Available)

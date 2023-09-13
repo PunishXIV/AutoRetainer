@@ -37,6 +37,19 @@ internal unsafe class Memory : IDisposable
     {
         SignatureHelper.Initialise(this, true);
         if (C.MarketCooldownOverlay) OnReceiveMarketPricePacketHook?.Enable();
+        ReceiveRetainerVentureListUpdateHook?.Enable();
+    }
+
+    delegate nint ReceiveRetainerVentureListUpdateDelegate(nint a1, int a2, nint a3);
+    [Signature("48 89 5C 24 ?? 56 41 56 41 57 48 83 EC 20 8B DA", DetourName =nameof(ReceiveRetainerVentureListUpdateDetour), Fallibility =Fallibility.Infallible)]
+    Hook<ReceiveRetainerVentureListUpdateDelegate> ReceiveRetainerVentureListUpdateHook;
+
+    nint ReceiveRetainerVentureListUpdateDetour(nint a1, int a2, nint a3)
+    {
+        var ret = ReceiveRetainerVentureListUpdateHook.Original(a1, a2, a3);
+        PluginLog.Debug($"{a1:X16}, {a2:X8}, {a3:X16}");
+        P.ListUpdateFrame = CSFramework.Instance()->FrameCounter;
+        return ret;
     }
 
     nint AddonItemSearchResult_OnRequestedUpdateDelegateDetour(nint a1, nint data)
@@ -77,6 +90,7 @@ internal unsafe class Memory : IDisposable
         FireCallbackHook?.Dispose();
         AddonAirShipExploration_SelectDestinationHook?.Dispose();
         OnReceiveMarketPricePacketHook?.Dispose();
+        ReceiveRetainerVentureListUpdateHook?.Dispose();
     }
 
     internal delegate void AddonAirShipExploration_SelectDestinationDelegate(nint a1, nint a2, AirshipExplorationInputData* a3);

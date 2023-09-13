@@ -14,7 +14,9 @@ internal static class TaskAssignQuickVenture
         P.TaskManager.Enqueue(RetainerHandlers.SelectAssignVenture);
         P.TaskManager.Enqueue(() => RetainerHandlers.EnforceSelectString(RetainerHandlers.SelectAssignVenture));
         P.TaskManager.Enqueue(RetainerHandlers.SelectQuickExploration);
-        P.TaskManager.DelayNext(10, true);
+        P.TaskManager.Enqueue(RetainerHandlers.WaitForVentureListUpdate);
+        P.TaskManager.DelayNext(C.FrameDelay, true);
+        //P.TaskManager.DelayNext(10, true);
         P.TaskManager.Enqueue(RetainerHandlers.ClickAskAssign);
     }
 }
