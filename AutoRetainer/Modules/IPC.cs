@@ -26,8 +26,10 @@ namespace AutoRetainer.Modules
             Svc.PluginInterface.GetIpcProvider<ulong, string, AdditionalRetainerData>("AutoRetainer.GetAdditionalRetainerData").RegisterFunc(GetARD);
             Svc.PluginInterface.GetIpcProvider<ulong, string, AdditionalRetainerData, object>("AutoRetainer.WriteAdditionalRetainerData").RegisterAction(SetARD);
             Svc.PluginInterface.GetIpcProvider<List<ulong>>("AutoRetainer.GetRegisteredCIDs").RegisterFunc(GetRegisteredCIDs);
-            Svc.PluginInterface.GetIpcProvider<string, object>("AutoRetainer.RequestPostprocess").RegisterAction(RequestPostprocess);
-            Svc.PluginInterface.GetIpcProvider<object>("AutoRetainer.FinishPostprocessRequest").RegisterAction(FinishPostprocessRequest);
+            Svc.PluginInterface.GetIpcProvider<string, object>(ApiConsts.RequestRetainerPostProcess).RegisterAction(RequestRetainerPostprocess);
+            Svc.PluginInterface.GetIpcProvider<object>(ApiConsts.FinishRetainerPostprocessRequest).RegisterAction(FinishRetainerPostprocessRequest);
+            Svc.PluginInterface.GetIpcProvider<string, object>(ApiConsts.RequestCharacterPostProcess).RegisterAction(RequestCharacterPostprocess);
+            Svc.PluginInterface.GetIpcProvider<object>(ApiConsts.FinishCharacterPostprocessRequest).RegisterAction(FinishCharacterPostprocessRequest);
             Svc.PluginInterface.GetIpcProvider<string, object>(ApiConsts.OnRetainerListCustomTask).RegisterAction(OnRetainerListCustomTask);
         }
 
@@ -48,25 +50,43 @@ namespace AutoRetainer.Modules
             Svc.PluginInterface.GetIpcProvider<ulong, string, AdditionalRetainerData>("AutoRetainer.GetAdditionalRetainerData").UnregisterFunc();
             Svc.PluginInterface.GetIpcProvider<ulong, string, AdditionalRetainerData, object>("AutoRetainer.WriteAdditionalRetainerData").UnregisterAction();
             Svc.PluginInterface.GetIpcProvider<List<ulong>>("AutoRetainer.GetRegisteredCIDs").UnregisterFunc();
-            Svc.PluginInterface.GetIpcProvider<string, object>("AutoRetainer.RequestPostprocess").UnregisterAction();
-            Svc.PluginInterface.GetIpcProvider<object>("AutoRetainer.FinishPostprocessRequest").UnregisterAction();
+            Svc.PluginInterface.GetIpcProvider<string, object>(ApiConsts.RequestRetainerPostProcess).UnregisterAction();
+            Svc.PluginInterface.GetIpcProvider<object>(ApiConsts.FinishRetainerPostprocessRequest).UnregisterAction();
+            Svc.PluginInterface.GetIpcProvider<string, object>(ApiConsts.RequestCharacterPostProcess).UnregisterAction();
+            Svc.PluginInterface.GetIpcProvider<object>(ApiConsts.FinishCharacterPostprocessRequest).UnregisterAction();
             Svc.PluginInterface.GetIpcProvider<string, object>(ApiConsts.OnRetainerListCustomTask).UnregisterAction();
         }
 
-        static void FinishPostprocessRequest()
+        static void FinishRetainerPostprocessRequest()
         {
-            Log("Received postprocess request finish");
-            SchedulerMain.PostProcessLocked = false;
+            Log("Received retainer postprocess request finish");
+            SchedulerMain.RetainerPostProcessLocked = false;
         }
 
-        static void RequestPostprocess(string pluginName)
+        static void FinishCharacterPostprocessRequest()
+        {
+            Log("Received character postprocess request finish");
+            SchedulerMain.CharacterPostProcessLocked = false;
+        }
+
+        static void RequestRetainerPostprocess(string pluginName)
         {
             if(SchedulerMain.RetainerPostprocess.Contains(pluginName))
             {
-                throw new Exception($"Postprocess request from {pluginName} already exist");
+                throw new Exception($"Retainer Postprocess request from {pluginName} already exist");
             }
             SchedulerMain.RetainerPostprocess = SchedulerMain.RetainerPostprocess.Add(pluginName);
-            Log($"Postprocess requested from {pluginName}");
+            Log($"Retainer Postprocess requested from {pluginName}");
+        }
+
+        static void RequestCharacterPostprocess(string pluginName)
+        {
+            if(SchedulerMain.CharacterPostprocess.Contains(pluginName))
+            {
+                throw new Exception($"Character Postprocess request from {pluginName} already exist");
+            }
+            SchedulerMain.CharacterPostprocess = SchedulerMain.CharacterPostprocess.Add(pluginName);
+            Log($"Character Postprocess requested from {pluginName}");
         }
 
         static List<ulong> GetRegisteredCIDs()
@@ -117,16 +137,28 @@ namespace AutoRetainer.Modules
             Svc.PluginInterface.GetIpcProvider<string, object>(ApiConsts.OnSendRetainerToVenture).SendMessage(retainer);
         }
 
-        internal static void FirePostprocessTaskRequestEvent(string retainer)
+        internal static void FireRetainerPostprocessTaskRequestEvent(string retainer)
         {
-            Log($"Firing FirePostprocessTaskRequestEvent for {retainer}");
+            Log($"Firing FireRetainerPostprocessTaskRequestEvent for {retainer}");
             Svc.PluginInterface.GetIpcProvider<string, object>(ApiConsts.OnRetainerAdditionalTask).SendMessage(retainer);
         }
 
-        internal static void FirePluginPostprocessEvent(string pluginName, string retainer)
+        internal static void FireRetainerPostprocessEvent(string pluginName, string retainer)
         {
-            Log($"Firing FirePluginPostprocessEvent for {retainer} for plugin {pluginName}");
+            Log($"Firing FireRetainerPostprocessEvent for {retainer} for plugin {pluginName}");
             Svc.PluginInterface.GetIpcProvider<string, string, object>(ApiConsts.OnRetainerReadyForPostprocess).SendMessage(pluginName, retainer);
+        }
+
+        internal static void FireCharacterPostprocessTaskRequestEvent()
+        {
+            Log($"Firing FireCharacterPostprocessTaskRequestEvent");
+            Svc.PluginInterface.GetIpcProvider<object>(ApiConsts.OnCharacterAdditionalTask).SendMessage();
+        }
+
+        internal static void FireCharacterPostprocessEvent(string pluginName)
+        {
+            Log($"Firing FireCharacterPostprocessEvent for plugin {pluginName}");
+            Svc.PluginInterface.GetIpcProvider<string, object>(ApiConsts.OnCharacterReadyForPostprocess).SendMessage(pluginName);
         }
     }
 }

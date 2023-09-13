@@ -25,7 +25,7 @@ namespace AutoRetainer.Modules
         {
             if (!Enabled) return;
             PluginLog.Information($"Now requesting postprocess for {retainerName}");
-            P.API.RequestPostprocess();
+            P.API.RequestRetainerPostprocess();
         }
 
         private static void API_OnRetainerReadyToPostprocess(string retainerName)
@@ -39,7 +39,7 @@ namespace AutoRetainer.Modules
                 }
                 return false;
             }, int.MaxValue);
-            TaskManager.Enqueue(P.API.FinishPostProcess);
+            TaskManager.Enqueue(P.API.FinishRetainerPostProcess);
         }
     }
 }

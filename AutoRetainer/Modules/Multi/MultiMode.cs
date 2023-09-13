@@ -313,6 +313,10 @@ internal unsafe static class MultiMode
         {
             ErrorMessage = "AutoLogin is already running";
         }
+        else if (SchedulerMain.CharacterPostProcessLocked)
+        {
+            ErrorMessage = "Currently in post-processing of character";
+        }
         /*else if (data != null && !data.Index.InRange(1, 9))
         {
             ErrorMessage = "Invalid character index";
@@ -339,13 +343,15 @@ internal unsafe static class MultiMode
                     {
                         CharaCnt.Clear();
                     }
+
+                    TaskPostprocessCharacterIPC.Enqueue();
                     if (data != null)
                     {
-                        AutoLogin.Instance.SwapCharacter(data.WorldOverride ?? data.World, data.Name, data.ServiceAccount);
+                        P.TaskManager.Enqueue(() => AutoLogin.Instance.SwapCharacter(data.WorldOverride ?? data.World, data.Name, data.ServiceAccount));
                     }
                     else
                     {
-                        AutoLogin.Instance.Logoff();
+                        P.TaskManager.Enqueue(() => AutoLogin.Instance.Logoff());
                     }
                     return true;
                 }

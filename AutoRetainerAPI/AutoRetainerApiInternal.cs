@@ -40,6 +40,7 @@ namespace AutoRetainerAPI
                 GenericHelpers.Safe(() => OnRetainerSettingsDraw(cid, retainer));
             }
         }
+
         private void OnRetainerReadyForPostprocessIntl(string plugin, string retainer)
         {
             if (ECommonsMain.Instance.Name == plugin)
@@ -47,6 +48,17 @@ namespace AutoRetainerAPI
                 if (OnRetainerReadyToPostprocess != null)
                 {
                     GenericHelpers.Safe(() => OnRetainerReadyToPostprocess(retainer));
+                }
+            }
+        }
+
+        private void OnCharacterReadyForPostprocessIntl(string plugin)
+        {
+            if (ECommonsMain.Instance.Name == plugin)
+            {
+                if (OnCharacterReadyToPostProcess != null)
+                {
+                    GenericHelpers.Safe(() => OnCharacterReadyToPostProcess());
                 }
             }
         }
@@ -64,6 +76,14 @@ namespace AutoRetainerAPI
             if (OnRetainerPostprocessStep != null)
             {
                 GenericHelpers.Safe(() => OnRetainerPostprocessStep(n));
+            }
+        }
+
+        void OnCharacterAdditionalTask()
+        {
+            if (OnCharacterPostprocessStep != null)
+            {
+                GenericHelpers.Safe(() => OnCharacterPostprocessStep());
             }
         }
     }

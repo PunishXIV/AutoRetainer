@@ -41,6 +41,16 @@ namespace AutoRetainerAPI
         public event OnRetainerListTaskButtonsDrawDelegate OnRetainerListTaskButtonsDraw;
 
         /// <summary>
+        /// Event which is fired when a character is processed and ready to receive additional postprocess tasks
+        /// </summary>
+        public event OnCharacterPostprocessTaskDelegate OnCharacterPostprocessStep;
+
+        /// <summary>
+        /// Event which is fired when your plugin should do additional post-process tasks. You must return game UI into the state from where you picked it up.
+        /// </summary>
+        public event OnCharacterReadyToPostprocessDelegate OnCharacterReadyToPostProcess;
+
+        /// <summary>
         /// Event which is fired every time when main controls are being drawn
         /// </summary>
         public event OnMainControlsDrawDelegate OnMainControlsDraw;
@@ -53,6 +63,8 @@ namespace AutoRetainerAPI
             Svc.PluginInterface.GetIpcSubscriber<ulong, string, object>(ApiConsts.OnRetainerSettingsDraw).Subscribe(OnRetainerSettingsDrawAction);
             Svc.PluginInterface.GetIpcSubscriber<ulong, string, object>(ApiConsts.OnRetainerPostVentureTaskDraw).Subscribe(OnRetainerPostVentureTaskDrawAction);
             Svc.PluginInterface.GetIpcSubscriber<object>(ApiConsts.OnRetainerListTaskButtonsDraw).Subscribe(OnRetainerListTaskButtonsDrawAction);
+            Svc.PluginInterface.GetIpcSubscriber<object>(ApiConsts.OnCharacterAdditionalTask).Subscribe(OnCharacterAdditionalTask);
+            Svc.PluginInterface.GetIpcSubscriber<string, object>(ApiConsts.OnCharacterReadyForPostprocess).Subscribe(OnCharacterReadyForPostprocessIntl);
             Svc.PluginInterface.GetIpcSubscriber<object>(ApiConsts.OnMainControlsDraw).Subscribe(OnMainControlsDrawAction);
         }
 
@@ -68,16 +80,26 @@ namespace AutoRetainerAPI
         /// <summary>
         /// Fire inside <see cref="OnRetainerPostprocessStep"/> event to indicate that you want to do the postprocessing of a retainer.
         /// </summary>
-        public void RequestPostprocess()
+        public void RequestRetainerPostprocess()
         {
-            Svc.PluginInterface.GetIpcSubscriber<string, object>("AutoRetainer.RequestPostprocess").InvokeAction(ECommonsMain.Instance.Name);
+            Svc.PluginInterface.GetIpcSubscriber<string, object>(ApiConsts.RequestRetainerPostProcess).InvokeAction(ECommonsMain.Instance.Name);
         }
 
         /// <summary>
-        /// Fire inside <see cref="OnRetainerReadyToPostprocess"/> to indicate that you have finished your postprocessing tasks
+        /// Fire inside <see cref="OnRetainerReadyToPostprocess"/> to indicate that you have finished your postprocessing tasks.
         /// </summary>
-        public void FinishPostProcess() => Svc.PluginInterface.GetIpcSubscriber<object>("AutoRetainer.FinishPostprocessRequest").InvokeAction();
+        public void FinishRetainerPostProcess() => Svc.PluginInterface.GetIpcSubscriber<object>(ApiConsts.FinishRetainerPostprocessRequest).InvokeAction();
 
+        /// <summary>
+        /// Fire inside <see cref="oncharacterpost"/> event to indicate that you want to do the postprocessing of a character.
+        /// </summary>
+        public void RequestCharacterPostprocess() => Svc.PluginInterface.GetIpcSubscriber<string, object>(ApiConsts.RequestCharacterPostProcess).InvokeAction(ECommonsMain.Instance.Name);
+
+
+        /// <summary>
+        /// Fire inside <see cref="OnCharacterReadyToPostProcess"/> to indicate that you have finished your postprocessing tasks.
+        /// </summary>
+        public void FinishCharacterPostProcess() => Svc.PluginInterface.GetIpcSubscriber<object>(ApiConsts.FinishCharacterPostprocessRequest).InvokeAction();
 
         /// <summary>
         /// Indicates whether AutoRetainer's API has been initialized and is ready to use.
@@ -124,6 +146,8 @@ namespace AutoRetainerAPI
             Svc.PluginInterface.GetIpcSubscriber<ulong, string, object>(ApiConsts.OnRetainerSettingsDraw).Unsubscribe(OnRetainerSettingsDrawAction);
             Svc.PluginInterface.GetIpcSubscriber<ulong, string, object>(ApiConsts.OnRetainerPostVentureTaskDraw).Unsubscribe(OnRetainerPostVentureTaskDrawAction);
             Svc.PluginInterface.GetIpcSubscriber<object>(ApiConsts.OnRetainerListTaskButtonsDraw).Unsubscribe(OnRetainerListTaskButtonsDrawAction);
+            Svc.PluginInterface.GetIpcSubscriber<object>(ApiConsts.OnCharacterAdditionalTask).Unsubscribe(OnCharacterAdditionalTask);
+            Svc.PluginInterface.GetIpcSubscriber<string, object>(ApiConsts.OnCharacterReadyForPostprocess).Unsubscribe(OnCharacterReadyForPostprocessIntl);
             Svc.PluginInterface.GetIpcSubscriber<object>(ApiConsts.OnMainControlsDraw).Unsubscribe(OnMainControlsDrawAction);
         }
 
