@@ -44,6 +44,7 @@ public class OfflineCharacterData
     public bool ExcludeWorkshop = false;
     public bool ExcludeOverlay = false;
     public List<uint> TransferItemsBlacklist = new();
+    public int NumSubSlots = 0;
 
     public string Identity => $"{CID}";
     public bool ShouldSerializeIdentity() => false;

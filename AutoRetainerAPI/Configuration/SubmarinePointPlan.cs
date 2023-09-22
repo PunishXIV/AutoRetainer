@@ -5,25 +5,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace AutoRetainerAPI.Configuration
 {
-    public class SubmarineUnlockPlan
+    public class SubmarinePointPlan
     {
         public string GUID = Guid.NewGuid().ToString();
         public string Name = string.Empty;
-        public List<uint> ExcludedRoutes = new();
+        public List<uint> Points = new();
         public bool Delete = false;
-        public bool UnlockSubs = true;
 
         public bool ShouldSerializeDelete() => false;
 
-        public void CopyFrom(SubmarineUnlockPlan other)
+        public void CopyFrom(SubmarinePointPlan other)
         {
             this.Name = other.Name;
-            this.ExcludedRoutes = other.ExcludedRoutes.JSONClone();
-            this.UnlockSubs = other.UnlockSubs;
+            this.Points = other.Points.JSONClone();
         }
 
         public override string ToString()

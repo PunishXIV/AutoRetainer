@@ -4,6 +4,7 @@ using ECommons.Reflection;
 using FFXIVClientStructs.FFXIV.Client.Game.Gauge;
 using Lumina.Excel.GeneratedSheets;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -17,8 +18,10 @@ namespace AutoRetainer.Modules.Voyage.Tasks
     internal static unsafe class TaskCalculateAndPickBestExpRoute
     {
         static volatile bool Calculating = false;
+        internal static volatile bool Stop = false;
         internal static void Enqueue(SubmarineUnlockPlan unlock = null)
         {
+            Stop = false;
             VoyageUtils.Log($"Task enqueued: {nameof(TaskCalculateAndPickBestExpRoute)} (plan: {unlock})");
             P.TaskManager.Enqueue(() => Calculate(unlock));
             P.TaskManager.Enqueue(WaitUntilCalculationStopped, 60*60*1000);
@@ -26,10 +29,16 @@ namespace AutoRetainer.Modules.Voyage.Tasks
 
         internal static void Calculate(SubmarineUnlockPlan unlock)
         {
+            if (Stop)
+            {
+                Stop = false;
+                return;
+            }
             Calculating = true;
             var calc = new Calculator();
             var curSubMaps = CurrentSubmarine.GetMaps();
             var curSubRank = CurrentSubmarine.Get()->RankId;
+            var prioList = unlock?.GetPrioritizedPointList();
             Task.Run(() =>
             {
                 VoyageMain.WaitOverlay.IsProcessing = true;
@@ -38,38 +47,50 @@ namespace AutoRetainer.Modules.Voyage.Tasks
                     double exp = 0;
                     uint[] path = null;
                     var selectedMap = 0;
-                    var prioList = unlock?.GetPrioritizedPointList();
                     if(prioList != null) VoyageUtils.Log($"Prioritized point list: {prioList.Select(x => $"{VoyageUtils.GetSubmarineExplorationName(x.point)} ({x.justification})").Print()}");
-                    foreach (var map in curSubMaps)
+                    var calcCnt = 0;
+                    void Calc()
                     {
-                        calc.RouteBuild.Value.ChangeMap((int)map);
-                        if (prioList != null && prioList.Count > 0)
+                        if (calcCnt > 1) throw new Exception("Could not calculate best path.");
+                        calcCnt++;
+                        foreach (var map in curSubMaps)
                         {
-                            var point = VoyageUtils.GetSubmarineExploration(prioList[0].point);
-                            if (point == null || point.Map.Row != map || point.RankReq > curSubRank)
+                            calc.RouteBuild.Value.ChangeMap((int)map);
+                            if (prioList != null && prioList.Count > 0)
                             {
-                                //
+                                var point = VoyageUtils.GetSubmarineExploration(prioList[0].point);
+                                if (point == null || point.Map.Row != map || point.RankReq > curSubRank)
+                                {
+                                    //
+                                }
+                                else
+                                {
+                                    VoyageUtils.Log($"Adding point: {VoyageUtils.GetSubmarineExplorationName(prioList[0].point)} ({prioList[0].justification})");
+                                    calc.MustInclude.Add(VoyageUtils.GetSubmarineExploration(prioList[0].point));
+                                }
                             }
-                            else
+                            var best = calc.FindBestPath(map);
+                            if (best != null && best.Value.path != null)
                             {
-                                VoyageUtils.Log($"Adding point: {VoyageUtils.GetSubmarineExplorationName(prioList[0].point)} ({prioList[0].justification})");
-                                calc.MustInclude.Add(VoyageUtils.GetSubmarineExploration(prioList[0].point));
-                            }
-                        }
-                        var best = calc.FindBestPath(map);
-                        if (best != null && best.Value.path != null)
-                        {
-                            var xptime = best.Value.exp / (double)best.Value.duration.TotalHours;
-                            VoyageUtils.Log($"Path {best.Value.path.Select(z => $"{z}/{Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(z).Location}").Print()}, is best for map {map} with {best.Value.duration} duration and {best.Value.exp} exp ({xptime} exp/hour)");
-                            if (xptime > exp)
-                            {
-                                selectedMap = (int)map;
-                                exp = xptime;
-                                path = best.Value.path;
+                                var xptime = best.Value.exp / (double)best.Value.duration.TotalHours;
+                                VoyageUtils.Log($"Path {best.Value.path.Select(z => $"{z}/{Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(z).Location}").Print()}, is best for map {map} with {best.Value.duration} duration and {best.Value.exp} exp ({xptime} exp/hour)");
+                                if (xptime > exp)
+                                {
+                                    selectedMap = (int)map;
+                                    exp = xptime;
+                                    path = best.Value.path;
+                                }
                             }
                         }
                     }
-                    if (path == null) throw new Exception("Path was null.");
+                    Calc();
+                    if (path == null)
+                    {
+                        VoyageUtils.Log($"Path was null. Retrying without plan...");
+                        calc.MustInclude.Clear();
+                        prioList = null;
+                        Calc();
+                    }
                     VoyageUtils.Log($"Path {path.Select(z => $"{z}/{Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(z).Location}").Print()}, is determined best on map {selectedMap} with ({exp} exp/hour)");
                     if (path != null)
                     {

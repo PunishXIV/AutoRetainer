@@ -21,6 +21,8 @@ internal static unsafe class DebugMisc
 
     internal static void Draw()
     {
+        ImGuiEx.TextCopy($"{(nint)(&TargetSystem.Instance()->Target):X16}");
+        ImGui.Checkbox($"Log opcodes", ref P.LogOpcodes);
         ImGuiEx.Text($"CSFramework.Instance()->FrameCounter: {CSFramework.Instance()->FrameCounter}");
         if(ImGui.Button("Test entrust dup"))
         {
@@ -47,7 +49,7 @@ internal static unsafe class DebugMisc
         {
             ImGuiEx.Text($"{x.Name}@{x.World}: {(x.Gil + x.RetainerData.Sum(z => z.Gil))}");
         }
-        var ocd = Utils.GetCurrentCharacterData();
+        var ocd = Data;
         if(ocd != null)
         {
             ImGuiEx.Text($"Level array:");

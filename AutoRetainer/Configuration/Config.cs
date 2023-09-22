@@ -76,6 +76,9 @@ internal unsafe class Config : IEzConfig
     public bool ArtisanIntegration = false;
     public bool DisplayMMType = false;
     public List<SubmarineUnlockPlan> SubmarineUnlockPlans = new();
+    public bool HideAirships = false;
+    public int DisableRetainerVesselReturn = 0;
+    public List<SubmarinePointPlan> SubmarinePointPlans = new();
 
     internal bool DontReassign
     {

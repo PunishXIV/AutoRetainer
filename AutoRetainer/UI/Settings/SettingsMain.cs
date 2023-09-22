@@ -226,6 +226,7 @@ internal static class SettingsMain
             ImGuiComponents.HelpMarker("AutoRetainer will wait for all deployables to return before cycling to the next character in multi mode operation.");
             ImGui.SetNextItemWidth(60);
             ImGui.DragInt("Advance Relog Threshold", ref C.MultiModeWorkshopConfiguration.AdvanceTimer.ValidateRange(0, 300), 0.1f, 0, 300);
+            ImGui.Checkbox("Wait even when already logged in", ref C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn);
             ImGuiGroup.EndGroupBox();
             ImGui.PopID();
         }

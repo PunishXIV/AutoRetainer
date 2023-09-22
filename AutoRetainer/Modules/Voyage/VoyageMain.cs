@@ -144,7 +144,7 @@ namespace AutoRetainer.Modules.Voyage
             {
                 if (FrameThrottler.Check("SchedulerRestartCooldown"))
                 {
-                    var data = Utils.GetCurrentCharacterData();
+                    var data = Data;
                     var panel = VoyageUtils.GetCurrentWorkshopPanelType();
                     if (panel == PanelType.TypeSelector)
                     {
@@ -202,7 +202,7 @@ namespace AutoRetainer.Modules.Voyage
                 }
                 else
                 {
-                    if (adata.VesselBehavior.EqualsAny(VesselBehavior.LevelUp, VesselBehavior.Unlock))
+                    if (adata.VesselBehavior.EqualsAny(VesselBehavior.LevelUp, VesselBehavior.Unlock, VesselBehavior.Use_plan))
                     {
                         if (EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResend", 1000))
                         {
@@ -224,6 +224,26 @@ namespace AutoRetainer.Modules.Voyage
                                 {
                                     TaskDeployOnBestExpVoyage.Enqueue(VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan) ?? new());
                                 }
+                                else if(adata.UnlockMode.EqualsAny(UnlockMode.SpamOne, UnlockMode.MultiSelect))
+                                {
+                                    TaskDeployOnUnlockRoute.Enqueue(VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan) ?? new(), adata.UnlockMode);
+                                }
+                                else
+                                {
+                                    throw new ArgumentOutOfRangeException(nameof(adata.UnlockMode));
+                                }
+                            }
+                            if (adata.VesselBehavior == VesselBehavior.Use_plan)
+                            {
+                                var plan = VoyageUtils.GetSubmarinePointPlanByGuid(adata.SelectedPointPlan);
+                                if (plan != null && plan.Points.Count >= 1 && plan.Points.Count <= 5)
+                                {
+                                    TaskDeployOnPointPlan.Enqueue(plan);
+                                }
+                                else
+                                {
+                                    DuoLog.Error($"Invalid plan selected (Points.Count={plan.Points.Count})");
+                                }
                             }
                         }
                     }
@@ -238,7 +258,7 @@ namespace AutoRetainer.Modules.Voyage
             }
             else
             {
-                if (!Data.AreAnyVesselsReturnInNext(type, 1 * 60))
+                if (!Data.AreAnyEnabledVesselsReturnInNext(type, 1 * 60))
                 {
                     if (EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResendQuitPanel", 1000))
                     {

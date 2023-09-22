@@ -5,6 +5,7 @@ using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,29 +18,36 @@ namespace AutoRetainer.UI.Dbg
         static int r1, r2, r3, r4, r5 = -1;
         internal static void Draw()
         {
-            if (ImGui.CollapsingHeader("Addesss"))
-            {
-            }
+            ImGuiEx.Text($"IsRetainerBlockedByVoyage: {VoyageUtils.IsRetainerBlockedByVoyage()}");
             if (ImGui.CollapsingHeader("data"))
             {
-                ImGuiEx.Text($"Curnet: {(nint)CurrentSubmarine.Get()}");
-                if(CurrentSubmarine.Get() != null)
+                try
                 {
-                    ImGuiEx.Text($"Name: {MemoryHelper.ReadStringNullTerminated((nint)CurrentSubmarine.Get()->Name)}");
-                    ImGuiEx.Text($"Hull: {CurrentSubmarine.Get()->HullId}");
-                    ImGuiEx.Text($"->SternId: {CurrentSubmarine.Get()->SternId}");
-                    ImGuiEx.Text($"BridgeId: {CurrentSubmarine.Get()->BridgeId}");
-                    ImGuiEx.Text($"BowId: {CurrentSubmarine.Get()->BowId}");
-                    ImGuiEx.Text($"RankId: {CurrentSubmarine.Get()->RankId}");
-                    if (ImGui.Button("Print best exp"))
+                    ImGuiEx.Text($"Curnet: {(nint)CurrentSubmarine.Get()}");
+                    if (CurrentSubmarine.Get() != null)
                     {
-                        CurrentSubmarine.GetBestExps();
-                    }
-                    if(ImGui.Button("Select best path"))
-                    {
-                        TaskCalculateAndPickBestExpRoute.Enqueue();
+                        ImGuiEx.Text($"Name: {MemoryHelper.ReadStringNullTerminated((nint)CurrentSubmarine.Get()->Name)}");
+                        ImGuiEx.Text($"Hull: {CurrentSubmarine.Get()->HullId}");
+                        ImGuiEx.Text($"->SternId: {CurrentSubmarine.Get()->SternId}");
+                        ImGuiEx.Text($"BridgeId: {CurrentSubmarine.Get()->BridgeId}");
+                        ImGuiEx.Text($"BowId: {CurrentSubmarine.Get()->BowId}");
+                        ImGuiEx.Text($"RankId: {CurrentSubmarine.Get()->RankId}");
+                        if (ImGui.Button("Print best exp"))
+                        {
+                            CurrentSubmarine.GetBestExps();
+                        }
+                        if (ImGui.Button("Select best path"))
+                        {
+                            TaskCalculateAndPickBestExpRoute.Enqueue();
+                        }
                     }
                 }
+                catch(Exception e)
+                {
+                    ImGuiEx.TextWrapped(e.ToString());
+                }
+                long* curPlotId = (long*)(Process.GetCurrentProcess().MainModule.BaseAddress + 0x215FB68);
+                ImGuiEx.TextCopy($"Plot ID: {*curPlotId:X16}");
                 ImGuiEx.Text($"HID: {HousingManager.Instance()->GetCurrentHouseId()}");
                 if (HousingManager.Instance()->WorkshopTerritory != null)
                 {

@@ -25,7 +25,11 @@ namespace AutoRetainer.Scheduler.Tasks
             P.TaskManager.Enqueue(RetainerHandlers.WaitForVentureListUpdate);
             P.TaskManager.DelayNext(C.FrameDelay, true);
             P.TaskManager.Enqueue(RetainerHandlers.ClearTaskSupplylist);
-            P.TaskManager.Enqueue(() => RetainerHandlers.SelectSpecificVentureByName(VentureID));
+            for (int i = 0; i < 20; i++)
+            {
+                P.TaskManager.Enqueue(() => RetainerHandlers.ForceSearchVentureByName(VentureID), $"ForceSearchVentureByName({VentureID})/{i}");
+            }
+            P.TaskManager.Enqueue(() => RetainerHandlers.SelectSpecificVentureByName(VentureID), $"SelectSpecificVentureByName({VentureID})");
             /*if (!C.NoErrorCheckPlanner2)
             {
                 P.TaskManager.DelayNext(10, true);

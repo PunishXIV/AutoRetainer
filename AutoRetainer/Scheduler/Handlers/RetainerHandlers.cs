@@ -503,6 +503,7 @@ internal unsafe static class RetainerHandlers
     }*/
 
     public static bool? SelectSpecificVentureByName(uint id) => SelectSpecificVentureByName(VentureUtils.GetVentureName(id));
+    public static bool? ForceSearchVentureByName(uint id) => ForceSearchVentureByName(VentureUtils.GetVentureName(id));
 
     public static bool? SelectSpecificVentureByName(string name)
     {
@@ -544,6 +545,33 @@ internal unsafe static class RetainerHandlers
                     Utils.RethrottleGeneric();
                     return false;
                 }
+            }
+        }
+        else
+        {
+            FrameThrottler.Throttle("RetainerTaskSupply.InitWait", 10, true);
+            PluginLog.Debug($"RetainerTaskSupply waiting...");
+        }
+        return false;
+    }
+
+    public static bool? ForceSearchVentureByName(string name)
+    {
+        if (TryGetAddonByName<AtkUnitBase>("RetainerTaskSupply", out var addon) && IsAddonReady(addon) && addon->AtkValuesCount > 2)
+        {
+            var state = addon->AtkValues[3];
+            if (state.Type == 0)
+            {
+                FrameThrottler.Throttle("RetainerTaskSupply.InitWait", 10, true);
+                PluginLog.Debug($"RetainerTaskSupply waiting (2)...");
+                return false;
+            }
+
+            if (FrameThrottler.Check("RetainerTaskSupply.InitWait") && Utils.GenericThrottle)
+            {
+                Callback.Fire(addon, true, 2, new AtkValue() { Type = 0, Int = 0 }, name);
+                Utils.RethrottleGeneric();
+                return true;
             }
         }
         else

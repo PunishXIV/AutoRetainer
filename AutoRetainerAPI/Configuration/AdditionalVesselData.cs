@@ -17,5 +17,6 @@ namespace AutoRetainerAPI.Configuration
         public VesselBehavior VesselBehavior = VesselBehavior.Redeploy;
         public UnlockMode UnlockMode = UnlockMode.WhileLevelling;
         public string SelectedUnlockPlan = Guid.Empty.ToString();
+        public string SelectedPointPlan = Guid.Empty.ToString();
     }
 }

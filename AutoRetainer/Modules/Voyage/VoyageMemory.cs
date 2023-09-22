@@ -82,7 +82,7 @@ namespace AutoRetainer.Modules.Voyage
                 }
                 if(temp.Count > 0)
                 {
-                    Utils.GetCurrentCharacterData().OfflineSubmarineData = temp;
+                    Data.OfflineSubmarineData = temp;
                     Notify.Info($"Updated airship data from SubmersibleTimer");
                 }
             }
@@ -106,7 +106,7 @@ namespace AutoRetainer.Modules.Voyage
                 }
                 //if (temp.Count > 0)
                 {
-                    Utils.GetCurrentCharacterData().OfflineSubmarineData = temp;
+                    Data.OfflineSubmarineData = temp;
                     Notify.Info($"Updated airship data from SubmersibleStatus");
                     LastSubmarineData = ImGui.GetFrameCount();
                 }
@@ -132,7 +132,7 @@ namespace AutoRetainer.Modules.Voyage
                 }
                 if (temp.Count > 0)
                 {
-                    Utils.GetCurrentCharacterData().OfflineAirshipData = temp;
+                    Data.OfflineAirshipData = temp;
                     Notify.Info($"Updated airship data from AirshipTimer");
                 }
             }
@@ -156,7 +156,7 @@ namespace AutoRetainer.Modules.Voyage
                 }
                 //if (temp.Count > 0)
                 {
-                    Utils.GetCurrentCharacterData().OfflineAirshipData = temp;
+                    Data.OfflineAirshipData = temp;
                     Notify.Info($"Updated airship data from AirshipStatus");
                     LastAirshipData = ImGui.GetFrameCount();
                 }

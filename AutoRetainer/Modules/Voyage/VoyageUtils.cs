@@ -16,9 +16,11 @@ using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using ECommons;
 
 namespace AutoRetainer.Modules.Voyage
 {
@@ -49,7 +51,7 @@ namespace AutoRetainer.Modules.Voyage
             {
                 foreach (var x in Unlocks.PointToUnlockPoint.Where(z => z.Value.Point < 9000 && z.Value.Sub))
                 {
-                    if (!P.SubmarineUnlockPlanUI.IsMapExplored(x.Key, true) && P.SubmarineUnlockPlanUI.IsMapUnlocked(x.Key))
+                    if (!P.SubmarineUnlockPlanUI.IsMapExplored(x.Key, true) && P.SubmarineUnlockPlanUI.IsMapUnlocked(x.Key, true))
                     {
                         ret.Add((x.Key, $"submarine slot from {VoyageUtils.GetSubmarineExplorationName(x.Key)}"));
                     }
@@ -59,17 +61,39 @@ namespace AutoRetainer.Modules.Voyage
             foreach (var x in Unlocks.PointToUnlockPoint.Where(z => z.Value.Point < 9000 && !plan.ExcludedRoutes.Contains(z.Key)))
             {
                 if (ret.Count > 0 && Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(ret.First().point).Map.Row != Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(x.Key).Map.Row) break;
-                if (!P.SubmarineUnlockPlanUI.IsMapUnlocked(x.Key, true) && P.SubmarineUnlockPlanUI.IsMapUnlocked(x.Value.Point) && !ret.Any(z => z.point == x.Value.Point))
+                if (!P.SubmarineUnlockPlanUI.IsMapUnlocked(x.Key, true) && P.SubmarineUnlockPlanUI.IsMapUnlocked(x.Value.Point, true) && !ret.Any(z => z.point == x.Value.Point))
                 {
                     ret.Add((x.Value.Point, $"{VoyageUtils.GetSubmarineExplorationName(x.Key)} not unlocked"));
                 }
             }
             return ret;
         }
+
         internal static SubmarineUnlockPlan GetSubmarineUnlockPlanByGuid(string guid)
         {
             return C.SubmarineUnlockPlans.FirstOrDefault(x => x.GUID == guid);
         }
+
+        internal static SubmarinePointPlan GetSubmarinePointPlanByGuid(string guid)
+        {
+            return C.SubmarinePointPlans.FirstOrDefault(x => x.GUID == guid);
+        }
+
+        internal static SubmarineMap GetMap(this SubmarinePointPlan plan)
+        {
+            if(plan.Points.Count == 0) return null;
+            return GetSubmarineExploration(plan.Points[0]).Map.Value;
+        }
+
+        internal static string GetPointPlanName(this SubmarinePointPlan plan)
+        {
+            if (plan == null) return "No or unknown plan selected";
+            if(plan.Name.Length > 0) return plan.Name;
+            if (plan.Points.Count == 0) return $"Plan {plan.GUID}";
+            return $"{plan.GetMap()?.Name}: {plan.Points.Select(x => Svc.Data.GetExcelSheet<SubmarineExplorationPretty>(Dalamud.ClientLanguage.Japanese).GetRow(x).Location.ToString()).Join("→")}";
+        }
+
+        internal static uint GetMapId(this SubmarinePointPlan plan) => GetMap(plan)?.RowId ?? 0;
 
         internal static PanelType GetCurrentWorkshopPanelType()
         {
@@ -189,28 +213,58 @@ namespace AutoRetainer.Modules.Voyage
                     }
                     if (temp.Count > 0)
                     {
-                        Utils.GetCurrentCharacterData().OfflineAirshipData = temp;
+                        Data.OfflineAirshipData = temp;
                     }
                 }
                 {
                     var vessels = HousingManager.Instance()->WorkshopTerritory->Submersible;
                     var temp = new List<OfflineVesselData>();
-                    foreach (var x in vessels.DataListSpan)
+                    for (int i = 0; i < vessels.DataListSpan.Length; i++)
                     {
-                        var name = MemoryHelper.ReadSeStringNullTerminated((nint)x.Name).ExtractText();
+                        var vessel = vessels.DataListSpan[i];
+                        var name = MemoryHelper.ReadSeStringNullTerminated((nint)vessel.Name).ExtractText();
                         if (name != "")
                         {
-                            temp.Add(new(name, x.ReturnTime));
+                            temp.Add(new(name, vessel.ReturnTime));
                             var adata = Data.GetAdditionalVesselData(name, VoyageType.Submersible);
-                            adata.Level = x.RankId;
+                            adata.Level = vessel.RankId;
+                            adata.Part1 = (int)GetVesselComponent(i, VoyageType.Submersible, 0)->ItemID;
+                            adata.Part2 = (int)GetVesselComponent(i, VoyageType.Submersible, 1)->ItemID;
+                            adata.Part3 = (int)GetVesselComponent(i, VoyageType.Submersible, 2)->ItemID;
+                            adata.Part4 = (int)GetVesselComponent(i, VoyageType.Submersible, 3)->ItemID;
                         }
                     }
                     if (temp.Count > 0)
                     {
-                        Utils.GetCurrentCharacterData().OfflineSubmarineData = temp;
+                        Data.OfflineSubmarineData = temp;
                     }
+                    Data.NumSubSlots = P.SubmarineUnlockPlanUI.GetNumUnlockedSubs() ?? Data.NumSubSlots;
                 }
             }
+        }
+
+        internal static bool IsRetainerBlockedByVoyage()
+        {
+            if (C.DisableRetainerVesselReturn == 0) return false;
+            foreach(var x in C.OfflineData)
+            {
+                if (x.AreAnyVesselsReturnInNext(C.DisableRetainerVesselReturn * 60)) return true;
+            }
+            return false;
+        }
+
+        internal static string GetSubmarineBuild(this AdditionalVesselData data)
+        {
+            if(data.Part1 != 0 && data.Part2 != 0 && data.Part3 != 0 && data.Part4 != 0)
+            {
+                var str = Build.ToIdentifier((ushort)((Items)data.Part1).GetPartId())
+                    + Build.ToIdentifier((ushort)((Items)data.Part2).GetPartId())
+                    + Build.ToIdentifier((ushort)((Items)data.Part3).GetPartId())
+                    + Build.ToIdentifier((ushort)((Items)data.Part4).GetPartId());
+                if(str.Length == 8) str = str.Replace("+", "") + "++";
+                return " " + str;
+            }
+            return "";
         }
 
         internal static VoyageType? DetectAddonType(AtkUnitBase* addon)
@@ -363,7 +417,7 @@ namespace AutoRetainer.Modules.Voyage
 
         internal static string GetNextCompletedVessel(VoyageType type)
         {
-            var data = Utils.GetCurrentCharacterData();
+            var data = Data;
             var v = data.GetVesselData(type).Where(x => data.IsVesselAvailable(x, type) && data.GetEnabledVesselsData(type).Contains(x.Name));
             if (v.Any())
             {
@@ -372,9 +426,9 @@ namespace AutoRetainer.Modules.Voyage
             return null;
         }
 
-        internal static bool AreAnyVesselsReturnInNext(this OfflineCharacterData data, int seconds, bool all = false) => data.AreAnyVesselsReturnInNext(VoyageType.Airship, seconds, all) || data.AreAnyVesselsReturnInNext(VoyageType.Submersible, seconds, all);
+        internal static bool AreAnyVesselsReturnInNext(this OfflineCharacterData data, int seconds, bool all = false) => data.AreAnyEnabledVesselsReturnInNext(VoyageType.Airship, seconds, all) || data.AreAnyEnabledVesselsReturnInNext(VoyageType.Submersible, seconds, all);
 
-        internal static bool AreAnyVesselsReturnInNext(this OfflineCharacterData data, VoyageType type, int seconds, bool all = false)
+        internal static bool AreAnyEnabledVesselsReturnInNext(this OfflineCharacterData data, VoyageType type, int seconds, bool all = false)
         {
             if (all)
             {
@@ -451,6 +505,10 @@ namespace AutoRetainer.Modules.Voyage
                 {
                     VoyageUtils.Log($"  Selecting {dest.NameFull} / {which}");
                     P.Memory.SelectRoutePointUnsafe(which);
+                }
+                else
+                {
+                    VoyageUtils.Log($"  Can't select {dest.NameFull} / {which}, skipping");
                 }
             }
         }

@@ -22,6 +22,7 @@ using AutoRetainerAPI;
 using ECommons.GameHelpers;
 using AutoRetainer.Modules.Voyage;
 using Dalamud.Game.Network;
+using AutoRetainer.Scheduler.Handlers;
 
 namespace AutoRetainer;
 
@@ -51,6 +52,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal LoginOverlay LoginOverlay;
     internal MarketCooldownOverlay MarketCooldownOverlay;
     internal SubmarineUnlockPlanUI SubmarineUnlockPlanUI;
+    internal SubmarinePointPlanUI SubmarinePointPlanUI;
     internal DuplicateBlacklistSelector DuplicateBlacklistSelector;
 
     internal long Time => C.UseServerTime ? CSFramework.GetServerTime() : DateTimeOffset.Now.ToUnixTimeSeconds();
@@ -60,6 +62,9 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal RetainerListOverlay RetainerListOverlay;
     internal uint LastVentureID = 0;
     internal uint ListUpdateFrame = 0;
+
+    internal bool LogOpcodes = false;
+
     internal static OfflineCharacterData Data => Utils.GetCurrentCharacterData();
 
     public AutoRetainer(DalamudPluginInterface pi)
@@ -112,6 +117,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 ws.AddWindow(LoginOverlay);
                 SubmarineUnlockPlanUI = new();
                 ws.AddWindow(SubmarineUnlockPlanUI);
+                SubmarinePointPlanUI = new();
+                ws.AddWindow(SubmarinePointPlanUI);
                 MultiMode.Init();
 
                 Safety.Check();
@@ -122,7 +129,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 ApiTest.Init();
                 FPSManager.UnlockChillFrames();
                 PluginLog.Information($"AutoRetainer v{P.GetType().Assembly.GetName().Version} is ready.");
-                //Svc.GameNetwork.NetworkMessage += GameNetwork_NetworkMessage;
+                Svc.GameNetwork.NetworkMessage += GameNetwork_NetworkMessage;
             });
         }
         //);
@@ -130,6 +137,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
     private void GameNetwork_NetworkMessage(nint dataPtr, ushort opCode, uint sourceActorId, uint targetActorId, NetworkMessageDirection direction)
     {
+        if (!LogOpcodes) return;
         DuoLog.Information($"{opCode:X16}, {direction}");
     }
 
@@ -221,6 +229,10 @@ public unsafe class AutoRetainer : IDalamudPlugin
         else if (arguments.EqualsIgnoreCase("het"))
         {
             HouseEnterTask.EnqueueTask();
+        }
+        else if (arguments.EqualsIgnoreCaseAny("deliver"))
+        {
+            GCHandlers.EnableDeliveringIfPossible();
         }
         else
         {

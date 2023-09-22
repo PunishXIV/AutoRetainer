@@ -30,7 +30,7 @@ internal unsafe static class MultiMode
 
     internal static bool Enabled = false;
 
-    internal static bool EnabledRetainers => C.MultiModeType.EqualsAny(MultiModeType.Retainers, MultiModeType.Everything);
+    internal static bool EnabledRetainers => C.MultiModeType.EqualsAny(MultiModeType.Retainers, MultiModeType.Everything) && !VoyageUtils.IsRetainerBlockedByVoyage();
     internal static bool EnabledSubmarines => C.MultiModeType.EqualsAny(MultiModeType.Submersibles, MultiModeType.Everything);
 
     internal static bool Synchronize = false;
@@ -225,12 +225,15 @@ internal unsafe static class MultiMode
                     }
                     else if(Data.AnyEnabledVesselsAvailable() && MultiMode.EnabledSubmarines)
                     {
-                        DebugLog($"Enqueueing interaction with panel");
-                        BlockInteraction(10);
-                        TaskInteractWithNearestPanel.Enqueue();
-                        P.TaskManager.Enqueue(() => { VoyageScheduler.Enabled = true; }) ;
-                        Interactions.PushBack(Environment.TickCount64);
-                        DebugLog($"Added interaction because of interacting (state: {Interactions.Print()})");
+                        if (!C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn || Data.AreAnyVesselsReturnInNext(0, true))
+                        {
+                            DebugLog($"Enqueueing interaction with panel");
+                            BlockInteraction(10);
+                            TaskInteractWithNearestPanel.Enqueue();
+                            P.TaskManager.Enqueue(() => { VoyageScheduler.Enabled = true; });
+                            Interactions.PushBack(Environment.TickCount64);
+                            DebugLog($"Added interaction because of interacting (state: {Interactions.Print()})");
+                        }
                     }
                 }
             }
@@ -379,6 +382,20 @@ internal unsafe static class MultiMode
         {
             data = data.OrderBy(x => CharaCnt.GetOrDefault(x.CID)).ToList();
         }
+        if (EnabledSubmarines)
+        {
+            foreach (var x in data)
+            {
+                if (x.CID == Player.CID) continue;
+                if (x.WorkshopEnabled && x.GetEnabledVesselsData(VoyageType.Airship).Count + x.GetEnabledVesselsData(VoyageType.Submersible).Count > 0)
+                {
+                    if (x.AreAnyVesselsReturnInNext(C.MultiModeWorkshopConfiguration.AdvanceTimer, C.MultiModeWorkshopConfiguration.MultiWaitForAll))
+                    {
+                        return x;
+                    }
+                }
+            }
+        }
         if (EnabledRetainers)
         {
             foreach (var x in data)
@@ -395,20 +412,7 @@ internal unsafe static class MultiMode
                 }
             }
         }
-        if (EnabledSubmarines)
-        {
-            foreach (var x in data)
-            {
-                if (x.CID == Player.CID) continue;
-                if (x.WorkshopEnabled && x.GetEnabledVesselsData(VoyageType.Airship).Count + x.GetEnabledVesselsData(VoyageType.Submersible).Count > 0)
-                {
-                    if (x.AreAnyVesselsReturnInNext(C.MultiModeWorkshopConfiguration.AdvanceTimer, C.MultiModeWorkshopConfiguration.MultiWaitForAll))
-                    {
-                        return x;
-                    }
-                }
-            }
-        }
+        
         return null;
     }
 
@@ -431,7 +435,7 @@ internal unsafe static class MultiMode
     {
         if (!EnabledSubmarines) return true;
         if(!Data.WorkshopEnabled) return true;
-        return !Data.AreAnyVesselsReturnInNext(5 * 60);
+        return !Data.AreAnyVesselsReturnInNext(5 * 60, C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn);
     }
 
     internal static bool IsAnySelectedRetainerFinishesWithin(int seconds)

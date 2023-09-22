@@ -83,6 +83,15 @@ namespace AutoRetainer.UI
                     ImGui.SetCursorPos(initCurpos);
                 }
 
+                if (data.NumSubSlots > data.GetVesselData(VoyageType.Submersible).Count)
+                {
+                    ImGui.PushFont(UiBuilder.IconFont);
+                    ImGuiEx.TextV(ImGuiColors.DalamudYellow, "\uf6e3");
+                    ImGui.PopFont();
+                    ImGuiEx.Tooltip($"You can construct new submarine ({data.GetVesselData(VoyageType.Submersible).Count}/{data.NumSubSlots})");
+                    ImGui.SameLine(0, 3);
+                }
+
                 if (ImGuiEx.CollapsingHeader(Censor.Character(data.Name, data.World)))
                 {
                     pad = ImGui.GetStyle().FramePadding.Y;
@@ -90,10 +99,11 @@ namespace AutoRetainer.UI
                 }
 
                 var rightText = $"R: {data.RepairKits} | C: {data.Ceruleum} | I: {data.InventorySpace}";
+                var col = data.RepairKits < 100 || data.Ceruleum < 200 || data.InventorySpace < 15;
                 var cur = ImGui.GetCursorPos();
                 ImGui.SameLine();
                 ImGui.SetCursorPos(new(ImGui.GetContentRegionMax().X - ImGui.CalcTextSize(rightText).X - ImGui.GetStyle().FramePadding.X, rCurPos.Y + pad));
-                ImGuiEx.Text(rightText);
+                ImGuiEx.Text(col?ImGuiColors.DalamudOrange:null, rightText);
 
                 ImGui.PopID();
             }
@@ -101,9 +111,14 @@ namespace AutoRetainer.UI
 
             ImGuiEx.ImGuiLineCentered("WorkshopUI planner button", () =>
             {
-                if(ImGui.Button("Open unlock plan editor"))
+                if (ImGui.Button("Open unlock plan editor"))
                 {
                     P.SubmarineUnlockPlanUI.IsOpen = true;
+                }
+                ImGui.SameLine();
+                if (ImGui.Button("Open point plan editor"))
+                {
+                    P.SubmarinePointPlanUI.IsOpen = true;
                 }
             });
 
@@ -114,10 +129,9 @@ namespace AutoRetainer.UI
                 ImGui.Checkbox($"When resending, auto-repair vessels", ref C.SubsAutoRepair);
                 ImGui.Checkbox($"Even when only finalizing, repair vessels", ref C.SubsRepairFinalize);
                 ImGui.Checkbox($"Experimental compatibility with SimpleTweaks destination letters tweak", ref C.SimpleTweaksCompat);
-                if (C.SimpleTweaksCompat)
-                {
-                    ImGuiEx.TextWrapped(ImGuiColors.DalamudOrange, $"Results of using this option are unpredictable.");
-                }
+                ImGui.Checkbox($"Hide airships", ref C.HideAirships);
+                ImGui.SetNextItemWidth(60);
+                ImGui.DragInt("Don't process retainers if vessels return in, minutes", ref C.DisableRetainerVesselReturn.ValidateRange(0, 60));
             }
 
             if (ImGui.CollapsingHeader("Public debug"))
@@ -137,6 +151,26 @@ namespace AutoRetainer.UI
                         if (ImGui.Button("Select best path with 1 unlock included"))
                         {
                             TaskCalculateAndPickBestExpRoute.Enqueue(VoyageUtils.GetSubmarineUnlockPlanByGuid(Data.GetAdditionalVesselData(Utils.Read(CurrentSubmarine.Get()->Name), VoyageType.Submersible).SelectedUnlockPlan) ?? new());
+                        }
+                        if (ImGui.Button("Select unlock path (up to 5)"))
+                        {
+                            TaskDeployOnUnlockRoute.EnqueuePickOrCalc(VoyageUtils.GetSubmarineUnlockPlanByGuid(Data.GetAdditionalVesselData(Utils.Read(CurrentSubmarine.Get()->Name), VoyageType.Submersible).SelectedUnlockPlan) ?? new(), UnlockMode.MultiSelect);
+                        }
+                        if (ImGui.Button("Select unlock path (only 1)"))
+                        {
+                            TaskDeployOnUnlockRoute.EnqueuePickOrCalc(VoyageUtils.GetSubmarineUnlockPlanByGuid(Data.GetAdditionalVesselData(Utils.Read(CurrentSubmarine.Get()->Name), VoyageType.Submersible).SelectedUnlockPlan) ?? new(), UnlockMode.SpamOne);
+                        }
+                        if (ImGui.Button("Select point planner path"))
+                        {
+                            var plan = VoyageUtils.GetSubmarinePointPlanByGuid(Data.GetAdditionalVesselData(Utils.Read(CurrentSubmarine.Get()->Name), VoyageType.Submersible).SelectedPointPlan);
+                            if (plan != null)
+                            {
+                                TaskDeployOnPointPlan.EnqueuePick(plan);
+                            }
+                            else
+                            {
+                                DuoLog.Error($"No plan selected!");
+                            }
                         }
                         foreach (var x in Data.OfflineSubmarineData)
                         {
@@ -196,8 +230,8 @@ namespace AutoRetainer.UI
                     }
                     if (ImGui.Button("Erase offline data"))
                     {
-                        Utils.GetCurrentCharacterData().OfflineAirshipData.Clear();
-                        Utils.GetCurrentCharacterData().OfflineSubmarineData.Clear();
+                        Data.OfflineAirshipData.Clear();
+                        Data.OfflineSubmarineData.Clear();
                     }
                     if (ImGui.Button("Repair 1")) VoyageScheduler.TryRepair(0);
                     if (ImGui.Button("Repair 2")) VoyageScheduler.TryRepair(1);
@@ -291,6 +325,7 @@ namespace AutoRetainer.UI
 
         static void DrawRow(OfflineCharacterData data, OfflineVesselData vessel, VoyageType type)
         {
+            if (type == VoyageType.Airship && data.GetEnabledVesselsData(type).Count == 0 && C.HideAirships) return;
             ImGui.PushID($"{data.CID}/{vessel.Name}/{type}");
             var enabled = type == VoyageType.Airship ? data.EnabledAirships : data.EnabledSubs;
             var adata = data.GetAdditionalVesselData(vessel.Name, type);
@@ -342,6 +377,10 @@ namespace AutoRetainer.UI
                     ImGuiEx.Text(Lang.IconWarning);
                 }
             }
+            else if (adata.VesselBehavior == VesselBehavior.Use_plan)
+            {
+                ImGuiEx.Text(Lang.IconPlanner);
+            }
             else
             {
                 ImGuiEx.Text(Lang.IconWarning);
@@ -354,7 +393,7 @@ namespace AutoRetainer.UI
             ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
             if (adata.Level > 0)
             {
-                var level = $"{Lang.CharLevel}{adata.Level}";
+                var level = $"{Lang.CharLevel}{adata.Level}{VoyageUtils.GetSubmarineBuild(adata)}";
                 ImGuiEx.TextV(level.ReplaceByChar(Lang.Digits.Normal, Lang.Digits.GameFont));
             }
             ImGui.TableNextColumn();
@@ -380,29 +419,54 @@ namespace AutoRetainer.UI
                 ImGui.CollapsingHeader($"{vessel.Name} - {Censor.Character(data.Name)} Configuration  ##conf", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.Bullet | ImGuiTreeNodeFlags.OpenOnArrow);
                 ImGuiEx.Text($"Vessel behavior:");
                 ImGuiEx.EnumCombo("##vbeh", ref adata.VesselBehavior);
-                if(adata.VesselBehavior == VesselBehavior.Unlock)
+                if (adata.VesselBehavior == VesselBehavior.Unlock)
                 {
                     ImGuiEx.Text($"Unlock mode:");
-                    ImGuiEx.EnumCombo("##umode", ref adata.UnlockMode, (x) => x == UnlockMode.WhileLevelling, Lang.UnlockModeNames);
+                    ImGuiEx.EnumCombo("##umode", ref adata.UnlockMode, Lang.UnlockModeNames);
                     var currentPlan = VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan);
                     var text = Environment.TickCount64 % 2000 > 1000 ? "Unlocking every point (default plan)" : "No or unknown plan selected";
                     if (ImGui.BeginCombo("##uplan", currentPlan?.Name ?? text))
                     {
-                        if(ImGui.Button("Open editor"))
+                        if (ImGui.Button("Open editor"))
                         {
                             P.SubmarineUnlockPlanUI.IsOpen = true;
                             P.SubmarineUnlockPlanUI.SelectedPlanGuid = adata.SelectedUnlockPlan;
                         }
                         ImGui.SameLine();
-                        if(ImGui.Button("Clear plan"))
+                        if (ImGui.Button("Clear plan"))
                         {
                             adata.SelectedUnlockPlan = Guid.Empty.ToString();
                         }
-                        foreach(var x in C.SubmarineUnlockPlans)
+                        foreach (var x in C.SubmarineUnlockPlans)
                         {
                             if (ImGui.Selectable($"{x.Name}##{x.GUID}"))
                             {
                                 adata.SelectedUnlockPlan = x.GUID;
+                            }
+                        }
+                        ImGui.EndCombo();
+                    }
+                }
+                if (adata.VesselBehavior == VesselBehavior.Use_plan)
+                {
+                    var currentPlan = VoyageUtils.GetSubmarinePointPlanByGuid(adata.SelectedPointPlan);
+                    if (ImGui.BeginCombo("##uplan", currentPlan.GetPointPlanName()))
+                    {
+                        if (ImGui.Button("Open editor"))
+                        {
+                            P.SubmarinePointPlanUI.IsOpen = true;
+                            P.SubmarinePointPlanUI.SelectedPlanGuid = adata.SelectedPointPlan;
+                        }
+                        ImGui.SameLine();
+                        if (ImGui.Button("Clear plan"))
+                        {
+                            adata.SelectedPointPlan = Guid.Empty.ToString();
+                        }
+                        foreach (var x in C.SubmarinePointPlans)
+                        {
+                            if (ImGui.Selectable($"{x.GetPointPlanName()}##{x.GUID}"))
+                            {
+                                adata.SelectedPointPlan = x.GUID;
                             }
                         }
                         ImGui.EndCombo();

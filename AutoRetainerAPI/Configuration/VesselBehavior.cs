@@ -8,6 +8,6 @@ namespace AutoRetainerAPI.Configuration
 {
     public enum VesselBehavior
     {
-        Finalize, Redeploy, LevelUp, Unlock
+        Finalize, Redeploy, LevelUp, Unlock, Use_plan
     }
 }
