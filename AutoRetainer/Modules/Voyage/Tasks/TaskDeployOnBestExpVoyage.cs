@@ -22,7 +22,7 @@ namespace AutoRetainer.Modules.Voyage.Tasks
 
         internal static bool? SelectDeploy()
         {
-            return Utils.TrySelectSpecificEntry("Deploy submersible on subaquatic voyage", () => Utils.GenericThrottle && EzThrottler.Throttle("Voyage.SelectDeploy", 1000));
+            return Utils.TrySelectSpecificEntry(Lang.DeployOnSubaquaticVoyage, () => Utils.GenericThrottle && EzThrottler.Throttle("Voyage.SelectDeploy", 1000));
         }
 
         internal static bool? Deploy()

@@ -99,7 +99,8 @@ namespace AutoRetainer.UI
                 }
 
                 var rightText = $"R: {data.RepairKits} | C: {data.Ceruleum} | I: {data.InventorySpace}";
-                var col = data.RepairKits < 100 || data.Ceruleum < 200 || data.InventorySpace < 15;
+                var subNum = data.GetEnabledVesselsData(VoyageType.Submersible).Count();
+                var col = data.RepairKits < 25 * subNum || data.Ceruleum < 50 * subNum || data.InventorySpace < 15;
                 var cur = ImGui.GetCursorPos();
                 ImGui.SameLine();
                 ImGui.SetCursorPos(new(ImGui.GetContentRegionMax().X - ImGui.CalcTextSize(rightText).X - ImGui.GetStyle().FramePadding.X, rCurPos.Y + pad));
@@ -241,6 +242,11 @@ namespace AutoRetainer.UI
                     //if (ImGui.Button("Trigger auto repair")) TaskRepairAll.EnqueueImmediate();
                     ImGui.InputText("data1", ref data1, 50);
                     ImGuiEx.EnumCombo("data2", ref data2);
+                    if(CurrentSubmarine.Get() != null)
+                    {
+                        ImGuiEx.Text($"{CurrentSubmarine.Get()->CurrentExp}/{CurrentSubmarine.Get()->NextLevelExp}");
+                    }
+                    ImGuiEx.Text($"Is voyage panel: {VoyageUtils.IsInVoyagePanel()}, {Lang.PanelName}");
                     if (ImGui.Button("IsVesselNeedsRepair"))
                     {
                         try
@@ -393,8 +399,16 @@ namespace AutoRetainer.UI
             ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
             if (adata.Level > 0)
             {
-                var level = $"{Lang.CharLevel}{adata.Level}{VoyageUtils.GetSubmarineBuild(adata)}";
-                ImGuiEx.TextV(level.ReplaceByChar(Lang.Digits.Normal, Lang.Digits.GameFont));
+                var lvlf = 0;
+                if(adata.CurrentExp > 0 && adata.NextLevelExp > 0)
+                {
+                    lvlf = (int)((float)adata.CurrentExp * 100f / (float)adata.NextLevelExp);
+                }
+                ImGuiEx.TextV(Lang.CharLevel + $"{adata.Level}".ReplaceByChar(Lang.Digits.Normal, Lang.Digits.GameFont));
+                ImGui.SameLine(0, 0);
+                ImGuiEx.Text(ImGuiColors.DalamudGrey2, $".{lvlf:D2}".ReplaceByChar(Lang.Digits.Normal, Lang.Digits.GameFont));
+                ImGui.SameLine(0, 0);
+                ImGuiEx.Text(VoyageUtils.GetSubmarineBuild(adata));
             }
             ImGui.TableNextColumn();
             ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);

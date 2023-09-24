@@ -5,6 +5,7 @@ using ECommons.Interop;
 using ECommons.MathHelpers;
 using PInvoke;
 using PunishLib.ImGuiMethods;
+using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 
 namespace AutoRetainer.UI.Settings;
@@ -180,6 +181,10 @@ internal static class SettingsMain
             ImGui.Checkbox($"Opt out of custom Dalamud theme", ref C.NoTheme);
             ImGui.Checkbox($"Display Extended Retainer Info", ref C.ShowAdditionalInfo);
             ImGuiComponents.HelpMarker("Displays retainer item level/gathering/perception and the name of their current venture in the main UI.");
+            if(ImGui.Checkbox("Do not close AutoRetainer windows on ESC key press", ref C.IgnoreEsc))
+            {
+                Utils.ResetEscIgnoreByWindows();
+            }
             ImGui.Separator();
             TabLoginOverlay();
             ImGuiGroup.EndGroupBox();
@@ -216,6 +221,8 @@ internal static class SettingsMain
             ImGuiComponents.HelpMarker("AutoRetainer will wait for all retainers to return before cycling to the next character in multi mode operation.");
             ImGui.SetNextItemWidth(60);
             ImGui.DragInt("Advance Relog Threshold", ref C.MultiModeRetainerConfiguration.AdvanceTimer.ValidateRange(0, 300), 0.1f, 0, 300);
+            ImGui.SetNextItemWidth(100);
+            ImGui.SliderInt("Minimum inventory slots to continue operation", ref C.MultiMinInventorySlots.ValidateRange(2, 9999), 2, 30);
             ImGuiGroup.EndGroupBox();
         }
 

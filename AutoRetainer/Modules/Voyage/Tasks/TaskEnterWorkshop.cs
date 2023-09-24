@@ -52,9 +52,9 @@ namespace AutoRetainer.Modules.Voyage.Tasks
 
         internal static bool? SelectEnterWorkshop()
         {
-            if (Utils.TrySelectSpecificEntry("Move to the company workshop", () => EzThrottler.Throttle("HET.SelectEnterWorkshop")))
+            if (Utils.TrySelectSpecificEntry(Lang.EnterWorkshop, () => EzThrottler.Throttle("HET.SelectEnterWorkshop")))
             {
-                DebugLog("Confirmed going to apartment");
+                DebugLog("Confirmed going to workhop");
                 return true;
             }
             return false;

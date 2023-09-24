@@ -130,6 +130,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 FPSManager.UnlockChillFrames();
                 PluginLog.Information($"AutoRetainer v{P.GetType().Assembly.GetName().Version} is ready.");
                 Svc.GameNetwork.NetworkMessage += GameNetwork_NetworkMessage;
+                Utils.ResetEscIgnoreByWindows();
             });
         }
         //);
@@ -348,7 +349,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             //5800	60	8	0	False	他のデータセンター<Highlight>StringParameter(1)</Highlight>へ遊びに行っているため操作できません。
             //5800	60	8	0	False	Der Vorgang kann nicht ausgeführt werden, da der Charakter gerade das Datenzentrum <Highlight>StringParameter(1)</Highlight> bereist.
             //5800	60	8	0	False	Impossible d'exécuter cette commande. Le personnage se trouve dans un autre centre de traitement de données (<Highlight>StringParameter(1)</Highlight>).
-            if (message.ToString().StartsWithAny("Unable to execute command. Character is currently visiting the", "他のデータセンター", "Der Vorgang kann nicht ausgeführt werden, da der Charakter gerade das Datenzentrum", "Impossible d'exécuter cette commande. Le personnage se trouve dans un autre centre de traitement de données"))
+            if (message.ToString().StartsWithAny(Lang.UnableToVisitWorld))
             {
 
                 MultiMode.Enabled = false;

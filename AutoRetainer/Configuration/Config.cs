@@ -79,6 +79,8 @@ internal unsafe class Config : IEzConfig
     public bool HideAirships = false;
     public int DisableRetainerVesselReturn = 0;
     public List<SubmarinePointPlan> SubmarinePointPlans = new();
+    public int MultiMinInventorySlots = 2;
+    public bool IgnoreEsc = false;
 
     internal bool DontReassign
     {
@@ -122,7 +124,7 @@ internal unsafe class Config : IEzConfig
     public WorkshopFailAction FailureNoRepair = WorkshopFailAction.ExcludeVessel;
     public WorkshopFailAction FailureNoInventory = WorkshopFailAction.ExcludeChar;
     public WorkshopFailAction FailureGeneric = WorkshopFailAction.StopPlugin;
-    public bool SimpleTweaksCompat = false;
+    public bool SimpleTweaksCompat = true;
 
     public MultiModeCommonConfiguration MultiModeRetainerConfiguration = new()
     {

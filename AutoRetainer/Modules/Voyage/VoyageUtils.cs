@@ -5,6 +5,7 @@ using AutoRetainerAPI.Configuration;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Memory;
+using ECommons;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game;
@@ -12,22 +13,14 @@ using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
-using System;
-using System.CodeDom;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.Xml;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using ECommons;
+using System.Xml.Linq;
 
 namespace AutoRetainer.Modules.Voyage
 {
     internal unsafe static class VoyageUtils
     {
-        internal static string[] PanelName = new string[] { "Voyage Control Panel" };
-        internal static uint[] Workshops = new uint[] { Houses.Company_Workshop_Empyreum, Houses.Company_Workshop_The_Goblet, Houses.Company_Workshop_Mist, Houses.Company_Workshop_Shirogane, Houses.Company_Workshop_The_Lavender_Beds };
+
+        internal static uint[] Workshops = [Houses.Company_Workshop_Empyreum, Houses.Company_Workshop_The_Goblet, Houses.Company_Workshop_Mist, Houses.Company_Workshop_Shirogane, Houses.Company_Workshop_The_Lavender_Beds];
 
         internal static SubmarineExplorationPretty GetSubmarineExploration(uint id)
         {
@@ -54,6 +47,18 @@ namespace AutoRetainer.Modules.Voyage
                     if (!P.SubmarineUnlockPlanUI.IsMapExplored(x.Key, true) && P.SubmarineUnlockPlanUI.IsMapUnlocked(x.Key, true))
                     {
                         ret.Add((x.Key, $"submarine slot from {VoyageUtils.GetSubmarineExplorationName(x.Key)}"));
+                    }
+                }
+                foreach (var unlock in Unlocks.PointToUnlockPoint.Where(x => x.Value.Sub)) 
+                {
+                    var path = Unlocks.FindUnlockPath(unlock.Key);
+                    path.Reverse();
+                    foreach (var x in path)
+                    {
+                        if (!ret.Any(z => z.point == x.Item2.Point) && !P.SubmarineUnlockPlanUI.IsMapUnlocked(x.Item1, true))
+                        {
+                            ret.Add((x.Item2.Point, $"{GetSubmarineExplorationName(x.Item1)} on the path to {GetSubmarineExplorationName(unlock.Key)} not unlocked"));
+                        }
                     }
                 }
             }
@@ -99,16 +104,16 @@ namespace AutoRetainer.Modules.Voyage
         {
             if (TryGetAddonByName<AtkUnitBase>("SelectString", out var addon) && IsAddonReady(addon))
             {
-                if (Utils.GetEntries((AddonSelectString*)addon).Contains("Submersible Management"))
+                if (Utils.GetEntries((AddonSelectString*)addon).Any(x => x.EqualsIgnoreCaseAny(Lang.SubmarineManagement)))
                 {
                     return PanelType.TypeSelector;
                 }
                 var text = MemoryHelper.ReadSeString(&addon->UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText).ExtractText();
-                if (text.Contains("Select a submersible."))
+                if (text.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.PanelSubmersible))
                 {
                     return PanelType.Submersible;
                 }
-                if (text.Contains("Select an airship."))
+                if (text.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.PanelAirship))
                 {
                     return PanelType.Airship;
                 }
@@ -145,7 +150,7 @@ namespace AutoRetainer.Modules.Voyage
 
         internal static bool IsVoyagePanel(this GameObject obj)
         {
-            return obj?.Name.ToString().EqualsAny(PanelName) == true;
+            return obj?.Name.ToString().EqualsIgnoreCaseAny(Lang.PanelName) == true;
         }
 
         internal static bool IsVoyageCondition()
@@ -165,7 +170,7 @@ namespace AutoRetainer.Modules.Voyage
         internal static bool TryGetNearestVoyagePanel(out GameObject obj)
         {
             //Data ID: 2007820
-            if (Svc.Objects.TryGetFirst(x => x.Name.ToString().EqualsAny(PanelName) && x.IsTargetable, out var o))
+            if (Svc.Objects.TryGetFirst(x => x.Name.ToString().EqualsIgnoreCaseAny(Lang.PanelName) && x.IsTargetable, out var o))
             {
                 obj = o;
                 return true;
@@ -209,6 +214,8 @@ namespace AutoRetainer.Modules.Voyage
                             temp.Add(new(name, x.ReturnTime));
                             var adata = Data.GetAdditionalVesselData(name, VoyageType.Airship);
                             adata.Level = x.RankId;
+                            adata.CurrentExp = x.CurrentExp;
+                            adata.NextLevelExp = x.NextLevelExp;
                         }
                     }
                     if (temp.Count > 0)
@@ -228,6 +235,9 @@ namespace AutoRetainer.Modules.Voyage
                             temp.Add(new(name, vessel.ReturnTime));
                             var adata = Data.GetAdditionalVesselData(name, VoyageType.Submersible);
                             adata.Level = vessel.RankId;
+                            adata.NextLevelExp = vessel.NextLevelExp;
+                            adata.CurrentExp = vessel.CurrentExp;
+                            PluginLog.Debug("Write offline sub data");
                             adata.Part1 = (int)GetVesselComponent(i, VoyageType.Submersible, 0)->ItemID;
                             adata.Part2 = (int)GetVesselComponent(i, VoyageType.Submersible, 1)->ItemID;
                             adata.Part3 = (int)GetVesselComponent(i, VoyageType.Submersible, 2)->ItemID;
@@ -239,6 +249,13 @@ namespace AutoRetainer.Modules.Voyage
                         Data.OfflineSubmarineData = temp;
                     }
                     Data.NumSubSlots = P.SubmarineUnlockPlanUI.GetNumUnlockedSubs() ?? Data.NumSubSlots;
+                    /*var curSub = CurrentSubmarine.Get();
+                    if (curSub != null)
+                    {
+                        var adata = Data.GetAdditionalVesselData(Utils.Read(curSub->Name), VoyageType.Submersible);
+                        adata.CurrentExp = curSub->CurrentExp;
+                        adata.NextLevelExp = curSub->NextLevelExp;
+                    }*/
                 }
             }
         }

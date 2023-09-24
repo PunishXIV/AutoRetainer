@@ -1,6 +1,7 @@
 ﻿using AutoRetainerAPI;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Interface.Components;
+using Dalamud.Interface.Style;
 using ECommons;
 using ECommons.GameHelpers;
 using ECommons.MathHelpers;
@@ -380,10 +381,11 @@ internal unsafe static class MultiModeUI
                 }
             }
             var rightText = ((C.CharEqualize && MultiMode.Enabled) ? $"C: {MultiMode.CharaCnt.GetOrDefault(data.CID)} | " : "") + $"V: {data.Ventures} | I: {data.InventorySpace}";
+            Vector4? rCol = (data.Ventures < data.GetEnabledRetainers().Length * 25 || data.InventorySpace < data.GetEnabledRetainers().Length * 12) ? ImGuiColors.DalamudOrange : null;
             var cur = ImGui.GetCursorPos();
             ImGui.SameLine();
             ImGui.SetCursorPos(new(ImGui.GetContentRegionMax().X - ImGui.CalcTextSize(rightText).X - ImGui.GetStyle().FramePadding.X, rCurPos.Y + pad));
-            ImGuiEx.Text(rightText);
+            ImGuiEx.Text(rCol, rightText);
             ImGui.PopID();
         }
 

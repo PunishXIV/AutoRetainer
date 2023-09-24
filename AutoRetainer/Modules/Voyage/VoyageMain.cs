@@ -55,7 +55,7 @@ namespace AutoRetainer.Modules.Voyage
                         Data.WorkshopEnabled = false;
                     }
                 }
-                if (txt.Contains("Unable to repair vessel."))
+                if (txt.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.UnableToRepairVessel))
                 {
                     TaskRepairAll.Abort = true;
                     DuoLog.Warning($"[Voyage] You are out of repair components!");

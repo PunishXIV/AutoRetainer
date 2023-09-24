@@ -239,7 +239,7 @@ namespace AutoRetainer.Modules.Voyage
 
         internal static bool? SelectExitMainPanel()
         {
-            return Utils.TrySelectSpecificEntry("Cancel", () => Utils.GenericThrottle && EzThrottler.Throttle("Voyage.ExitMainPanel", 1000));
+            return Utils.TrySelectSpecificEntry(Lang.CancelVoyage, () => Utils.GenericThrottle && EzThrottler.Throttle("Voyage.ExitMainPanel", 1000));
         }
 
         internal static bool? SelectVesselByName(string name)
@@ -249,7 +249,7 @@ namespace AutoRetainer.Modules.Voyage
 
         internal static bool? SelectViewPreviousLog()
         {
-            return Utils.TrySelectSpecificEntry("View previous voyage log", () => Utils.GenericThrottle && EzThrottler.Throttle("Voyage.SelectViewPreviousLog", 1000));
+            return Utils.TrySelectSpecificEntry(Lang.ViewPrevVoyageLog, () => Utils.GenericThrottle && EzThrottler.Throttle("Voyage.SelectViewPreviousLog", 1000));
         }
 
         internal static bool? RedeployVessel()
