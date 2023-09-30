@@ -52,9 +52,9 @@ internal unsafe class Config : IEzConfig
     public bool Stay5 = true;
     public bool NoCurrentCharaOnTop = false;
 
-    public bool UseFrameDelay = true;
+    internal bool UseFrameDelay = true;
     public int Delay = 200;
-    public int FrameDelay = 4;
+    public int FrameDelay = 8;
 
     public bool _dontReassign = false;
     public bool OldRetainerSense = false;
@@ -81,6 +81,12 @@ internal unsafe class Config : IEzConfig
     public List<SubmarinePointPlan> SubmarinePointPlans = new();
     public int MultiMinInventorySlots = 2;
     public bool IgnoreEsc = false;
+
+    public int UIWarningRetSlotNum = 20;
+    public int UIWarningRetVentureNum = 50;
+    public int UIWarningDepTanksNum = 300;
+    public int UIWarningDepRepairNum = 100;
+    public int UIWarningDepSlotNum = 20;
 
     internal bool DontReassign
     {
@@ -114,17 +120,17 @@ internal unsafe class Config : IEzConfig
     public bool ManipulatePriority = false;
 
     public bool SubsAutoResend = false;
-    public bool SubsAutoRepair = false;
+    public bool SubsAutoRepair = true;
     public bool SubsOnlyFinalize = false;
     public bool SubsAutoEnable = false;
-    public bool SubsRepairFinalize = false;
+    public bool SubsRepairFinalize = true;
     public MultiModeType MultiModeType = MultiModeType.Everything;
     public bool NoErrorCheckPlanner2 = true;
     public WorkshopFailAction FailureNoFuel = WorkshopFailAction.ExcludeChar;
     public WorkshopFailAction FailureNoRepair = WorkshopFailAction.ExcludeVessel;
     public WorkshopFailAction FailureNoInventory = WorkshopFailAction.ExcludeChar;
     public WorkshopFailAction FailureGeneric = WorkshopFailAction.StopPlugin;
-    public bool SimpleTweaksCompat = true;
+    internal bool SimpleTweaksCompat = true;
 
     public MultiModeCommonConfiguration MultiModeRetainerConfiguration = new()
     {

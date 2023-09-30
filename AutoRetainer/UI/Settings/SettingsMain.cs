@@ -126,7 +126,7 @@ internal static class SettingsMain
             ImGui.SetNextItemWidth(100f);
             ImGui.SliderInt("Time Desynchronization Compensation", ref C.UnsyncCompensation.ValidateRange(-60, 0), -10, 0);
             ImGuiComponents.HelpMarker("Additional amount of seconds that will be subtracted from venture ending time to help mitigate possible issues of time desynchronization between the game and your PC. ");
-            ImGui.Checkbox($"Enable SuperSonic(tm) Blazing fast operation speed", ref C.UseFrameDelay);
+            //ImGui.Checkbox($"Enable SuperSonic(tm) Blazing fast operation speed", ref C.UseFrameDelay);
             ImGui.SetNextItemWidth(100f);
             if (!C.UseFrameDelay)
             {
@@ -187,6 +187,17 @@ internal static class SettingsMain
             }
             ImGui.Separator();
             TabLoginOverlay();
+            ImGui.Separator();
+            ImGui.SetNextItemWidth(100f);
+            ImGui.InputInt($"Retainer list: remaining inventory slots warning", ref C.UIWarningRetSlotNum.ValidateRange(2,1000));
+            ImGui.SetNextItemWidth(100f);
+            ImGui.InputInt($"Retainer list: remaining ventures warning", ref C.UIWarningRetVentureNum.ValidateRange(2,1000));
+            ImGui.SetNextItemWidth(100f);
+            ImGui.InputInt($"Deployables list: remaining inventory slots warning", ref C.UIWarningDepSlotNum.ValidateRange(2, 1000));
+            ImGui.SetNextItemWidth(100f);
+            ImGui.InputInt($"Deployables list: remaining fuel warning", ref C.UIWarningDepTanksNum.ValidateRange(20, 1000));
+            ImGui.SetNextItemWidth(100f);
+            ImGui.InputInt($"Deployables list: remaining repair kit warning", ref C.UIWarningDepRepairNum.ValidateRange(5, 1000));
             ImGuiGroup.EndGroupBox();
         }
         if (ImGuiGroup.BeginGroupBox("Keybinds"))

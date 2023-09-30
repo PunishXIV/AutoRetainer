@@ -20,5 +20,6 @@ namespace AutoRetainerAPI.Configuration
         public UnlockMode UnlockMode = UnlockMode.WhileLevelling;
         public string SelectedUnlockPlan = Guid.Empty.ToString();
         public string SelectedPointPlan = Guid.Empty.ToString();
+        public byte[] Points = new byte[5];
     }
 }

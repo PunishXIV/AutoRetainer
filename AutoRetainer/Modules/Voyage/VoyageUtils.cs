@@ -13,7 +13,9 @@ using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
+using System;
 using System.Xml.Linq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AutoRetainer.Modules.Voyage
 {
@@ -203,6 +205,7 @@ namespace AutoRetainer.Modules.Voyage
         {
             if (HousingManager.Instance()->WorkshopTerritory != null && C.OfflineData.TryGetFirst(x => x.CID == Player.CID, out var ocd))
             {
+                ocd.WriteOfflineInventoryData();
                 {
                     var vessels = HousingManager.Instance()->WorkshopTerritory->Airship;
                     var temp = new List<OfflineVesselData>();
@@ -237,11 +240,12 @@ namespace AutoRetainer.Modules.Voyage
                             adata.Level = vessel.RankId;
                             adata.NextLevelExp = vessel.NextLevelExp;
                             adata.CurrentExp = vessel.CurrentExp;
-                            PluginLog.Debug("Write offline sub data");
+                            //PluginLog.Debug("Write offline sub data");
                             adata.Part1 = (int)GetVesselComponent(i, VoyageType.Submersible, 0)->ItemID;
                             adata.Part2 = (int)GetVesselComponent(i, VoyageType.Submersible, 1)->ItemID;
                             adata.Part3 = (int)GetVesselComponent(i, VoyageType.Submersible, 2)->ItemID;
                             adata.Part4 = (int)GetVesselComponent(i, VoyageType.Submersible, 3)->ItemID;
+                            adata.Points = new Span<byte>(vessel.CurrentExplorationPoints, 5).ToArray();
                         }
                     }
                     if (temp.Count > 0)
@@ -429,7 +433,7 @@ namespace AutoRetainer.Modules.Voyage
         {
             return (x.ReturnTime != 0 && x.GetRemainingSeconds() < C.UnsyncCompensation) 
                 ||
-                (x.ReturnTime == 0 && data.GetAdditionalVesselData(x.Name, type).VesselBehavior.EqualsAny(VesselBehavior.LevelUp, VesselBehavior.Unlock));
+                (x.ReturnTime == 0 && data.GetAdditionalVesselData(x.Name, type).VesselBehavior.EqualsAny(VesselBehavior.LevelUp, VesselBehavior.Unlock, VesselBehavior.Use_plan));
         }
 
         internal static string GetNextCompletedVessel(VoyageType type)

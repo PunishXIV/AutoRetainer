@@ -202,7 +202,7 @@ namespace AutoRetainer.Modules.Voyage
                 }
                 else
                 {
-                    if (adata.VesselBehavior.EqualsAny(VesselBehavior.LevelUp, VesselBehavior.Unlock, VesselBehavior.Use_plan))
+                    if (adata.VesselBehavior.EqualsAny(VesselBehavior.LevelUp, VesselBehavior.Unlock, VesselBehavior.Use_plan, VesselBehavior.Use_plan))
                     {
                         if (EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResend", 1000))
                         {

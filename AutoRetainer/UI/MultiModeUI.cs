@@ -381,7 +381,7 @@ internal unsafe static class MultiModeUI
                 }
             }
             var rightText = ((C.CharEqualize && MultiMode.Enabled) ? $"C: {MultiMode.CharaCnt.GetOrDefault(data.CID)} | " : "") + $"V: {data.Ventures} | I: {data.InventorySpace}";
-            Vector4? rCol = (data.Ventures < data.GetEnabledRetainers().Length * 25 || data.InventorySpace < data.GetEnabledRetainers().Length * 12) ? ImGuiColors.DalamudOrange : null;
+            Vector4? rCol = (data.Ventures < C.UIWarningRetVentureNum || data.InventorySpace < C.UIWarningRetSlotNum) ? ImGuiColors.DalamudOrange : null;
             var cur = ImGui.GetCursorPos();
             ImGui.SameLine();
             ImGui.SetCursorPos(new(ImGui.GetContentRegionMax().X - ImGui.CalcTextSize(rightText).X - ImGui.GetStyle().FramePadding.X, rCurPos.Y + pad));

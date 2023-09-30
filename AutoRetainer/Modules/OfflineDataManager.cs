@@ -108,12 +108,17 @@ internal unsafe static class OfflineDataManager
                 }
             }
         }
+        data.WriteOfflineInventoryData();
+        C.OfflineData.RemoveAll(x => x.World == "" && x.Name == "Unknown");
+        if (saveConfig) EzConfig.Save();
+    }
+
+    internal static void WriteOfflineInventoryData(this OfflineCharacterData data)
+    {
         data.Ventures = Utils.GetVenturesAmount();
         data.InventorySpace = (uint)Utils.GetInventoryFreeSlotCount();
         data.Ceruleum = InventoryManager.Instance()->GetInventoryItemCount(10155);
         data.RepairKits = InventoryManager.Instance()->GetInventoryItemCount(10373);
-        C.OfflineData.RemoveAll(x => x.World == "" && x.Name == "Unknown");
-        if (saveConfig) EzConfig.Save();
     }
 
     internal static OfflineRetainerData GetData(SeString name, ulong? CID = null) => GetData(name.ToString(), CID);

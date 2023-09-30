@@ -100,7 +100,7 @@ namespace AutoRetainer.UI
 
                 var rightText = $"R: {data.RepairKits} | C: {data.Ceruleum} | I: {data.InventorySpace}";
                 var subNum = data.GetEnabledVesselsData(VoyageType.Submersible).Count();
-                var col = data.RepairKits < 25 * subNum || data.Ceruleum < 50 * subNum || data.InventorySpace < 15;
+                var col = data.RepairKits < C.UIWarningDepRepairNum || data.Ceruleum < C.UIWarningDepTanksNum || data.InventorySpace < C.UIWarningDepSlotNum;
                 var cur = ImGui.GetCursorPos();
                 ImGui.SameLine();
                 ImGui.SetCursorPos(new(ImGui.GetContentRegionMax().X - ImGui.CalcTextSize(rightText).X - ImGui.GetStyle().FramePadding.X, rCurPos.Y + pad));
@@ -129,7 +129,7 @@ namespace AutoRetainer.UI
                 ImGui.Checkbox($"Only finalize reports", ref C.SubsOnlyFinalize);
                 ImGui.Checkbox($"When resending, auto-repair vessels", ref C.SubsAutoRepair);
                 ImGui.Checkbox($"Even when only finalizing, repair vessels", ref C.SubsRepairFinalize);
-                ImGui.Checkbox($"Experimental compatibility with SimpleTweaks destination letters tweak", ref C.SimpleTweaksCompat);
+                //ImGui.Checkbox($"Experimental compatibility with SimpleTweaks destination letters tweak", ref C.SimpleTweaksCompat);
                 ImGui.Checkbox($"Hide airships", ref C.HideAirships);
                 ImGui.SetNextItemWidth(60);
                 ImGui.DragInt("Don't process retainers if vessels return in, minutes", ref C.DisableRetainerVesselReturn.ValidateRange(0, 60));
@@ -406,7 +406,7 @@ namespace AutoRetainer.UI
                 }
                 ImGuiEx.TextV(Lang.CharLevel + $"{adata.Level}".ReplaceByChar(Lang.Digits.Normal, Lang.Digits.GameFont));
                 ImGui.SameLine(0, 0);
-                ImGuiEx.Text(ImGuiColors.DalamudGrey2, $".{lvlf:D2}".ReplaceByChar(Lang.Digits.Normal, Lang.Digits.GameFont));
+                ImGuiEx.Text(ImGuiColors.DalamudGrey3, $".{lvlf:D2}".ReplaceByChar(Lang.Digits.Normal, Lang.Digits.GameFont));
                 ImGui.SameLine(0, 0);
                 ImGuiEx.Text(VoyageUtils.GetSubmarineBuild(adata));
             }
@@ -419,6 +419,20 @@ namespace AutoRetainer.UI
             }
             else
             {
+                List<string> points = [];
+                foreach(var x in adata.Points)
+                {
+                    if(x != 0)
+                    {
+                        var d = Svc.Data.GetExcelSheet<SubmarineExplorationPretty>(Dalamud.ClientLanguage.Japanese).GetRow(x);
+                        if(d != null && d.Location.ToString().Length > 0)
+                        {
+                            points.Add(d.Location.ToString());
+                        }
+                    }
+                }
+                ImGuiEx.Text(points.Join(""));
+                ImGui.SameLine();
                 ImGuiEx.Text(vessel.GetRemainingSeconds() > 0 ? $"{VoyageUtils.Seconds2Time(vessel.GetRemainingSeconds())}" : "Voyage completed");
             }
             ImGui.TableNextColumn();

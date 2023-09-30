@@ -93,6 +93,11 @@ internal unsafe static class MultiMode
     {
         if (Active)
         {
+            if(!C.MultiModeWorkshopConfiguration.MultiWaitForAll && C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn)
+            {
+                DuoLog.Warning($"Invalid configuration: {nameof(C.MultiModeWorkshopConfiguration.MultiWaitForAll)} was not activated but {nameof(C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn)} was. The configuration was fixed.");
+                C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn = false;
+            }
             if(!Svc.ClientState.IsLoggedIn && TryGetAddonByName<AtkUnitBase>("Title", out _) && !AutoLogin.Instance.IsRunning)
             {
                 LastLogin = 0;
@@ -380,7 +385,7 @@ internal unsafe static class MultiMode
         var data = C.OfflineData;
         if (C.CharEqualize)
         {
-            data = data.OrderBy(x => CharaCnt.GetOrDefault(x.CID)).ToList();
+            data = [.. data.OrderBy(x => CharaCnt.GetOrDefault(x.CID))];
         }
         if (EnabledSubmarines)
         {

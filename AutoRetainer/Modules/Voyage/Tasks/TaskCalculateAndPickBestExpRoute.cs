@@ -56,6 +56,7 @@ namespace AutoRetainer.Modules.Voyage.Tasks
                         foreach (var map in curSubMaps)
                         {
                             calc.RouteBuild.Value.ChangeMap((int)map);
+                            var doCalc = false;
                             if (prioList != null && prioList.Count > 0)
                             {
                                 var point = VoyageUtils.GetSubmarineExploration(prioList[0].point);
@@ -65,21 +66,33 @@ namespace AutoRetainer.Modules.Voyage.Tasks
                                 }
                                 else
                                 {
+                                    doCalc = true;
                                     VoyageUtils.Log($"Adding point: {VoyageUtils.GetSubmarineExplorationName(prioList[0].point)} ({prioList[0].justification})");
                                     calc.MustInclude.Add(VoyageUtils.GetSubmarineExploration(prioList[0].point));
                                 }
                             }
-                            var best = calc.FindBestPath(map);
-                            if (best != null && best.Value.path != null)
+                            else
                             {
-                                var xptime = best.Value.exp / (double)best.Value.duration.TotalHours;
-                                VoyageUtils.Log($"Path {best.Value.path.Select(z => $"{z}/{Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(z).Location}").Print()}, is best for map {map} with {best.Value.duration} duration and {best.Value.exp} exp ({xptime} exp/hour)");
-                                if (xptime > exp)
+                                doCalc = true;
+                            }
+                            if (doCalc)
+                            {
+                                var best = calc.FindBestPath(map);
+                                if (best != null && best.Value.path != null)
                                 {
-                                    selectedMap = (int)map;
-                                    exp = xptime;
-                                    path = best.Value.path;
+                                    var xptime = best.Value.exp / (double)best.Value.duration.TotalHours;
+                                    VoyageUtils.Log($"Path {best.Value.path.Select(z => $"{z}/{Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(z).Location}").Print()}, is best for map {map} with {best.Value.duration} duration and {best.Value.exp} exp ({xptime} exp/hour)");
+                                    if (xptime > exp)
+                                    {
+                                        selectedMap = (int)map;
+                                        exp = xptime;
+                                        path = best.Value.path;
+                                    }
                                 }
+                            }
+                            else
+                            {
+                                VoyageUtils.Log($"Map {map} skipped because it has no zones to unlock");
                             }
                         }
                     }
