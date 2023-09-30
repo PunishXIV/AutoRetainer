@@ -35,7 +35,7 @@ internal unsafe class Memory : IDisposable
 
     internal Memory()
     {
-        SignatureHelper.Initialise(this, true);
+        Svc.Hook.InitializeFromAttributes(this);
         if (C.MarketCooldownOverlay) OnReceiveMarketPricePacketHook?.Enable();
         ReceiveRetainerVentureListUpdateHook?.Enable();
     }
@@ -79,7 +79,7 @@ internal unsafe class Memory : IDisposable
     {
         if (InteractWithObjectHook == null)
         {
-            InteractWithObjectHook = Hook<InteractWithObjectDelegate>.FromAddress((nint)TargetSystem.Addresses.InteractWithObject.Value, InteractWithObjectDetour);
+            InteractWithObjectHook = Svc.Hook.HookFromAddress<InteractWithObjectDelegate>((nint)TargetSystem.Addresses.InteractWithObject.Value, InteractWithObjectDetour);
             InteractWithObjectHook.Enable();
         }
     }

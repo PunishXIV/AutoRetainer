@@ -58,16 +58,6 @@ namespace AutoRetainer.UI.Dbg
                     }
                 }
             }
-            {
-                if (TryGetAddonByName<AtkUnitBase>("RetainerSellList", out var a) && IsAddonReady(a))
-                {
-                    var reader = new ReaderRetainerSellList(a);
-                    foreach (var r in reader.Entries)
-                    {
-                        ImGuiEx.Text($"{r.Name} / {r.Id} / {r.Amount} / {r.PricePerUnit}");
-                    }
-                }
-            }
         }
     }
 }

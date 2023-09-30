@@ -1,4 +1,5 @@
 ﻿using ECommons;
+using ECommons.DalamudServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,7 +44,7 @@ namespace AutoRetainerAPI
 
         private void OnRetainerReadyForPostprocessIntl(string plugin, string retainer)
         {
-            if (ECommonsMain.Instance.Name == plugin)
+            if (Svc.PluginInterface.InternalName == plugin)
             {
                 if (OnRetainerReadyToPostprocess != null)
                 {
@@ -54,7 +55,7 @@ namespace AutoRetainerAPI
 
         private void OnCharacterReadyForPostprocessIntl(string plugin)
         {
-            if (ECommonsMain.Instance.Name == plugin)
+            if (Svc.PluginInterface.InternalName == plugin)
             {
                 if (OnCharacterReadyToPostProcess != null)
                 {

@@ -22,7 +22,7 @@ internal static class StatisticsManager
         Files.Clear();
     }
 
-    private static void ClientState_TerritoryChanged(object sender, ushort e)
+    private static void ClientState_TerritoryChanged(ushort e)
     {
         Files.Clear();
     }

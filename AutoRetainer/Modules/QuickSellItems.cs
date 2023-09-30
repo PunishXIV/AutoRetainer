@@ -60,7 +60,7 @@ public unsafe class QuickSellItems : IDisposable
         retrieveFromRetainerText = Svc.Data.GetExcelSheet<Addon>()?.GetRow(98)?.Text?.RawString ?? "Retrieve from Retainer";
         //99	Put Up for Sale
         putUpForSaleText = Svc.Data.GetExcelSheet<Addon>()?.GetRow(99)?.Text?.RawString ?? "Put Up for Sale";
-        SignatureHelper.Initialise(this);
+        Svc.Hook.InitializeFromAttributes(this);
         UiHelper.Setup();
         Toggle();
     }

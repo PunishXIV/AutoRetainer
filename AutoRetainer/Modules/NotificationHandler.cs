@@ -16,7 +16,7 @@ internal static class NotificationHandler
             CurrentState = currentState;
             if (currentState)
             {
-                Svc.Chat.PrintChat(new()
+                Svc.Chat.Print(new()
                 {
                     Message = new SeStringBuilder().AddUiForeground("[AutoRetainer] Some of the retainers have completed their ventures!", (ushort)UIColor.Green).Build()
                 });

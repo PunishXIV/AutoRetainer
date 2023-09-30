@@ -8,7 +8,7 @@ public unsafe class RetainerManager
     private static StaticRetainerContainer _address;
     private static RetainerContainer* _container;
 
-    public RetainerManager(SigScanner sigScanner)
+    public RetainerManager(ISigScanner sigScanner)
     {
         if (_address != null)
             return;

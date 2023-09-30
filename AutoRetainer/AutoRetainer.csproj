@@ -2,15 +2,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<Authors>Puni.sh</Authors>
-		<Version>4.1.2.5</Version>
+		<Version>4.2.0.0</Version>
 	</PropertyGroup>
 
 	<PropertyGroup>
 		<TargetFramework>net7.0-windows</TargetFramework>
 		<Platforms>x64</Platforms>
 		<LangVersion>preview</LangVersion>
-		<DalamudLibPath>$(appdata)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
-		<DalamudPluginPath>$(appdata)\XIVLauncher\installedPlugins\AutoRetainer\$(version)</DalamudPluginPath>
+		<DalamudLibPath>$(appdata)\xl2\addon\Hooks\dev\</DalamudLibPath>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>

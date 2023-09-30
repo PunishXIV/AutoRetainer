@@ -1,5 +1,6 @@
 ﻿using ClickLib.Clicks;
 using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Hooking;
 using Dalamud.Memory;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;

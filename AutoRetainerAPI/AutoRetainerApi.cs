@@ -73,7 +73,7 @@ namespace AutoRetainerAPI
         /// </summary>
         public void ProcessIPCTaskFromOverlay()
         {
-            Svc.PluginInterface.GetIpcSubscriber<string, object>(ApiConsts.OnRetainerListCustomTask).InvokeAction(ECommonsMain.Instance.Name);
+            Svc.PluginInterface.GetIpcSubscriber<string, object>(ApiConsts.OnRetainerListCustomTask).InvokeAction(Svc.PluginInterface.InternalName);
         }
 
 
@@ -82,7 +82,7 @@ namespace AutoRetainerAPI
         /// </summary>
         public void RequestRetainerPostprocess()
         {
-            Svc.PluginInterface.GetIpcSubscriber<string, object>(ApiConsts.RequestRetainerPostProcess).InvokeAction(ECommonsMain.Instance.Name);
+            Svc.PluginInterface.GetIpcSubscriber<string, object>(ApiConsts.RequestRetainerPostProcess).InvokeAction(Svc.PluginInterface.InternalName);
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace AutoRetainerAPI
         /// <summary>
         /// Fire inside <see cref="oncharacterpost"/> event to indicate that you want to do the postprocessing of a character.
         /// </summary>
-        public void RequestCharacterPostprocess() => Svc.PluginInterface.GetIpcSubscriber<string, object>(ApiConsts.RequestCharacterPostProcess).InvokeAction(ECommonsMain.Instance.Name);
+        public void RequestCharacterPostprocess() => Svc.PluginInterface.GetIpcSubscriber<string, object>(ApiConsts.RequestCharacterPostProcess).InvokeAction(Svc.PluginInterface.InternalName);
 
 
         /// <summary>

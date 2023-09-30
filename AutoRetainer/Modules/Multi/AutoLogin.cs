@@ -156,7 +156,7 @@ internal unsafe class AutoLogin
         actionQueue.Clear();
     }
 
-    private void OnFrameworkUpdate(Framework framework)
+    private void OnFrameworkUpdate(object _)
     {
         if (actionQueue.Count == 0)
         {

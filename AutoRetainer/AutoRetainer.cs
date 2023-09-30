@@ -23,6 +23,7 @@ using ECommons.GameHelpers;
 using AutoRetainer.Modules.Voyage;
 using Dalamud.Game.Network;
 using AutoRetainer.Scheduler.Handlers;
+using Dalamud.Plugin.Services;
 
 namespace AutoRetainer;
 
@@ -241,7 +242,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         }
     }
 
-    private void Tick(Framework framework)
+    private void Tick(object _)
     {
         if (!IPC.Suppressed)
         {
@@ -515,7 +516,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         }
     }
 
-    void Logout(object _, object __)
+    void Logout()
     {
         SchedulerMain.DisablePlugin();
 

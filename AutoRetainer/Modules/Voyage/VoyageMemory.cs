@@ -35,7 +35,7 @@ namespace AutoRetainer.Modules.Voyage
 
         VoyageMemory()
         {
-            SignatureHelper.Initialise(this);
+            Svc.Hook.InitializeFromAttributes(this);
             _submersibleStatusListHook?.Enable();
             _submersibleTimersHook?.Enable();
             _airshipTimersHook?.Enable();

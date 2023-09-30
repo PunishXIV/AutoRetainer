@@ -47,7 +47,7 @@ namespace AutoRetainer.UI
 
         public override void OnOpen()
         {
-            GatherBuddyPresent = Svc.PluginInterface.PluginNames.Contains("GatherBuddy");
+            GatherBuddyPresent = Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "GatherBuddy");
         }
 
         public override void Draw()
