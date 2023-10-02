@@ -27,3 +27,4 @@ global using AutoRetainer.Modules.GcHandin;
 global using AutoRetainer.Modules.Multi;
 global using Callback = ECommons.Automation.Callback;
 global using Dalamud.Interface.Utility;
+global using ECommons.DalamudServices.Legacy;
