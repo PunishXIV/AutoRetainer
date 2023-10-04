@@ -210,7 +210,7 @@ internal unsafe class AutoLogin
     {
         var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("_TitleMenu", 1);
         if (addon == null || addon->IsVisible == false) return false;
-        Callback.Fire(addon,false, 12);
+        Callback.Fire(addon,false, 13);
         var nextAddon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("TitleDCWorldMap", 1);
         if (nextAddon == null) return false;
         return true;
@@ -276,7 +276,7 @@ internal unsafe class AutoLogin
             if (s.Trim().Length == 0) continue;
             checkedWorldCount++;
             if (s != world.Name.RawString) continue;
-            Callback.Fire(addon, false, 9, 0, i);
+            Callback.Fire(addon, false, 10, 0, i);
             return true;
         }
 
@@ -291,7 +291,7 @@ internal unsafe class AutoLogin
         if (addon == null || tempCharacter == null) return false;
         if (Utils.TryGetCharacterIndex(tempCharacter, out var index))
         {
-            Callback.Fire(addon, false, (int)17, (int)0, (int)index);
+            Callback.Fire(addon, false, (int)18, (int)0, (int)index);
             var nextAddon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("SelectYesno", 1);
             return nextAddon != null;
         }

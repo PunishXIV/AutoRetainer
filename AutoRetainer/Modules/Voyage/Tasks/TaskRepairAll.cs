@@ -30,7 +30,7 @@ namespace AutoRetainer.Modules.Voyage.Tasks
                 P.TaskManager.EnqueueImmediate(VoyageScheduler.ConfirmRepair, 5000, false);
                 P.TaskManager.EnqueueImmediate(() => Abort || VoyageScheduler.WaitForYesNoDisappear() == true, 5000, false, "WaitForYesNoDisappear");
                 P.TaskManager.EnqueueImmediate(() => Abort || VoyageUtils.GetVesselComponent(vesselIndex, type, index)->Condition > 0, "WaitUntilRepairComplete");
-                P.TaskManager.DelayNextImmediate(5, true);
+                P.TaskManager.DelayNextImmediate(C.FrameDelay * 2, true);
             }
             P.TaskManager.EnqueueImmediate(VoyageScheduler.CloseRepair);
             //P.TaskManager.Enqueue(() => Abort ? VoyageScheduler.SelectQuitVesselMenu() : true, "SelectQuitVesselMenu failed repair");

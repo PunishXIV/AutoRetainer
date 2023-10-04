@@ -21,6 +21,8 @@ internal static unsafe class DebugMisc
 
     internal static void Draw()
     {
+        if (ImGui.Button("Install callback hook")) Callback.InstallHook();
+        if (ImGui.Button("Disable callback hook")) Callback.UninstallHook();
         ImGuiEx.TextCopy($"{(nint)(&TargetSystem.Instance()->Target):X16}");
         ImGui.Checkbox($"Log opcodes", ref P.LogOpcodes);
         ImGuiEx.Text($"CSFramework.Instance()->FrameCounter: {CSFramework.Instance()->FrameCounter}");

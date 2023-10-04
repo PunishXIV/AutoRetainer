@@ -1,6 +1,7 @@
 ﻿using Dalamud.Utility;
 using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
+using ECommons.GameHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using Lumina.Excel.GeneratedSheets;
@@ -11,7 +12,7 @@ internal unsafe static class DebugMulti
 {
     internal static void Draw()
     {
-
+        ImGuiEx.TextCopy($"CID: {Player.CID}");
         ImGuiEx.Text($"{Svc.Data.GetExcelSheet<Addon>()?.GetRow(115)?.Text.ToDalamudString().ExtractText()}");
         ImGuiEx.Text($"Server time: {Framework.GetServerTime()}");
         ImGuiEx.Text($"PC time: {DateTimeOffset.Now.ToUnixTimeSeconds()}");

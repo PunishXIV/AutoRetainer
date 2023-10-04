@@ -192,8 +192,8 @@ namespace AutoRetainer.Modules.Voyage
             if (next != null)
             {
                 var adata = Data.GetAdditionalVesselData(next, type);
-                var data = Data.GetOfflineVesselData(next, type);
-                if (C.SubsOnlyFinalize || C.DontReassign || adata.VesselBehavior == VesselBehavior.Finalize)
+                var data = Data.GetOfflineVesselData(next, type) ?? throw new NullReferenceException($"Offline vessel data for {next}, {type} is null");
+                if ((C.SubsOnlyFinalize || VoyageUtils.DontReassign || adata.VesselBehavior == VesselBehavior.Finalize) && data.ReturnTime != 0)
                 {
                     if (EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResend", 1000))
                     {
@@ -206,7 +206,7 @@ namespace AutoRetainer.Modules.Voyage
                     {
                         if (EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResend", 1000))
                         {
-                            if (data?.ReturnTime != 0)
+                            if (data.ReturnTime != 0)
                             {
                                 TaskFinalizeVessel.Enqueue(next, type, true, false);
                             }

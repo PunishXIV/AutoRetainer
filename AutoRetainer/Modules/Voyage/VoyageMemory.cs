@@ -82,6 +82,7 @@ namespace AutoRetainer.Modules.Voyage
                 }
                 if(temp.Count > 0)
                 {
+                    if (Data == null) PluginLog.Error($"Data is null");
                     Data.OfflineSubmarineData = temp;
                     VoyageUtils.Log($"Updated airship data from SubmersibleTimer");
                 }
