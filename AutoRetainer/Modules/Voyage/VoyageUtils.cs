@@ -5,7 +5,6 @@ using AutoRetainerAPI.Configuration;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Memory;
-using ECommons;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
 using ECommons.Interop;
@@ -14,9 +13,6 @@ using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
-using System;
-using System.Xml.Linq;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AutoRetainer.Modules.Voyage
 {
@@ -39,6 +35,37 @@ namespace AutoRetainer.Modules.Voyage
         internal static string GetMapName(uint id)
         {
             return Svc.Data.GetExcelSheet<SubmarineMap>().GetRow(id)?.Name.ToString();
+        }
+
+        internal static int? GetVesselIndex(string name, VoyageType type)
+        {
+            var w = HousingManager.Instance()->WorkshopTerritory;
+            if (w == null) return null;
+            if (type == VoyageType.Airship)
+            {
+                var v = w->Airship.DataListSpan;
+                for (int i = 0; i < v.Length; i++)
+                {
+                    var sub = v[i];
+                    if (Utils.Read(sub.Name) == name)
+                    {
+                        return i;
+                    }
+                }
+            }
+            if (type == VoyageType.Submersible)
+            {
+                var v = w->Submersible.DataListSpan;
+                for (int i = 0; i < v.Length; i++)
+                {
+                    var sub = v[i];
+                    if (Utils.Read(sub.Name) == name)
+                    {
+                        return i;
+                    }
+                }
+            }
+            return null;
         }
 
         internal static List<(uint point, string justification)> GetPrioritizedPointList(this SubmarineUnlockPlan plan)

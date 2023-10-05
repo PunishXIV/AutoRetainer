@@ -1,4 +1,5 @@
-﻿using AutoRetainer.Modules.Voyage.Tasks;
+﻿using AutoRetainer.Internal;
+using AutoRetainer.Modules.Voyage.Tasks;
 using ClickLib.Clicks;
 using Dalamud.Game.ClientState.Conditions;
 using ECommons.Automation;
@@ -7,6 +8,7 @@ using ECommons.GameHelpers;
 using ECommons.MathHelpers;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
+using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using System.Windows.Forms;
@@ -242,10 +244,32 @@ namespace AutoRetainer.Modules.Voyage
             return Utils.TrySelectSpecificEntry(Lang.CancelVoyage, () => Utils.GenericThrottle && EzThrottler.Throttle("Voyage.ExitMainPanel", 1000));
         }
 
-        internal static bool? SelectVesselByName(string name)
+        internal static bool? SelectVesselByName(string name, VoyageType type)
         {
-            return Utils.TrySelectSpecificEntry((x) => x.StartsWith($"{name}."), () => EzThrottler.Throttle("Voyage.SelectVesselByName", 1000));
+            var index = VoyageUtils.GetVesselIndex(name, type);
+            if(index != null)
+            {
+                if (TryGetAddonByName<AddonSelectString>("SelectString", out var addon) && IsAddonReady(&addon->AtkUnitBase))
+                {
+                    var entries = Utils.GetEntries(addon);
+                    if (index.Value < entries.Count && entries[index.Value].Contains(name))
+                    {
+                        if (index >= 0 && Utils.IsSelectItemEnabled(addon, index.Value) && Utils.GenericThrottle && EzThrottler.Throttle("SelectVesselByName"))
+                        {
+                            ClickSelectString.Using((nint)addon).SelectItem((ushort)index);
+                            DebugLog($"Selecting vessel {name}/{type}/{entries[index.Value]}/{index}");
+                            return true;
+                        }
+                    }
+                }
+                else
+                {
+                    Utils.RethrottleGeneric();
+                }
+            }
+            return false;
         }
+
 
         internal static bool? SelectViewPreviousLog()
         {

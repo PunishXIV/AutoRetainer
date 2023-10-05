@@ -212,7 +212,7 @@ namespace AutoRetainer.Modules.Voyage
                             }
                             else
                             {
-                                TaskSelectVesselByName.Enqueue(next);
+                                TaskSelectVesselByName.Enqueue(next, type);
                             }
                             if (adata.VesselBehavior == VesselBehavior.LevelUp)
                             {

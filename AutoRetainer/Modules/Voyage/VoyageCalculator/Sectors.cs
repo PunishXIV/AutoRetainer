@@ -119,6 +119,13 @@ namespace AutoRetainer.Modules.Voyage.VoyageCalculator
         { 099, new Breakpoint(225, 237, 280, 325, 227) },
         { 100, new Breakpoint(225, 238, 280, 325, 230) },
         { 101, new Breakpoint(225, 240, 280, 325, 230) },
+
+        { 102, new Breakpoint(226,241,281,326,231) },
+        { 103, new Breakpoint(227,242,282,327,232) },
+        { 104, new Breakpoint(228,243,283,328,233) },
+        { 105, new Breakpoint(229,244,284,329,234) },
+        { 106, new Breakpoint(230,245,285,330,235) },
+        { 107, new Breakpoint(230,245,285,330,235) },
     };
 
         public static Breakpoint CalculateBreakpoint(List<uint> points)

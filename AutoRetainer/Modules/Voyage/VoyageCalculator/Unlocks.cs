@@ -118,6 +118,10 @@ namespace AutoRetainer.Modules.Voyage.VoyageCalculator
         { 99, new UnlockedFrom(97) },               // Runner's Reach                      <-       Fortune's Ford
         { 100, new UnlockedFrom(96) },              // Bellflower Flood                    <-       The Forsaken Isle
         { 101, new UnlockedFrom(97) },              // The Lilac Sea 2                     <-       Fortune's Ford
+        { 102, new UnlockedFrom(101) },                         // Lilac Sea 3                         <-       Lilac Sea 2
+        { 103, new UnlockedFrom(98) },                          // Northwest Bellflower                <-       Lilac Sea 1
+        { 104, new UnlockedFrom(100) },                         // Corolla Isle                        <-       Bellflower Flood
+        { 105, new UnlockedFrom(101) },                         // Southeast Bellflower                <-       Lilac Sea 2
     };
 
         public static List<(uint, UnlockedFrom)> FindUnlockPath(uint finalPoint)

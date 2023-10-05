@@ -179,7 +179,7 @@ namespace AutoRetainer.UI
                             {
                                 if (VoyageUtils.GetCurrentWorkshopPanelType() == PanelType.Submersible)
                                 {
-                                    TaskSelectVesselByName.Enqueue(x.Name);
+                                    TaskSelectVesselByName.Enqueue(x.Name, VoyageType.Submersible);
                                     TaskIntelligentRepair.Enqueue(x.Name, VoyageType.Submersible);
                                     P.TaskManager.Enqueue(VoyageScheduler.SelectQuitVesselMenu);
                                 }

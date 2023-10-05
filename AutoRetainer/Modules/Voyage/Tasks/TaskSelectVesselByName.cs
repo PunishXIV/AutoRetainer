@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AutoRetainer.Internal;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,10 +9,10 @@ namespace AutoRetainer.Modules.Voyage.Tasks
 {
     internal static class TaskSelectVesselByName
     {
-        internal static void Enqueue(string name)
+        internal static void Enqueue(string name, VoyageType type)
         {
             VoyageUtils.Log($"Task enqueued: {nameof(TaskSelectVesselByName)} ({name})");
-            P.TaskManager.Enqueue(() => VoyageScheduler.SelectVesselByName(name), $"TaskSelectVesselByName: {name}");
+            P.TaskManager.Enqueue(() => VoyageScheduler.SelectVesselByName(name, type), $"TaskSelectVesselByName: {name}");
         }
     }
 }
