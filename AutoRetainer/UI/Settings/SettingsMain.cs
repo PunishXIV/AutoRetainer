@@ -1,12 +1,7 @@
-﻿using AutoRetainer.UI.Overlays;
-using AutoRetainerAPI.Configuration;
+﻿using AutoRetainerAPI.Configuration;
 using Dalamud.Interface.Components;
 using ECommons.Interop;
-using ECommons.MathHelpers;
-using PInvoke;
 using PunishLib.ImGuiMethods;
-using System.Runtime.CompilerServices;
-using System.Windows.Forms;
 
 namespace AutoRetainer.UI.Settings;
 

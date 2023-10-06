@@ -1,10 +1,4 @@
-﻿using AutoRetainer.Modules.Voyage.VoyageCalculator;
-using AutoRetainerAPI.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AutoRetainerAPI.Configuration;
 
 namespace AutoRetainer.Modules.Voyage.Tasks
 {

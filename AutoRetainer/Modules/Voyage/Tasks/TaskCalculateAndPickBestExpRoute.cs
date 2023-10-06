@@ -1,17 +1,5 @@
 ﻿using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using AutoRetainerAPI.Configuration;
-using ECommons.Reflection;
-using FFXIVClientStructs.FFXIV.Client.Game.Gauge;
-using Lumina.Excel.GeneratedSheets;
-using System;
-using System.CodeDom;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace AutoRetainer.Modules.Voyage.Tasks
 {

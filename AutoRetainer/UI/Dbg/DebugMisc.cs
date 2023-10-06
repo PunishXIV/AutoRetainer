@@ -1,17 +1,7 @@
-﻿using AutoRetainer.Helpers;
-using Dalamud.Utility;
-using ECommons.Automation;
-using ECommons.GameHelpers;
-using ECommons.MathHelpers;
-using ECommons.ObjectLifeTracker;
-using ECommons.Reflection;
+﻿using ECommons.MathHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
-using FFXIVClientStructs.FFXIV.Client.Game.MJI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using Lumina.Excel.GeneratedSheets;
 using PInvoke;
-using System.Diagnostics;
-using System.Windows.Forms;
 using ItemLevel = AutoRetainer.Helpers.ItemLevel;
 
 namespace AutoRetainer.UI.Dbg;

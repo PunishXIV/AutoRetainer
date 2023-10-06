@@ -1,12 +1,4 @@
-﻿using ECommons.GameHelpers;
-using FFXIVClientStructs.FFXIV.Component.Excel;
-using Lumina.Excel.GeneratedSheets;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Concurrent;
 using static AutoRetainer.Modules.Voyage.VoyageCalculator.Build;
 
 namespace AutoRetainer.Modules.Voyage.VoyageCalculator

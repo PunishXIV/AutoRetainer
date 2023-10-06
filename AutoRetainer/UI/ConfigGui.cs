@@ -2,10 +2,8 @@
 using ECommons.Configuration;
 using PunishLib.ImGuiMethods;
 using AutoRetainer.UI.Settings;
-using Dalamud.Interface.Style;
 using AutoRetainerAPI.Configuration;
 using AutoRetainerAPI;
-using ECommons.ChatMethods;
 using AutoRetainer.Modules.Voyage;
 
 namespace AutoRetainer.UI;

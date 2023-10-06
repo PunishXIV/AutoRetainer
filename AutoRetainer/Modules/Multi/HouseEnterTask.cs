@@ -1,5 +1,4 @@
-﻿using AutoRetainer.Modules.Voyage;
-using AutoRetainer.Modules.Voyage.Tasks;
+﻿using AutoRetainer.Modules.Voyage.Tasks;
 using ClickLib.Clicks;
 using ECommons.Automation;
 using ECommons.Events;
@@ -7,7 +6,6 @@ using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
-using FFXIVClientStructs.FFXIV.Client.UI;
 
 namespace AutoRetainer.Modules.Multi;
 

@@ -1,6 +1,5 @@
 ﻿using ClickLib.Clicks;
 using Dalamud.Game.ClientState.Objects.Enums;
-using Dalamud.Hooking;
 using Dalamud.Memory;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;
@@ -8,11 +7,6 @@ using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
 
 namespace AutoRetainer.Scheduler.Handlers

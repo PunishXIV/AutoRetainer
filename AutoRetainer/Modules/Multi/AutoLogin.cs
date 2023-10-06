@@ -3,7 +3,6 @@
 
 
 using ClickLib.Clicks;
-using Dalamud.Game;
 using Dalamud.Memory;
 using Dalamud.Utility;
 using ECommons.Automation;
@@ -11,7 +10,6 @@ using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
 using System.Diagnostics;
-using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
 
 namespace AutoRetainer.Modules.Multi;
 

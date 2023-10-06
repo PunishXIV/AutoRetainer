@@ -1,13 +1,5 @@
 ﻿using AutoRetainer.Internal;
-using AutoRetainer.Modules.Voyage;
-using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AutoRetainer.Modules.Voyage.Tasks
 {

@@ -1,11 +1,4 @@
-﻿using Dalamud.Interface.Utility;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AutoRetainer.Modules.Voyage.VoyageCalculator
+﻿namespace AutoRetainer.Modules.Voyage.VoyageCalculator
 {
     internal class WaitOverlay : Window
     {

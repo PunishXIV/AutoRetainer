@@ -1,12 +1,6 @@
 ﻿using AutoRetainerAPI;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Interface.Components;
-using Dalamud.Interface.Style;
-using ECommons;
-using ECommons.GameHelpers;
-using ECommons.MathHelpers;
-using FFXIVClientStructs.FFXIV.Client.Game;
-using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 
 namespace AutoRetainer.UI;
 

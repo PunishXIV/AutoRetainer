@@ -4,7 +4,6 @@ using AutoRetainerAPI.Configuration;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using System.Collections.Immutable;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AutoRetainer.Scheduler;
 

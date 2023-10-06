@@ -1,13 +1,7 @@
 ﻿using Lumina.Excel.GeneratedSheets;
 using Lumina.Excel;
 using Lumina;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Lumina.Data;
-using Dalamud.Utility;
 
 namespace AutoRetainer.Modules.Voyage.VoyageCalculator
 {

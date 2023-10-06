@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-#nullable enable
+﻿#nullable enable
 namespace AutoRetainer.Modules.Voyage.VoyageCalculator
 {
     public class ListComparer : IEqualityComparer<List<uint>>

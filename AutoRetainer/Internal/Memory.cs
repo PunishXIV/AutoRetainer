@@ -1,13 +1,9 @@
-﻿using AutoRetainer.Scheduler.Handlers;
-using ClickLib.Structures;
-using Dalamud.Hooking;
+﻿using Dalamud.Hooking;
 using Dalamud.Memory;
 using Dalamud.Utility.Signatures;
-using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using System.Net.NetworkInformation;
 
 namespace AutoRetainer.Internal;
 

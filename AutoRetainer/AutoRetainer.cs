@@ -1,5 +1,4 @@
 ﻿using AutoRetainer.UI;
-using Dalamud.Game;
 using Dalamud.Game.ClientState.Conditions;
 using Lumina.Excel.GeneratedSheets;
 using ECommons.Events;
@@ -23,7 +22,6 @@ using ECommons.GameHelpers;
 using AutoRetainer.Modules.Voyage;
 using Dalamud.Game.Network;
 using AutoRetainer.Scheduler.Handlers;
-using Dalamud.Plugin.Services;
 
 namespace AutoRetainer;
 

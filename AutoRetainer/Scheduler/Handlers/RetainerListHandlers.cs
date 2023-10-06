@@ -1,7 +1,5 @@
-﻿using AutoRetainer.Internal.Clicks;
-using AutoRetainer.Scheduler.Tasks;
+﻿using AutoRetainer.Scheduler.Tasks;
 using ClickLib.Clicks;
-using ECommons.UIHelpers;
 using ECommons.UIHelpers.Implementations;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 

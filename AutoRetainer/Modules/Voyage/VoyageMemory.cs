@@ -1,14 +1,7 @@
 ﻿using AutoRetainerAPI.Configuration;
 using Dalamud.Hooking;
 using Dalamud.Utility.Signatures;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Security.Cryptography.Xml;
-using System.Text;
-using System.Threading.Tasks;
-using static AutoRetainer.Modules.Voyage.Offsets;
 
 namespace AutoRetainer.Modules.Voyage
 {

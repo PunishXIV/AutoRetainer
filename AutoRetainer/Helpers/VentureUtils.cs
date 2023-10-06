@@ -1,20 +1,9 @@
-﻿using AutoRetainer.Modules.Statistics;
-using AutoRetainer.Scheduler.Tasks;
+﻿using AutoRetainer.Scheduler.Tasks;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Memory;
 using Dalamud.Utility;
-using ECommons;
 using ECommons.ExcelServices;
-using FFXIVClientStructs.FFXIV.Client.Game;
 using Lumina.Excel.GeneratedSheets;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AutoRetainer.Helpers
 {

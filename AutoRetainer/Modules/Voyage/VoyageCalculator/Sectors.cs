@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AutoRetainer.Modules.Voyage.VoyageCalculator
+﻿namespace AutoRetainer.Modules.Voyage.VoyageCalculator
 {
     // All this data is taken from:
     // https://docs.google.com/spreadsheets/d/1-j0a-I7bQdjnXkplP9T4lOLPH2h3U_-gObxAiI4JtpA

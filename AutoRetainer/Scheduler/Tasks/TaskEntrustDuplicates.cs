@@ -1,5 +1,4 @@
 ﻿using AutoRetainer.Internal;
-using AutoRetainer.Internal.Clicks;
 using AutoRetainer.Scheduler.Handlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Component.GUI;

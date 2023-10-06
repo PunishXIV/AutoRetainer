@@ -1,13 +1,7 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage.Readers;
-using ECommons.UIHelpers;
 using ECommons.UIHelpers.Implementations;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AutoRetainer.UI.Dbg
 {

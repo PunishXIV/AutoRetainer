@@ -1,5 +1,4 @@
-﻿using AutoRetainer.Configuration;
-using AutoRetainer.Modules.Voyage;
+﻿using AutoRetainer.Modules.Voyage;
 using AutoRetainerAPI.Configuration;
 using ClickLib.Clicks;
 using Dalamud;
@@ -20,11 +19,8 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
-using PInvoke;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using static System.Net.Mime.MediaTypeNames;
-using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
 
 namespace AutoRetainer.Helpers;
 

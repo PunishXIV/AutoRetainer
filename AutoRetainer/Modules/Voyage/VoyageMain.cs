@@ -2,19 +2,7 @@
 using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using AutoRetainerAPI.Configuration;
-using Dalamud.Game.ClientState.Conditions;
-using ECommons.Automation;
-using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.Throttlers;
-using FFXIVClientStructs.FFXIV.Client.Game.Housing;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AutoRetainer.Modules.Voyage
 {
