@@ -84,6 +84,8 @@ internal unsafe class Config : IEzConfig
     public int UIWarningDepRepairNum = 100;
     public int UIWarningDepSlotNum = 20;
 
+    internal bool ExtraDebug = false;
+
     internal bool DontReassign
     {
         get

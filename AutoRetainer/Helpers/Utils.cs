@@ -26,6 +26,10 @@ namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
+    public static void ExtraLog(string s)
+    {
+        if (C.ExtraDebug) PluginLog.Debug(s);
+    }
 
     public static bool ContainsAllItems<T>(this IEnumerable<T> a, IEnumerable<T> b)
     {
@@ -723,21 +727,26 @@ internal static unsafe class Utils
 
     internal static GameObject GetNearestWorkshopEntrance(out float Distance)
     {
+        Utils.ExtraLog($"GetNearestWorkshopEntrance: Begin");
         var currentDistance = float.MaxValue;
         GameObject currentObject = null;
         foreach (var x in Svc.Objects)
         {
+            Utils.ExtraLog($"GetNearestWorkshopEntrance: Scanning object table: object={x}, targetable={x.IsTargetable}");
             if (x.IsTargetable && x.Name.ToString().EqualsIgnoreCaseAny(Lang.AdditionalChambersEntrance))
             {
                 var distance = Vector3.Distance(Svc.ClientState.LocalPlayer.Position, x.Position);
+                Utils.ExtraLog($"GetNearestWorkshopEntrance: check passed, object={x}, targetable={x.IsTargetable}, distance={distance}");
                 if (distance < currentDistance)
                 {
+                    Utils.ExtraLog($"GetNearestWorkshopEntrance: distance is less than current {currentDistance}, assigning from {currentObject}, object={x}, targetable={x.IsTargetable}, distance={distance}");
                     currentDistance = distance;
                     currentObject = x;
                 }
             }
         }
         Distance = currentDistance;
+        Utils.ExtraLog($"GetNearestWorkshopEntrance: End with distance={currentDistance}, obj={currentObject}");
         return currentObject;
     }
 }
