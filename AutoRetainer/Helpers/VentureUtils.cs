@@ -388,7 +388,7 @@ internal static unsafe class VentureUtils
         {
             if(Task.RetainerLevel >= x.Min && Task.RetainerLevel <= x.Max)
             {
-                return new string[] { $" {x.Min}-{x.Max}.", $"  {x.Min}～{x.Max}", $" {x.Min} - {x.Max}", $" {x.Min} à {x.Max}" };
+                return [$" {x.Min}-{x.Max}.", $"  {x.Min}～{x.Max}", $" {x.Min} - {x.Max}", $" {x.Min} à {x.Max}"];
             }
         }
         return null;

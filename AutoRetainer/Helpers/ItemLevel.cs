@@ -7,8 +7,8 @@ internal unsafe static class ItemLevel
 {
     //This code is authored by Caraxi https://github.com/Caraxi/SimpleTweaksPlugin/blob/main/Tweaks/UiAdjustment/ExamineItemLevel.cs
 
-    private static readonly uint[] canHaveOffhand = { 2, 6, 8, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32 };
-    private static readonly uint[] ignoreCategory = { 105 };
+    private static readonly uint[] canHaveOffhand = [2, 6, 8, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32];
+    private static readonly uint[] ignoreCategory = [105];
 
     internal static int? Calculate(out int gathering, out int perception)
     {

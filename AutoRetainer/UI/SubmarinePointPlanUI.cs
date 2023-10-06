@@ -133,8 +133,8 @@ internal unsafe class SubmarinePointPlanUI : Window
                 }
             });
 
-            ImGuiEx.EzTableColumns("SubPlan", new System.Action[] 
-            { 
+            ImGuiEx.EzTableColumns("SubPlan",
+            [
                 delegate 
                 {
                     if(ImGui.BeginChild("col1"))
@@ -198,7 +198,7 @@ internal unsafe class SubmarinePointPlanUI : Window
                     ImGui.EndChild();
                     }
                 }
-            });
+            ]);
         }
     }
 }

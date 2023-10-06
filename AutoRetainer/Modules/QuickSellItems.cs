@@ -18,7 +18,7 @@ public unsafe class QuickSellItems : IDisposable
     [Signature("83 B9 ?? ?? ?? ?? ?? 7E 11", DetourName = nameof(OpenInventoryContextDetour), Fallibility = Fallibility.Fallible)]
     internal Hook<OpenInventoryContext> openInventoryContextHook;
 
-    public InventoryType[] CanSellFrom = {
+    public InventoryType[] CanSellFrom = [
         InventoryType.Inventory1,
         InventoryType.Inventory2,
         InventoryType.Inventory3,
@@ -41,7 +41,7 @@ public unsafe class QuickSellItems : IDisposable
         InventoryType.RetainerPage5,
         InventoryType.RetainerPage6,
         InventoryType.RetainerPage7,
-    };
+    ];
 
     private string retainerSellText;
     private string entrustToRetainerText;

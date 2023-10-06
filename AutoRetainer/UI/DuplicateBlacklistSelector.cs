@@ -24,7 +24,7 @@ internal class DuplicateBlacklistSelector() : Window("Entrust duplicates blackli
             ImGui.EndCombo();
         }
         ImGui.Separator();
-        ImGuiEx.EzTableColumns("cols", new System.Action[] {delegate
+        ImGuiEx.EzTableColumns("cols", [delegate
         {
             ImGuiEx.SetNextItemFullWidth();
             ImGui.InputTextWithHint($"##fltr", "Filter...", ref Filter, 100);
@@ -77,6 +77,6 @@ internal class DuplicateBlacklistSelector() : Window("Entrust duplicates blackli
                 }
                 ImGui.EndChild();
             }
-        } });
+        } ]);
     }
 }

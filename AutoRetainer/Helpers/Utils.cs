@@ -663,7 +663,7 @@ internal static unsafe class Utils
 
     internal static int GetInventoryFreeSlotCount()
     {
-        InventoryType[] types = new InventoryType[] { InventoryType.Inventory1, InventoryType.Inventory2, InventoryType.Inventory3, InventoryType.Inventory4 };
+        InventoryType[] types = [InventoryType.Inventory1, InventoryType.Inventory2, InventoryType.Inventory3, InventoryType.Inventory4];
         var c = InventoryManager.Instance();
         var slots = 0;
         foreach (var x in types)
