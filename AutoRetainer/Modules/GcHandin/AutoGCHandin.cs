@@ -86,10 +86,10 @@ internal unsafe static class AutoGCHandin
             {
                 if (FrameThrottler.Throttle("Yesno", 8) && addonSS->YesButton->IsEnabled)
                 {
-                    var str = MemoryHelper.ReadSeString(&addonSS->PromptText->NodeText).ExtractText();
+                    var str = MemoryHelper.ReadSeString(&addonSS->PromptText->NodeText).ExtractText().Replace(" ", "");
                     DebugLog($"SelectYesno encountered: {str}");
                     //102434	Do you really want to trade a high-quality item?
-                    if (str.Equals(Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(102434).Text.ToDalamudString().ExtractText()))
+                    if (str.Equals(Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(102434).Text.ExtractText().Replace(" ", "")))
                     {
                         ClickSelectYesNo.Using((IntPtr)addonSS).Yes();
                         DebugLog($"Selecting yes");
