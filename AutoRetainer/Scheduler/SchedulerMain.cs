@@ -24,8 +24,10 @@ internal unsafe static class SchedulerMain
 
     internal static bool CanAssignQuickExploration => C.EnableAssigningQuickExploration && !C.DontReassign && Utils.GetVenturesAmount() > 1;
     internal static volatile uint VentureOverride = 0;
-    internal static volatile bool PostProcessLocked = false;
+    internal static volatile bool RetainerPostProcessLocked = false;
+    internal static volatile bool CharacterPostProcessLocked = false;
     internal static ImmutableList<string> RetainerPostprocess = Array.Empty<string>().ToImmutableList();
+    internal static ImmutableList<string> CharacterPostprocess = Array.Empty<string>().ToImmutableList();
 
     internal static PluginEnableReason Reason { get; set; }
 
@@ -33,14 +35,14 @@ internal unsafe static class SchedulerMain
     {
         Reason = reason;
         PluginEnabled = true;
-        P.DebugLog($"Plugin is enabled, reason: {reason}");
+        DebugLog($"Plugin is enabled, reason: {reason}");
         return true;
     }
 
     internal static bool? DisablePlugin() 
     {
         PluginEnabled = false;
-        P.DebugLog($"Plugin disabled");
+        DebugLog($"Plugin disabled");
         return true;
     }
 
@@ -80,7 +82,7 @@ internal unsafe static class SchedulerMain
 
                                     if(VentureOverride > 0)
                                     {
-                                        P.DebugLog($"Using VentureOverride = {VentureOverride}");
+                                        DebugLog($"Using VentureOverride = {VentureOverride}");
                                         ret.ProcessVenturePlanner(VentureOverride);
                                     }
                                     else if (!adata.IsVenturePlannerActive())
@@ -109,9 +111,9 @@ internal unsafe static class SchedulerMain
                                     else
                                     {
                                         var next = adata.GetNextPlannedVenture();
-                                        P.DebugLog($"Next planned venture: {next}");
+                                        DebugLog($"Next planned venture: {next}, current venture: {ret.VentureID}");
                                         var completed = adata.IsLastPlannedVenture();
-                                        P.DebugLog($"Is last planned venture: {completed}");
+                                        DebugLog($"Is last planned venture: {completed}");
                                         if(next == 0)
                                         {
                                             var t = ($"Next venture ID is zero, planner is to be disabled");
@@ -121,15 +123,15 @@ internal unsafe static class SchedulerMain
                                             }
                                             else
                                             {
-                                                P.DebugLog(t);
+                                                DebugLog(t);
                                             }
                                         }
                                         if (next == 0 || (completed && adata.VenturePlan.PlanCompleteBehavior != PlanCompleteBehavior.Restart_plan))
                                         {
-                                            P.DebugLog($"Completed and behavior is {adata.VenturePlan.PlanCompleteBehavior}");
+                                            DebugLog($"Completed and behavior is {adata.VenturePlan.PlanCompleteBehavior}");
                                             if (adata.VenturePlan.PlanCompleteBehavior == PlanCompleteBehavior.Repeat_last_venture)
                                             {
-                                                P.DebugLog($"Reassigning this venture and disabling planner");
+                                                DebugLog($"Reassigning this venture and disabling planner");
                                                 TaskReassignVenture.Enqueue();
                                             }
                                             else
@@ -137,12 +139,12 @@ internal unsafe static class SchedulerMain
                                                 TaskCollectVenture.Enqueue();
                                                 if (adata.VenturePlan.PlanCompleteBehavior == PlanCompleteBehavior.Assign_Quick_Venture)
                                                 {
-                                                    P.DebugLog($"Assigning quick venture");
+                                                    DebugLog($"Assigning quick venture");
                                                     TaskAssignQuickVenture.Enqueue();
                                                 }
                                             }
                                             adata.EnablePlanner = false;
-                                            P.DebugLog($"Now disabling planner");
+                                            DebugLog($"Now disabling planner");
                                         }
                                         else
                                         {
@@ -175,7 +177,7 @@ internal unsafe static class SchedulerMain
                                     }
 
                                     //fire event, let other plugins deal with retainer
-                                    TaskPostprocessIPC.Enqueue(retainer);
+                                    TaskPostprocessRetainerIPC.Enqueue(retainer);
 
                                     if (C.RetainerMenuDelay > 0)
                                     {
@@ -194,13 +196,13 @@ internal unsafe static class SchedulerMain
                                 {
                                     if (Reason == PluginEnableReason.MultiMode)
                                     {
-                                        P.DebugLog($"Scheduling closing and disabling plugin as MultiMode is running");
+                                        DebugLog($"Scheduling closing and disabling plugin as MultiMode is running");
                                         P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
                                         P.TaskManager.Enqueue(DisablePlugin);
                                     }
                                     else if (Reason == PluginEnableReason.Artisan)
                                     {
-                                        P.DebugLog($"Scheduling closing  as Artisan is running");
+                                        DebugLog($"Scheduling closing  as Artisan is running");
                                         P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
                                         //P.TaskManager.Enqueue(DisablePlugin);
                                     }
@@ -208,15 +210,15 @@ internal unsafe static class SchedulerMain
                                     {
                                         void Process(TaskCompletedBehavior behavior)
                                         {
-                                            //P.DebugLog($"Behavior: {behavior}");
+                                            //DebugLog($"Behavior: {behavior}");
                                             if (behavior.EqualsAny(TaskCompletedBehavior.Stay_in_retainer_list_and_disable_plugin, TaskCompletedBehavior.Close_retainer_list_and_disable_plugin))
                                             {
-                                                P.DebugLog($"Scheduling plugin disabling (behavior={behavior})");
+                                                DebugLog($"Scheduling plugin disabling (behavior={behavior})");
                                                 P.TaskManager.Enqueue(DisablePlugin);
                                             }
                                             if (behavior.EqualsAny(TaskCompletedBehavior.Close_retainer_list_and_disable_plugin, TaskCompletedBehavior.Close_retainer_list_and_keep_plugin_enabled))
                                             {
-                                                P.DebugLog($"Scheduling retainer list closing (behavior={behavior})");
+                                                DebugLog($"Scheduling retainer list closing (behavior={behavior})");
                                                 P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
                                             }
                                         }
@@ -244,17 +246,17 @@ internal unsafe static class SchedulerMain
                                 DuoLog.Warning($"Your inventory is full");
                                 if (MultiMode.Active)
                                 {
-                                    P.DebugLog($"Scheduling retainer list closing (multi mode)");
+                                    DebugLog($"Scheduling retainer list closing (multi mode)");
                                     P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
                                 }
                                 else
                                 {
                                     void Process(TaskCompletedBehavior behavior)
                                     {
-                                        P.DebugLog($"Behavior: {behavior}");
+                                        DebugLog($"Behavior: {behavior}");
                                         if (behavior.EqualsAny(TaskCompletedBehavior.Close_retainer_list_and_disable_plugin, TaskCompletedBehavior.Close_retainer_list_and_keep_plugin_enabled))
                                         {
-                                            P.DebugLog($"Scheduling retainer list closing (behavior={behavior})");
+                                            DebugLog($"Scheduling retainer list closing (behavior={behavior})");
                                             P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
                                         }
                                     }
@@ -306,15 +308,20 @@ internal unsafe static class SchedulerMain
     {
         if (P.retainerManager.Ready)
         {
-            for (var i = 0; i < P.retainerManager.Count; i++)
+            if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var cdata))
             {
-                var r = P.retainerManager.Retainer(i);
-                var rname = r.Name.ToString();
-                var adata = Utils.GetAdditionalData(Svc.ClientState.LocalContentId, rname);
-                if (P.GetSelectedRetainers(Svc.ClientState.LocalContentId).Contains(rname)
-                    && r.GetVentureSecondsRemaining() <= C.UnsyncCompensation && (r.VentureID != 0 || CanAssignQuickExploration || (adata.EnablePlanner && adata.VenturePlan.ListUnwrapped.Count > 0)))
+                var retainerData = cdata.ShowRetainersInDisplayOrder ? cdata.RetainerData.OrderBy(x => x.DisplayOrder).ToList() : cdata.RetainerData;
+
+                for (var i = 0; i < retainerData.Count; i++)
                 {
-                    return rname;
+                    var r = retainerData[i];
+                    var rname = r.Name.ToString();
+                    var adata = Utils.GetAdditionalData(Svc.ClientState.LocalContentId, rname);
+                    if (P.GetSelectedRetainers(Svc.ClientState.LocalContentId).Contains(rname)
+                        && r.GetVentureSecondsRemaining() <= C.UnsyncCompensation && (r.VentureID != 0 || CanAssignQuickExploration || (adata.EnablePlanner && adata.VenturePlan.ListUnwrapped.Count > 0)))
+                    {
+                        return rname;
+                    }
                 }
             }
         }

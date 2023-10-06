@@ -22,7 +22,7 @@ internal static class StatisticsManager
         Files.Clear();
     }
 
-    private static void ClientState_TerritoryChanged(object sender, ushort e)
+    private static void ClientState_TerritoryChanged(ushort e)
     {
         Files.Clear();
     }
@@ -40,12 +40,12 @@ internal static class StatisticsManager
                     {
                         if (x.ToString().TryMatch(@"([0-9]+)", out var match) && uint.TryParse(match.Groups[1].ToString(), out var amt))
                         {
-                            P.DebugLog($"Amount parsed: {amt}");
+                            DebugLog($"Amount parsed: {amt}");
                             amount = amt;
                         }
                         else
                         {
-                            P.DebugLog($"Single item {x}");
+                            DebugLog($"Single item {x}");
                         }
                         textProcessed = true;
                     }
@@ -58,8 +58,9 @@ internal static class StatisticsManager
                             ItemId = p.ItemId,
                             IsHQ = p.IsHQ,
                             Timestamp = P.Time,
-                            Amount = amount
-                        });
+                            Amount = amount,
+                            VentureID = P.LastVentureID
+                        }) ;
                         break;
                     }
                 }

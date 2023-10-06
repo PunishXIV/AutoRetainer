@@ -1,11 +1,6 @@
 ﻿using AutoRetainerAPI;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Interface.Components;
-using ECommons;
-using ECommons.GameHelpers;
-using ECommons.MathHelpers;
-using FFXIVClientStructs.FFXIV.Client.Game;
-using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 
 namespace AutoRetainer.UI;
 
@@ -43,7 +38,7 @@ internal unsafe static class MultiModeUI
         for (var index = 0; index < sortedData.Count; index++)
         {
             var data = sortedData[index];
-            if (data.World.IsNullOrEmpty()) continue;
+            if (data.World.IsNullOrEmpty() || data.ExcludeRetainer) continue;
             ImGui.PushID(data.CID.ToString());
             var rCurPos = ImGui.GetCursorPos();
             var colen = false;
@@ -55,11 +50,6 @@ internal unsafe static class MultiModeUI
             if (ImGuiEx.IconButton(Lang.IconMultiMode))
             {
                 data.Enabled = !data.Enabled;
-                /*if (data.Enabled && !data.Index.InRange(1, 9))
-                {
-                    data.Enabled = false;
-                    Svc.Chat.PrintError("[AutoRetainer] Error: Please set the character index and service account for this character before enabling multi mode.");
-                }*/
             }
             if (colen) ImGui.PopStyleColor();
             ImGuiEx.Tooltip($"Enable multi-mode for this character");
@@ -104,20 +94,6 @@ internal unsafe static class MultiModeUI
                 {
                     ImGui.CloseCurrentPopup();
                 }
-                /*ImGuiEx.TextV("Character index:");
-                ImGui.SameLine();
-                ImGui.SetNextItemWidth(100);
-                if (ImGui.BeginCombo("##index", data.Index == 0 ? "n/a" : data.Index.ToString()))
-                {
-                    for (var i = 1; i <= 8; i++)
-                    {
-                        if (ImGui.Selectable($"{i}"))
-                        {
-                            data.Index = i;
-                        }
-                    }
-                    ImGui.EndCombo();
-                }*/
 
                 //if (C.MultipleServiceAccounts)
                 {
@@ -148,7 +124,7 @@ internal unsafe static class MultiModeUI
                 }
                 ImGuiComponents.HelpMarker("When operating in multi mode, if there are no other characters with imminent ventures to collect, it will relog back to your preferred character.");
 
-                ImGui.Checkbox("Show Retainers in Display Order", ref data.ShowRetainersInDisplayOrder);
+                ImGui.Checkbox("Show & Process Retainers in Display Order", ref data.ShowRetainersInDisplayOrder);
 
                 ImGuiEx.Text($"Automatic Grand Company Expert Delivery:");
                 if (!AutoGCHandin.Operation)
@@ -160,13 +136,18 @@ internal unsafe static class MultiModeUI
                 {
                     ImGuiEx.Text($"Can't change this now");
                 }
+                if(ImGui.Button("Configure entrust duplicates exclusions"))
+                {
+                    P.DuplicateBlacklistSelector.IsOpen = true;
+                    P.DuplicateBlacklistSelector.SelectedData = data;
+                }
                 ImGui.Separator();
-                if (ImGui.Button("Exclude Character"))
+                if (ImGuiEx.ButtonCtrl("Exclude Character"))
                 {
                     C.Blacklist.Add((data.CID, data.Name));
                 }
                 ImGuiComponents.HelpMarker("Excluding this character will immediately reset it's settings, remove it from this list and exclude all retainers from being processed. You can still run manual tasks on it's retainers. You can cancel this action in settings.");
-                if (ImGui.Button("Reset character data"))
+                if (ImGuiEx.ButtonCtrl("Reset character data"))
                 {
                     deleteData = data.CID;
                 }
@@ -175,11 +156,13 @@ internal unsafe static class MultiModeUI
             }
 
             var initCurpos = ImGui.GetCursorPos();
-            var lowestRetainer = C.MultiWaitForAll? data.GetEnabledRetainers().OrderBy(z => z.GetVentureSecondsRemaining()).LastOrDefault() : data.GetEnabledRetainers().OrderBy(z => z.GetVentureSecondsRemaining()).FirstOrDefault();
+            var lowestRetainer = C.MultiModeRetainerConfiguration.MultiWaitForAll? data.GetEnabledRetainers().OrderBy(z => z.GetVentureSecondsRemaining()).LastOrDefault() : data.GetEnabledRetainers().OrderBy(z => z.GetVentureSecondsRemaining()).FirstOrDefault();
             if (lowestRetainer != default)
             {
-                ImGui.PushStyleColor(ImGuiCol.PlotHistogram, 0xbb500000);
-                ImGui.ProgressBar(Math.Max(0, (float)(3600 - lowestRetainer.GetVentureSecondsRemaining(false)) / 3600f), new(ImGui.GetContentRegionAvail().X, ImGui.CalcTextSize("A").Y + ImGui.GetStyle().FramePadding.Y*2), "");
+                var prog = Math.Max(0, (float)(3600 - lowestRetainer.GetVentureSecondsRemaining(false)) / 3600f);
+                var pcol = prog == 1f ? GradientColor.Get(0xbb500000.ToVector4(), 0xbb005000.ToVector4()) : 0xbb500000.ToVector4();
+                ImGui.PushStyleColor(ImGuiCol.PlotHistogram, pcol);
+                ImGui.ProgressBar(prog, new(ImGui.GetContentRegionAvail().X, ImGui.CalcTextSize("A").Y + ImGui.GetStyle().FramePadding.Y*2), "");
                 ImGui.PopStyleColor();
                 ImGui.SetCursorPos(initCurpos);
             }
@@ -392,10 +375,11 @@ internal unsafe static class MultiModeUI
                 }
             }
             var rightText = ((C.CharEqualize && MultiMode.Enabled) ? $"C: {MultiMode.CharaCnt.GetOrDefault(data.CID)} | " : "") + $"V: {data.Ventures} | I: {data.InventorySpace}";
+            Vector4? rCol = (data.Ventures < C.UIWarningRetVentureNum || data.InventorySpace < C.UIWarningRetSlotNum) ? ImGuiColors.DalamudOrange : null;
             var cur = ImGui.GetCursorPos();
             ImGui.SameLine();
             ImGui.SetCursorPos(new(ImGui.GetContentRegionMax().X - ImGui.CalcTextSize(rightText).X - ImGui.GetStyle().FramePadding.X, rCurPos.Y + pad));
-            ImGuiEx.Text(rightText);
+            ImGuiEx.Text(rCol, rightText);
             ImGui.PopID();
         }
 
@@ -411,13 +395,12 @@ internal unsafe static class MultiModeUI
             ImGuiEx.Text($"IsCurrentCharacterDone: {MultiMode.IsCurrentCharacterDone()}");
             ImGuiEx.Text($"NextInteraction: {Math.Max(0, MultiMode.NextInteractionAt - Environment.TickCount64)}");
             ImGuiEx.Text($"EnsureCharacterValidity: {MultiMode.EnsureCharacterValidity(true)}");
-            ImGuiEx.Text($"GetNearbyBell: {MultiMode.GetNearbyBell()}");
             ImGuiEx.Text($"IsInteractionAllowed: {MultiMode.IsInteractionAllowed()}");
             ImGuiEx.Text($"GetPreferredCharacter: {MultiMode.GetPreferredCharacter()}");
             ImGuiEx.Text($"IsAllRetainersHaveMoreThan15Mins: {MultiMode.IsAllRetainersHaveMoreThan15Mins()}");
             ImGuiEx.Text($"Target ?? Preferred: {MultiMode.GetCurrentTargetCharacter() ?? MultiMode.GetPreferredCharacter()}");
             ImGuiEx.Text($"GetAutoAfkOpt: {MultiMode.GetAutoAfkOpt()}");
-            ImGuiEx.Text($"AutoAfkValue: {ConfigModule.Instance()->GetIntValue(145)}");
+            //ImGuiEx.Text($"AutoAfkValue: {ConfigModule.Instance()->GetIntValue(145)}");
             ImGuiEx.Text($"LastLongin: {MultiMode.LastLogin:X16}");
             ImGuiEx.Text($"AnyRetainersAvailable: {MultiMode.AnyRetainersAvailable()}");
             ImGuiEx.Text($"IsAnySelectedRetainerFinishesWithin, 60: {MultiMode.IsAnySelectedRetainerFinishesWithin(60)}");

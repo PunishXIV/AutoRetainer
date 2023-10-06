@@ -17,6 +17,13 @@ namespace AutoRetainerAPI
         public const string OnRetainerListCustomTask = "AutoRetainer.OnRetainerListCustomTask";
         public const string OnUITabDraw = "AutoRetainer.OnUITabDraw";
         public const string DrawTab = "AutoRetainer.DrawTab";
+        public const string OnCharacterAdditionalTask = "AutoRetainer.OnCharacterAdditionalTask";
         public const string OnMainControlsDraw = "AutoRetainer.OnMainControlsDraw";
+        public const string RequestRetainerPostProcess = "AutoRetainer.RequestPostprocess";
+        public const string FinishRetainerPostprocessRequest = "AutoRetainer.FinishPostprocessRequest";
+        public const string OnCharacterReadyForPostprocess = "AutoRetainer.OnCharacterReadyForPostprocess";
+        public const string RequestCharacterPostProcess = "AutoRetainer.RequestCharacterPostprocess";
+        public const string FinishCharacterPostprocessRequest = "AutoRetainer.FinishCharacterPostprocessRequest";
+
     }
 }

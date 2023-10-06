@@ -1,4 +1,5 @@
-﻿using Dalamud.Game.ClientState.Conditions;
+﻿using AutoRetainer.Modules.Voyage;
+using Dalamud.Game.ClientState.Conditions;
 using System.IO;
 
 namespace AutoRetainer.UI.Overlays;
@@ -16,7 +17,7 @@ internal class MultiModeOverlay : Window
 
     public override bool DrawConditions()
     {
-        return !C.HideOverlayIcons && (P.TaskManager.IsBusy || P.IsNextToBell || MultiMode.Enabled || AutoLogin.Instance.IsRunning || SchedulerMain.PluginEnabled || DisplayNotify);
+        return !C.HideOverlayIcons && (P.TaskManager.IsBusy || P.IsNextToBell || MultiMode.Enabled || AutoLogin.Instance.IsRunning || SchedulerMain.PluginEnabled || DisplayNotify || VoyageScheduler.Enabled);
     }
 
     public override void Draw()
@@ -117,9 +118,33 @@ internal class MultiModeOverlay : Window
                 ImGuiEx.Text($"loading login.png");
             }
         }
+        else if (VoyageScheduler.Enabled)
+        {
+            if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "submarine.png"), out var t))
+            {
+                ImGui.Image(t.ImGuiHandle, new(128, 128));
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+                    if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
+                    {
+                        Svc.Commands.ProcessCommand("/ays");
+                    }
+                    if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                    {
+                        VoyageScheduler.Enabled = false;
+                    }
+                    ImGui.SetTooltip("Submarine module enabled. \nLeft click - open AutoRetainer. \nRight click - disable submarine module.");
+                }
+            }
+            else
+            {
+                ImGuiEx.Text($"loading submarine.png");
+            }
+        }
         else if (SchedulerMain.PluginEnabled)
         {
-            if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", Utils.GetReachableRetainerBell() == null ? "bellcrossed.png" : "bell.png"), out var t))
+            if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", Utils.GetReachableRetainerBell(false) == null ? "bellcrossed.png" : "bell.png"), out var t))
             {
                 ImGui.Image(t.ImGuiHandle, new(128, 128));
                 if (ImGui.IsItemHovered())

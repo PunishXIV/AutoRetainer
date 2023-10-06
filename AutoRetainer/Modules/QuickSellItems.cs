@@ -8,8 +8,6 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
-using PInvoke;
-using System.Windows.Forms;
 using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
 
 namespace AutoRetainer.Modules;
@@ -20,7 +18,7 @@ public unsafe class QuickSellItems : IDisposable
     [Signature("83 B9 ?? ?? ?? ?? ?? 7E 11", DetourName = nameof(OpenInventoryContextDetour), Fallibility = Fallibility.Fallible)]
     internal Hook<OpenInventoryContext> openInventoryContextHook;
 
-    public InventoryType[] CanSellFrom = {
+    public InventoryType[] CanSellFrom = [
         InventoryType.Inventory1,
         InventoryType.Inventory2,
         InventoryType.Inventory3,
@@ -43,7 +41,7 @@ public unsafe class QuickSellItems : IDisposable
         InventoryType.RetainerPage5,
         InventoryType.RetainerPage6,
         InventoryType.RetainerPage7,
-    };
+    ];
 
     private string retainerSellText;
     private string entrustToRetainerText;
@@ -60,7 +58,7 @@ public unsafe class QuickSellItems : IDisposable
         retrieveFromRetainerText = Svc.Data.GetExcelSheet<Addon>()?.GetRow(98)?.Text?.RawString ?? "Retrieve from Retainer";
         //99	Put Up for Sale
         putUpForSaleText = Svc.Data.GetExcelSheet<Addon>()?.GetRow(99)?.Text?.RawString ?? "Put Up for Sale";
-        SignatureHelper.Initialise(this);
+        Svc.Hook.InitializeFromAttributes(this);
         UiHelper.Setup();
         Toggle();
     }
@@ -145,13 +143,13 @@ public unsafe class QuickSellItems : IDisposable
                                 {
                                     if (Bitmask.IsBitSet(agent->ContextItemDisabledMask, i))
                                     {
-                                        P.DebugLog($"QRA found {i}:{contextItemName} but it's disabled");
+                                        DebugLog($"QRA found {i}:{contextItemName} but it's disabled");
                                         continue;
                                     }
                                     Common.GenerateCallback(addon, 0, i, 0U, 0, 0);
                                     agent->AgentInterface.Hide();
                                     UiHelper.Close(addon);
-                                    P.DebugLog($"QRA Selected {i}:{contextItemName}");
+                                    DebugLog($"QRA Selected {i}:{contextItemName}");
                                     return retVal;
                                 }
                             }

@@ -1,13 +1,7 @@
-﻿using AutoRetainer.Helpers;
-using Dalamud.Utility;
-using ECommons.GameHelpers;
-using ECommons.MathHelpers;
-using ECommons.Reflection;
+﻿using ECommons.MathHelpers;
+using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using Lumina.Excel.GeneratedSheets;
 using PInvoke;
-using System.Diagnostics;
-using System.Windows.Forms;
 using ItemLevel = AutoRetainer.Helpers.ItemLevel;
 
 namespace AutoRetainer.UI.Dbg;
@@ -17,6 +11,19 @@ internal static unsafe class DebugMisc
 
     internal static void Draw()
     {
+        if (ImGui.Button("Install callback hook")) Callback.InstallHook();
+        if (ImGui.Button("Disable callback hook")) Callback.UninstallHook();
+        ImGuiEx.TextCopy($"{(nint)(&TargetSystem.Instance()->Target):X16}");
+        ImGui.Checkbox($"Log opcodes", ref P.LogOpcodes);
+        ImGuiEx.Text($"CSFramework.Instance()->FrameCounter: {CSFramework.Instance()->FrameCounter}");
+        if(ImGui.Button("Test entrust dup"))
+        {
+            if(TryGetAddonByName<AtkUnitBase>("RetainerItemTransferList", out var addon))
+            {
+                Callback.Fire(addon, true, 0, (uint)29);
+            }
+        }
+        ImGuiEx.Text($"Lockon: {*(byte*)(((nint)TargetSystem.Instance()) + 309)}");
         if (ImGui.Button("Chill frames lock"))
         {
             FPSManager.LockChillFrames();
@@ -34,7 +41,7 @@ internal static unsafe class DebugMisc
         {
             ImGuiEx.Text($"{x.Name}@{x.World}: {(x.Gil + x.RetainerData.Sum(z => z.Gil))}");
         }
-        var ocd = Utils.GetCurrentCharacterData();
+        var ocd = Data;
         if(ocd != null)
         {
             ImGuiEx.Text($"Level array:");

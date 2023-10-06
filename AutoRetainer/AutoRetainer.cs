@@ -1,5 +1,4 @@
 ﻿using AutoRetainer.UI;
-using Dalamud.Game;
 using Dalamud.Game.ClientState.Conditions;
 using Lumina.Excel.GeneratedSheets;
 using ECommons.Events;
@@ -11,19 +10,18 @@ using Dalamud.Utility;
 using AutoRetainer.Scheduler.Tasks;
 using ClickLib.Clicks;
 using FFXIVClientStructs.FFXIV.Client.UI;
-using ECommons.MathHelpers;
-using PInvoke;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using System.Diagnostics;
 using AutoRetainer.Modules.Statistics;
 using AutoRetainer.Internal;
 using AutoRetainer.UI.Overlays;
 using ECommons.Throttlers;
-using AutoRetainer.Modules;
 using AutoRetainerAPI.Configuration;
 using AutoRetainerAPI;
 using ECommons.GameHelpers;
-using System.Xml.Linq;
+using AutoRetainer.Modules.Voyage;
+using Dalamud.Game.Network;
+using AutoRetainer.Scheduler.Handlers;
 
 namespace AutoRetainer;
 
@@ -51,12 +49,22 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal LogWindow LogWindow;
     internal AutoRetainerApi API;
     internal LoginOverlay LoginOverlay;
+    internal MarketCooldownOverlay MarketCooldownOverlay;
+    internal SubmarineUnlockPlanUI SubmarineUnlockPlanUI;
+    internal SubmarinePointPlanUI SubmarinePointPlanUI;
+    internal DuplicateBlacklistSelector DuplicateBlacklistSelector;
 
     internal long Time => C.UseServerTime ? CSFramework.GetServerTime() : DateTimeOffset.Now.ToUnixTimeSeconds();
 
     internal StyleModel Style;
     internal bool StylePushed = false;
     internal RetainerListOverlay RetainerListOverlay;
+    internal uint LastVentureID = 0;
+    internal uint ListUpdateFrame = 0;
+
+    internal bool LogOpcodes = false;
+
+    internal static OfflineCharacterData Data => Utils.GetCurrentCharacterData();
 
     public AutoRetainer(DalamudPluginInterface pi)
     {
@@ -79,6 +87,10 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 LogWindow = new();
                 ws.AddWindow(LogWindow);
                 configGui = new();
+                MarketCooldownOverlay = new();
+                ws.AddWindow(MarketCooldownOverlay);
+                DuplicateBlacklistSelector = new();
+                ws.AddWindow(DuplicateBlacklistSelector);
                 TaskManager = new() { AbortOnTimeout = true, TimeLimitMS = 20000 };
                 Memory = new();
                 Svc.PluginInterface.UiBuilder.Draw += ws.Draw;
@@ -95,12 +107,17 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 AutoGCHandin.Init();
                 IPC.Init();
                 Utils.FixKeys();
+                VoyageMain.Init();
 
                 ws.AddWindow(new MultiModeOverlay());
                 RetainerListOverlay = new RetainerListOverlay();
                 ws.AddWindow(RetainerListOverlay);
                 LoginOverlay = (new LoginOverlay());
                 ws.AddWindow(LoginOverlay);
+                SubmarineUnlockPlanUI = new();
+                ws.AddWindow(SubmarineUnlockPlanUI);
+                SubmarinePointPlanUI = new();
+                ws.AddWindow(SubmarinePointPlanUI);
                 MultiMode.Init();
 
                 Safety.Check();
@@ -110,9 +127,18 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 API = new();
                 ApiTest.Init();
                 FPSManager.UnlockChillFrames();
+                PluginLog.Information($"AutoRetainer v{P.GetType().Assembly.GetName().Version} is ready.");
+                Svc.GameNetwork.NetworkMessage += GameNetwork_NetworkMessage;
+                Utils.ResetEscIgnoreByWindows();
             });
         }
         //);
+    }
+
+    private void GameNetwork_NetworkMessage(nint dataPtr, ushort opCode, uint sourceActorId, uint targetActorId, NetworkMessageDirection direction)
+    {
+        if (!LogOpcodes) return;
+        DuoLog.Information($"{opCode:X16}, {direction}");
     }
 
     private void Toasts_Toast(ref Dalamud.Game.Text.SeStringHandling.SeString message, ref Dalamud.Game.Gui.Toast.ToastOptions options, ref bool isHandled)
@@ -129,14 +155,14 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 && offlineData.RetainerData.TryGetFirst(x => x.Name == ret, out var offlineRetainerData))
             {
                 offlineRetainerData.VentureBeginsAt = P.Time;
-                P.DebugLog($"Recorded venture start time = {offlineRetainerData.VentureBeginsAt}");
+                DebugLog($"Recorded venture start time = {offlineRetainerData.VentureBeginsAt}");
             }
             //4578	57	33	0	False	Gil earned from market sales has been entrusted to your retainer.<If(Equal(IntegerParameter(1),1))>
             //The amount earned exceeded your retainer's gil limit. Excess gil has been discarded.<Else/></If>
             if (text.StartsWith(Svc.Data.GetExcelSheet<LogMessage>().GetRow(4578).Text.ToDalamudString().ExtractText(true)))
             {
                 TaskWithdrawGil.forceCheck = true;
-                P.DebugLog($"Forcing to check for gil");
+                DebugLog($"Forcing to check for gil");
             }
         }
     }
@@ -183,7 +209,17 @@ public unsafe class AutoRetainer : IDalamudPlugin
             var target = C.OfflineData.Where(x => $"{x.Name}@{x.World}" == arguments[6..]).FirstOrDefault();
             if (target != null)
             {
-                if (!AutoLogin.Instance.IsRunning) AutoLogin.Instance.SwapCharacter(target.WorldOverride ?? target.World, target.Name, target.ServiceAccount);
+                if (!AutoLogin.Instance.IsRunning)
+                {
+                    if (Svc.ClientState.IsLoggedIn)
+                    {
+                        AutoLogin.Instance.SwapCharacter(target.WorldOverride ?? target.World, target.Name, target.ServiceAccount);
+                    }
+                    else
+                    {
+                        AutoLogin.Instance.Login(target.WorldOverride ?? target.World, target.Name, target.ServiceAccount);
+                    }
+                }
             }
             else
             {
@@ -194,13 +230,17 @@ public unsafe class AutoRetainer : IDalamudPlugin
         {
             HouseEnterTask.EnqueueTask();
         }
+        else if (arguments.EqualsIgnoreCaseAny("deliver"))
+        {
+            GCHandlers.EnableDeliveringIfPossible();
+        }
         else
         {
             configGui.IsOpen = !configGui.IsOpen;
         }
     }
 
-    private void Tick(Framework framework)
+    private void Tick(object _)
     {
         if (!IPC.Suppressed)
         {
@@ -212,7 +252,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                     C.SelectedRetainers[Svc.ClientState.LocalContentId] = new();
                 }
             }
-            if (Svc.Condition[ConditionFlag.OccupiedSummoningBell] && (SchedulerMain.PluginEnabled || P.TaskManager.IsBusy || ConditionWasEnabled))
+            if (P.TaskManager.IsBusy || (Svc.Condition[ConditionFlag.OccupiedSummoningBell] && (SchedulerMain.PluginEnabled || P.TaskManager.IsBusy || ConditionWasEnabled)))
             {
                 if (TryGetAddonByName<AddonTalk>("Talk", out var addon) && addon->AtkUnitBase.IsVisible)
                 {
@@ -227,6 +267,24 @@ public unsafe class AutoRetainer : IDalamudPlugin
         YesAlready.Tick();
         Artisan.ArtisanTick();
         FPSManager.Tick();
+        PriorityManager.Tick();
+        TextAdvanceManager.Tick();
+        if (Svc.Condition[ConditionFlag.OccupiedSummoningBell] && Utils.TryGetCurrentRetainer(out var name) && Utils.TryGetRetainerByName(name, out var retainer))
+        {
+            if(!retainer.VentureID.EqualsAny(0u, LastVentureID))
+            {
+                LastVentureID = retainer.VentureID;
+                PluginLog.Debug($"Retainer {retainer.Name} current venture={LastVentureID}");
+            }
+        }
+        else
+        {
+            if (LastVentureID != 0)
+            {
+                LastVentureID = 0;
+                PluginLog.Debug($"Last venture ID reset");
+            }
+        }
         //if(C.RetryItemSearch) RetryItemSearch.Tick();
         if (SchedulerMain.PluginEnabled || MultiMode.Enabled || TaskManager.IsBusy)
         {
@@ -239,7 +297,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 if (!ConditionWasEnabled)
                 {
                     ConditionWasEnabled = true;
-                    P.DebugLog($"ConditionWasEnabled = true");
+                    DebugLog($"ConditionWasEnabled = true");
                 }
             }
         }
@@ -248,7 +306,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         {
             if(!IPC.Suppressed && !IsOccupied() && !C.OldRetainerSense && !TaskManager.IsBusy && !Utils.MultiModeOrArtisan && !Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BoundByDuty] && Utils.IsAnyRetainersCompletedVenture())
             {
-                var bell = Utils.GetReachableRetainerBell();
+                var bell = Utils.GetReachableRetainerBell(true);
                 if (bell == null || LastPosition != Svc.ClientState.LocalPlayer.Position)
                 {
                     LastPosition = Svc.ClientState.LocalPlayer.Position;
@@ -290,7 +348,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             //5800	60	8	0	False	他のデータセンター<Highlight>StringParameter(1)</Highlight>へ遊びに行っているため操作できません。
             //5800	60	8	0	False	Der Vorgang kann nicht ausgeführt werden, da der Charakter gerade das Datenzentrum <Highlight>StringParameter(1)</Highlight> bereist.
             //5800	60	8	0	False	Impossible d'exécuter cette commande. Le personnage se trouve dans un autre centre de traitement de données (<Highlight>StringParameter(1)</Highlight>).
-            if (message.ToString().StartsWithAny("Unable to execute command. Character is currently visiting the", "他のデータセンター", "Der Vorgang kann nicht ausgeführt werden, da der Charakter gerade das Datenzentrum", "Impossible d'exécuter cette commande. Le personnage se trouve dans un autre centre de traitement de données"))
+            if (message.ToString().StartsWithAny(Lang.UnableToVisitWorld))
             {
 
                 MultiMode.Enabled = false;
@@ -311,6 +369,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             Svc.Framework.Update -= Tick;
             Svc.Toasts.ErrorToast -= Toasts_ErrorToast;
             Svc.Toasts.Toast -= Toasts_Toast;
+            Svc.GameNetwork.NetworkMessage -= GameNetwork_NetworkMessage;
             Safe(delegate
             {
                 YesAlready.EnableIfNeeded();
@@ -321,6 +380,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
             Safe(IPC.Shutdown);
             Safe(API.Dispose);
             Safe(FPSManager.ForceRestore);
+            Safe(PriorityManager.RestorePriority);
+            Safe(VoyageMain.Shutdown);
             PunishLibMain.Dispose();
             ECommonsMain.Dispose();
         }
@@ -364,9 +425,13 @@ public unsafe class AutoRetainer : IDalamudPlugin
         return config.SelectedRetainers[cid];
     }
 
-    internal void DebugLog(string message)
+    internal static string LastLogMsg = string.Empty;
+    internal static void DebugLog(string message)
     {
-        PluginLog.Debug(message);
+        if (LastLogMsg != message)
+        {
+            PluginLog.Debug(message);
+        }
     }
 
     private void ConditionChange(ConditionFlag flag, bool value)
@@ -377,7 +442,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             if (!value)
             {
                 ConditionWasEnabled = false;
-                P.DebugLog("ConditionWasEnabled = false;");
+                DebugLog("ConditionWasEnabled = false;");
             }
             if (Svc.Targets.Target.IsRetainerBell()) {
                 if (value)
@@ -429,13 +494,13 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 {
                     if (WasEnabled)
                     {
-                        P.DebugLog($"Enabling plugin because WasEnabled is true");
+                        DebugLog($"Enabling plugin because WasEnabled is true");
                         SchedulerMain.EnablePlugin(PluginEnableReason.Auto);
                         WasEnabled = false;
                     }
                     else if(!IsCloseActionAutomatic && C.AutoDisable && !Utils.MultiModeOrArtisan)
                     {
-                        P.DebugLog($"Disabling plugin because AutoDisable is on");
+                        DebugLog($"Disabling plugin because AutoDisable is on");
                         SchedulerMain.DisablePlugin();
                     }
                 }
@@ -449,7 +514,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         }
     }
 
-    void Logout(object _, object __)
+    void Logout()
     {
         SchedulerMain.DisablePlugin();
 

@@ -1,0 +1,1 @@
+Most of stuff in this folder carefully yoinked from https://github.com/Infiziert90/SubmarineTracker

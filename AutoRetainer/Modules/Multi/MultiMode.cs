@@ -1,20 +1,15 @@
-﻿using AutoRetainer.Scheduler.Tasks;
+﻿using AutoRetainer.Internal;
+using AutoRetainer.Modules.Voyage;
+using AutoRetainer.Modules.Voyage.Tasks;
+using AutoRetainer.Scheduler.Tasks;
 using AutoRetainer.UI;
 using AutoRetainerAPI.Configuration;
-using Dalamud.Game.ClientState.Conditions;
-using Dalamud.Game.ClientState.Objects.Enums;
-using Dalamud.Game.ClientState.Objects.Types;
 using ECommons.CircularBuffers;
 using ECommons.Events;
-using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
-using ECommons.GameFunctions;
 using ECommons.GameHelpers;
-using ECommons.MathHelpers;
 using ECommons.Throttlers;
-using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using static AutoRetainer.Modules.OfflineDataManager;
 
@@ -25,6 +20,9 @@ internal unsafe static class MultiMode
     internal static bool Active => Enabled && !IPC.Suppressed;
 
     internal static bool Enabled = false;
+
+    internal static bool EnabledRetainers => C.MultiModeType.EqualsAny(MultiModeType.Retainers, MultiModeType.Everything) && !VoyageUtils.IsRetainerBlockedByVoyage();
+    internal static bool EnabledSubmarines => C.MultiModeType.EqualsAny(MultiModeType.Submersibles, MultiModeType.Everything);
 
     internal static bool Synchronize = false;
     internal static long NextInteractionAt { get; private set; } = 0;
@@ -49,7 +47,7 @@ internal unsafe static class MultiMode
             Interactions.Clear();
             if (CanHET)
             {
-                P.DebugLog($"ProperOnLogin: {Svc.ClientState.LocalPlayer}, residential area, scheduling HET");
+                DebugLog($"ProperOnLogin: {Svc.ClientState.LocalPlayer}, residential area, scheduling HET");
                 HouseEnterTask.EnqueueTask();
             }
             MultiModeUI.JustRelogged = true;
@@ -62,11 +60,18 @@ internal unsafe static class MultiMode
 
     internal static void OnMultiModeEnabled()
     {
-        if (!Enabled) return;
+        if (!Enabled)
+        {
+            return;
+        }
         LastLogin = 0;
         if (C.MultiHETOnEnable && CanHET && Player.Available)
         {
             HouseEnterTask.EnqueueTask();
+        }
+        if(Utils.GetNearestWorkshopEntrance(out _) && Utils.GetReachableRetainerBell(false) == null)
+        {
+            TaskEnterWorkshop.Enqueue();
         }
     }
 
@@ -79,6 +84,11 @@ internal unsafe static class MultiMode
     {
         if (Active)
         {
+            if(!C.MultiModeWorkshopConfiguration.MultiWaitForAll && C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn)
+            {
+                DuoLog.Warning($"Invalid configuration: {nameof(C.MultiModeWorkshopConfiguration.MultiWaitForAll)} was not activated but {nameof(C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn)} was. The configuration was fixed.");
+                C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn = false;
+            }
             if(!Svc.ClientState.IsLoggedIn && TryGetAddonByName<AtkUnitBase>("Title", out _) && !AutoLogin.Instance.IsRunning)
             {
                 LastLogin = 0;
@@ -156,56 +166,93 @@ internal unsafe static class MultiMode
                     }
                     if (next != null)
                     {
-                        P.DebugLog($"Enqueueing relog");
+                        DebugLog($"Enqueueing relog");
                         BlockInteraction(20);
                         EnsureCharacterValidity();
+                        RestoreValidityInWorkshop();
                         if (!Relog(next, out var error))
                         {
                             DuoLog.Error(error);
                         }
                         else
                         {
-                            P.DebugLog($"Relog command success");
+                            DebugLog($"Relog command success");
                         }
                         Interactions.PushBack(Environment.TickCount64);
-                        P.DebugLog($"Added interaction because of relogging (state: {Interactions.Print()})");
+                        DebugLog($"Added interaction because of relogging (state: {Interactions.Print()})");
                     }
                     else
                     {
                         if(C.MultiWaitOnLoginScreen)
                         {
-                            P.DebugLog($"Enqueueing logoff");
+                            DebugLog($"Enqueueing logoff");
                             BlockInteraction(20);
                             EnsureCharacterValidity();
+                            RestoreValidityInWorkshop();
                             if (!Relog(null, out var error))
                             {
                                 DuoLog.Error(error);
                             }
                             else
                             {
-                                P.DebugLog($"Logoff command success");
+                                DebugLog($"Logoff command success");
                             }
                             Interactions.PushBack(Environment.TickCount64);
-                            P.DebugLog($"Added interaction because of logging off (state: {Interactions.Print()})");
+                            DebugLog($"Added interaction because of logging off (state: {Interactions.Print()})");
                         }
                     }
                 }
-                else if (!IsOccupied() && AnyRetainersAvailable())
+                else if (!IsOccupied() && !P.TaskManager.IsBusy)
                 {
-                    //DuoLog.Information($"1234");
-                    EnsureCharacterValidity();
-                    if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data) && data.Enabled)
+                    if (AnyRetainersAvailable() && EnabledRetainers)
                     {
-                        P.DebugLog($"Enqueueing interaction with bell");
-                        TaskInteractWithNearestBell.Enqueue();
-                        P.TaskManager.Enqueue(() => { SchedulerMain.EnablePlugin(PluginEnableReason.MultiMode); return true; });
-                        BlockInteraction(10);
-                        Interactions.PushBack(Environment.TickCount64);
-                        P.DebugLog($"Added interaction because of interacting (state: {Interactions.Print()})");
+                        //DuoLog.Information($"1234");
+                        EnsureCharacterValidity();
+                        RestoreValidityInWorkshop();
+                        if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data) && data.Enabled)
+                        {
+                            DebugLog($"Enqueueing interaction with bell");
+                            TaskInteractWithNearestBell.Enqueue();
+                            P.TaskManager.Enqueue(() => { SchedulerMain.EnablePlugin(PluginEnableReason.MultiMode); return true; });
+                            BlockInteraction(10);
+                            Interactions.PushBack(Environment.TickCount64);
+                            DebugLog($"Added interaction because of interacting (state: {Interactions.Print()})");
+                        }
+                    }
+                    else if(Data.AnyEnabledVesselsAvailable() && MultiMode.EnabledSubmarines)
+                    {
+                        if (!C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn || Data.AreAnyVesselsReturnInNext(0, true))
+                        {
+                            DebugLog($"Enqueueing interaction with panel");
+                            BlockInteraction(10);
+                            TaskInteractWithNearestPanel.Enqueue();
+                            P.TaskManager.Enqueue(() => { VoyageScheduler.Enabled = true; });
+                            Interactions.PushBack(Environment.TickCount64);
+                            DebugLog($"Added interaction because of interacting (state: {Interactions.Print()})");
+                        }
                     }
                 }
             }
         }
+    }
+
+    internal static bool CheckInventoryValidity() => Svc.ClientState.LocalPlayer.HomeWorld.Id == Svc.ClientState.LocalPlayer.CurrentWorld.Id && Utils.GetVenturesAmount() >= Data.GetNeededVentureAmount() && Utils.IsInventoryFree();
+    internal static void RestoreValidityInWorkshop()
+    {
+        return;
+        if (VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType))
+        {
+            if (!ProperOnLogin.PlayerPresent) return;
+            if (Data != null)
+            {
+                if (CheckInventoryValidity())
+                {
+                    Data.Enabled = true;
+                    return;
+                }
+            }
+        }
+        return;
     }
 
     internal static IEnumerable<OfflineCharacterData> GetEnabledOfflineData()
@@ -265,6 +312,10 @@ internal unsafe static class MultiMode
         {
             ErrorMessage = "AutoLogin is already running";
         }
+        else if (SchedulerMain.CharacterPostProcessLocked)
+        {
+            ErrorMessage = "Currently in post-processing of character";
+        }
         /*else if (data != null && !data.Index.InRange(1, 9))
         {
             ErrorMessage = "Invalid character index";
@@ -291,13 +342,15 @@ internal unsafe static class MultiMode
                     {
                         CharaCnt.Clear();
                     }
+
+                    TaskPostprocessCharacterIPC.Enqueue();
                     if (data != null)
                     {
-                        AutoLogin.Instance.SwapCharacter(data.WorldOverride ?? data.World, data.Name, data.ServiceAccount);
+                        P.TaskManager.Enqueue(() => AutoLogin.Instance.SwapCharacter(data.WorldOverride ?? data.World, data.Name, data.ServiceAccount));
                     }
                     else
                     {
-                        AutoLogin.Instance.Logoff();
+                        P.TaskManager.Enqueue(() => AutoLogin.Instance.Logoff());
                     }
                     return true;
                 }
@@ -323,29 +376,50 @@ internal unsafe static class MultiMode
         var data = C.OfflineData;
         if (C.CharEqualize)
         {
-            data = data.OrderBy(x => CharaCnt.GetOrDefault(x.CID)).ToList();
+            data = [.. data.OrderBy(x => CharaCnt.GetOrDefault(x.CID))];
         }
-        foreach (var x in data)
+        if (EnabledSubmarines)
         {
-            if (x.CID == Player.CID) continue;
-            if (x.Enabled && C.SelectedRetainers.TryGetValue(x.CID, out var enabledRetainers))
+            foreach (var x in data)
             {
-                var selectedRetainers = x.GetEnabledRetainers().Where(z => z.HasVenture);
-                if (selectedRetainers.Any() &&
-                    C.MultiWaitForAll ? selectedRetainers.All(z => z.GetVentureSecondsRemaining() <= C.AdvanceTimer) : selectedRetainers.Any(z => z.GetVentureSecondsRemaining() <= C.AdvanceTimer))
+                if (x.CID == Player.CID) continue;
+                if (x.WorkshopEnabled && x.GetEnabledVesselsData(VoyageType.Airship).Count + x.GetEnabledVesselsData(VoyageType.Submersible).Count > 0)
                 {
-                    return x;
+                    if (x.AreAnyVesselsReturnInNext(C.MultiModeWorkshopConfiguration.AdvanceTimer, C.MultiModeWorkshopConfiguration.MultiWaitForAll))
+                    {
+                        return x;
+                    }
                 }
             }
         }
+        if (EnabledRetainers)
+        {
+            foreach (var x in data)
+            {
+                if (x.CID == Player.CID) continue;
+                if (x.Enabled && C.SelectedRetainers.TryGetValue(x.CID, out var enabledRetainers))
+                {
+                    var selectedRetainers = x.GetEnabledRetainers().Where(z => z.HasVenture);
+                    if (selectedRetainers.Any() &&
+                        C.MultiModeRetainerConfiguration.MultiWaitForAll ? selectedRetainers.All(z => z.GetVentureSecondsRemaining() <= C.MultiModeRetainerConfiguration.AdvanceTimer) : selectedRetainers.Any(z => z.GetVentureSecondsRemaining() <= C.MultiModeRetainerConfiguration.AdvanceTimer))
+                    {
+                        return x;
+                    }
+                }
+            }
+        }
+        
         return null;
     }
 
-    internal static bool IsCurrentCharacterDone()
+    internal static bool IsCurrentCharacterDone() => IsCurrentCharacterRetainersDone() && IsCurrentCharacterCaptainDone();
+
+    internal static bool IsCurrentCharacterRetainersDone()
     {
         if (!ProperOnLogin.PlayerPresent) return false;
         if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
         {
+            if (!EnabledRetainers) return true;
             if (!data.Enabled) return true;
             if (Utils.GetVenturesAmount() < 2 || !Utils.IsInventoryFree()) return true;
             return !IsAnySelectedRetainerFinishesWithin(5 * 60);
@@ -353,9 +427,17 @@ internal unsafe static class MultiMode
         return false;
     }
 
+    internal static bool IsCurrentCharacterCaptainDone()
+    {
+        if (!EnabledSubmarines) return true;
+        if(!Data.WorkshopEnabled) return true;
+        return !Data.AreAnyVesselsReturnInNext(5 * 60, C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn);
+    }
+
     internal static bool IsAnySelectedRetainerFinishesWithin(int seconds)
     {
         if (!ProperOnLogin.PlayerPresent) return false;
+        if (!EnabledRetainers) return false;
         if (GetEnabledOfflineData().TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
         {
             var selectedRetainers = data.GetEnabledRetainers().Where(z => z.HasVenture);
@@ -369,7 +451,7 @@ internal unsafe static class MultiMode
         if (!ProperOnLogin.PlayerPresent) return false;
         if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
         {
-            if (Svc.ClientState.LocalPlayer.HomeWorld.Id == Svc.ClientState.LocalPlayer.CurrentWorld.Id && Utils.GetVenturesAmount() >= data.GetNeededVentureAmount() && Utils.IsInventoryFree() && GetNearbyBell() != null)
+            if (Svc.ClientState.LocalPlayer.HomeWorld.Id == Svc.ClientState.LocalPlayer.CurrentWorld.Id && Utils.GetVenturesAmount() >= data.GetNeededVentureAmount() && Utils.IsInventoryFree() && Utils.GetReachableRetainerBell(true) != null)
             {
                 return true;
             }
@@ -381,7 +463,7 @@ internal unsafe static class MultiMode
         return false;
     }
 
-    internal static GameObject GetNearbyBell()
+    /*internal static GameObject GetNearbyBell()
     {
         if (!ProperOnLogin.PlayerPresent) return null;
         foreach (var x in Svc.Objects)
@@ -395,11 +477,10 @@ internal unsafe static class MultiMode
             }
         }
         return null;
-    }
+    }*/
 
     internal static int GetNeededVentureAmount(this OfflineCharacterData data)
     {
         return data.GetEnabledRetainers().Length * 2;
     }
-
 }

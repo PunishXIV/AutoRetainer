@@ -1,4 +1,5 @@
 ﻿using ECommons;
+using ECommons.DalamudServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,13 +41,25 @@ namespace AutoRetainerAPI
                 GenericHelpers.Safe(() => OnRetainerSettingsDraw(cid, retainer));
             }
         }
+
         private void OnRetainerReadyForPostprocessIntl(string plugin, string retainer)
         {
-            if (ECommonsMain.Instance.Name == plugin)
+            if (Svc.PluginInterface.InternalName == plugin)
             {
                 if (OnRetainerReadyToPostprocess != null)
                 {
                     GenericHelpers.Safe(() => OnRetainerReadyToPostprocess(retainer));
+                }
+            }
+        }
+
+        private void OnCharacterReadyForPostprocessIntl(string plugin)
+        {
+            if (Svc.PluginInterface.InternalName == plugin)
+            {
+                if (OnCharacterReadyToPostProcess != null)
+                {
+                    GenericHelpers.Safe(() => OnCharacterReadyToPostProcess());
                 }
             }
         }
@@ -64,6 +77,14 @@ namespace AutoRetainerAPI
             if (OnRetainerPostprocessStep != null)
             {
                 GenericHelpers.Safe(() => OnRetainerPostprocessStep(n));
+            }
+        }
+
+        void OnCharacterAdditionalTask()
+        {
+            if (OnCharacterPostprocessStep != null)
+            {
+                GenericHelpers.Safe(() => OnCharacterPostprocessStep());
             }
         }
     }

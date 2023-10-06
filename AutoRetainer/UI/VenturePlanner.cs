@@ -1,284 +1,263 @@
 ﻿using AutoRetainerAPI.Configuration;
 using ECommons.ExcelServices;
 using ECommons.GameHelpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace AutoRetainer.UI
+namespace AutoRetainer.UI;
+
+internal class VenturePlanner : Window
 {
-    internal class VenturePlanner : Window
+    OfflineRetainerData SelectedRetainer = null;
+    OfflineCharacterData SelectedCharacter = null;
+    string search = "";
+    int minLevel = 1;
+    int maxLevel = 90;
+    Dictionary<uint, (string l, string r, bool avail)> Cache = new();
+
+    public VenturePlanner() : base("Venture Planner")
     {
-        OfflineRetainerData SelectedRetainer = null;
-        OfflineCharacterData SelectedCharacter = null;
-        string search = "";
-        int minLevel = 1;
-        int maxLevel = 90;
-        Dictionary<uint, (string l, string r, bool avail)> Cache = new();
+    }
 
-        public VenturePlanner() : base("Venture Planner")
-        {
-        }
+    internal void Open(OfflineCharacterData characterData, OfflineRetainerData selectedRetainer)
+    {
+        this.SelectedCharacter = characterData;
+        this.SelectedRetainer = selectedRetainer;
+        this.IsOpen = true;
+    }
 
-        internal void Open(OfflineCharacterData characterData, OfflineRetainerData selectedRetainer)
+    public override void Draw()
+    {
+        ImGuiEx.SetNextItemFullWidth();
+        if(ImGui.BeginCombo("##selectRet", $"{Censor.Character(SelectedCharacter.Name, SelectedCharacter.World)} - {Censor.Retainer(SelectedRetainer.Name)} - {SelectedRetainer.Level} {ExcelJobHelper.GetJobNameById(SelectedRetainer.Job)}" ?? "Select a retainer..."))
         {
-            this.SelectedCharacter = characterData;
-            this.SelectedRetainer = selectedRetainer;
-            this.IsOpen = true;
-        }
-
-        public override void Draw()
-        {
-            ImGuiEx.SetNextItemFullWidth();
-            if(ImGui.BeginCombo("##selectRet", $"{Censor.Character(SelectedCharacter.Name, SelectedCharacter.World)} - {Censor.Retainer(SelectedRetainer.Name)} - {SelectedRetainer.Level} {ExcelJobHelper.GetJobNameById(SelectedRetainer.Job)}" ?? "Select a retainer..."))
+            foreach(var x in C.OfflineData.OrderBy(x => !C.NoCurrentCharaOnTop && x.CID == Player.CID?0:1))
             {
-                foreach(var x in C.OfflineData.OrderBy(x => !C.NoCurrentCharaOnTop && x.CID == Player.CID?0:1))
+                foreach(var r in x.RetainerData)
                 {
-                    foreach(var r in x.RetainerData)
+                    if(ImGui.Selectable($"{Censor.Character(x.Name, x.World)} - {Censor.Retainer(r.Name)} - Lv{r.Level} {ExcelJobHelper.GetJobNameById(r.Job)}"))
                     {
-                        if(ImGui.Selectable($"{Censor.Character(x.Name, x.World)} - {Censor.Retainer(r.Name)} - Lv{r.Level} {ExcelJobHelper.GetJobNameById(r.Job)}"))
+                        SelectedRetainer = r;
+                        SelectedCharacter = x;
+                    }
+                }
+            }
+            ImGui.EndCombo();
+        }
+
+        if (SelectedRetainer != null && SelectedCharacter != null)
+        {
+            var adata = Utils.GetAdditionalData(SelectedCharacter.CID, SelectedRetainer.Name);
+            /*ImGuiEx.TextV("Share venture plan with:");
+            ImGui.SameLine();
+            ImGuiEx.SetNextItemFullWidth();
+            var n = "No shared plan";
+            if (adata.LinkedVenturePlan != "")
+            {
+                var linkedAdata = C.AdditionalData.GetOrDefault(adata.LinkedVenturePlan);
+                if (linkedAdata != null)
+                {
+                    var linkedOCD = Utils.GetOfflineCharacterDataFromAdditionalRetainerDataKey(adata.LinkedVenturePlan);
+                    var linkedORD = Utils.GetOfflineRetainerDataFromAdditionalRetainerDataKey(adata.LinkedVenturePlan);
+                    n = $"{linkedOCD.Name}@{linkedOCD.World} - {linkedORD.Name}";
+                }
+            }
+            if (ImGui.BeginCombo("##selectLinked", n))
+            {
+                if(ImGui.Selectable("Remove sharing"))
+                {
+                    adata.LinkedVenturePlan = "";
+                }
+                foreach (var x in C.OfflineData.OrderBy(x => !C.NoCurrentCharaOnTop && x.CID == Player.CID ? 0 : 1))
+                {
+                    foreach (var r in x.RetainerData)
+                    {
+                        if (ImGui.Selectable($"{Censor.Character(x.Name, x.World)} - {Censor.Retainer(r.Name)} - Lv{r.Level} {ExcelJobHelper.GetJobNameById(r.Job)}"))
                         {
-                            SelectedRetainer = r;
-                            SelectedCharacter = x;
+                            adata.LinkedVenturePlan = Utils.GetAdditionalDataKey(x.CID, r.Name);
                         }
                     }
                 }
                 ImGui.EndCombo();
-            }
-
-            if (SelectedRetainer != null && SelectedCharacter != null)
+            }*/
+            if (adata.LinkedVenturePlan == "")
             {
-                var adata = Utils.GetAdditionalData(SelectedCharacter.CID, SelectedRetainer.Name);
-                /*ImGuiEx.TextV("Share venture plan with:");
-                ImGui.SameLine();
-                ImGuiEx.SetNextItemFullWidth();
-                var n = "No shared plan";
-                if (adata.LinkedVenturePlan != "")
+                var ww = ImGui.GetContentRegionAvail().X;
+                ImGui.Columns(2);
+                ImGui.SetColumnWidth(0, ww / 2);
+
                 {
-                    var linkedAdata = C.AdditionalData.GetOrDefault(adata.LinkedVenturePlan);
-                    if (linkedAdata != null)
+                    int? toRem = null;
+
+                    for (int i = 0; i < adata.VenturePlan.List.Count; i++)
                     {
-                        var linkedOCD = Utils.GetOfflineCharacterDataFromAdditionalRetainerDataKey(adata.LinkedVenturePlan);
-                        var linkedORD = Utils.GetOfflineRetainerDataFromAdditionalRetainerDataKey(adata.LinkedVenturePlan);
-                        n = $"{linkedOCD.Name}@{linkedOCD.World} - {linkedORD.Name}";
+                        var v = adata.VenturePlan.List[i];
+                        ImGui.PushID(v.GUID);
+                        {
+                            var d = i == 0;
+                            if (d) ImGui.BeginDisabled();
+                            if (ImGui.ArrowButton("##up", ImGuiDir.Up))
+                            {
+                                Safe(() => (adata.VenturePlan.List[i], adata.VenturePlan.List[i - 1]) = (adata.VenturePlan.List[i - 1], adata.VenturePlan.List[i]));
+                            }
+                            if (d) ImGui.EndDisabled();
+                        }
+                        ImGui.SameLine();
+                        {
+                            var d = i == adata.VenturePlan.List.Count - 1;
+                            if (d) ImGui.BeginDisabled();
+                            if (ImGui.ArrowButton("##down", ImGuiDir.Down))
+                            {
+                                Safe(() => (adata.VenturePlan.List[i], adata.VenturePlan.List[i + 1]) = (adata.VenturePlan.List[i + 1], adata.VenturePlan.List[i]));
+                            }
+                            if (d) ImGui.EndDisabled();
+                        }
+                        ImGui.SameLine();
+                        ImGui.SetNextItemWidth(100f);
+                        ImGui.InputInt("##cnt", ref v.Num.ValidateRange(1, 9999), 1, 1);
+                        ImGui.SameLine();
+                        if (ImGuiEx.IconButton(FontAwesomeIcon.Trash))
+                        {
+                            toRem = i;
+                        }
+                        ImGui.SameLine();
+                        ImGuiEx.Text($"{VentureUtils.GetFancyVentureName(v.ID, SelectedCharacter, SelectedRetainer, out _)}");
+
+                        ImGui.PopID();
+                    }
+
+                    if (toRem != null)
+                    {
+                        adata.VenturePlan.List.RemoveAt(toRem.Value);
+                        adata.VenturePlanIndex = 0;
                     }
                 }
-                if (ImGui.BeginCombo("##selectLinked", n))
-                {
-                    if(ImGui.Selectable("Remove sharing"))
-                    {
-                        adata.LinkedVenturePlan = "";
-                    }
-                    foreach (var x in C.OfflineData.OrderBy(x => !C.NoCurrentCharaOnTop && x.CID == Player.CID ? 0 : 1))
-                    {
-                        foreach (var r in x.RetainerData)
-                        {
-                            if (ImGui.Selectable($"{Censor.Character(x.Name, x.World)} - {Censor.Retainer(r.Name)} - Lv{r.Level} {ExcelJobHelper.GetJobNameById(r.Job)}"))
-                            {
-                                adata.LinkedVenturePlan = Utils.GetAdditionalDataKey(x.CID, r.Name);
-                            }
-                        }
-                    }
-                    ImGui.EndCombo();
-                }*/
-                if (adata.LinkedVenturePlan == "")
-                {
-                    var ww = ImGui.GetContentRegionAvail().X;
-                    ImGui.Columns(2);
-                    ImGui.SetColumnWidth(0, ww / 2);
 
+
+                ImGui.NextColumn();
+
+
+                if (ImGui.Checkbox("Enable planner", ref adata.EnablePlanner))
+                {
+                    if (adata.EnablePlanner)
+                    {
+                        adata.VenturePlanIndex = 0;
+                    }
+                }
+
+                if (C.SavedPlans.Count > 0)
+                {
+                    ImGuiEx.SetNextItemFullWidth();
+                    if (ImGui.BeginCombo("##load", "Load saved plan..."))
                     {
                         int? toRem = null;
-
-                        for (int i = 0; i < adata.VenturePlan.List.Count; i++)
+                        for (int i = 0; i < C.SavedPlans.Count; i++)
                         {
-                            var v = adata.VenturePlan.List[i];
-                            ImGui.PushID(v.GUID);
+                            var p = C.SavedPlans[i];
+                            ImGui.PushID(p.GUID);
+                            if (ImGui.Selectable(p.Name))
                             {
-                                var d = i == 0;
-                                if (d) ImGui.BeginDisabled();
-                                if (ImGui.ArrowButton("##up", ImGuiDir.Up))
+                                adata.VenturePlan = p.JSONClone();
+                                adata.VenturePlanIndex = 0;
+                            }
+                            if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                            {
+                                ImGui.OpenPopup($"Context");
+                            }
+                            if (ImGui.BeginPopup($"Context"))
+                            {
+                                if (ImGui.Selectable("Delete plan"))
                                 {
-                                    Safe(() => (adata.VenturePlan.List[i], adata.VenturePlan.List[i - 1]) = (adata.VenturePlan.List[i - 1], adata.VenturePlan.List[i]));
+                                    toRem = i;
                                 }
-                                if (d) ImGui.EndDisabled();
+                                ImGui.EndPopup();
                             }
-                            ImGui.SameLine();
-                            {
-                                var d = i == adata.VenturePlan.List.Count - 1;
-                                if (d) ImGui.BeginDisabled();
-                                if (ImGui.ArrowButton("##down", ImGuiDir.Down))
-                                {
-                                    Safe(() => (adata.VenturePlan.List[i], adata.VenturePlan.List[i + 1]) = (adata.VenturePlan.List[i + 1], adata.VenturePlan.List[i]));
-                                }
-                                if (d) ImGui.EndDisabled();
-                            }
-                            ImGui.SameLine();
-                            ImGui.SetNextItemWidth(100f);
-                            ImGui.InputInt("##cnt", ref v.Num.ValidateRange(1, 9999), 1, 1);
-                            ImGui.SameLine();
-                            if (ImGuiEx.IconButton(FontAwesomeIcon.Trash))
-                            {
-                                toRem = i;
-                            }
-                            ImGui.SameLine();
-                            ImGuiEx.Text($"{VentureUtils.GetFancyVentureName(v.ID, SelectedCharacter, SelectedRetainer, out _)}");
-
                             ImGui.PopID();
                         }
-
                         if (toRem != null)
                         {
-                            adata.VenturePlan.List.RemoveAt(toRem.Value);
-                            adata.VenturePlanIndex = 0;
+                            C.SavedPlans.RemoveAt(toRem.Value);
                         }
+                        ImGui.EndCombo();
                     }
+                    //ImGui.Separator();
+                }
 
 
-                    ImGui.NextColumn();
-
-
-                    if (ImGui.Checkbox("Enable planner", ref adata.EnablePlanner))
-                    {
-                        if (adata.EnablePlanner)
-                        {
-                            adata.VenturePlanIndex = 0;
-                        }
-                    }
-
-                    if (C.SavedPlans.Count > 0)
-                    {
-                        ImGuiEx.SetNextItemFullWidth();
-                        if (ImGui.BeginCombo("##load", "Load saved plan..."))
-                        {
-                            int? toRem = null;
-                            for (int i = 0; i < C.SavedPlans.Count; i++)
-                            {
-                                var p = C.SavedPlans[i];
-                                ImGui.PushID(p.GUID);
-                                if (ImGui.Selectable(p.Name))
-                                {
-                                    adata.VenturePlan = p.JSONClone();
-                                    adata.VenturePlanIndex = 0;
-                                }
-                                if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
-                                {
-                                    ImGui.OpenPopup($"Context");
-                                }
-                                if (ImGui.BeginPopup($"Context"))
-                                {
-                                    if (ImGui.Selectable("Delete plan"))
-                                    {
-                                        toRem = i;
-                                    }
-                                    ImGui.EndPopup();
-                                }
-                                ImGui.PopID();
-                            }
-                            if (toRem != null)
-                            {
-                                C.SavedPlans.RemoveAt(toRem.Value);
-                            }
-                            ImGui.EndCombo();
-                        }
-                        //ImGui.Separator();
-                    }
-
-
-                    if (adata.VenturePlan.List.Count > 0)
-                    {
-                        //ImGui.Separator();
-                        ImGuiEx.TextV("On plan completion:");
-                        ImGui.SameLine();
-                        ImGuiEx.SetNextItemFullWidth();
-                        ImGuiEx.EnumCombo("##cBeh", ref adata.VenturePlan.PlanCompleteBehavior);
-                        //ImGui.Separator();
-                        var overwrite = C.SavedPlans.Any(x => x.Name == adata.VenturePlan.Name);
-                        ImGuiEx.InputWithRightButtonsArea("SavePlan", delegate
-                        {
-                            if (overwrite) ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudYellow);
-                            ImGui.InputTextWithHint("##name", "Enter plan name...", ref adata.VenturePlan.Name, 50);
-                            if (overwrite) ImGui.PopStyleColor();
-                        }, delegate
-                        {
-                            if (ImGuiEx.IconButton(FontAwesomeIcon.Save))
-                            {
-                                if (overwrite)
-                                {
-                                    C.SavedPlans.RemoveAll(x => x.Name == adata.VenturePlan.Name);
-                                }
-                                C.SavedPlans.Add(adata.VenturePlan.JSONClone());
-                                Notify.Success($"Plan {adata.VenturePlan.Name} saved!");
-                            }
-                            ImGuiEx.Tooltip(overwrite ? "Overwrite Existing Venture Plan" : $"Save Venture Plan");
-                        });
-                    }
-
+                if (adata.VenturePlan.List.Count > 0)
+                {
+                    //ImGui.Separator();
+                    ImGuiEx.TextV("On plan completion:");
+                    ImGui.SameLine();
                     ImGuiEx.SetNextItemFullWidth();
-                    if (ImGui.BeginCombo("##addVenture", "Add venture...", ImGuiComboFlags.HeightLargest))
+                    ImGuiEx.EnumCombo("##cBeh", ref adata.VenturePlan.PlanCompleteBehavior);
+                    //ImGui.Separator();
+                    var overwrite = C.SavedPlans.Any(x => x.Name == adata.VenturePlan.Name);
+                    ImGuiEx.InputWithRightButtonsArea("SavePlan", delegate
                     {
-                        ImGuiEx.SetNextItemFullWidth();
-                        ImGui.InputTextWithHint("##search", "Filter...", ref search, 100);
-                        ImGuiEx.TextV($"Level range:");
-                        ImGui.SameLine();
-                        ImGui.SetNextItemWidth(50f);
-                        ImGui.DragInt("##minL", ref minLevel, 1, 1, 90);
-                        ImGui.SameLine();
-                        ImGuiEx.Text($"-");
-                        ImGui.SameLine();
-                        ImGui.SetNextItemWidth(50f);
-                        ImGui.DragInt("##maxL", ref maxLevel, 1, 1, 90);
-                        ImGuiEx.TextV($"Unavailable ventures:");
-                        ImGui.SameLine();
-                        ImGuiEx.SetNextItemFullWidth();
-                        ImGuiEx.EnumCombo("##unavail", ref C.UnavailableVentureDisplay);
-                        if (ImGui.BeginChild("##ventureCh", new(ImGui.GetContentRegionAvail().X, ImGuiHelpers.MainViewport.Size.Y / 3)))
+                        if (overwrite) ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudYellow);
+                        ImGui.InputTextWithHint("##name", "Enter plan name...", ref adata.VenturePlan.Name, 50);
+                        if (overwrite) ImGui.PopStyleColor();
+                    }, delegate
+                    {
+                        if (ImGuiEx.IconButton(FontAwesomeIcon.Save))
                         {
-                            if (ImGui.CollapsingHeader(VentureUtils.GetHuntingVentureName(SelectedRetainer.Job)))
+                            if (overwrite)
                             {
-                                foreach (var item in VentureUtils.GetHunts(SelectedRetainer.Job).Where(x => search.IsNullOrEmpty() || x.GetVentureName().Contains(search, StringComparison.OrdinalIgnoreCase)).Where(x => x.RetainerLevel >= minLevel && x.RetainerLevel <= maxLevel))
-                                {
-                                    string l = "";
-                                    string r = "";
-                                    bool Avail;
-                                    if (Cache.TryGetValue(item.RowId, out var result))
-                                    {
-                                        l = result.l;
-                                        r = result.r;
-                                        Avail = result.avail;
-                                    }
-                                    else
-                                    {
-                                        item.GetFancyVentureName(SelectedCharacter, SelectedRetainer, out Avail, out l, out r);
-                                        Cache[item.RowId] = (l, r, Avail);
-                                    }
-                                    if (Avail || C.UnavailableVentureDisplay != UnavailableVentureDisplay.Hide)
-                                    {
-                                        var d = !Avail && C.UnavailableVentureDisplay != UnavailableVentureDisplay.Allow_selection;
-                                        if (d) ImGui.BeginDisabled();
-                                        var cur = ImGui.GetCursorPos();
-                                        ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail().X - ImGui.CalcTextSize(r).X);
-                                        ImGuiEx.Text(r);
-                                        ImGui.SetCursorPos(cur);
-                                        if (ImGui.Selectable(l, adata.VenturePlan.List.Any(x => x.ID == item.RowId), ImGuiSelectableFlags.DontClosePopups))
-                                        {
-                                            adata.VenturePlan.List.Add(new(item));
-                                            adata.VenturePlanIndex = 0;
-                                        }
-                                        if (d) ImGui.EndDisabled();
-                                    }
-                                }
+                                C.SavedPlans.RemoveAll(x => x.Name == adata.VenturePlan.Name);
                             }
-                            if (ImGui.CollapsingHeader(VentureUtils.GetFieldExVentureName(SelectedRetainer.Job)))
+                            C.SavedPlans.Add(adata.VenturePlan.JSONClone());
+                            Notify.Success($"Plan {adata.VenturePlan.Name} saved!");
+                        }
+                        ImGuiEx.Tooltip(overwrite ? "Overwrite Existing Venture Plan" : $"Save Venture Plan");
+                    });
+                }
+
+                ImGuiEx.SetNextItemFullWidth();
+                if (ImGui.BeginCombo("##addVenture", "Add venture...", ImGuiComboFlags.HeightLargest))
+                {
+                    ImGuiEx.SetNextItemFullWidth();
+                    ImGui.InputTextWithHint("##search", "Filter...", ref search, 100);
+                    ImGuiEx.TextV($"Level range:");
+                    ImGui.SameLine();
+                    ImGui.SetNextItemWidth(50f);
+                    ImGui.DragInt("##minL", ref minLevel, 1, 1, 90);
+                    ImGui.SameLine();
+                    ImGuiEx.Text($"-");
+                    ImGui.SameLine();
+                    ImGui.SetNextItemWidth(50f);
+                    ImGui.DragInt("##maxL", ref maxLevel, 1, 1, 90);
+                    ImGuiEx.TextV($"Unavailable ventures:");
+                    ImGui.SameLine();
+                    ImGuiEx.SetNextItemFullWidth();
+                    ImGuiEx.EnumCombo("##unavail", ref C.UnavailableVentureDisplay);
+                    if (ImGui.BeginChild("##ventureCh", new(ImGui.GetContentRegionAvail().X, ImGuiHelpers.MainViewport.Size.Y / 3)))
+                    {
+                        if (ImGui.CollapsingHeader(VentureUtils.GetHuntingVentureName(SelectedRetainer.Job)))
+                        {
+                            foreach (var item in VentureUtils.GetHunts(SelectedRetainer.Job).Where(x => search.IsNullOrEmpty() || x.GetVentureName().Contains(search, StringComparison.OrdinalIgnoreCase)).Where(x => x.RetainerLevel >= minLevel && x.RetainerLevel <= maxLevel))
                             {
-                                foreach (var item in VentureUtils.GetFieldExplorations(SelectedRetainer.Job).Where(x => search.IsNullOrEmpty() || x.GetVentureName().Contains(search, StringComparison.OrdinalIgnoreCase)).Where(x => x.RetainerLevel >= minLevel && x.RetainerLevel <= maxLevel))
+                                string l = "";
+                                string r = "";
+                                bool Avail;
+                                if (Cache.TryGetValue(item.RowId, out var result))
                                 {
-                                    var name = VentureUtils.GetFancyVentureName(item, SelectedCharacter, SelectedRetainer, out var Avail);
+                                    l = result.l;
+                                    r = result.r;
+                                    Avail = result.avail;
+                                }
+                                else
+                                {
+                                    item.GetFancyVentureName(SelectedCharacter, SelectedRetainer, out Avail, out l, out r);
+                                    Cache[item.RowId] = (l, r, Avail);
+                                }
+                                if (Avail || C.UnavailableVentureDisplay != UnavailableVentureDisplay.Hide)
+                                {
                                     var d = !Avail && C.UnavailableVentureDisplay != UnavailableVentureDisplay.Allow_selection;
                                     if (d) ImGui.BeginDisabled();
-                                    if (ImGui.Selectable(name, adata.VenturePlan.List.Any(x => x.ID == item.RowId), ImGuiSelectableFlags.DontClosePopups))
+                                    var cur = ImGui.GetCursorPos();
+                                    ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail().X - ImGui.CalcTextSize(r).X);
+                                    ImGuiEx.Text(r);
+                                    ImGui.SetCursorPos(cur);
+                                    if (ImGui.Selectable(l, adata.VenturePlan.List.Any(x => x.ID == item.RowId), ImGuiSelectableFlags.DontClosePopups))
                                     {
                                         adata.VenturePlan.List.Add(new(item));
                                         adata.VenturePlanIndex = 0;
@@ -286,51 +265,66 @@ namespace AutoRetainer.UI
                                     if (d) ImGui.EndDisabled();
                                 }
                             }
-                            ImGui.PushStyleVar(ImGuiStyleVar.ButtonTextAlign, Vector2.Zero);
-                            if (ImGui.Button($"{Lang.CharDice}    Quick Exploration", ImGuiHelpers.GetButtonSize("A") with { X = ImGui.GetContentRegionAvail().X }))
-                            {
-                                adata.VenturePlan.List.Add(new(VentureUtils.QuickExplorationID));
-                                adata.VenturePlanIndex = 0;
-                            }
-                            ImGui.PopStyleVar();
-                            ImGui.EndChild();
                         }
-                        ImGui.EndCombo();
-                    }
-                    else
-                    {
-                        Cache.Clear();
-                    }
-
-                    if (adata.EnablePlanner && adata.VenturePlan.ListUnwrapped.Count > 0)
-                    {
-                        var pct = (float)(adata.VenturePlanIndex) / (float)adata.VenturePlan.ListUnwrapped.Count;
-
-                        if (ImGuiEx.IconButton(Lang.IconRefresh))
+                        if (ImGui.CollapsingHeader(VentureUtils.GetFieldExVentureName(SelectedRetainer.Job)))
                         {
+                            foreach (var item in VentureUtils.GetFieldExplorations(SelectedRetainer.Job).Where(x => search.IsNullOrEmpty() || x.GetVentureName().Contains(search, StringComparison.OrdinalIgnoreCase)).Where(x => x.RetainerLevel >= minLevel && x.RetainerLevel <= maxLevel))
+                            {
+                                var name = VentureUtils.GetFancyVentureName(item, SelectedCharacter, SelectedRetainer, out var Avail);
+                                var d = !Avail && C.UnavailableVentureDisplay != UnavailableVentureDisplay.Allow_selection;
+                                if (d) ImGui.BeginDisabled();
+                                if (ImGui.Selectable(name, adata.VenturePlan.List.Any(x => x.ID == item.RowId), ImGuiSelectableFlags.DontClosePopups))
+                                {
+                                    adata.VenturePlan.List.Add(new(item));
+                                    adata.VenturePlanIndex = 0;
+                                }
+                                if (d) ImGui.EndDisabled();
+                            }
+                        }
+                        ImGui.PushStyleVar(ImGuiStyleVar.ButtonTextAlign, Vector2.Zero);
+                        if (ImGui.Button($"{Lang.CharDice}    Quick Exploration", ImGuiHelpers.GetButtonSize("A") with { X = ImGui.GetContentRegionAvail().X }))
+                        {
+                            adata.VenturePlan.List.Add(new(VentureUtils.QuickExplorationID));
                             adata.VenturePlanIndex = 0;
                         }
-                        ImGui.SameLine();
-                        ImGuiEx.Tooltip("Cancels remaining ventures from this plan and starts from the beginning");
-                        ImGui.ProgressBar(pct, new Vector2(ImGui.GetContentRegionAvail().X, ImGuiHelpers.GetButtonSize("X").Y));
+                        ImGui.PopStyleVar();
+                        ImGui.EndChild();
                     }
-
-                    if (C.Verbose)
-                    {
-                        if (ImGui.CollapsingHeader("Debug"))
-                        {
-                            ImGuiEx.InputUint("Index", ref adata.VenturePlanIndex);
-                        }
-                    }
-
-                    ImGui.Columns(1);
+                    ImGui.EndCombo();
                 }
                 else
                 {
-                    ImGuiEx.TextWrapped($"This retainer's venture plan is shared with different retainer's venture plan.");
+                    Cache.Clear();
                 }
-            }
 
+                if (adata.EnablePlanner && adata.VenturePlan.ListUnwrapped.Count > 0)
+                {
+                    var pct = (float)(adata.VenturePlanIndex) / (float)adata.VenturePlan.ListUnwrapped.Count;
+
+                    if (ImGuiEx.IconButton(Lang.IconRefresh))
+                    {
+                        adata.VenturePlanIndex = 0;
+                    }
+                    ImGui.SameLine();
+                    ImGuiEx.Tooltip("Cancels remaining ventures from this plan and starts from the beginning");
+                    ImGui.ProgressBar(pct, new Vector2(ImGui.GetContentRegionAvail().X, ImGuiHelpers.GetButtonSize("X").Y));
+                }
+
+                if (C.Verbose)
+                {
+                    if (ImGui.CollapsingHeader("Debug"))
+                    {
+                        ImGuiEx.InputUint("Index", ref adata.VenturePlanIndex);
+                    }
+                }
+
+                ImGui.Columns(1);
+            }
+            else
+            {
+                ImGuiEx.TextWrapped($"This retainer's venture plan is shared with different retainer's venture plan.");
+            }
         }
+
     }
 }

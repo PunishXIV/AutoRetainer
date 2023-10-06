@@ -1,4 +1,4 @@
-﻿using AutoRetainer.Configuration;
+﻿using AutoRetainer.Modules.Voyage;
 using AutoRetainerAPI.Configuration;
 using ClickLib.Clicks;
 using Dalamud;
@@ -19,16 +19,34 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
-using PInvoke;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
 
 namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
+
+    public static bool ContainsAllItems<T>(this IEnumerable<T> a, IEnumerable<T> b)
+    {
+        return !b.Except(a).Any();
+    }
+
+    internal static string Read(byte* ptr)
+    {
+        return MemoryHelper.ReadStringNullTerminated((nint)ptr);
+    }
+
+    internal static float Random { get; private set; } = 1f;
+    internal static void RegenerateRandom()
+    {
+        Random = (float)new Random().NextDouble();
+        DebugLog($"Random regenerated: {Random}");
+    }
+
     internal static bool MultiModeOrArtisan => MultiMode.Active || (SchedulerMain.PluginEnabled && SchedulerMain.Reason == PluginEnableReason.Artisan);
+    internal static bool IsBusy => P.TaskManager.IsBusy || AutoGCHandin.Operation || AutoLogin.Instance.IsRunning;
+    internal static AtkValue ZeroAtkValue = new() { Type = 0, Int = 0 };
 
     internal static void FixKeys()
     {
@@ -48,7 +66,7 @@ internal static unsafe class Utils
 
     internal static IEnumerable<string> GetEObjNames(params uint[] values)
     {
-        foreach(var x in values)
+        foreach (var x in values)
         {
             yield return Svc.Data.GetExcelSheet<EObjName>().GetRow(x).Singular.ToDalamudString().ExtractText();
         }
@@ -62,7 +80,7 @@ internal static unsafe class Utils
             if (Player.Object.StatusList.TryGetFirst(x => x.StatusId == 414, out var s)) ret = 1f + (float)s.StackCount / 100f;
             if (Player.Object.StatusList.Any(x => x.StatusId == 1078)) ret = 1.15f;
         }
-        return ret > 1f?ret:1f;
+        return ret > 1f ? ret : 1f;
     }
 
     internal static bool TryGetCharacterIndex(string name, out int index)
@@ -100,7 +118,7 @@ internal static unsafe class Utils
     internal static int GetJobLevel(this OfflineCharacterData data, uint job)
     {
         var d = Svc.Data.GetExcelSheet<ClassJob>().GetRow(job);
-        if(d != null)
+        if (d != null)
         {
             try
             {
@@ -118,15 +136,15 @@ internal static unsafe class Utils
 
     internal static bool CanAutoLogin()
     {
-        return !Svc.ClientState.IsLoggedIn 
-            && !Svc.Condition.Any() 
-            && !P.TaskManager.IsBusy 
-            && !AutoLogin.Instance.IsRunning 
-            && TryGetAddonByName<AtkUnitBase>("_TitleMenu", out var title) 
-            && IsAddonReady(title) 
-            && title->UldManager.NodeListCount > 3 
-            && title->UldManager.NodeList[3]->Color.A == 0xFF 
-            && !TryGetAddonByName<AtkUnitBase>("TitleDCWorldMap", out _) 
+        return !Svc.ClientState.IsLoggedIn
+            && !Svc.Condition.Any()
+            && !P.TaskManager.IsBusy
+            && !AutoLogin.Instance.IsRunning
+            && TryGetAddonByName<AtkUnitBase>("_TitleMenu", out var title)
+            && IsAddonReady(title)
+            && title->UldManager.NodeListCount > 3
+            && title->UldManager.NodeList[3]->Color.A == 0xFF
+            && !TryGetAddonByName<AtkUnitBase>("TitleDCWorldMap", out _)
             && !TryGetAddonByName<AtkUnitBase>("TitleConnect", out _);
     }
 
@@ -144,7 +162,7 @@ internal static unsafe class Utils
     internal static uint GetNextPlannedVenture(this AdditionalRetainerData data)
     {
         var index = data.GetNextPlannedVentureIndex();
-        if(index == -1)
+        if (index == -1)
         {
             return 0;
         }
@@ -162,9 +180,9 @@ internal static unsafe class Utils
         }
         else
         {
-            if(data.VenturePlanIndex >= data.VenturePlan.ListUnwrapped.Count)
+            if (data.VenturePlanIndex >= data.VenturePlan.ListUnwrapped.Count)
             {
-                if(data.VenturePlan.PlanCompleteBehavior == PlanCompleteBehavior.Restart_plan)
+                if (data.VenturePlan.PlanCompleteBehavior == PlanCompleteBehavior.Restart_plan)
                 {
                     return 0;
                 }
@@ -246,13 +264,34 @@ internal static unsafe class Utils
         return ("InventoryRetainer", 5);
     }
 
-    internal static GameObject GetReachableRetainerBell()
+    internal static GameObject GetNearestRetainerBell(out float Distance)
+    {
+        var currentDistance = float.MaxValue;
+        GameObject currentObject = null;
+        foreach (var x in Svc.Objects)
+        {
+            if (x.IsTargetable && (x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName))
+            {
+                var distance = Vector3.Distance(Svc.ClientState.LocalPlayer.Position, x.Position);
+                if (distance < currentDistance)
+                {
+                    currentDistance = distance;
+                    currentObject = x;
+                }
+            }
+        }
+        Distance = currentDistance;
+        return currentObject;
+    }
+
+    internal static GameObject GetReachableRetainerBell(bool extend)
     {
         foreach (var x in Svc.Objects)
         {
-            if ((x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName, "リテイナーベル"))
+            if ((x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName))
             {
-                if (Vector3.Distance(x.Position, Svc.ClientState.LocalPlayer.Position) < GetValidInteractionDistance(x) && x.IsTargetable())
+                var distance = extend && VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType) ? 20f : GetValidInteractionDistance(x);
+                if (Vector3.Distance(x.Position, Svc.ClientState.LocalPlayer.Position) < distance && x.IsTargetable)
                 {
                     return x;
                 }
@@ -288,9 +327,52 @@ internal static unsafe class Utils
         return key;
     }
 
-    internal static bool GenericThrottle => EzThrottler.Throttle("AutoRetainerGenericThrottle", C.Delay);
-    internal static void RethrottleGeneric(int num) => EzThrottler.Throttle("AutoRetainerGenericThrottle", num, true);
-    internal static void RethrottleGeneric() => EzThrottler.Throttle("AutoRetainerGenericThrottle", C.Delay, true);
+    public static string UpperCaseStr(Lumina.Text.SeString s, sbyte article = 0)
+    {
+        if (article == 1)
+            return s.ToDalamudString().ToString();
+
+        var sb = new StringBuilder(s.ToDalamudString().ToString());
+        var lastSpace = true;
+        for (var i = 0; i < sb.Length; ++i)
+        {
+            if (sb[i] == ' ')
+            {
+                lastSpace = true;
+            }
+            else if (lastSpace)
+            {
+                lastSpace = false;
+                sb[i] = char.ToUpperInvariant(sb[i]);
+            }
+        }
+
+        return sb.ToString();
+    }
+
+    internal static bool GenericThrottle => C.UseFrameDelay ? FrameThrottler.Throttle("AutoRetainerGenericThrottle", C.FrameDelay) : EzThrottler.Throttle("AutoRetainerGenericThrottle", C.Delay);
+    internal static void RethrottleGeneric(int num)
+    {
+        if (C.UseFrameDelay)
+        {
+            FrameThrottler.Throttle("AutoRetainerGenericThrottle", num, true);
+        }
+        else
+        {
+            EzThrottler.Throttle("AutoRetainerGenericThrottle", num, true);
+        }
+    }
+    internal static void RethrottleGeneric()
+    {
+        if (C.UseFrameDelay)
+        {
+            FrameThrottler.Throttle("AutoRetainerGenericThrottle", C.FrameDelay, true);
+        }
+        else
+        {
+            EzThrottler.Throttle("AutoRetainerGenericThrottle", C.Delay, true);
+        }
+    }
 
     internal static bool TrySelectSpecificEntry(string text, Func<bool> Throttler = null)
     {
@@ -299,7 +381,8 @@ internal static unsafe class Utils
 
     internal static bool TrySelectSpecificEntry(IEnumerable<string> text, Func<bool> Throttler = null)
     {
-        if (TryGetAddonByName<AddonSelectString>("SelectString", out var addon) && IsAddonReady(&addon->AtkUnitBase))
+        return TrySelectSpecificEntry((x) => x.EqualsAny(text), Throttler);
+        /*if (TryGetAddonByName<AddonSelectString>("SelectString", out var addon) && IsAddonReady(&addon->AtkUnitBase))
         {
             var entry = GetEntries(addon).FirstOrDefault(x => x.EqualsAny(text));
             if (entry != null)
@@ -308,7 +391,30 @@ internal static unsafe class Utils
                 if (index >= 0 && IsSelectItemEnabled(addon, index) && (Throttler?.Invoke() ?? GenericThrottle))
                 {
                     ClickSelectString.Using((nint)addon).SelectItem((ushort)index);
-                    P.DebugLog($"TrySelectSpecificEntry: selecting {entry}/{index} as requested by {text.Print()}");
+                    DebugLog($"TrySelectSpecificEntry: selecting {entry}/{index} as requested by {text.Print()}");
+                    return true;
+                }
+            }
+        }
+        else
+        {
+            RethrottleGeneric();
+        }
+        return false;*/
+    }
+
+    internal static bool TrySelectSpecificEntry(Func<string, bool> inputTextTest, Func<bool> Throttler = null)
+    {
+        if (TryGetAddonByName<AddonSelectString>("SelectString", out var addon) && IsAddonReady(&addon->AtkUnitBase))
+        {
+            var entry = GetEntries(addon).FirstOrDefault(inputTextTest);
+            if (entry != null)
+            {
+                var index = GetEntries(addon).IndexOf(entry);
+                if (index >= 0 && IsSelectItemEnabled(addon, index) && (Throttler?.Invoke() ?? GenericThrottle))
+                {
+                    ClickSelectString.Using((nint)addon).SelectItem((ushort)index);
+                    DebugLog($"TrySelectSpecificEntry: selecting {entry}/{index}");
                     return true;
                 }
             }
@@ -490,7 +596,18 @@ internal static unsafe class Utils
 
     internal static bool IsInventoryFree()
     {
-        return GetInventoryFreeSlotCount() >= 2;
+        return GetInventoryFreeSlotCount() >= C.MultiMinInventorySlots;
+    }
+
+    internal static void ResetEscIgnoreByWindows()
+    {
+        P.SubmarinePointPlanUI.RespectCloseHotkey = !C.IgnoreEsc;
+        P.SubmarineUnlockPlanUI.RespectCloseHotkey = !C.IgnoreEsc;
+        P.configGui.RespectCloseHotkey = !C.IgnoreEsc;
+        P.VenturePlanner.RespectCloseHotkey = !C.IgnoreEsc;
+        P.VentureBrowser.RespectCloseHotkey = !C.IgnoreEsc;
+        P.LogWindow.RespectCloseHotkey = !C.IgnoreEsc;
+        P.DuplicateBlacklistSelector.RespectCloseHotkey = !C.IgnoreEsc;
     }
 
     internal static string ToTimeString(long seconds)
@@ -509,7 +626,7 @@ internal static unsafe class Utils
     {
         return o != null &&
             (o.ObjectKind == ObjectKind.EventObj || o.ObjectKind == ObjectKind.Housing)
-            && o.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName, "リテイナーベル");
+            && o.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName);
     }
 
     internal static long GetVentureSecondsRemaining(this SeRetainer ret, bool allowNegative = true)
@@ -546,7 +663,7 @@ internal static unsafe class Utils
 
     internal static int GetInventoryFreeSlotCount()
     {
-        InventoryType[] types = new InventoryType[] { InventoryType.Inventory1, InventoryType.Inventory2, InventoryType.Inventory3, InventoryType.Inventory4 };
+        InventoryType[] types = [InventoryType.Inventory1, InventoryType.Inventory2, InventoryType.Inventory3, InventoryType.Inventory4];
         var c = InventoryManager.Instance();
         var slots = 0;
         foreach (var x in types)
@@ -602,5 +719,25 @@ internal static unsafe class Utils
         {
             return source.Contains($"Retainer: {name}");
         }
+    }
+
+    internal static GameObject GetNearestWorkshopEntrance(out float Distance)
+    {
+        var currentDistance = float.MaxValue;
+        GameObject currentObject = null;
+        foreach (var x in Svc.Objects)
+        {
+            if (x.IsTargetable && x.Name.ToString().EqualsIgnoreCaseAny(Lang.AdditionalChambersEntrance))
+            {
+                var distance = Vector3.Distance(Svc.ClientState.LocalPlayer.Position, x.Position);
+                if (distance < currentDistance)
+                {
+                    currentDistance = distance;
+                    currentObject = x;
+                }
+            }
+        }
+        Distance = currentDistance;
+        return currentObject;
     }
 }

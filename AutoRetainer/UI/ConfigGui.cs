@@ -2,9 +2,9 @@
 using ECommons.Configuration;
 using PunishLib.ImGuiMethods;
 using AutoRetainer.UI.Settings;
-using Dalamud.Interface.Style;
 using AutoRetainerAPI.Configuration;
 using AutoRetainerAPI;
+using AutoRetainer.Modules.Voyage;
 
 namespace AutoRetainer.UI;
 
@@ -35,6 +35,7 @@ unsafe internal class ConfigGui : Window
     {
         var e = SchedulerMain.PluginEnabledInternal;
         var disabled = MultiMode.Active && !ImGui.GetIO().KeyCtrl;
+
         if (disabled)
         {
             ImGui.BeginDisabled();
@@ -62,12 +63,24 @@ unsafe internal class ConfigGui : Window
             ImGui.SameLine();
             ImGuiEx.Text(GradientColor.Get(ImGuiColors.DalamudGrey, ImGuiColors.DalamudGrey3, 500), $"Paused");
         }
+
+        if (VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType) || VoyageScheduler.Enabled)
+        {
+            ImGui.SameLine();
+            ImGui.Checkbox($"Enable Deployables", ref VoyageScheduler.Enabled);
+        }
         ImGui.SameLine();
-        if(ImGui.Checkbox("Multi", ref MultiMode.Enabled))
+        if (ImGui.Checkbox("Multi", ref MultiMode.Enabled))
         {
             MultiMode.OnMultiModeEnabled();
         }
-        if(C.CharEqualize && MultiMode.Enabled)
+        if (C.DisplayMMType)
+        {
+            ImGui.SameLine();
+            ImGui.SetNextItemWidth(100f);
+            ImGuiEx.EnumCombo("##mode", ref C.MultiModeType);
+        }
+        if (C.CharEqualize && MultiMode.Enabled)
         {
             ImGui.SameLine();
             if(ImGui.Button("Reset counters"))
@@ -100,6 +113,7 @@ unsafe internal class ConfigGui : Window
 
         ImGuiEx.EzTabBar("tabbar",
                 ("Retainers", MultiModeUI.Draw, null, true),
+                ("Deployables", WorkshopUI.Draw, null, true),
                 (C.RecordStats ? "Statistics" : null, StatisticsUI.Draw, null, true),
                 ("Settings", SettingsMain.Draw, null, true),
                 (C.Expert?"Expert":null, Expert.Draw, null, true),

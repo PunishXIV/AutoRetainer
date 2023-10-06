@@ -153,6 +153,10 @@ internal unsafe static class DebugScheduler
             }
         }
         ImGui.InputText("Retainer name", ref dbgRetName, 50);
+        if(ImGui.Button("Select retainer by name"))
+        {
+            DuoLog.Information($"{RetainerListHandlers.SelectRetainerByName(dbgRetName)}");
+        }
 
         if (ImGui.Button("AtkStage get focus"))
         {

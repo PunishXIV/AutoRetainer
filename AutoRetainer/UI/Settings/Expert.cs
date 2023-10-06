@@ -38,6 +38,8 @@ internal static class Expert
             ImGui.Checkbox($"Auto-disable plugin when closing retainer list", ref C.AutoDisable);
             ImGuiEx.TextWrapped($"Only applies when you exit menu by yourself. Otherwise, settings above apply.");
             ImGui.Checkbox($"Do not show plugin status icons", ref C.HideOverlayIcons);
+
+            ImGui.Checkbox($"Display multi mode type selector", ref C.DisplayMMType);
         });
 
         InfoBox.DrawBox("Settings##expert", delegate
@@ -47,6 +49,20 @@ internal static class Expert
             ImGui.SetNextItemWidth(100f);
             ImGuiEx.SliderIntAsFloat("Retainer menu delay, seconds", ref C.RetainerMenuDelay.ValidateRange(0, 2000), 0, 2000);
             ImGui.Checkbox($"Allow venture timer to display negative values", ref C.TimerAllowNegative);
+            ImGui.Checkbox($"Do not error check venture planner", ref C.NoErrorCheckPlanner2);
+            ImGui.Checkbox($"Artisan integration", ref C.ArtisanIntegration);
+            ImGuiComponents.HelpMarker($"Automatically enables AutoRetainer while Artisan is Pauses Artisan operation when ventures are ready to be collected and a retainer bell is within range. Once ventures have been dealt with Artisan will be enabled and resume whatever it was doing.");
+            if(ImGui.Checkbox($"MarketCooldownOverlay", ref C.MarketCooldownOverlay))
+            {
+                if (C.MarketCooldownOverlay)
+                {
+                    P.Memory.OnReceiveMarketPricePacketHook?.Enable();
+                }
+                else
+                {
+                    P.Memory.OnReceiveMarketPricePacketHook?.Disable();
+                }
+            }
         });
 
         InfoBox.DrawBox("Server time", delegate

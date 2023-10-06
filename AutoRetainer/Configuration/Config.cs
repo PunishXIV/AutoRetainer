@@ -1,9 +1,6 @@
 ﻿using AutoRetainerAPI.Configuration;
 using ECommons.Configuration;
 using ECommons.Interop;
-using ECommons.MathHelpers;
-using PInvoke;
-using System.Windows.Forms;
 
 namespace AutoRetainer.Configuration;
 
@@ -15,11 +12,9 @@ internal unsafe class Config : IEzConfig
     public bool EnableAssigningQuickExploration = false;
     public bool Verbose = false;
     public List<OfflineCharacterData> OfflineData = new();
-    public bool MultiWaitForAll = false;
     //public bool MultipleServiceAccounts = false;
     public bool NoNames = false;
     public int UnsyncCompensation = -5;
-    public int AdvanceTimer = 60;
     public bool StatsUnifyHQ = false;
     public bool RecordStats = true;
     public bool EnableAutoGCHandin = false; //todo: remove
@@ -38,6 +33,7 @@ internal unsafe class Config : IEzConfig
     public bool UnsafeProtection = false;
     public bool CharEqualize = false;
     public bool TimerAllowNegative = false;
+    public bool MarketCooldownOverlay = false;
 
     public bool LoginOverlay = false;
     public float LoginOverlayScale = 1f;
@@ -52,7 +48,9 @@ internal unsafe class Config : IEzConfig
     public bool Stay5 = true;
     public bool NoCurrentCharaOnTop = false;
 
+    internal bool UseFrameDelay = true;
     public int Delay = 200;
+    public int FrameDelay = 8;
 
     public bool _dontReassign = false;
     public bool OldRetainerSense = false;
@@ -72,6 +70,19 @@ internal unsafe class Config : IEzConfig
     public bool ShowAdditionalInfo = true;
     public bool RetryItemSearch = false;
     public bool ArtisanIntegration = false;
+    public bool DisplayMMType = false;
+    public List<SubmarineUnlockPlan> SubmarineUnlockPlans = new();
+    public bool HideAirships = false;
+    public int DisableRetainerVesselReturn = 0;
+    public List<SubmarinePointPlan> SubmarinePointPlans = new();
+    public int MultiMinInventorySlots = 2;
+    public bool IgnoreEsc = false;
+
+    public int UIWarningRetSlotNum = 20;
+    public int UIWarningRetVentureNum = 50;
+    public int UIWarningDepTanksNum = 300;
+    public int UIWarningDepRepairNum = 100;
+    public int UIWarningDepSlotNum = 20;
 
     internal bool DontReassign
     {
@@ -101,4 +112,30 @@ internal unsafe class Config : IEzConfig
     public bool UnlockFPS = true;
     public bool UnlockFPSUnlimited = false;
     public bool UnlockFPSChillFrames = false;
+
+    public bool ManipulatePriority = false;
+
+    public bool SubsAutoResend = false;
+    public bool SubsAutoRepair = true;
+    public bool SubsOnlyFinalize = false;
+    public bool SubsAutoEnable = false;
+    public bool SubsRepairFinalize = true;
+    public MultiModeType MultiModeType = MultiModeType.Everything;
+    public bool NoErrorCheckPlanner2 = true;
+    public WorkshopFailAction FailureNoFuel = WorkshopFailAction.ExcludeChar;
+    public WorkshopFailAction FailureNoRepair = WorkshopFailAction.ExcludeVessel;
+    public WorkshopFailAction FailureNoInventory = WorkshopFailAction.ExcludeChar;
+    public WorkshopFailAction FailureGeneric = WorkshopFailAction.StopPlugin;
+    internal bool SimpleTweaksCompat = true;
+
+    public MultiModeCommonConfiguration MultiModeRetainerConfiguration = new()
+    {
+        AdvanceTimer = 60,
+        MultiWaitForAll = false,
+    };
+    public MultiModeCommonConfiguration MultiModeWorkshopConfiguration = new()
+    {
+        MultiWaitForAll = false,
+        AdvanceTimer = 120,
+    };
 }
