@@ -1,26 +1,25 @@
 ﻿using Dalamud.Memory;
 
-namespace AutoRetainer.Modules.Voyage
+namespace AutoRetainer.Modules.Voyage;
+
+[StructLayout(LayoutKind.Explicit, Size = Offsets.Submersible.StatusSize)]
+internal unsafe struct SubmersibleStatus
 {
-    [StructLayout(LayoutKind.Explicit, Size = Offsets.Submersible.StatusSize)]
-    internal unsafe struct SubmersibleStatus
+    [FieldOffset(Offsets.Submersible.StatusTimeStamp)]
+    internal uint TimeStamp;
+
+    [FieldOffset(Offsets.Submersible.StatusRawName)]
+    internal fixed byte RawName[Offsets.Submersible.StatusRawNameSize];
+
+    internal string Name
     {
-        [FieldOffset(Offsets.Submersible.StatusTimeStamp)]
-        internal uint TimeStamp;
-
-        [FieldOffset(Offsets.Submersible.StatusRawName)]
-        internal fixed byte RawName[Offsets.Submersible.StatusRawNameSize];
-
-        internal string Name
+        get
         {
-            get
+            fixed (byte* name = RawName)
             {
-                fixed (byte* name = RawName)
-                {
-                    return MemoryHelper.ReadStringNullTerminated((IntPtr)name);
-                }
+                return MemoryHelper.ReadStringNullTerminated((IntPtr)name);
             }
         }
-
     }
+
 }

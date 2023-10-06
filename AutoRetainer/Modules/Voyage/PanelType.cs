@@ -1,7 +1,6 @@
-﻿namespace AutoRetainer.Modules.Voyage
+﻿namespace AutoRetainer.Modules.Voyage;
+
+internal enum PanelType
 {
-    internal enum PanelType
-    {
-        None, Unknown, TypeSelector, Airship, Submersible
-    }
+    None, Unknown, TypeSelector, Airship, Submersible
 }

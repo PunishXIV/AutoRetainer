@@ -1,26 +1,25 @@
 ﻿using Dalamud.Memory;
 
-namespace AutoRetainer.Modules.Voyage
+namespace AutoRetainer.Modules.Voyage;
+
+[StructLayout(LayoutKind.Explicit, Size = Offsets.Airship.StatusSize)]
+internal unsafe struct AirshipStatus
 {
-    [StructLayout(LayoutKind.Explicit, Size = Offsets.Airship.StatusSize)]
-    internal unsafe struct AirshipStatus
+    [FieldOffset(Offsets.Airship.StatusTimeStamp)]
+    internal uint TimeStamp;
+
+    [FieldOffset(Offsets.Airship.StatusRawName)]
+    internal fixed byte RawName[Offsets.Airship.StatusRawNameSize];
+
+    internal string Name
     {
-        [FieldOffset(Offsets.Airship.StatusTimeStamp)]
-        internal uint TimeStamp;
-
-        [FieldOffset(Offsets.Airship.StatusRawName)]
-        internal fixed byte RawName[Offsets.Airship.StatusRawNameSize];
-
-        internal string Name
+        get
         {
-            get
+            fixed (byte* name = RawName)
             {
-                fixed (byte* name = RawName)
-                {
-                    return MemoryHelper.ReadStringNullTerminated((IntPtr)name);
-                }
+                return MemoryHelper.ReadStringNullTerminated((IntPtr)name);
             }
         }
-
     }
+
 }
