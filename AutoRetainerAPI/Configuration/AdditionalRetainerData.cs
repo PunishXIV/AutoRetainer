@@ -1,10 +1,12 @@
 ﻿using AutoRetainerAPI.Configuration;
 using ECommons.DalamudServices;
 using System;
+using System.Reflection;
 
 namespace AutoRetainerAPI.Configuration;
 
 [Serializable]
+[Obfuscation(Exclude = true, ApplyToMembers = true)]
 public class AdditionalRetainerData
 {
     public readonly ulong CreationFrame = Svc.PluginInterface.UiBuilder.FrameCount;

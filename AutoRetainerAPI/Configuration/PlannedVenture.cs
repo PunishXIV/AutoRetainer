@@ -2,12 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace AutoRetainerAPI.Configuration
 {
     [Serializable]
+    [Obfuscation(Exclude = true, ApplyToMembers = true)]
     public class PlannedVenture
     {
         [NonSerialized] public string GUID = Guid.NewGuid().ToString();

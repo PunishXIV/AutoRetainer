@@ -3,10 +3,12 @@ using ECommons.DalamudServices;
 using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace AutoRetainerAPI.Configuration;
 
 [Serializable]
+[Obfuscation(Exclude = true, ApplyToMembers = true)]
 public class OfflineCharacterData
 {
     public readonly ulong CreationFrame = Svc.PluginInterface.UiBuilder.FrameCount;
