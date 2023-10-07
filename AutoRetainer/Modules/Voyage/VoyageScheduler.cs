@@ -17,12 +17,12 @@ internal unsafe static class VoyageScheduler
 {
     internal static void Log(string t) => VoyageUtils.Log(t);
     internal static bool Enabled = false;
-    internal static bool? SelectQuitVesselMenu() => Utils.TrySelectSpecificEntry("Quit");
+    internal static bool? SelectQuitVesselMenu() => Utils.TrySelectSpecificEntry(Lang.VoyageQuitEntry);
 
     internal static bool? ConfirmRepair()
     {
         if (TaskRepairAll.Abort) return true;
-        var x = Utils.GetSpecificYesno((s) => s.ContainsAny(StringComparison.OrdinalIgnoreCase, "repair"));
+        var x = Utils.GetSpecificYesno((s) => s.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.WorkshopRepairConfirm));
         if(x != null && Utils.GenericThrottle)
         {
             Log("Confirming repair");

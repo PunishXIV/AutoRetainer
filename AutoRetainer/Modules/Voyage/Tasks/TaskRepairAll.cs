@@ -15,7 +15,7 @@ internal unsafe static class TaskRepairAll
         Type = type;
         Abort = false;
         var vesselIndex = VoyageUtils.GetVesselIndexByName(vesselName, type);
-        P.TaskManager.EnqueueImmediate(() => Utils.TrySelectSpecificEntry(new string[] { "Repair submersible components" , "Repair airship components"}, () => EzThrottler.Throttle("RepairAllSelectRepair")), "RepairAllSelectRepair");
+        P.TaskManager.EnqueueImmediate(() => Utils.TrySelectSpecificEntry(Lang.WorkshopRepair, () => EzThrottler.Throttle("RepairAllSelectRepair")), "RepairAllSelectRepair");
         foreach(int index in indexes)
         {
             if(index < 0 || index > 3) throw new ArgumentOutOfRangeException(nameof(index));
