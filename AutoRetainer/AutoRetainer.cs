@@ -63,6 +63,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal uint ListUpdateFrame = 0;
 
     internal bool LogOpcodes = false;
+    internal int LastLoadedItems = 0;
 
     internal static OfflineCharacterData Data => Utils.GetCurrentCharacterData();
 
@@ -271,7 +272,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         TextAdvanceManager.Tick();
         if (Svc.Condition[ConditionFlag.OccupiedSummoningBell] && Utils.TryGetCurrentRetainer(out var name) && Utils.TryGetRetainerByName(name, out var retainer))
         {
-            if(!retainer.VentureID.EqualsAny(0u, LastVentureID))
+            if (!retainer.VentureID.EqualsAny(0u, LastVentureID))
             {
                 LastVentureID = retainer.VentureID;
                 PluginLog.Debug($"Retainer {retainer.Name} current venture={LastVentureID}");

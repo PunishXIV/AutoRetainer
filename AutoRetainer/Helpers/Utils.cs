@@ -26,12 +26,14 @@ namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
-    public static void ExtraLog(string s)
+    internal static int LoadedItems => AtkStage.GetSingleton()->GetNumberArrayData()[36]->IntArray[401];
+
+    internal static void ExtraLog(string s)
     {
         if (C.ExtraDebug) PluginLog.Debug(s);
     }
 
-    public static bool ContainsAllItems<T>(this IEnumerable<T> a, IEnumerable<T> b)
+    internal static bool ContainsAllItems<T>(this IEnumerable<T> a, IEnumerable<T> b)
     {
         return !b.Except(a).Any();
     }
@@ -517,7 +519,7 @@ internal static unsafe class Utils
                 if (IsAddonReady(addon))
                 {
                     var textNode = addon->UldManager.NodeList[15]->GetAsAtkTextNode();
-                    var text = MemoryHelper.ReadSeString(&textNode->NodeText).ExtractText().Replace(" ", "");
+                    var text = MemoryHelper.ReadSeString(&textNode->NodeText).ExtractText();
                     if (compare(text))
                     {
                         PluginLog.Verbose($"SelectYesno {text} addon {i} by predicate");
