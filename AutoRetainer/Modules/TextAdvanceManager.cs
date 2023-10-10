@@ -17,7 +17,7 @@ internal static class TextAdvanceManager
                 PluginLog.Debug($"TextAdvance unlocked");
             }
         }
-        else if (C.UnlockFPS)
+        else
         {
             if (IsBusy)
             {

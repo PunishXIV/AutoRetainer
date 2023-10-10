@@ -22,6 +22,7 @@ using ECommons.GameHelpers;
 using AutoRetainer.Modules.Voyage;
 using Dalamud.Game.Network;
 using AutoRetainer.Scheduler.Handlers;
+using System.Threading;
 
 namespace AutoRetainer;
 
@@ -131,10 +132,12 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 PluginLog.Information($"AutoRetainer v{P.GetType().Assembly.GetName().Version} is ready.");
                 Svc.GameNetwork.NetworkMessage += GameNetwork_NetworkMessage;
                 Utils.ResetEscIgnoreByWindows();
+                Svc.PluginInterface.UiBuilder.Draw += FPSLimiter.FPSLimit;
             });
         }
         //);
     }
+
 
     private void GameNetwork_NetworkMessage(nint dataPtr, ushort opCode, uint sourceActorId, uint targetActorId, NetworkMessageDirection direction)
     {
@@ -364,6 +367,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         {
             Safe(this.quickSellItems.Disable);
             Safe(this.quickSellItems.Dispose);
+            Svc.PluginInterface.UiBuilder.Draw -= FPSLimiter.FPSLimit;
             Svc.PluginInterface.UiBuilder.Draw -= ws.Draw;
             Svc.ClientState.Logout -= Logout;
             Svc.Condition.ConditionChange -= ConditionChange;

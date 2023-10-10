@@ -31,7 +31,7 @@ internal unsafe static class MultiMode
     internal static CircularBuffer<long> Interactions = new(5);
 
     internal static Dictionary<ulong, int> CharaCnt = new();
-    internal static bool CanHET => Active && C.MultiAllowHET && ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType);
+    internal static bool CanHET => Active && C.ExpertMultiAllowHET && ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType);
 
     internal static void Init()
     {

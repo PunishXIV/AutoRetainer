@@ -262,22 +262,7 @@ internal unsafe static class MultiModeUI
                             if (ImGui.IsItemHovered())
                             {
                                 ImGui.BeginTooltip();
-                                for (int j = 0; j < adata.VenturePlan.ListUnwrapped.Count; j++)
-                                {
-                                    var v = adata.VenturePlan.ListUnwrapped[j];
-                                    if (j == adata.VenturePlanIndex - 1)
-                                    {
-                                        ImGuiEx.Text(ImGuiColors.ParsedGreen, $"{VentureUtils.GetFancyVentureName(v, data, ret, out _)}");
-                                    }
-                                    else if (j == adata.VenturePlanIndex || (j == 0 && adata.VenturePlan.PlanCompleteBehavior == PlanCompleteBehavior.Restart_plan && adata.VenturePlanIndex >= adata.VenturePlan.ListUnwrapped.Count))
-                                    {
-                                        ImGuiEx.Text(ImGuiColors.DalamudYellow, $"{VentureUtils.GetFancyVentureName(v, data, ret, out _)}");
-                                    }
-                                    else
-                                    {
-                                        ImGuiEx.Text($"{VentureUtils.GetFancyVentureName(v, data, ret, out _)}");
-                                    }
-                                }
+                                VentureUtils.BuildUnwrappedList(adata, data, ret);
                                 ImGui.EndTooltip();
                             }
                         }

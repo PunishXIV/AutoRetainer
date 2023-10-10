@@ -63,6 +63,12 @@ internal static class Expert
                     P.Memory.OnReceiveMarketPricePacketHook?.Disable();
                 }
             }
+
+            ImGui.Checkbox($"Housing Bell Support", ref C.ExpertMultiAllowHET);
+            ImGui.PushStyleColor(ImGuiCol.TextDisabled, ImGuiColors.DalamudOrange);
+            ImGuiComponents.HelpMarker("A Summoning Bell must be within range of the spawn point once the home is entered, or a workshop must be purchased.");
+            ImGui.PopStyleColor();
+            ImGui.Checkbox($"Upon activating Multi Mode, attempt to enter nearby house", ref C.MultiHETOnEnable);
         });
 
         InfoBox.DrawBox("Server time", delegate

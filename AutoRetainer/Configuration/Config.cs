@@ -21,7 +21,7 @@ internal unsafe class Config : IEzConfig
     public bool ShouldSerializeEnableAutoGCHandin() => false;
     public bool GCHandinNotify = false;
     internal bool BypassSanctuaryCheck = false;
-    public bool MultiAllowHET = false;
+    public bool ExpertMultiAllowHET = true;
     public bool MultiHETOnEnable = true;
     public bool UseServerTime = true;
     public bool NoTheme = false;
@@ -83,6 +83,9 @@ internal unsafe class Config : IEzConfig
     public int UIWarningDepTanksNum = 300;
     public int UIWarningDepRepairNum = 100;
     public int UIWarningDepSlotNum = 20;
+    public int TargetMSPTIdle = 0;
+    public int TargetMSPTRunning = 0;
+    public bool NoFPSLockWhenActive = true;
 
     internal bool ExtraDebug = false;
 

@@ -19,12 +19,30 @@ internal static class SettingsMain
         ImGuiEx.EzTabBar("GeneralSettings",
             ("General", TabGeneral, null, true),
             ("Multi Mode", TabMulti, null, true),
+            ("Deployables", TabDeployables, null, true),
             //("Contingency", TabCont, null, true),
             //("Login Overlay", TabLoginOverlay, null, true),
             ("Character Order", TabCharaOrder, null, true),
             ("Exclusions", TabExclusions, null, true),
             ("Other", TabOther, null, true)
             );
+    }
+
+    static void TabDeployables()
+    {
+        if (ImGuiGroup.BeginGroupBox("General Deployables Settings"))
+        {
+            ImGui.Checkbox($"Resend vessels when accessing the Voyage Control Panel", ref C.SubsAutoResend);
+            ImGuiEx.Spacing(); ImGui.Checkbox($"Finalise Only", ref C.SubsOnlyFinalize);
+            ImGuiComponents.HelpMarker("Does not redeploy your deployables and instead only finalises their voyages.");
+            ImGuiEx.Spacing(); ImGuiEx.Spacing(); ImGui.Checkbox($"Repair Deployables on Resend", ref C.SubsAutoRepair);
+            ImGuiEx.Spacing(); ImGuiEx.Spacing(); ImGui.Checkbox($"Repair After Finalising", ref C.SubsRepairFinalize);
+            ImGui.Checkbox($"Hide Airships from Deployables UI", ref C.HideAirships);
+            ImGui.SetNextItemWidth(60);
+            ImGui.DragInt("Retainer venture processing cutoff", ref C.DisableRetainerVesselReturn.ValidateRange(0, 60));
+            ImGuiComponents.HelpMarker("The number of minutes remaining on deployable voyages to prevent processing of retainer tasks.");
+            ImGuiGroup.EndGroupBox();
+        }
     }
 
     static void TabLoginOverlay()
@@ -103,15 +121,14 @@ internal static class SettingsMain
             ImGuiEx.SetNextItemFullWidth(-20);
             ImGuiEx.EnumCombo("##Critical Operation Failure", ref C.FailureGeneric, (x) => x != WorkshopFailAction.ExcludeVessel, WorkshopFailActionNames);
 
-                ImGuiEx.Text($"Jailed by the GM");
-                ImGuiComponents.HelpMarker("Applies selected fallback action in the case if you got jailed by the GM while plugin is running.");
-                ImGuiEx.InvisibleButton(3);
-                ImGui.SameLine();
-                ImGuiEx.SetNextItemFullWidth(-20);
-                ImGui.BeginDisabled();
-                if(ImGui.BeginCombo("##jailsel", "Terminate the game")) { ImGui.EndCombo(); }
-                ImGui.EndDisabled();
-                ImGuiGroup.EndGroupBox();
+            ImGuiEx.Text($"Jailed by the GM");
+            ImGuiComponents.HelpMarker("Applies selected fallback action in the case if you got jailed by the GM while plugin is running.");
+            ImGuiEx.InvisibleButton(3);
+            ImGui.SameLine();
+            ImGuiEx.SetNextItemFullWidth(-20);
+            ImGui.BeginDisabled();
+            if(ImGui.BeginCombo("##jailsel", "Terminate the game")) { ImGui.EndCombo(); }
+            ImGui.EndDisabled();
     }
 
     static void TabGeneral()
@@ -209,11 +226,6 @@ internal static class SettingsMain
     {
         if(ImGuiGroup.BeginGroupBox("Common settings"))
         {
-            ImGui.Checkbox($"Housing Bell Support", ref C.MultiAllowHET);
-            ImGui.PushStyleColor(ImGuiCol.TextDisabled, ImGuiColors.DalamudOrange);
-            ImGuiComponents.HelpMarker("A Summoning Bell must be within range of the spawn point once the home is entered, or a workshop must be purchased.");
-            ImGui.PopStyleColor();
-            ImGui.Checkbox($"Upon activating Multi Mode, attempt to enter nearby house", ref C.MultiHETOnEnable);
             ImGui.Checkbox($"Enforce Full Character Rotation", ref C.CharEqualize);
             ImGuiComponents.HelpMarker("Recommended for users with > 15 characters, forces multi mode to make sure ventures are processed on all characters in order before returning to the beginning of the cycle.");
             ImGui.Checkbox($"Wait on login screen", ref C.MultiWaitOnLoginScreen);
@@ -242,14 +254,25 @@ internal static class SettingsMain
             ImGui.SetNextItemWidth(60);
             ImGui.DragInt("Advance Relog Threshold", ref C.MultiModeWorkshopConfiguration.AdvanceTimer.ValidateRange(0, 300), 0.1f, 0, 300);
             ImGui.Checkbox("Wait even when already logged in", ref C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn);
-            ImGuiGroup.EndGroupBox();
             ImGui.PopID();
+            ImGuiGroup.EndGroupBox();
         }
 
         if (ImGuiGroup.BeginGroupBox("Contingency"))
         {
             TabCont();
-            ImGui.EndGroup();
+            ImGuiGroup.EndGroupBox();
+        }
+
+        if (ImGuiGroup.BeginGroupBox("FPS Limiter"))
+        {
+            ImGuiEx.Text($"FPS Limiter is only active when Multi Mode is enabled");
+            ImGui.SetNextItemWidth(150f);
+            ImGui.SliderInt("Target frame time when idling", ref C.TargetMSPTIdle.ValidateRange(0, 500), 0, 100);
+            ImGui.SetNextItemWidth(150f);
+            ImGui.SliderInt("Target frame time when operating", ref C.TargetMSPTRunning.ValidateRange(0, 100), 0, 50);
+            ImGui.Checkbox("Release FPS lock when game is active", ref C.NoFPSLockWhenActive);
+            ImGuiGroup.EndGroupBox();
         }
     }
 

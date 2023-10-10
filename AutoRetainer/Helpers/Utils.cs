@@ -8,6 +8,7 @@ using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Memory;
 using Dalamud.Utility;
 using ECommons.Events;
+using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;
@@ -26,6 +27,7 @@ namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
+
     internal static int LoadedItems => AtkStage.GetSingleton()->GetNumberArrayData()[36]->IntArray[401];
 
     internal static void ExtraLog(string s)
