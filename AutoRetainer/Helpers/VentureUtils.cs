@@ -17,7 +17,13 @@ internal static unsafe class VentureUtils
     {
         try
         {
-            List<(Vector4? col, string str)> strings = new();
+            if(adata.VenturePlan.ListUnwrapped.Count > 500)
+            {
+                ImGuiEx.Text($"The venture list is too large to show preview.");
+                ImGuiEx.Text($"Progress: {adata.VenturePlanIndex}/{adata.VenturePlan.ListUnwrapped.Count}");
+                return;
+            }
+            List<(Vector4? col, string str)> strings = [];
             int focus = 0;
             for (int j = 0; j < adata.VenturePlan.ListUnwrapped.Count; j++)
             {
@@ -48,7 +54,7 @@ internal static unsafe class VentureUtils
         }
         catch(Exception e)
         {
-            ImGuiEx.TextWrapped($"{e}");
+            PluginLog.Error($"{e}");
         }
     }
 
@@ -224,14 +230,25 @@ internal static unsafe class VentureUtils
 
     internal static string GetFancyVentureName(this RetainerTask Task, OfflineCharacterData data, OfflineRetainerData retainer, out bool Available) => GetFancyVentureName(Task, data, retainer, out Available, out _, out _);
 
+    static Dictionary<string, FancyVentureCacheEntry> FancyVentureNameCache = [];
     internal static string GetFancyVentureName(this RetainerTask Task, OfflineCharacterData data, OfflineRetainerData retainer, out bool Available, out string left, out string right)
     {
+        var signature = $"{Task.RowId}/{data.Identity}/{retainer.Identity}";
+        if(FancyVentureNameCache.TryGetValue(signature, out var cached) && cached.IsValid)
+        {
+            left = cached.Left;
+            right = cached.Right;
+            Available = cached.Avail;
+            return cached.Entry;
+        }
         var r = Task.GetFancyVentureNameParts(data, retainer, out Available);
         left = Available ? "" : Lang.CharDeny + r.UnavailabilitySymbols + " ";
         var lvls = r.Level == 0 ? "" : $"{Lang.CharLevel}{r.Level} ";
         right = r.Yield == 0 ? "" : $"x{r.Yield} {r.YieldStars}";
         left = $"{left}{lvls}{r.Name}";
-        return (C.Verbose ? $"#{Task.RowId}->{Task.GetAdjustedRetainerTask((Job)retainer.Job).RowId}/{Task.ClassJobCategory.Value.GetShortName()} " : "") + left + " " + right;
+        var ret = (C.Verbose ? $"#{Task.RowId}->{Task.GetAdjustedRetainerTask((Job)retainer.Job).RowId}/{Task.ClassJobCategory.Value.GetShortName()} " : "") + left + " " + right;
+        FancyVentureNameCache[signature] = new(ret, Available, left, right);
+        return ret;
     }
 
     internal static string GetShortName(this ClassJobCategory cat)
