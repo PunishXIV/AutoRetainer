@@ -254,9 +254,9 @@ internal static class SettingsMain
         {
             ImGuiEx.Text($"FPS Limiter is only active when Multi Mode is enabled");
             ImGui.SetNextItemWidth(100f);
-            SliderIntFrameTimeAsFPS("Target frame time when idling", ref C.TargetMSPTIdle, C.ExtraFPSLockRange?1:10);
+            SliderIntFrameTimeAsFPS("Target frame rate when idling", ref C.TargetMSPTIdle, C.ExtraFPSLockRange?1:10);
             ImGui.SetNextItemWidth(100f);
-            SliderIntFrameTimeAsFPS("Target frame time when operating", ref C.TargetMSPTRunning, C.ExtraFPSLockRange ? 1 : 20);
+            SliderIntFrameTimeAsFPS("Target frame rate when operating", ref C.TargetMSPTRunning, C.ExtraFPSLockRange ? 1 : 20);
             ImGui.Checkbox("Release FPS lock when game is active", ref C.NoFPSLockWhenActive);
             ImGui.Checkbox($"Allow extra low FPS limiter values", ref C.ExtraFPSLockRange);
             ImGuiComponents.HelpMarker("No support is provided if you enable this and run into ANY errors in Multi Mode");
