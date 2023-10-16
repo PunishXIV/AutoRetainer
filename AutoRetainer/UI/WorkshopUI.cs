@@ -132,10 +132,10 @@ internal static unsafe class WorkshopUI
                 {
                     if (!P.TaskManager.IsBusy)
                     {
-                        if (ImGui.Button("Resend currently selected submarine on previous voyage"))
+                        /*if (ImGui.Button("Resend currently selected submarine on previous voyage"))
                         {
                             TaskDeployOnPreviousVoyage.Enqueue();
-                        }
+                        }*/
                         if (ImGui.Button("Select best path"))
                         {
                             TaskCalculateAndPickBestExpRoute.Enqueue();
@@ -190,12 +190,12 @@ internal static unsafe class WorkshopUI
                             TaskInteractWithNearestPanel.Enqueue(false);
                         }
 
-                        if (ImGui.Button("Redeploy current vessel on previous voyage"))
+                        /*if (ImGui.Button("Redeploy current vessel on previous voyage"))
                         {
                             TaskRedeployPreviousLog.Enqueue();
-                        }
+                        }*/
 
-                        if (ImGui.Button($"Deploy current submarine on best experience route")) TaskDeployOnBestExpVoyage.Enqueue();
+                        //if (ImGui.Button($"Deploy current submarine on best experience route")) TaskDeployOnBestExpVoyage.Enqueue();
 
                     }
                     else

@@ -11,7 +11,6 @@ internal unsafe static class TaskRedeployVessel
         TaskSelectVesselByName.Enqueue(name, type);
         P.TaskManager.Enqueue(VoyageScheduler.FinalizeVessel);
         P.TaskManager.Enqueue(() => TryGetAddonByName<AtkUnitBase>("SelectString", out var addon) && IsAddonReady(addon), "WaitForSelectStringAddon");
-        TaskIntelligentRepair.Enqueue(name, type);
-        TaskRedeployPreviousLog.Enqueue();
+        TaskRedeployPreviousLog.Enqueue(name, type);
     }
 }

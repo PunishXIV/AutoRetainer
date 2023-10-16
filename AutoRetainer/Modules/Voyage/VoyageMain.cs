@@ -181,11 +181,11 @@ internal static unsafe class VoyageMain
         {
             var adata = Data.GetAdditionalVesselData(next, type);
             var data = Data.GetOfflineVesselData(next, type) ?? throw new NullReferenceException($"Offline vessel data for {next}, {type} is null");
-            if ((C.SubsOnlyFinalize || VoyageUtils.DontReassign || adata.VesselBehavior == VesselBehavior.Finalize) && data.ReturnTime != 0)
+            if ((VoyageUtils.DontReassign || adata.VesselBehavior == VesselBehavior.Finalize) && data.ReturnTime != 0)
             {
                 if (EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResend", 1000))
                 {
-                    TaskFinalizeVessel.Enqueue(next, type, false, true);
+                    TaskFinalizeVessel.Enqueue(next, type, true);
                 }
             }
             else
@@ -196,7 +196,7 @@ internal static unsafe class VoyageMain
                     {
                         if (data.ReturnTime != 0)
                         {
-                            TaskFinalizeVessel.Enqueue(next, type, true, false);
+                            TaskFinalizeVessel.Enqueue(next, type, false);
                         }
                         else
                         {
@@ -204,17 +204,17 @@ internal static unsafe class VoyageMain
                         }
                         if (adata.VesselBehavior == VesselBehavior.LevelUp)
                         {
-                            TaskDeployOnBestExpVoyage.Enqueue();
+                            TaskDeployOnBestExpVoyage.Enqueue(next, type);
                         }
                         else if(adata.VesselBehavior == VesselBehavior.Unlock)
                         {
                             if(adata.UnlockMode == UnlockMode.WhileLevelling)
                             {
-                                TaskDeployOnBestExpVoyage.Enqueue(VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan) ?? new());
+                                TaskDeployOnBestExpVoyage.Enqueue(next, type, VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan) ?? new());
                             }
                             else if(adata.UnlockMode.EqualsAny(UnlockMode.SpamOne, UnlockMode.MultiSelect))
                             {
-                                TaskDeployOnUnlockRoute.Enqueue(VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan) ?? new(), adata.UnlockMode);
+                                TaskDeployOnUnlockRoute.Enqueue(next, type, VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan) ?? new(), adata.UnlockMode);
                             }
                             else
                             {
@@ -226,7 +226,7 @@ internal static unsafe class VoyageMain
                             var plan = VoyageUtils.GetSubmarinePointPlanByGuid(adata.SelectedPointPlan);
                             if (plan != null && plan.Points.Count >= 1 && plan.Points.Count <= 5)
                             {
-                                TaskDeployOnPointPlan.Enqueue(plan);
+                                TaskDeployOnPointPlan.Enqueue(next, type, plan);
                             }
                             else
                             {

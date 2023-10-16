@@ -1,4 +1,5 @@
-﻿using AutoRetainerAPI.Configuration;
+﻿using AutoRetainer.Internal;
+using AutoRetainerAPI.Configuration;
 using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
@@ -6,9 +7,10 @@ namespace AutoRetainer.Modules.Voyage.Tasks;
 
 internal static unsafe class TaskRedeployPreviousLog
 {
-    internal static void Enqueue()
+    internal static void Enqueue(string name, VoyageType type)
     {
         VoyageUtils.Log($"Task enqueued: {nameof(TaskRedeployPreviousLog)}");
+        TaskIntelligentRepair.Enqueue(name, type);
         P.TaskManager.Enqueue(VoyageScheduler.SelectViewPreviousLog);
         P.TaskManager.Enqueue(VoyageScheduler.RedeployVessel);
         P.TaskManager.DelayNext(10, true);

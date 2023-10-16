@@ -48,7 +48,7 @@ internal unsafe class Config : IEzConfig
     public bool Stay5 = true;
     public bool NoCurrentCharaOnTop = false;
 
-    internal bool UseFrameDelay = true;
+    public bool UseFrameDelay = true;
     public int Delay = 200;
     public int FrameDelay = 8;
 
@@ -86,6 +86,7 @@ internal unsafe class Config : IEzConfig
     public int TargetMSPTIdle = 0;
     public int TargetMSPTRunning = 0;
     public bool NoFPSLockWhenActive = true;
+    public bool ExtraFPSLockRange = false;
 
     internal bool ExtraDebug = false;
 
@@ -121,10 +122,10 @@ internal unsafe class Config : IEzConfig
     public bool ManipulatePriority = false;
 
     public bool SubsAutoResend = false;
-    public bool SubsAutoRepair = true;
-    public bool SubsOnlyFinalize = false;
+    //public bool SubsAutoRepair = true;
+    //public bool SubsOnlyFinalize = false;
     public bool SubsAutoEnable = false;
-    public bool SubsRepairFinalize = true;
+    //public bool SubsRepairFinalize = true;
     public MultiModeType MultiModeType = MultiModeType.Everything;
     public bool NoErrorCheckPlanner2 = true;
     public WorkshopFailAction FailureNoFuel = WorkshopFailAction.ExcludeChar;

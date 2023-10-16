@@ -163,7 +163,7 @@ internal static unsafe class DebugVoyage
             if (ImGui.Button($"{nameof(VoyageScheduler.RedeployVessel)}")) DuoLog.Information($"{VoyageScheduler.RedeployVessel()}");
             if (ImGui.Button($"{nameof(VoyageScheduler.DeployVessel)}")) DuoLog.Information($"{VoyageScheduler.DeployVessel()}");
             if (ImGui.Button($"{nameof(TaskDeployOnBestExpVoyage.Deploy)}")) DuoLog.Information($"{TaskDeployOnBestExpVoyage.Deploy()}");
-            if (ImGui.Button($"{nameof(TaskDeployOnBestExpVoyage)}")) TaskDeployOnBestExpVoyage.Enqueue();
+            //if (ImGui.Button($"{nameof(TaskDeployOnBestExpVoyage)}")) TaskDeployOnBestExpVoyage.Enqueue();
             if (ImGui.Button($"{nameof(VoyageScheduler.Approach)}")) DuoLog.Information($"{VoyageScheduler.Approach}");
         }
         if(ImGui.CollapsingHeader("Test task manager"))

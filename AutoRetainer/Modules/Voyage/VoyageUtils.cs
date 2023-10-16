@@ -18,7 +18,7 @@ namespace AutoRetainer.Modules.Voyage;
 
 internal unsafe static class VoyageUtils
 {
-    internal static bool DontReassign => C.SubsOnlyFinalize || (C.TempCollectB != LimitedKeys.None && IsKeyPressed(C.TempCollectB) && !CSFramework.Instance()->WindowInactive);
+    internal static bool DontReassign => (C.TempCollectB != LimitedKeys.None && IsKeyPressed(C.TempCollectB) && !CSFramework.Instance()->WindowInactive);
 
     internal static uint[] Workshops = [Houses.Company_Workshop_Empyreum, Houses.Company_Workshop_The_Goblet, Houses.Company_Workshop_Mist, Houses.Company_Workshop_Shirogane, Houses.Company_Workshop_The_Lavender_Beds];
 
@@ -458,9 +458,9 @@ internal unsafe static class VoyageUtils
         return null;
     }
 
-    internal static bool IsVesselAvailable(this OfflineCharacterData data, OfflineVesselData x, VoyageType type)
+    internal static bool IsVesselAvailable(this OfflineCharacterData data, OfflineVesselData x, VoyageType type, int advanceSeconds = 0)
     {
-        return (x.ReturnTime != 0 && x.GetRemainingSeconds() < C.UnsyncCompensation) 
+        return (x.ReturnTime != 0 && x.GetRemainingSeconds() < C.UnsyncCompensation + advanceSeconds)
             ||
             (x.ReturnTime == 0 && data.GetAdditionalVesselData(x.Name, type).VesselBehavior.EqualsAny(VesselBehavior.LevelUp, VesselBehavior.Unlock, VesselBehavior.Use_plan));
     }
@@ -483,11 +483,11 @@ internal unsafe static class VoyageUtils
         if (all)
         {
             var v = data.GetVesselData(type).Where(x => data.GetEnabledVesselsData(type).Contains(x.Name));
-            return v.Any() && v.All(x => data.IsVesselAvailable(x, type));
+            return v.Any() && v.All(x => data.IsVesselAvailable(x, type, seconds));
         }
         else
         {
-            var v = data.GetVesselData(type).Where(x => data.IsVesselAvailable(x, type) && data.GetEnabledVesselsData(type).Contains(x.Name));
+            var v = data.GetVesselData(type).Where(x => data.IsVesselAvailable(x, type, seconds) && data.GetEnabledVesselsData(type).Contains(x.Name));
             if (v.Any())
             {
                 return true;

@@ -19,7 +19,6 @@ internal static class SettingsMain
         ImGuiEx.EzTabBar("GeneralSettings",
             ("General", TabGeneral, null, true),
             ("Multi Mode", TabMulti, null, true),
-            ("Deployables", TabDeployables, null, true),
             //("Contingency", TabCont, null, true),
             //("Login Overlay", TabLoginOverlay, null, true),
             ("Character Order", TabCharaOrder, null, true),
@@ -27,24 +26,6 @@ internal static class SettingsMain
             ("Other", TabOther, null, true)
             );
     }
-
-    static void TabDeployables()
-    {
-        if (ImGuiGroup.BeginGroupBox("General Deployables Settings"))
-        {
-            ImGui.Checkbox($"Resend vessels when accessing the Voyage Control Panel", ref C.SubsAutoResend);
-            ImGuiEx.Spacing(); ImGui.Checkbox($"Finalise Only", ref C.SubsOnlyFinalize);
-            ImGuiComponents.HelpMarker("Does not redeploy your deployables and instead only finalises their voyages.");
-            ImGuiEx.Spacing(); ImGuiEx.Spacing(); ImGui.Checkbox($"Repair Deployables on Resend", ref C.SubsAutoRepair);
-            ImGuiEx.Spacing(); ImGuiEx.Spacing(); ImGui.Checkbox($"Repair After Finalising", ref C.SubsRepairFinalize);
-            ImGui.Checkbox($"Hide Airships from Deployables UI", ref C.HideAirships);
-            ImGui.SetNextItemWidth(60);
-            ImGui.DragInt("Retainer venture processing cutoff", ref C.DisableRetainerVesselReturn.ValidateRange(0, 60));
-            ImGuiComponents.HelpMarker("The number of minutes remaining on deployable voyages to prevent processing of retainer tasks.");
-            ImGuiGroup.EndGroupBox();
-        }
-    }
-
     static void TabLoginOverlay()
     {
         ImGui.Checkbox($"Display Login Overlay", ref C.LoginOverlay);
@@ -138,7 +119,7 @@ internal static class SettingsMain
             ImGui.SetNextItemWidth(100f);
             ImGui.SliderInt("Time Desynchronization Compensation", ref C.UnsyncCompensation.ValidateRange(-60, 0), -10, 0);
             ImGuiComponents.HelpMarker("Additional amount of seconds that will be subtracted from venture ending time to help mitigate possible issues of time desynchronization between the game and your PC. ");
-            //ImGui.Checkbox($"Enable SuperSonic(tm) Blazing fast operation speed", ref C.UseFrameDelay);
+            ImGui.Checkbox($"Enable frame delay", ref C.UseFrameDelay);
             ImGui.SetNextItemWidth(100f);
             if (!C.UseFrameDelay)
             {
@@ -185,6 +166,7 @@ internal static class SettingsMain
             }
             ImGui.SetNextItemWidth(200f);
             ImGuiEx.SliderIntAsFloat("Activation Time", ref C.RetainerSenseThreshold, 1000, 100000);
+            ImGui.Checkbox($"Resend vessels when accessing the Voyage Control Panel", ref C.SubsAutoResend);
             ImGuiGroup.EndGroupBox();
         };
         if(ImGuiGroup.BeginGroupBox("User Interface"))
@@ -199,6 +181,7 @@ internal static class SettingsMain
             {
                 Utils.ResetEscIgnoreByWindows();
             }
+            ImGui.Checkbox($"Hide Airships from Deployables UI", ref C.HideAirships);
             ImGui.Separator();
             TabLoginOverlay();
             ImGui.Separator();
@@ -254,6 +237,9 @@ internal static class SettingsMain
             ImGui.SetNextItemWidth(60);
             ImGui.DragInt("Advance Relog Threshold", ref C.MultiModeWorkshopConfiguration.AdvanceTimer.ValidateRange(0, 300), 0.1f, 0, 300);
             ImGui.Checkbox("Wait even when already logged in", ref C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn);
+            ImGui.SetNextItemWidth(60);
+            ImGui.DragInt("Retainer venture processing cutoff", ref C.DisableRetainerVesselReturn.ValidateRange(0, 60));
+            ImGuiComponents.HelpMarker("The number of minutes remaining on deployable voyages to prevent processing of retainer tasks.");
             ImGui.PopID();
             ImGuiGroup.EndGroupBox();
         }
@@ -267,13 +253,26 @@ internal static class SettingsMain
         if (ImGuiGroup.BeginGroupBox("FPS Limiter"))
         {
             ImGuiEx.Text($"FPS Limiter is only active when Multi Mode is enabled");
-            ImGui.SetNextItemWidth(150f);
-            ImGui.SliderInt("Target frame time when idling", ref C.TargetMSPTIdle.ValidateRange(0, 500), 0, 100);
-            ImGui.SetNextItemWidth(150f);
-            ImGui.SliderInt("Target frame time when operating", ref C.TargetMSPTRunning.ValidateRange(0, 100), 0, 50);
+            ImGui.SetNextItemWidth(100f);
+            SliderIntFrameTimeAsFPS("Target frame time when idling", ref C.TargetMSPTIdle, C.ExtraFPSLockRange?1:10);
+            ImGui.SetNextItemWidth(100f);
+            SliderIntFrameTimeAsFPS("Target frame time when operating", ref C.TargetMSPTRunning, C.ExtraFPSLockRange ? 1 : 20);
             ImGui.Checkbox("Release FPS lock when game is active", ref C.NoFPSLockWhenActive);
+            ImGui.Checkbox($"Allow extra low FPS limiter values", ref C.ExtraFPSLockRange);
+            ImGuiComponents.HelpMarker("No support is provided if you enable this and run into ANY errors in Multi Mode");
             ImGuiGroup.EndGroupBox();
         }
+    }
+
+    static void SliderIntFrameTimeAsFPS(string name, ref int frameTime, int min = 1)
+    {
+        int fps = 60;
+        if(frameTime != 0)
+        {
+            fps = (int)(1000f / (float)frameTime);
+        }
+        ImGui.SliderInt(name, ref fps, min, 60, fps == 60?"Unlimited":null, ImGuiSliderFlags.AlwaysClamp);
+        frameTime = fps == 60 ? 0 : (int)(1000f / (float)fps);
     }
 
     static void TabOther()
