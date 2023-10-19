@@ -20,7 +20,6 @@ internal unsafe static class TaskRepairAll
         {
             if(index < 0 || index > 3) throw new ArgumentOutOfRangeException(nameof(index));
             P.TaskManager.EnqueueImmediate(() => VoyageScheduler.TryRepair(index), $"Repair {index}");
-            P.TaskManager.EnqueueImmediate(VoyageScheduler.ConfirmRepair, 5000, false);
             P.TaskManager.EnqueueImmediate(() => Abort || VoyageScheduler.WaitForYesNoDisappear() == true, 5000, false, "WaitForYesNoDisappear");
             P.TaskManager.EnqueueImmediate(() => Abort || VoyageUtils.GetVesselComponent(vesselIndex, type, index)->Condition > 0, "WaitUntilRepairComplete");
             P.TaskManager.DelayNextImmediate(C.FrameDelay * 2, true);

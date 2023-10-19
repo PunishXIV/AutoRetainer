@@ -129,10 +129,11 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 API = new();
                 ApiTest.Init();
                 FPSManager.UnlockChillFrames();
-                PluginLog.Information($"AutoRetainer v{P.GetType().Assembly.GetName().Version} is ready.");
                 Svc.GameNetwork.NetworkMessage += GameNetwork_NetworkMessage;
                 Utils.ResetEscIgnoreByWindows();
                 Svc.PluginInterface.UiBuilder.Draw += FPSLimiter.FPSLimit;
+                AutoCutsceneSkipper.Init(MiniTA.ProcessCutsceneSkip);
+                PluginLog.Information($"AutoRetainer v{P.GetType().Assembly.GetName().Version} is ready.");
             });
         }
         //);
@@ -256,14 +257,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
                     C.SelectedRetainers[Svc.ClientState.LocalContentId] = new();
                 }
             }
-            if (P.TaskManager.IsBusy || (Svc.Condition[ConditionFlag.OccupiedSummoningBell] && (SchedulerMain.PluginEnabled || P.TaskManager.IsBusy || ConditionWasEnabled)))
-            {
-                if (TryGetAddonByName<AddonTalk>("Talk", out var addon) && addon->AtkUnitBase.IsVisible)
-                {
-                    ClickTalk.Using((IntPtr)addon).Click();
-                }
-            }
         }
+        MiniTA.Tick();
         OfflineDataManager.Tick();
         AutoGCHandin.Tick();
         MultiMode.Tick();

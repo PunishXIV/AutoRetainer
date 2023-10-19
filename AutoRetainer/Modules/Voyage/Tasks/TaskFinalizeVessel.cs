@@ -11,6 +11,7 @@ internal unsafe static class TaskFinalizeVessel
         TaskSelectVesselByName.Enqueue(name, type);
         P.TaskManager.Enqueue(VoyageScheduler.FinalizeVessel);
         P.TaskManager.Enqueue(() => TryGetAddonByName<AtkUnitBase>("SelectString", out var addon) && IsAddonReady(addon), "WaitForSelectStringAddon");
-        if(quit) P.TaskManager.Enqueue(VoyageScheduler.SelectQuitVesselMenu);
+        TaskIntelligentRepair.Enqueue(name, type);
+        if (quit) P.TaskManager.Enqueue(VoyageScheduler.SelectQuitVesselMenu);
     }
 }

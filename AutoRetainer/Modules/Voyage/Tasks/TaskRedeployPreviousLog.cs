@@ -17,8 +17,7 @@ internal static unsafe class TaskRedeployPreviousLog
         P.TaskManager.Enqueue(CheckForFuel);
         P.TaskManager.Enqueue(VoyageScheduler.DeployVessel);
         P.TaskManager.Enqueue(VoyageScheduler.WaitForCutscene);
-        P.TaskManager.Enqueue(VoyageScheduler.PressEsc);
-        P.TaskManager.Enqueue(VoyageScheduler.ConfirmSkip);
+        P.TaskManager.Enqueue(VoyageScheduler.WaitForNoCutscene);
     }
 
     internal static bool? CheckForFuel()
