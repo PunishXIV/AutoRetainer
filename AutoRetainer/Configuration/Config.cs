@@ -87,6 +87,7 @@ internal unsafe class Config : IEzConfig
     public int TargetMSPTRunning = 0;
     public bool NoFPSLockWhenActive = true;
     public bool ExtraFPSLockRange = false;
+    public bool FpsLockOnlyShutdownTimer = false;
 
     internal bool ExtraDebug = false;
 

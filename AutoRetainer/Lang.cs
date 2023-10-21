@@ -32,6 +32,8 @@ internal static class Lang
     internal const string IconRepeat = "\uf363";
     internal const string IconPath = "\uf55b";
 
+    internal static string LogOutAndExitGame => Svc.Data.GetExcelSheet<Addon>().GetRow(116).Text.ExtractText();
+
     internal static readonly ReadOnlyDictionary<UnlockMode, string> UnlockModeNames = new(new Dictionary<UnlockMode, string>()
     {
         { UnlockMode.MultiSelect, "Pick max amount of destinations" },

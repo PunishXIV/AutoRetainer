@@ -259,6 +259,7 @@ internal static class SettingsMain
             SliderIntFrameTimeAsFPS("Target frame rate when operating", ref C.TargetMSPTRunning, C.ExtraFPSLockRange ? 1 : 20);
             ImGui.Checkbox("Release FPS lock when game is active", ref C.NoFPSLockWhenActive);
             ImGui.Checkbox($"Allow extra low FPS limiter values", ref C.ExtraFPSLockRange);
+            ImGui.Checkbox($"Limiter active only when shutdown timer is set", ref C.FpsLockOnlyShutdownTimer);
             ImGuiComponents.HelpMarker("No support is provided if you enable this and run into ANY errors in Multi Mode");
             ImGuiGroup.EndGroupBox();
         }

@@ -7,6 +7,7 @@ using Dalamud.Memory;
 using Dalamud.Utility;
 using ECommons.Automation;
 using FFXIVClientStructs.FFXIV.Client.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
 using System.Diagnostics;
@@ -287,7 +288,9 @@ internal unsafe class AutoLogin
         // Select Character
         var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("_CharaSelectListMenu", 1);
         if (addon == null || tempCharacter == null) return false;
-        if (Utils.TryGetCharacterIndex(tempCharacter, out var index))
+        if (!AgentLobby.Instance()->AgentInterface.IsAgentActive()) return false;
+        if (AgentLobby.Instance()->TemporaryLocked) return false;
+        if (Utils.TryGetCharacterIndex(tempCharacter, tempWorld.Value, out var index))
         {
             Callback.Fire(addon, false, (int)18, (int)0, (int)index);
             var nextAddon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("SelectYesno", 1);

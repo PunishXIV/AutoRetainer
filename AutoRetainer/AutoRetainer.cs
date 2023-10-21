@@ -99,7 +99,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 Svc.PluginInterface.UiBuilder.OpenConfigUi += delegate { configGui.IsOpen = true; };
                 Svc.ClientState.Logout += Logout;
                 Svc.Condition.ConditionChange += ConditionChange;
-                EzCmd.Add("/autoretainer", CommandHandler, "Open plugin interface\n/autoretainer e|enable → Enable plugin\n/autoretainer d|disable - Disable plugin\n/autoretainer t|toggle - toggle plugin\n/autoretainer m|multi - toggle MultiMode\n/autoretainer relog Character Name@WorldName - relog to the targeted character if configured\n/autoretainer b|browser - open venture browser\n/autoretainer expert - toggle expert settings\n/autoretainer debug - toggle debug menu and verbose output");
+                EzCmd.Add("/autoretainer", CommandHandler, "Open plugin interface\n/autoretainer e|enable → Enable plugin\n/autoretainer d|disable - Disable plugin\n/autoretainer t|toggle - toggle plugin\n/autoretainer m|multi - toggle MultiMode\n/autoretainer relog Character Name@WorldName - relog to the targeted character if configured\n/autoretainer b|browser - open venture browser\n/autoretainer expert - toggle expert settings\n/autoretainer debug - toggle debug menu and verbose output\n/autoretainer shutdown <hours> [minutes] [seconds] - schedule a game shutdown in this amount of time");
                 EzCmd.Add("/ays", CommandHandler);
                 Svc.Toasts.ErrorToast += Toasts_ErrorToast;
                 Svc.Toasts.Toast += Toasts_Toast;
@@ -239,6 +239,41 @@ public unsafe class AutoRetainer : IDalamudPlugin
         {
             GCHandlers.EnableDeliveringIfPossible();
         }
+        else if (arguments.StartsWith("shutdown"))
+        {
+            var str = arguments.Split((char[])[' ', ',', ':', '-', '/', '.'], StringSplitOptions.RemoveEmptyEntries);
+            if(str.Length <= 1)
+            {
+                Shutdown.ShutdownAt = 0;
+                Shutdown.ForceShutdownAt = 0;
+                Svc.Chat.Print("Shutdown timer cleared");
+            }
+            else
+            {
+                try
+                {
+                    var time = new TimeSpan();
+                    time = time.Add(TimeSpan.FromHours(int.Parse(str[1])));
+                    if (str.Length > 2) time = time.Add(TimeSpan.FromMinutes(int.Parse(str[2])));
+                    if (str.Length > 3) time = time.Add(TimeSpan.FromSeconds(int.Parse(str[3])));
+                    if (time.TotalSeconds < 10)
+                    {
+                        DuoLog.Error("Timer can't be less than 10 seconds");
+                    }
+                    else
+                    {
+                        Svc.Chat.Print($"Shutting down in {time}");
+                        Shutdown.ShutdownAt = Environment.TickCount64 + (long)time.TotalMilliseconds;
+                        Shutdown.ForceShutdownAt = Environment.TickCount64 + (long)time.TotalMilliseconds + 10 * 60 * 1000;
+                    }
+                }
+                catch(Exception e)
+                {
+                    DuoLog.Error($"{e.Message}");
+                    PluginLog.Error($"{e.StackTrace}");
+                }
+            }
+        }
         else
         {
             configGui.IsOpen = !configGui.IsOpen;
@@ -268,6 +303,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         FPSManager.Tick();
         PriorityManager.Tick();
         TextAdvanceManager.Tick();
+        Shutdown.Tick();
         if (Svc.Condition[ConditionFlag.OccupiedSummoningBell] && Utils.TryGetCurrentRetainer(out var name) && Utils.TryGetRetainerByName(name, out var retainer))
         {
             if (!retainer.VentureID.EqualsAny(0u, LastVentureID))

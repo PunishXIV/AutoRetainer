@@ -15,7 +15,10 @@ namespace AutoRetainer.Modules
         {
             if (MultiMode.Active)
             {
-                if (!C.NoFPSLockWhenActive || CSFramework.Instance()->WindowInactive)
+                if (
+                    (!C.NoFPSLockWhenActive || CSFramework.Instance()->WindowInactive)
+                    && (!C.FpsLockOnlyShutdownTimer || Shutdown.Active)
+                    )
                 {
                     if (Utils.IsBusy)
                     {

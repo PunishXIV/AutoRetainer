@@ -18,10 +18,12 @@ using ECommons.Reflection;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using CharaData = (string Name, ushort World);
 
 namespace AutoRetainer.Helpers;
 
@@ -91,16 +93,16 @@ internal static unsafe class Utils
         return ret > 1f ? ret : 1f;
     }
 
-    internal static bool TryGetCharacterIndex(string name, out int index)
+    internal static bool TryGetCharacterIndex(string name, uint world, out int index)
     {
-        index = GetCharacterNames().IndexOf(name);
+        index = GetCharacterNames().IndexOf((name, (ushort)world));
         return index >= 0;
     }
 
-    internal static List<string> GetCharacterNames()
+    internal static List<CharaData> GetCharacterNames()
     {
-        List<string> ret = new();
-        var data = CSFramework.Instance()->UIModule->GetRaptureAtkModule()->AtkModule.GetStringArrayData(1);
+        List<CharaData> ret = [];
+        /*var data = CSFramework.Instance()->UIModule->GetRaptureAtkModule()->AtkModule.GetStringArrayData(1);
         if (data != null)
         {
             for (int i = 60; i < data->AtkArrayData.Size; i++)
@@ -113,6 +115,16 @@ internal static unsafe class Utils
                     if (str == "") break;
                     ret.Add(str);
                 }
+            }
+        }*/
+        var agent = AgentLobby.Instance();
+        if (agent->AgentInterface.IsAgentActive())
+        {
+            var charaSpan = agent->LobbyData.CharaSelectEntries.Span;
+            for (int i = 0; i < charaSpan.Length; i++)
+            {
+                var s = charaSpan[i];
+                ret.Add(($"{Utils.Read(s.Value->Name)}", s.Value->HomeWorldId));
             }
         }
         return ret;

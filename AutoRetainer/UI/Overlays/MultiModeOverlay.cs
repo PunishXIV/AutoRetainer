@@ -17,14 +17,38 @@ internal class MultiModeOverlay : Window
 
     public override bool DrawConditions()
     {
-        return !C.HideOverlayIcons && (P.TaskManager.IsBusy || P.IsNextToBell || MultiMode.Enabled || AutoLogin.Instance.IsRunning || SchedulerMain.PluginEnabled || DisplayNotify || VoyageScheduler.Enabled);
+        return !C.HideOverlayIcons && (P.TaskManager.IsBusy || P.IsNextToBell || MultiMode.Enabled || AutoLogin.Instance.IsRunning || SchedulerMain.PluginEnabled || DisplayNotify || VoyageScheduler.Enabled || Shutdown.Active);
     }
 
     public override void Draw()
     {
         CImGui.igBringWindowToDisplayBack(CImGui.igGetCurrentWindow());
-
-        if (P.TaskManager.IsBusy)
+        if (Shutdown.Active)
+        {
+            if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "timer.png"), out var t))
+            {
+                ImGui.Image(t.ImGuiHandle, new(128, 128));
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+                    if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
+                    {
+                        Svc.Commands.ProcessCommand("/ays");
+                    }
+                    if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                    {
+                        Shutdown.ForceShutdownAt = 0;
+                        Shutdown.ShutdownAt = 0;
+                    }
+                    ImGui.SetTooltip($"A shutdown timer is set.\nShutting down in {TimeSpan.FromMilliseconds(Shutdown.ShutdownAt - Environment.TickCount64)}\nForce shutdown in {TimeSpan.FromMilliseconds(Shutdown.ForceShutdownAt - Environment.TickCount64)} \nLeft click - open AutoRetainer. \nRight click - clear timer.");
+                }
+            }
+            else
+            {
+                ImGuiEx.Text($"loading timer.png");
+            }
+        }
+        else if (P.TaskManager.IsBusy)
         {
             if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "processing.png"), out var t))
             {
