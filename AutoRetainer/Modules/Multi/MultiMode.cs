@@ -6,11 +6,13 @@ using AutoRetainer.UI;
 using AutoRetainerAPI.Configuration;
 using ECommons.CircularBuffers;
 using ECommons.Events;
+using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using Lumina.Data.Files.Excel;
 using static AutoRetainer.Modules.OfflineDataManager;
 
 namespace AutoRetainer.Modules.Multi;
@@ -346,7 +348,7 @@ internal unsafe static class MultiMode
                     TaskPostprocessCharacterIPC.Enqueue();
                     if (data != null)
                     {
-                        P.TaskManager.Enqueue(() => AutoLogin.Instance.SwapCharacter(data.WorldOverride ?? data.World, data.Name, data.ServiceAccount));
+                        P.TaskManager.Enqueue(() => AutoLogin.Instance.SwapCharacter(data.CurrentWorld, data.Name, ExcelWorldHelper.GetWorldByName(data.World).RowId, data.ServiceAccount));
                     }
                     else
                     {
@@ -359,7 +361,7 @@ internal unsafe static class MultiMode
             {
                 if (Utils.CanAutoLogin())
                 {
-                    AutoLogin.Instance.Login(data.World, data.Name, data.ServiceAccount);
+                    AutoLogin.Instance.Login(data.CurrentWorld, data.Name, ExcelWorldHelper.GetWorldByName(data.World).RowId, data.ServiceAccount);
                     return true;
                 }
                 else

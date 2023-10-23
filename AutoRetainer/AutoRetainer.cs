@@ -23,6 +23,7 @@ using AutoRetainer.Modules.Voyage;
 using Dalamud.Game.Network;
 using AutoRetainer.Scheduler.Handlers;
 using System.Threading;
+using ECommons.ExcelServices;
 
 namespace AutoRetainer;
 
@@ -218,11 +219,11 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 {
                     if (Svc.ClientState.IsLoggedIn)
                     {
-                        AutoLogin.Instance.SwapCharacter(target.WorldOverride ?? target.World, target.Name, target.ServiceAccount);
+                        AutoLogin.Instance.SwapCharacter(target.CurrentWorld, target.Name, ExcelWorldHelper.GetWorldByName(target.World).RowId, target.ServiceAccount);
                     }
                     else
                     {
-                        AutoLogin.Instance.Login(target.WorldOverride ?? target.World, target.Name, target.ServiceAccount);
+                        AutoLogin.Instance.Login(target.CurrentWorld, target.Name, ExcelWorldHelper.GetWorldByName(target.World).RowId, target.ServiceAccount);
                     }
                 }
             }
