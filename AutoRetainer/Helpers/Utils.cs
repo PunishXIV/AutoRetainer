@@ -286,6 +286,8 @@ internal static unsafe class Utils
 
     internal static GameObject GetReachableRetainerBell(bool extend)
     {
+        if (Player.Object is null) return null;
+
         foreach (var x in Svc.Objects)
         {
             if ((x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName))
