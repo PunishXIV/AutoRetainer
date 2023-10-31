@@ -93,6 +93,33 @@ internal static unsafe class WorkshopUI
                 ImGui.SameLine(0, 3);
             }
 
+            if (data.IsNotEnoughSubmarinesEnabled())
+            {
+                ImGui.PushFont(UiBuilder.IconFont);
+                ImGuiEx.TextV(ImGuiColors.DalamudOrange, "\ue4ac");
+                ImGui.PopFont();
+                ImGuiEx.Tooltip($"Some of your submersibles are not enabled");
+                ImGui.SameLine(0, 3);
+            }
+
+            if (data.IsThereNotAssignedSubmarine())
+            {
+                ImGui.PushFont(UiBuilder.IconFont);
+                ImGuiEx.TextV(ImGuiColors.DalamudOrange, "\ue4ab");
+                ImGui.PopFont();
+                ImGuiEx.Tooltip($"Some of your submersibles are not undertaking voyage");
+                ImGui.SameLine(0, 3);
+            }
+
+            if (data.AreAnySuboptimalBuildsFound())
+            {
+                ImGui.PushFont(UiBuilder.IconFont);
+                ImGuiEx.TextV(ImGuiColors.DalamudOrange, "\uf0ad");
+                ImGui.PopFont();
+                ImGuiEx.Tooltip($"Unoptimal configurations are found");
+                ImGui.SameLine(0, 3);
+            }
+
             if (ImGuiEx.CollapsingHeader(Censor.Character(data.Name, data.World)))
             {
                 pad = ImGui.GetStyle().FramePadding.Y;
@@ -327,7 +354,11 @@ internal static unsafe class WorkshopUI
             ImGui.SameLine(0, 0);
             ImGuiEx.Text(ImGuiColors.DalamudGrey3, $".{lvlf:D2}".ReplaceByChar(Lang.Digits.Normal, Lang.Digits.GameFont));
             ImGui.SameLine(0, 0);
-            ImGuiEx.Text(VoyageUtils.GetSubmarineBuild(adata));
+            ImGuiEx.Text(adata.IsUnoptimalBuild(out var justification)?ImGuiColors.DalamudOrange:null, VoyageUtils.GetSubmarineBuild(adata));
+            if(justification != null)
+            {
+                ImGuiEx.Tooltip(justification);
+            }
         }
         ImGui.TableNextColumn();
         ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);

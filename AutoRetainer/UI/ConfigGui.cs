@@ -52,6 +52,11 @@ unsafe internal class ConfigGui : Window
                 SchedulerMain.DisablePlugin();
             }
         }
+        if (C.ShowDeployables && VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType) || VoyageScheduler.Enabled)
+        {
+            ImGui.SameLine();
+            ImGui.Checkbox($"Deployables", ref VoyageScheduler.Enabled);
+        }
         if (disabled)
         {
             ImGui.EndDisabled();
@@ -64,11 +69,6 @@ unsafe internal class ConfigGui : Window
             ImGuiEx.Text(GradientColor.Get(ImGuiColors.DalamudGrey, ImGuiColors.DalamudGrey3, 500), $"Paused");
         }
 
-        if (VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType) || VoyageScheduler.Enabled)
-        {
-            ImGui.SameLine();
-            ImGui.Checkbox($"Enable Deployables", ref VoyageScheduler.Enabled);
-        }
         ImGui.SameLine();
         if (ImGui.Checkbox("Multi", ref MultiMode.Enabled))
         {

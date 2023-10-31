@@ -21,6 +21,64 @@ internal unsafe static class VoyageUtils
     internal static bool DontReassign => (C.TempCollectB != LimitedKeys.None && IsKeyPressed(C.TempCollectB) && !CSFramework.Instance()->WindowInactive);
 
     internal static uint[] Workshops = [Houses.Company_Workshop_Empyreum, Houses.Company_Workshop_The_Goblet, Houses.Company_Workshop_Mist, Houses.Company_Workshop_Shirogane, Houses.Company_Workshop_The_Lavender_Beds];
+    
+    internal static bool IsNotEnoughSubmarinesEnabled(this OfflineCharacterData data)
+    {
+        return data.GetVesselData(VoyageType.Submersible).Count > data.GetVesselData(VoyageType.Submersible).Where(x => data.GetEnabledVesselsData(VoyageType.Submersible).Contains(x.Name)).Count();
+    }
+
+    internal static bool IsThereNotAssignedSubmarine(this OfflineCharacterData data)
+    {
+        return data.GetVesselData(VoyageType.Submersible).Where(x => data.GetEnabledVesselsData(VoyageType.Submersible).Contains(x.Name)).Any(x => x.ReturnTime == 0);
+    }
+
+    internal static bool AreAnySuboptimalBuildsFound(this OfflineCharacterData data)
+    {
+        var v = data.GetVesselData(VoyageType.Submersible).Where(x => data.GetEnabledVesselsData(VoyageType.Submersible).Contains(x.Name));
+        foreach(var s in v)
+        {
+            var adata = data.GetAdditionalVesselData(s.Name, VoyageType.Submersible);
+            if (adata.IsUnoptimalBuild(out _))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    internal static bool IsUnoptimalBuild(this AdditionalVesselData adata, out string justification)
+    {
+        var conf = adata.GetSubmarineBuild().Trim();
+        //PluginLog.Information($"{conf}");
+        foreach (var x in C.UnoptimalVesselConfigurations)
+        {
+            if (adata.Level >= x.MinRank && adata.Level <= x.MaxRank)
+            {
+                if (x.ConfigurationsInvert)
+                {
+                    //PluginLog.Information($"{conf} vs {x.Configurations.Print()}={conf.EqualsIgnoreCaseAny(x.Configurations)}");
+                    if (!conf.EqualsIgnoreCaseAny(x.Configurations))
+                    {
+                        justification = $"Build is not {x.Configurations.Print()}";
+                        return true;
+                    }
+                }
+                else
+                {
+                    foreach (var inv in x.Configurations)
+                    {
+                        if (conf.EqualsIgnoreCase(inv))
+                        {
+                            justification = $"Build is {conf}";
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        justification = default;
+        return false;
+    }
 
     internal static SubmarineExplorationPretty GetSubmarineExploration(uint id)
     {
@@ -298,7 +356,7 @@ internal unsafe static class VoyageUtils
         if (C.DisableRetainerVesselReturn == 0) return false;
         foreach(var x in C.OfflineData)
         {
-            if (x.AreAnyVesselsReturnInNext(C.DisableRetainerVesselReturn * 60)) return true;
+            if (x.AreAnyEnabledVesselsReturnInNext(C.DisableRetainerVesselReturn * 60)) return true;
         }
         return false;
     }
@@ -462,7 +520,21 @@ internal unsafe static class VoyageUtils
     {
         return (x.ReturnTime != 0 && x.GetRemainingSeconds() < C.UnsyncCompensation + advanceSeconds)
             ||
-            (x.ReturnTime == 0 && data.GetAdditionalVesselData(x.Name, type).VesselBehavior.EqualsAny(VesselBehavior.LevelUp, VesselBehavior.Unlock, VesselBehavior.Use_plan));
+            (x.ReturnTime == 0 && data.GetAdditionalVesselData(x.Name, type).VesselBehavior.EqualsAny(VesselBehavior.LevelUp, VesselBehavior.Unlock, VesselBehavior.Use_plan, VesselBehavior.Redeploy));
+    }
+
+    internal static bool IsVesselNotDeployed(this OfflineVesselData x)
+    {
+        return x.ReturnTime == 0;
+    }
+
+    internal static bool AreAnyEnabledVesselsNotDeployed(this OfflineCharacterData data) => AreAnyEnabledVesselsNotDeployed(data, VoyageType.Airship) && AreAnyEnabledVesselsNotDeployed(data, VoyageType.Submersible);
+
+    internal static bool AreAnyEnabledVesselsNotDeployed(this OfflineCharacterData data, VoyageType type)
+    {
+        var v = data.GetVesselData(type).Where(x => data.IsVesselAvailable(x, type) && data.GetEnabledVesselsData(type).Contains(x.Name));
+        if (v.Any(x => x.IsVesselNotDeployed())) return true;
+        return false;
     }
 
     internal static string GetNextCompletedVessel(VoyageType type)
@@ -476,7 +548,7 @@ internal unsafe static class VoyageUtils
         return null;
     }
 
-    internal static bool AreAnyVesselsReturnInNext(this OfflineCharacterData data, int seconds, bool all = false) => data.AreAnyEnabledVesselsReturnInNext(VoyageType.Airship, seconds, all) || data.AreAnyEnabledVesselsReturnInNext(VoyageType.Submersible, seconds, all);
+    internal static bool AreAnyEnabledVesselsReturnInNext(this OfflineCharacterData data, int seconds, bool all = false) => data.AreAnyEnabledVesselsReturnInNext(VoyageType.Airship, seconds, all) || data.AreAnyEnabledVesselsReturnInNext(VoyageType.Submersible, seconds, all);
 
     internal static bool AreAnyEnabledVesselsReturnInNext(this OfflineCharacterData data, VoyageType type, int seconds, bool all = false)
     {

@@ -40,6 +40,8 @@ internal static class Expert
             ImGui.Checkbox($"Do not show plugin status icons", ref C.HideOverlayIcons);
 
             ImGui.Checkbox($"Display multi mode type selector", ref C.DisplayMMType);
+
+            
         });
 
         InfoBox.DrawBox("Settings##expert", delegate

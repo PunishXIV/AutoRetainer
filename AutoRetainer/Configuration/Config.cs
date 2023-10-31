@@ -89,6 +89,8 @@ internal unsafe class Config : IEzConfig
     public bool ExtraFPSLockRange = false;
     public bool FpsLockOnlyShutdownTimer = false;
 
+    public bool ShowDeployables = false;
+
     internal bool ExtraDebug = false;
 
     internal bool DontReassign
@@ -134,6 +136,10 @@ internal unsafe class Config : IEzConfig
     public WorkshopFailAction FailureNoInventory = WorkshopFailAction.ExcludeChar;
     public WorkshopFailAction FailureGeneric = WorkshopFailAction.StopPlugin;
     internal bool SimpleTweaksCompat = true;
+    public bool FinalizeBeforeResend = false;
+    public bool AlertNotAllEnabled = true;
+    public bool AlertNotDeployed = true;
+    public List<UnoptimalVesselConfiguration> UnoptimalVesselConfigurations = [];
 
     public MultiModeCommonConfiguration MultiModeRetainerConfiguration = new()
     {

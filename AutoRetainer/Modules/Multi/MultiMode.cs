@@ -223,7 +223,7 @@ internal unsafe static class MultiMode
                     }
                     else if(Data.AnyEnabledVesselsAvailable() && MultiMode.EnabledSubmarines)
                     {
-                        if (!C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn || Data.AreAnyVesselsReturnInNext(0, true))
+                        if (!C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn || Data.AreAnyEnabledVesselsReturnInNext(0, true))
                         {
                             DebugLog($"Enqueueing interaction with panel");
                             BlockInteraction(10);
@@ -387,7 +387,7 @@ internal unsafe static class MultiMode
                 if (x.CID == Player.CID) continue;
                 if (x.WorkshopEnabled && x.GetEnabledVesselsData(VoyageType.Airship).Count + x.GetEnabledVesselsData(VoyageType.Submersible).Count > 0)
                 {
-                    if (x.AreAnyVesselsReturnInNext(C.MultiModeWorkshopConfiguration.AdvanceTimer, C.MultiModeWorkshopConfiguration.MultiWaitForAll))
+                    if (x.AreAnyEnabledVesselsReturnInNext(C.MultiModeWorkshopConfiguration.AdvanceTimer, C.MultiModeWorkshopConfiguration.MultiWaitForAll))
                     {
                         return x;
                     }
@@ -433,7 +433,7 @@ internal unsafe static class MultiMode
     {
         if (!EnabledSubmarines) return true;
         if(!Data.WorkshopEnabled) return true;
-        return !Data.AreAnyVesselsReturnInNext(5 * 60, C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn);
+        return !Data.AreAnyEnabledVesselsReturnInNext(5 * 60, C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn);
     }
 
     internal static bool IsAnySelectedRetainerFinishesWithin(int seconds)
