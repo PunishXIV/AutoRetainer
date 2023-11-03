@@ -119,7 +119,7 @@ unsafe internal class ConfigGui : Window
                 ("Settings", SettingsMain.Draw, null, true),
                 (C.Expert?"Expert":null, Expert.Draw, null, true),
                 //("Beta", Beta.Draw, null, true),
-                ("About", delegate { AboutTab.Draw(P); }, null, true),
+                ("About", delegate { AboutTab.Draw(P.Name); }, null, true),
                 (C.Verbose ? "Dev" : null, delegate
                 {
                     ImGuiEx.EzTabBar("DebugBar",

@@ -74,7 +74,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         //PluginLoader.CheckAndLoad(pi, "https://love.puni.sh/plugins/AutoRetainer/blacklist.txt", delegate
         {
             ECommonsMain.Init(pi, this, Module.DalamudReflector);
-            PunishLibMain.Init(pi, this, PunishOption.DefaultKoFi); // Default button
+            PunishLibMain.Init(pi, Name, PunishOption.DefaultKoFi); // Default button
             P = this;
             new TickScheduler(delegate
             {
