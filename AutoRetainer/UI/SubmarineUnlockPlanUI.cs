@@ -221,7 +221,8 @@ internal unsafe class SubmarineUnlockPlanUI : Window
                                 ImGui.TableNextColumn();
                             ImGuiEx.TextV($"{data.Map?.Value?.Name}");
                             ImGui.TableNextColumn();
-                            ImGuiEx.TextV($"{Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(x.Value.Point)?.FancyDestination()}");
+                            var notEnabled = !SelectedPlan.ExcludedRoutes.Contains(x.Key) && SelectedPlan.ExcludedRoutes.Contains(x.Value.Point);
+                            ImGuiEx.TextV(notEnabled?ImGuiColors.DalamudRed:null, $"{Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(x.Value.Point)?.FancyDestination()}");
                             ImGui.PopID();
                         }
                     }

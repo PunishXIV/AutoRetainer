@@ -5,6 +5,7 @@ using AutoRetainer.UI.Settings;
 using AutoRetainerAPI.Configuration;
 using AutoRetainerAPI;
 using AutoRetainer.Modules.Voyage;
+using AutoRetainer.UI.Settings.SettingsMain;
 
 namespace AutoRetainer.UI;
 
