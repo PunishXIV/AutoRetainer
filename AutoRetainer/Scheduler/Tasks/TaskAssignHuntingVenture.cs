@@ -6,7 +6,7 @@ internal static class TaskAssignHuntingVenture
 {
     internal static void Enqueue(uint VentureID)
     {
-        P.TaskManager.Enqueue(YesAlready.WaitForYesAlreadyDisabledTask);
+        P.TaskManager.Enqueue(NewYesAlreadyManager.WaitForYesAlreadyDisabledTask);
         if (C.RetainerMenuDelay > 0)
         {
             TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);

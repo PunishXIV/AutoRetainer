@@ -129,7 +129,8 @@ unsafe internal class ConfigGui : Window
                         ("WIP", SuperSecret.Draw, null, true)
                     );
                 }, null, true)
-                );
+                ); 
+
     }
 
     public override void PostDraw()

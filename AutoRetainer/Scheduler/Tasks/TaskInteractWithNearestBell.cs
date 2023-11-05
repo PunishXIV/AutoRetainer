@@ -7,7 +7,7 @@ internal unsafe static class TaskInteractWithNearestBell
 {
     internal static void Enqueue(bool interact = true)
     {
-        P.TaskManager.Enqueue(YesAlready.WaitForYesAlreadyDisabledTask);
+        P.TaskManager.Enqueue(NewYesAlreadyManager.WaitForYesAlreadyDisabledTask);
         P.TaskManager.Enqueue(() => 
         {
             if (VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType) && Utils.GetReachableRetainerBell(false) == null)

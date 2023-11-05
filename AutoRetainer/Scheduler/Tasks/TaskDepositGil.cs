@@ -11,7 +11,7 @@ internal unsafe static class TaskDepositGil
     internal static void Enqueue(int percent, bool isGilAmount = false)
     {
         Func<int, bool?> depFunc = isGilAmount ? RetainerHandlers.SetDepositGilAmountExact : RetainerHandlers.SetDepositGilAmount;
-        P.TaskManager.Enqueue(YesAlready.WaitForYesAlreadyDisabledTask);
+        P.TaskManager.Enqueue(NewYesAlreadyManager.WaitForYesAlreadyDisabledTask);
         if (C.RetainerMenuDelay > 0)
         {
             TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);

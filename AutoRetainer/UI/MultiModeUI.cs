@@ -376,7 +376,7 @@ internal unsafe static class MultiModeUI
         if (C.Verbose && ImGui.CollapsingHeader("Debug"))
         {
             ImGuiEx.Text($"GetCurrentTargetCharacter: {MultiMode.GetCurrentTargetCharacter()}");
-            ImGuiEx.Text($"Yes Already: {YesAlready.IsEnabled()}");
+            //ImGuiEx.Text($"Yes Already: {YesAlready.IsEnabled()}");
             ImGuiEx.Text($"IsCurrentCharacterDone: {MultiMode.IsCurrentCharacterDone()}");
             ImGuiEx.Text($"NextInteraction: {Math.Max(0, MultiMode.NextInteractionAt - Environment.TickCount64)}");
             ImGuiEx.Text($"EnsureCharacterValidity: {MultiMode.EnsureCharacterValidity(true)}");

@@ -10,7 +10,7 @@ internal static class TaskWithdrawGil
     internal static void Enqueue(int percent)
     {
         hasGilInt = false;
-        P.TaskManager.Enqueue(YesAlready.WaitForYesAlreadyDisabledTask);
+        P.TaskManager.Enqueue(NewYesAlreadyManager.WaitForYesAlreadyDisabledTask);
         P.TaskManager.Enqueue(() =>
         {
             var g = CurrentRetainerHasGil();

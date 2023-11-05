@@ -299,7 +299,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         AutoGCHandin.Tick();
         MultiMode.Tick();
         NotificationHandler.Tick();
-        YesAlready.Tick();
+        NewYesAlreadyManager.Tick();
         Artisan.ArtisanTick();
         FPSManager.Tick();
         PriorityManager.Tick();
@@ -407,10 +407,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
             Svc.Toasts.ErrorToast -= Toasts_ErrorToast;
             Svc.Toasts.Toast -= Toasts_Toast;
             Svc.GameNetwork.NetworkMessage -= GameNetwork_NetworkMessage;
-            Safe(delegate
-            {
-                YesAlready.EnableIfNeeded();
-            });
+            Safe(NewYesAlreadyManager.Unlock);
+            Safe(TextAdvanceManager.UnlockTA);
             Safe(StatisticsManager.Dispose);
             Safe(AutoLogin.Dispose);
             Safe(Memory.Dispose);
