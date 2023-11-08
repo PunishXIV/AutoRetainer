@@ -2,6 +2,7 @@
 using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using AutoRetainerAPI.Configuration;
+using Dalamud.Game.Text.SeStringHandling;
 using ECommons.Throttlers;
 
 namespace AutoRetainer.Modules.Voyage;
@@ -21,7 +22,7 @@ internal static unsafe class VoyageMain
         P.ws.AddWindow(WaitOverlay);
     }
 
-    private static void Toasts_ErrorToast(ref Dalamud.Game.Text.SeStringHandling.SeString message, ref bool isHandled)
+    private static void Toasts_ErrorToast(ref SeString message, ref bool isHandled)
     {
         if (MultiMode.Active || P.TaskManager.IsBusy)
         {
@@ -79,6 +80,7 @@ internal static unsafe class VoyageMain
             {
                 if (!IsInVoyagePanel)
                 {
+                    PluginLog.Debug($"Entered voyage panel");
                     IsInVoyagePanel = true;
                     Notify.Info($"Entered voyage panel");
                     if (IsKeyPressed(C.Suppress))
@@ -92,6 +94,7 @@ internal static unsafe class VoyageMain
                             if (Data.AnyEnabledVesselsAvailable())
                             {
                                 VoyageScheduler.Enabled = true;
+                                PluginLog.Debug($"<!> Enabled voyage scheduler");
                             }
                             else
                             {
@@ -109,6 +112,7 @@ internal static unsafe class VoyageMain
                 IsInVoyagePanel = false;
                 Notify.Info("Closed voyage panel");
                 VoyageScheduler.Enabled = false;
+                PluginLog.Debug($"<!> Exited voyage panel, disabled voyage scheduler");
             }
         }
 
@@ -150,7 +154,7 @@ internal static unsafe class VoyageMain
                             P.TaskManager.Enqueue(VoyageScheduler.SelectSubManagement);
                         }
                     }
-                    else if (!data.AreAnyVesselsReturnInNext(5 * 60))
+                    else if (!data.AreAnyEnabledVesselsReturnInNext(5 * 60))
                     {
                         if (EzThrottler.Throttle("DoWorkshopPanelTick.EnqueuePanelSelector", 1000))
                         {
@@ -181,22 +185,22 @@ internal static unsafe class VoyageMain
         {
             var adata = Data.GetAdditionalVesselData(next, type);
             var data = Data.GetOfflineVesselData(next, type) ?? throw new NullReferenceException($"Offline vessel data for {next}, {type} is null");
-            if ((C.SubsOnlyFinalize || VoyageUtils.DontReassign || adata.VesselBehavior == VesselBehavior.Finalize) && data.ReturnTime != 0)
+            if ((VoyageUtils.DontReassign || adata.VesselBehavior == VesselBehavior.Finalize || (C.FinalizeBeforeResend && Data.AreAnyEnabledVesselsReturnInNext(0))) && data.ReturnTime != 0)
             {
                 if (EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResend", 1000))
                 {
-                    TaskFinalizeVessel.Enqueue(next, type, false, true);
+                    TaskFinalizeVessel.Enqueue(next, type, true);
                 }
             }
             else
             {
-                if (adata.VesselBehavior.EqualsAny(VesselBehavior.LevelUp, VesselBehavior.Unlock, VesselBehavior.Use_plan, VesselBehavior.Use_plan))
+                if (adata.VesselBehavior.EqualsAny(VesselBehavior.LevelUp, VesselBehavior.Unlock, VesselBehavior.Use_plan, VesselBehavior.Redeploy))
                 {
                     if (EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResend", 1000))
                     {
                         if (data.ReturnTime != 0)
                         {
-                            TaskFinalizeVessel.Enqueue(next, type, true, false);
+                            TaskFinalizeVessel.Enqueue(next, type, false);
                         }
                         else
                         {
@@ -204,42 +208,39 @@ internal static unsafe class VoyageMain
                         }
                         if (adata.VesselBehavior == VesselBehavior.LevelUp)
                         {
-                            TaskDeployOnBestExpVoyage.Enqueue();
+                            TaskDeployOnBestExpVoyage.Enqueue(next, type);
                         }
                         else if(adata.VesselBehavior == VesselBehavior.Unlock)
                         {
                             if(adata.UnlockMode == UnlockMode.WhileLevelling)
                             {
-                                TaskDeployOnBestExpVoyage.Enqueue(VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan) ?? new());
+                                TaskDeployOnBestExpVoyage.Enqueue(next, type, VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan) ?? new());
                             }
                             else if(adata.UnlockMode.EqualsAny(UnlockMode.SpamOne, UnlockMode.MultiSelect))
                             {
-                                TaskDeployOnUnlockRoute.Enqueue(VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan) ?? new(), adata.UnlockMode);
+                                TaskDeployOnUnlockRoute.Enqueue(next, type, VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan) ?? new(), adata.UnlockMode);
                             }
                             else
                             {
                                 throw new ArgumentOutOfRangeException(nameof(adata.UnlockMode));
                             }
                         }
-                        if (adata.VesselBehavior == VesselBehavior.Use_plan)
+                        else if (adata.VesselBehavior == VesselBehavior.Use_plan)
                         {
                             var plan = VoyageUtils.GetSubmarinePointPlanByGuid(adata.SelectedPointPlan);
                             if (plan != null && plan.Points.Count >= 1 && plan.Points.Count <= 5)
                             {
-                                TaskDeployOnPointPlan.Enqueue(plan);
+                                TaskDeployOnPointPlan.Enqueue(next, type, plan);
                             }
                             else
                             {
                                 DuoLog.Error($"Invalid plan selected (Points.Count={plan.Points.Count})");
                             }
                         }
-                    }
-                }
-                else if (adata.VesselBehavior == VesselBehavior.Redeploy)
-                {
-                    if (EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResend", 1000))
-                    {
-                        TaskRedeployVessel.Enqueue(next, type);
+                        else if(adata.VesselBehavior == VesselBehavior.Redeploy)
+                        {
+                            TaskRedeployVessel.Enqueue(next, type);
+                        }
                     }
                 }
             }

@@ -4,6 +4,7 @@ using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using AutoRetainer.Scheduler.Tasks;
 using AutoRetainerAPI.Configuration;
+using Dalamud.Interface.Components;
 using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -15,7 +16,7 @@ internal static unsafe class WorkshopUI
     static List<(ulong cid, ulong frame, Vector2 start, Vector2 end, float percent)> bars = new();
     internal static void Draw()
     {
-        ImGuiEx.ImGuiLineCentered("WorkshopBetaWarning", () => ImGuiEx.Text(ImGuiColors.DalamudYellow, "This feature is in beta testing."));
+        //ImGuiEx.ImGuiLineCentered("WorkshopBetaWarning", () => ImGuiEx.Text(ImGuiColors.DalamudYellow, "This feature is in beta testing."));
         var sortedData = new List<OfflineCharacterData>();
         if (C.NoCurrentCharaOnTop)
         {
@@ -88,7 +89,34 @@ internal static unsafe class WorkshopUI
                 ImGui.PushFont(UiBuilder.IconFont);
                 ImGuiEx.TextV(ImGuiColors.DalamudYellow, "\uf6e3");
                 ImGui.PopFont();
-                ImGuiEx.Tooltip($"You can construct new submarine ({data.GetVesselData(VoyageType.Submersible).Count}/{data.NumSubSlots})");
+                ImGuiEx.Tooltip($"You can construct new submersible ({data.GetVesselData(VoyageType.Submersible).Count}/{data.NumSubSlots})");
+                ImGui.SameLine(0, 3);
+            }
+
+            if (data.IsNotEnoughSubmarinesEnabled())
+            {
+                ImGui.PushFont(UiBuilder.IconFont);
+                ImGuiEx.TextV(ImGuiColors.DalamudOrange, "\ue4ac");
+                ImGui.PopFont();
+                ImGuiEx.Tooltip($"Some of your submersibles are not enabled");
+                ImGui.SameLine(0, 3);
+            }
+
+            if (data.IsThereNotAssignedSubmarine())
+            {
+                ImGui.PushFont(UiBuilder.IconFont);
+                ImGuiEx.TextV(ImGuiColors.DalamudOrange, "\ue4ab");
+                ImGui.PopFont();
+                ImGuiEx.Tooltip($"Some of your submersibles are not undertaking voyage");
+                ImGui.SameLine(0, 3);
+            }
+
+            if (data.AreAnySuboptimalBuildsFound())
+            {
+                ImGui.PushFont(UiBuilder.IconFont);
+                ImGuiEx.TextV(ImGuiColors.DalamudOrange, "\uf0ad");
+                ImGui.PopFont();
+                ImGuiEx.Tooltip($"Unoptimal configurations are found");
                 ImGui.SameLine(0, 3);
             }
 
@@ -112,182 +140,100 @@ internal static unsafe class WorkshopUI
 
         ImGuiEx.ImGuiLineCentered("WorkshopUI planner button", () =>
         {
-            if (ImGui.Button("Open unlock plan editor"))
-            {
-                P.SubmarineUnlockPlanUI.IsOpen = true;
-            }
-            ImGui.SameLine();
-            if (ImGui.Button("Open point plan editor"))
+            if (ImGui.Button("Open Voyage Route Planner"))
             {
                 P.SubmarinePointPlanUI.IsOpen = true;
             }
+            ImGui.SameLine();
+            if (ImGui.Button("Open Voyage Unlockable Planner"))
+            {
+                P.SubmarineUnlockPlanUI.IsOpen = true;
+            }
         });
 
-        if (ImGui.CollapsingHeader("Settings"))
+        if (C.Verbose)
         {
-            ImGui.Checkbox($"Resend airships and submarines on voyage CP access", ref C.SubsAutoResend);
-            ImGui.Checkbox($"Only finalize reports", ref C.SubsOnlyFinalize);
-            ImGui.Checkbox($"When resending, auto-repair vessels", ref C.SubsAutoRepair);
-            ImGui.Checkbox($"Even when only finalizing, repair vessels", ref C.SubsRepairFinalize);
-            //ImGui.Checkbox($"Experimental compatibility with SimpleTweaks destination letters tweak", ref C.SimpleTweaksCompat);
-            ImGui.Checkbox($"Hide airships", ref C.HideAirships);
-            ImGui.SetNextItemWidth(60);
-            ImGui.DragInt("Don't process retainers if vessels return in, minutes", ref C.DisableRetainerVesselReturn.ValidateRange(0, 60));
-        }
-
-        if (ImGui.CollapsingHeader("Public debug"))
-        {
-            try
+            if (ImGui.CollapsingHeader("Public debug"))
             {
-                if (!P.TaskManager.IsBusy)
+                try
                 {
-                    if (ImGui.Button("Resend currently selected submarine on previous voyage"))
+                    if (!P.TaskManager.IsBusy)
                     {
-                        TaskDeployOnPreviousVoyage.Enqueue();
-                    }
-                    if (ImGui.Button("Select best path"))
-                    {
-                        TaskCalculateAndPickBestExpRoute.Enqueue();
-                    }
-                    if (ImGui.Button("Select best path with 1 unlock included"))
-                    {
-                        TaskCalculateAndPickBestExpRoute.Enqueue(VoyageUtils.GetSubmarineUnlockPlanByGuid(Data.GetAdditionalVesselData(Utils.Read(CurrentSubmarine.Get()->Name), VoyageType.Submersible).SelectedUnlockPlan) ?? new());
-                    }
-                    if (ImGui.Button("Select unlock path (up to 5)"))
-                    {
-                        TaskDeployOnUnlockRoute.EnqueuePickOrCalc(VoyageUtils.GetSubmarineUnlockPlanByGuid(Data.GetAdditionalVesselData(Utils.Read(CurrentSubmarine.Get()->Name), VoyageType.Submersible).SelectedUnlockPlan) ?? new(), UnlockMode.MultiSelect);
-                    }
-                    if (ImGui.Button("Select unlock path (only 1)"))
-                    {
-                        TaskDeployOnUnlockRoute.EnqueuePickOrCalc(VoyageUtils.GetSubmarineUnlockPlanByGuid(Data.GetAdditionalVesselData(Utils.Read(CurrentSubmarine.Get()->Name), VoyageType.Submersible).SelectedUnlockPlan) ?? new(), UnlockMode.SpamOne);
-                    }
-                    if (ImGui.Button("Select point planner path"))
-                    {
-                        var plan = VoyageUtils.GetSubmarinePointPlanByGuid(Data.GetAdditionalVesselData(Utils.Read(CurrentSubmarine.Get()->Name), VoyageType.Submersible).SelectedPointPlan);
-                        if (plan != null)
+                        /*if (ImGui.Button("Resend currently selected submarine on previous voyage"))
                         {
-                            TaskDeployOnPointPlan.EnqueuePick(plan);
+                            TaskDeployOnPreviousVoyage.Enqueue();
+                        }*/
+                        if (ImGui.Button("Select best path"))
+                        {
+                            TaskCalculateAndPickBestExpRoute.Enqueue();
                         }
-                        else
+                        if (ImGui.Button("Select best path with 1 unlock included"))
                         {
-                            DuoLog.Error($"No plan selected!");
+                            TaskCalculateAndPickBestExpRoute.Enqueue(VoyageUtils.GetSubmarineUnlockPlanByGuid(Data.GetAdditionalVesselData(Utils.Read(CurrentSubmarine.Get()->Name), VoyageType.Submersible).SelectedUnlockPlan) ?? new());
                         }
-                    }
-                    foreach (var x in Data.OfflineSubmarineData)
-                    {
-                        if (ImGui.Button($"Repair {x.Name} submarine's broken components"))
+                        if (ImGui.Button("Select unlock path (up to 5)"))
                         {
-                            if (VoyageUtils.GetCurrentWorkshopPanelType() == PanelType.Submersible)
+                            TaskDeployOnUnlockRoute.EnqueuePickOrCalc(VoyageUtils.GetSubmarineUnlockPlanByGuid(Data.GetAdditionalVesselData(Utils.Read(CurrentSubmarine.Get()->Name), VoyageType.Submersible).SelectedUnlockPlan) ?? new(), UnlockMode.MultiSelect);
+                        }
+                        if (ImGui.Button("Select unlock path (only 1)"))
+                        {
+                            TaskDeployOnUnlockRoute.EnqueuePickOrCalc(VoyageUtils.GetSubmarineUnlockPlanByGuid(Data.GetAdditionalVesselData(Utils.Read(CurrentSubmarine.Get()->Name), VoyageType.Submersible).SelectedUnlockPlan) ?? new(), UnlockMode.SpamOne);
+                        }
+                        if (ImGui.Button("Select point planner path"))
+                        {
+                            var plan = VoyageUtils.GetSubmarinePointPlanByGuid(Data.GetAdditionalVesselData(Utils.Read(CurrentSubmarine.Get()->Name), VoyageType.Submersible).SelectedPointPlan);
+                            if (plan != null)
                             {
-                                TaskSelectVesselByName.Enqueue(x.Name, VoyageType.Submersible);
-                                TaskIntelligentRepair.Enqueue(x.Name, VoyageType.Submersible);
-                                P.TaskManager.Enqueue(VoyageScheduler.SelectQuitVesselMenu);
+                                TaskDeployOnPointPlan.EnqueuePick(plan);
                             }
                             else
                             {
-                                Notify.Error("You are not in a submersible menu");
+                                DuoLog.Error($"No plan selected!");
                             }
                         }
-                    }
-                    if (ImGui.Button("Approach bell"))
-                    {
-                        TaskInteractWithNearestBell.Enqueue(false);
-                    }
+                        foreach (var x in Data.OfflineSubmarineData)
+                        {
+                            if (ImGui.Button($"Repair {x.Name} submarine's broken components"))
+                            {
+                                if (VoyageUtils.GetCurrentWorkshopPanelType() == PanelType.Submersible)
+                                {
+                                    TaskSelectVesselByName.Enqueue(x.Name, VoyageType.Submersible);
+                                    TaskIntelligentRepair.Enqueue(x.Name, VoyageType.Submersible);
+                                    P.TaskManager.Enqueue(VoyageScheduler.SelectQuitVesselMenu);
+                                }
+                                else
+                                {
+                                    Notify.Error("You are not in a submersible menu");
+                                }
+                            }
+                        }
+                        if (ImGui.Button("Approach bell"))
+                        {
+                            TaskInteractWithNearestBell.Enqueue(false);
+                        }
 
-                    if (ImGui.Button("Approach panel"))
-                    {
-                        TaskInteractWithNearestPanel.Enqueue(false);
-                    }
+                        if (ImGui.Button("Approach panel"))
+                        {
+                            TaskInteractWithNearestPanel.Enqueue(false);
+                        }
 
-                    if(ImGui.Button("Redeploy current vessel on previous voyage"))
-                    {
-                        TaskRedeployPreviousLog.Enqueue();
-                    }
+                        /*if (ImGui.Button("Redeploy current vessel on previous voyage"))
+                        {
+                            TaskRedeployPreviousLog.Enqueue();
+                        }*/
 
-                    if (ImGui.Button($"Deploy current submarine on best experience route")) TaskDeployOnBestExpVoyage.Enqueue();
+                        //if (ImGui.Button($"Deploy current submarine on best experience route")) TaskDeployOnBestExpVoyage.Enqueue();
 
-                }
-                else
-                {
-                    ImGuiEx.Text(EColor.RedBright, $"Currently executing: {P.TaskManager.CurrentTaskName}");
-                }
-            }
-            catch(Exception e)
-            {
-                ImGuiEx.TextWrapped(e.ToString());
-            }
-        }
-        if (ImGui.CollapsingHeader("Debug"))
-        {
-            try
-            {
-                var h = HousingManager.Instance()->WorkshopTerritory;
-                if (h != null) 
-                { 
-                    foreach(var x in h->Submersible.DataListSpan)
+                    }
+                    else
                     {
-                        ImGuiEx.Text($"{MemoryHelper.ReadStringNullTerminated((nint)x.Name)}/{x.ReturnTime}/{*x.CurrentExplorationPoints}");
+                        ImGuiEx.Text(EColor.RedBright, $"Currently executing: {P.TaskManager.CurrentTaskName}");
                     }
                 }
-                if (ImGui.Button("Erase offline data"))
+                catch (Exception e)
                 {
-                    Data.OfflineAirshipData.Clear();
-                    Data.OfflineSubmarineData.Clear();
+                    ImGuiEx.TextWrapped(e.ToString());
                 }
-                if (ImGui.Button("Repair 1")) VoyageScheduler.TryRepair(0);
-                if (ImGui.Button("Repair 2")) VoyageScheduler.TryRepair(1);
-                if (ImGui.Button("Repair 3")) VoyageScheduler.TryRepair(2);
-                if (ImGui.Button("Repair 4")) VoyageScheduler.TryRepair(3);
-                if (ImGui.Button("Close repair")) VoyageScheduler.CloseRepair();
-                //if (ImGui.Button("Trigger auto repair")) TaskRepairAll.EnqueueImmediate();
-                ImGui.InputText("data1", ref data1, 50);
-                ImGuiEx.EnumCombo("data2", ref data2);
-                if(CurrentSubmarine.Get() != null)
-                {
-                    ImGuiEx.Text($"{CurrentSubmarine.Get()->CurrentExp}/{CurrentSubmarine.Get()->NextLevelExp}");
-                }
-                ImGuiEx.Text($"Is voyage panel: {VoyageUtils.IsInVoyagePanel()}, {Lang.PanelName}");
-                if (ImGui.Button("IsVesselNeedsRepair"))
-                {
-                    try
-                    {
-                        DuoLog.Information($"{VoyageUtils.GetIsVesselNeedsRepair(data1, data2, out var log).Print()}\n{log.Join("\n")}");
-                    }
-                    catch (Exception e)
-                    {
-                        e.LogDuo();
-                    }
-                }
-                if (ImGui.Button("GetSubmarineIndexByName"))
-                {
-                    try
-                    {
-                        DuoLog.Information($"{VoyageUtils.GetVesselIndexByName(data1, VoyageType.Submersible)}");
-                    }
-                    catch (Exception e)
-                    {
-                        e.LogDuo();
-                    }
-                }
-                ImGuiEx.Text($"Bell: {Utils.GetReachableRetainerBell(false)}");
-                ImGuiEx.Text($"Bell(true): {Utils.GetReachableRetainerBell(true)}");
-                ImGuiEx.TextWrapped($"Enabled subs: {Data.GetVesselData(VoyageType.Submersible).Select(x => $"{x.Name}, {x.GetRemainingSeconds()}").Print()}");
-                ImGuiEx.Text($"AnyEnabledVesselsAvailable: {Data.AnyEnabledVesselsAvailable()}");
-                ImGuiEx.Text($"Panel type: {VoyageUtils.GetCurrentWorkshopPanelType()}");
-                if (TryGetAddonByName<AtkUnitBase>("AirShipExplorationResult", out var addon) && IsAddonReady(addon))
-                {
-                    var button = addon->UldManager.NodeList[3]->GetAsAtkComponentButton();
-                    ImGuiEx.Text($"Button: {button->IsEnabled}");
-                }
-                if (ImGui.Button("Interact with nearest panel"))
-                {
-                    TaskInteractWithNearestPanel.Enqueue();
-                }
-                ImGuiEx.Text($"bars\n{bars.Select(x => $"{x.cid},{x.start},{x.end},{x.frame},{x.percent}").Join("\n")}");
-            }
-            catch(Exception e)
-            {
-                ImGuiEx.TextWrapped(e.ToString());
             }
         }
     }
@@ -408,7 +354,11 @@ internal static unsafe class WorkshopUI
             ImGui.SameLine(0, 0);
             ImGuiEx.Text(ImGuiColors.DalamudGrey3, $".{lvlf:D2}".ReplaceByChar(Lang.Digits.Normal, Lang.Digits.GameFont));
             ImGui.SameLine(0, 0);
-            ImGuiEx.Text(VoyageUtils.GetSubmarineBuild(adata));
+            ImGuiEx.Text(adata.IsUnoptimalBuild(out var justification)?ImGuiColors.DalamudOrange:null, VoyageUtils.GetSubmarineBuild(adata));
+            if(justification != null)
+            {
+                ImGuiEx.Tooltip(justification);
+            }
         }
         ImGui.TableNextColumn();
         ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);

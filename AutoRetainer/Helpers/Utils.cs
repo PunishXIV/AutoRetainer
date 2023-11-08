@@ -8,6 +8,7 @@ using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Memory;
 using Dalamud.Utility;
 using ECommons.Events;
+using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;
@@ -17,17 +18,26 @@ using ECommons.Reflection;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using CharaData = (string Name, ushort World);
 
 namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
 
-    public static bool ContainsAllItems<T>(this IEnumerable<T> a, IEnumerable<T> b)
+    internal static int LoadedItems => AtkStage.GetSingleton()->GetNumberArrayData()[36]->IntArray[401];
+
+    internal static void ExtraLog(string s)
+    {
+        if (C.ExtraDebug) PluginLog.Debug(s);
+    }
+
+    internal static bool ContainsAllItems<T>(this IEnumerable<T> a, IEnumerable<T> b)
     {
         return !b.Except(a).Any();
     }
@@ -83,16 +93,16 @@ internal static unsafe class Utils
         return ret > 1f ? ret : 1f;
     }
 
-    internal static bool TryGetCharacterIndex(string name, out int index)
+    internal static bool TryGetCharacterIndex(string name, uint world, out int index)
     {
-        index = GetCharacterNames().IndexOf(name);
+        index = GetCharacterNames().IndexOf((name, (ushort)world));
         return index >= 0;
     }
 
-    internal static List<string> GetCharacterNames()
+    internal static List<CharaData> GetCharacterNames()
     {
-        List<string> ret = new();
-        var data = CSFramework.Instance()->UIModule->GetRaptureAtkModule()->AtkModule.GetStringArrayData(1);
+        List<CharaData> ret = [];
+        /*var data = CSFramework.Instance()->UIModule->GetRaptureAtkModule()->AtkModule.GetStringArrayData(1);
         if (data != null)
         {
             for (int i = 60; i < data->AtkArrayData.Size; i++)
@@ -105,6 +115,16 @@ internal static unsafe class Utils
                     if (str == "") break;
                     ret.Add(str);
                 }
+            }
+        }*/
+        var agent = AgentLobby.Instance();
+        if (agent->AgentInterface.IsAgentActive())
+        {
+            var charaSpan = agent->LobbyData.CharaSelectEntries.Span;
+            for (int i = 0; i < charaSpan.Length; i++)
+            {
+                var s = charaSpan[i];
+                ret.Add(($"{Utils.Read(s.Value->Name)}", s.Value->HomeWorldId));
             }
         }
         return ret;
@@ -515,7 +535,7 @@ internal static unsafe class Utils
                 if (IsAddonReady(addon))
                 {
                     var textNode = addon->UldManager.NodeList[15]->GetAsAtkTextNode();
-                    var text = MemoryHelper.ReadSeString(&textNode->NodeText).ExtractText().Replace(" ", "");
+                    var text = MemoryHelper.ReadSeString(&textNode->NodeText).ExtractText();
                     if (compare(text))
                     {
                         PluginLog.Verbose($"SelectYesno {text} addon {i} by predicate");
@@ -725,21 +745,26 @@ internal static unsafe class Utils
 
     internal static GameObject GetNearestWorkshopEntrance(out float Distance)
     {
+        Utils.ExtraLog($"GetNearestWorkshopEntrance: Begin");
         var currentDistance = float.MaxValue;
         GameObject currentObject = null;
         foreach (var x in Svc.Objects)
         {
+            Utils.ExtraLog($"GetNearestWorkshopEntrance: Scanning object table: object={x}, targetable={x.IsTargetable}");
             if (x.IsTargetable && x.Name.ToString().EqualsIgnoreCaseAny(Lang.AdditionalChambersEntrance))
             {
                 var distance = Vector3.Distance(Svc.ClientState.LocalPlayer.Position, x.Position);
+                Utils.ExtraLog($"GetNearestWorkshopEntrance: check passed, object={x}, targetable={x.IsTargetable}, distance={distance}");
                 if (distance < currentDistance)
                 {
+                    Utils.ExtraLog($"GetNearestWorkshopEntrance: distance is less than current {currentDistance}, assigning from {currentObject}, object={x}, targetable={x.IsTargetable}, distance={distance}");
                     currentDistance = distance;
                     currentObject = x;
                 }
             }
         }
         Distance = currentDistance;
+        Utils.ExtraLog($"GetNearestWorkshopEntrance: End with distance={currentDistance}, obj={currentObject}");
         return currentObject;
     }
 }

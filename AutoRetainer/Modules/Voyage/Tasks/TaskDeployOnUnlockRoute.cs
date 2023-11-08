@@ -1,14 +1,15 @@
-﻿using AutoRetainer.Modules.Voyage.VoyageCalculator;
+﻿using AutoRetainer.Internal;
+using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using AutoRetainerAPI.Configuration;
 
 namespace AutoRetainer.Modules.Voyage.Tasks;
 
 internal unsafe static class TaskDeployOnUnlockRoute
 {
-    internal static void Enqueue(SubmarineUnlockPlan unlock, UnlockMode mode)
+    internal static void Enqueue(string name, VoyageType type, SubmarineUnlockPlan unlock, UnlockMode mode)
     {
         VoyageUtils.Log($"Task enqueued: {nameof(TaskDeployOnUnlockRoute)} (plan: {unlock})");
-
+        TaskIntelligentRepair.Enqueue(name, type);
         P.TaskManager.Enqueue(TaskDeployOnBestExpVoyage.SelectDeploy);
         EnqueuePickOrCalc(unlock, mode);
         P.TaskManager.Enqueue(TaskDeployOnBestExpVoyage.Deploy);

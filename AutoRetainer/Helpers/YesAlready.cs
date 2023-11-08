@@ -3,6 +3,7 @@ using ECommons.Reflection;
 
 namespace AutoRetainer.Helpers;
 
+[Obsolete("", true)]
 internal static class YesAlready
 {
     internal static bool Reenable = false;

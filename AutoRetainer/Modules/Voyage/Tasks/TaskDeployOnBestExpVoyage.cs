@@ -1,14 +1,17 @@
-﻿using AutoRetainerAPI.Configuration;
+﻿using AutoRetainer.Internal;
+using AutoRetainerAPI.Configuration;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using System.Xml.Linq;
 
 namespace AutoRetainer.Modules.Voyage.Tasks;
 
 internal static unsafe class TaskDeployOnBestExpVoyage
 {
-    internal static void Enqueue(SubmarineUnlockPlan unlock = null)
+    internal static void Enqueue(string name, VoyageType type, SubmarineUnlockPlan unlock = null)
     {
         VoyageUtils.Log($"Task enqueued: {nameof(TaskCalculateAndPickBestExpRoute)} (plan: {unlock})");
+        TaskIntelligentRepair.Enqueue(name, type);
         P.TaskManager.Enqueue(SelectDeploy);
         TaskCalculateAndPickBestExpRoute.Enqueue(unlock);
         P.TaskManager.Enqueue(Deploy);

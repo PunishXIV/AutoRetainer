@@ -11,8 +11,7 @@ internal unsafe static class TaskDeployAndSkipCutscene
         if (validate) P.TaskManager.Enqueue(ValidateDeployment);
         P.TaskManager.Enqueue(VoyageScheduler.DeployVessel);
         P.TaskManager.Enqueue(VoyageScheduler.WaitForCutscene);
-        P.TaskManager.Enqueue(VoyageScheduler.PressEsc);
-        P.TaskManager.Enqueue(VoyageScheduler.ConfirmSkip);
+        P.TaskManager.Enqueue(VoyageScheduler.WaitForNoCutscene);
     }
 
     internal static bool? ValidateDeployment()

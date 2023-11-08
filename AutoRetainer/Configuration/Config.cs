@@ -21,7 +21,7 @@ internal unsafe class Config : IEzConfig
     public bool ShouldSerializeEnableAutoGCHandin() => false;
     public bool GCHandinNotify = false;
     internal bool BypassSanctuaryCheck = false;
-    public bool MultiAllowHET = false;
+    public bool ExpertMultiAllowHET = true;
     public bool MultiHETOnEnable = true;
     public bool UseServerTime = true;
     public bool NoTheme = false;
@@ -48,7 +48,7 @@ internal unsafe class Config : IEzConfig
     public bool Stay5 = true;
     public bool NoCurrentCharaOnTop = false;
 
-    internal bool UseFrameDelay = true;
+    public bool UseFrameDelay = true;
     public int Delay = 200;
     public int FrameDelay = 8;
 
@@ -83,6 +83,15 @@ internal unsafe class Config : IEzConfig
     public int UIWarningDepTanksNum = 300;
     public int UIWarningDepRepairNum = 100;
     public int UIWarningDepSlotNum = 20;
+    public int TargetMSPTIdle = 0;
+    public int TargetMSPTRunning = 0;
+    public bool NoFPSLockWhenActive = true;
+    public bool ExtraFPSLockRange = false;
+    public bool FpsLockOnlyShutdownTimer = false;
+
+    public bool ShowDeployables = false;
+
+    internal bool ExtraDebug = false;
 
     internal bool DontReassign
     {
@@ -116,10 +125,10 @@ internal unsafe class Config : IEzConfig
     public bool ManipulatePriority = false;
 
     public bool SubsAutoResend = false;
-    public bool SubsAutoRepair = true;
-    public bool SubsOnlyFinalize = false;
+    //public bool SubsAutoRepair = true;
+    //public bool SubsOnlyFinalize = false;
     public bool SubsAutoEnable = false;
-    public bool SubsRepairFinalize = true;
+    //public bool SubsRepairFinalize = true;
     public MultiModeType MultiModeType = MultiModeType.Everything;
     public bool NoErrorCheckPlanner2 = true;
     public WorkshopFailAction FailureNoFuel = WorkshopFailAction.ExcludeChar;
@@ -127,6 +136,10 @@ internal unsafe class Config : IEzConfig
     public WorkshopFailAction FailureNoInventory = WorkshopFailAction.ExcludeChar;
     public WorkshopFailAction FailureGeneric = WorkshopFailAction.StopPlugin;
     internal bool SimpleTweaksCompat = true;
+    public bool FinalizeBeforeResend = false;
+    public bool AlertNotAllEnabled = true;
+    public bool AlertNotDeployed = true;
+    public List<UnoptimalVesselConfiguration> UnoptimalVesselConfigurations = [];
 
     public MultiModeCommonConfiguration MultiModeRetainerConfiguration = new()
     {

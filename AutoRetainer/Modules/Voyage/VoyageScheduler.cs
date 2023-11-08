@@ -17,20 +17,7 @@ internal unsafe static class VoyageScheduler
 {
     internal static void Log(string t) => VoyageUtils.Log(t);
     internal static bool Enabled = false;
-    internal static bool? SelectQuitVesselMenu() => Utils.TrySelectSpecificEntry("Quit");
-
-    internal static bool? ConfirmRepair()
-    {
-        if (TaskRepairAll.Abort) return true;
-        var x = Utils.GetSpecificYesno((s) => s.ContainsAny(StringComparison.OrdinalIgnoreCase, "repair"));
-        if(x != null && Utils.GenericThrottle)
-        {
-            Log("Confirming repair");
-            ClickSelectYesNo.Using((nint)x).Yes();
-            return true;
-        }
-        return false;
-    }
+    internal static bool? SelectQuitVesselMenu() => Utils.TrySelectSpecificEntry(Lang.VoyageQuitEntry);
 
     internal static bool? CloseRepair()
     {
@@ -105,48 +92,12 @@ internal unsafe static class VoyageScheduler
             || Svc.Condition[ConditionFlag.WatchingCutscene78];
     }
 
-    internal static bool? PressEsc()
+    internal static bool? WaitForNoCutscene()
     {
-        var nLoading = Svc.GameGui.GetAddonByName("NowLoading", 1);
-        if (nLoading != nint.Zero)
-        {
-            var nowLoading = (AtkUnitBase*)nLoading;
-            if (nowLoading->IsVisible)
-            {
-                //pi.Framework.Gui.Chat.Print(Environment.TickCount + " Now loading visible");
-            }
-            else
-            {
-                //pi.Framework.Gui.Chat.Print(Environment.TickCount + " Now loading not visible");
-                if (WindowsKeypress.SendKeypress(Keys.Escape))
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return !(Svc.Condition[ConditionFlag.OccupiedInCutSceneEvent]
+            || Svc.Condition[ConditionFlag.WatchingCutscene78]);
     }
 
-    internal static bool? ConfirmSkip()
-    {
-        
-        var addon = Svc.GameGui.GetAddonByName("SelectString", 1);
-        if (addon == nint.Zero) return false;
-        var selectStrAddon = (AddonSelectString*)addon;
-        if (!IsAddonReady(&selectStrAddon->AtkUnitBase))
-        {
-            return false;
-        }
-        //PluginLog.Debug($"1: {selectStrAddon->AtkUnitBase.UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText.ToString()}");
-        if (!Lang.SkipCutsceneStr.Contains(selectStrAddon->AtkUnitBase.UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText.ToString())) return false;
-        if (Utils.GenericThrottle && EzThrottler.Throttle("Voyage.CutsceneSkip"))
-        {
-            Log("Selecting cutscene skipping");
-            ClickSelectString.Using(addon).SelectItem(0);
-            return true;
-        }
-        return false;
-    }
 
     internal static bool? Lockon()
     {

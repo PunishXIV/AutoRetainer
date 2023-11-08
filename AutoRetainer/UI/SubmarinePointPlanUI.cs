@@ -12,7 +12,7 @@ internal unsafe class SubmarinePointPlanUI : Window
     internal string SelectedPlanName => VoyageUtils.GetSubmarinePointPlanByGuid(SelectedPlanGuid).GetPointPlanName();
     internal SubmarinePointPlan SelectedPlan => VoyageUtils.GetSubmarinePointPlanByGuid(SelectedPlanGuid);
 
-    public SubmarinePointPlanUI() : base("Submarine planner")
+    public SubmarinePointPlanUI() : base("Submersible Voyage Route Planner")
     {
     }
 
@@ -65,7 +65,7 @@ internal unsafe class SubmarinePointPlanUI : Window
                 {
                     if (!my.Any())
                     {
-                        ImGuiEx.TextWrapped($"This plan is not used by any submarines.");
+                        ImGuiEx.TextWrapped($"This plan is not used by any submersibles.");
                     }
                     else
                     {
@@ -76,11 +76,11 @@ internal unsafe class SubmarinePointPlanUI : Window
                 {
                     if (!my.Any())
                     {
-                        ImGuiEx.TextWrapped($"This plan is used by {users} submarines of your other characters.");
+                        ImGuiEx.TextWrapped($"This plan is used by {users} submersibles of your other characters.");
                     }
                     else
                     {
-                        ImGuiEx.TextWrapped($"This plan is used by {my.Select(X => X.Key).Print()} and {users} more submarines on other characters.");
+                        ImGuiEx.TextWrapped($"This plan is used by {my.Select(X => X.Key).Print()} and {users} more submersibles on other characters.");
                     }
                 }
             }
@@ -92,17 +92,17 @@ internal unsafe class SubmarinePointPlanUI : Window
             {
                 ImGuiEx.TextV($"Apply this plan to:");
                 ImGui.SameLine();
-                if (ImGui.Button("ALL submarines"))
+                if (ImGui.Button("ALL submersibles"))
                 {
                     C.OfflineData.Each(x => x.AdditionalSubmarineData.Each(s => s.Value.SelectedPointPlan = SelectedPlanGuid));
                 }
                 ImGui.SameLine();
-                if (ImGui.Button("Current character's submarines"))
+                if (ImGui.Button("Current character's submersibles"))
                 {
                     Data.AdditionalSubmarineData.Each(s => s.Value.SelectedPointPlan = SelectedPlanGuid);
                 }
                 ImGui.SameLine();
-                if (ImGui.Button("No submarines"))
+                if (ImGui.Button("No submersibles"))
                 {
                     C.OfflineData.Each(x => x.AdditionalSubmarineData.Where(s => s.Value.SelectedPointPlan == SelectedPlanGuid).Each(s => s.Value.SelectedPointPlan = Guid.Empty.ToString()));
                 }

@@ -14,7 +14,7 @@ internal unsafe class SubmarineUnlockPlanUI : Window
     internal string SelectedPlanName => VoyageUtils.GetSubmarineUnlockPlanByGuid(SelectedPlanGuid)?.Name ?? "No or unknown plan selected";
     internal SubmarineUnlockPlan SelectedPlan => VoyageUtils.GetSubmarineUnlockPlanByGuid(SelectedPlanGuid);
 
-    public SubmarineUnlockPlanUI() : base("Submarine unlock plan editor")
+    public SubmarineUnlockPlanUI() : base("Submersible Voyage Unlockable Planner")
     {
     }
 
@@ -120,7 +120,7 @@ internal unsafe class SubmarineUnlockPlanUI : Window
                 {
                     if (!my.Any())
                     {
-                        ImGuiEx.TextWrapped($"This plan is not used by any submarines.");
+                        ImGuiEx.TextWrapped($"This plan is not used by any submersibles.");
                     }
                     else
                     {
@@ -131,11 +131,11 @@ internal unsafe class SubmarineUnlockPlanUI : Window
                 {
                     if (!my.Any())
                     {
-                        ImGuiEx.TextWrapped($"This plan is not used by {users} submarines of your other characters.");
+                        ImGuiEx.TextWrapped($"This plan is used by {users} submersibles of your other characters.");
                     }
                     else
                     {
-                        ImGuiEx.TextWrapped($"This plan is used by {my.Select(X => X.Key).Print()} and {users} more submarines on other characters.");
+                        ImGuiEx.TextWrapped($"This plan is used by {my.Select(X => X.Key).Print()} and {users} more submersibles on other characters.");
                     }
                 }
             }
@@ -147,17 +147,17 @@ internal unsafe class SubmarineUnlockPlanUI : Window
             {
                 ImGuiEx.TextV($"Apply this plan to:");
                 ImGui.SameLine();
-                if(ImGui.Button("ALL submarines"))
+                if(ImGui.Button("ALL submersibles"))
                 {
                     C.OfflineData.Each(x => x.AdditionalSubmarineData.Each(s => s.Value.SelectedUnlockPlan = SelectedPlanGuid));
                 }
                 ImGui.SameLine();
-                if (ImGui.Button("Current character's submarines"))
+                if (ImGui.Button("Current character's submersibles"))
                 {
                     Data.AdditionalSubmarineData.Each(s => s.Value.SelectedUnlockPlan = SelectedPlanGuid);
                 }
                 ImGui.SameLine();
-                if (ImGui.Button("No submarines"))
+                if (ImGui.Button("No submersibles"))
                 {
                     C.OfflineData.Each(x => x.AdditionalSubmarineData.Where(s => s.Value.SelectedUnlockPlan == SelectedPlanGuid).Each(s => s.Value.SelectedUnlockPlan = Guid.Empty.ToString()));
                 }
@@ -221,7 +221,8 @@ internal unsafe class SubmarineUnlockPlanUI : Window
                                 ImGui.TableNextColumn();
                             ImGuiEx.TextV($"{data.Map?.Value?.Name}");
                             ImGui.TableNextColumn();
-                            ImGuiEx.TextV($"{Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(x.Value.Point)?.FancyDestination()}");
+                            var notEnabled = !SelectedPlan.ExcludedRoutes.Contains(x.Key) && SelectedPlan.ExcludedRoutes.Contains(x.Value.Point);
+                            ImGuiEx.TextV(notEnabled?ImGuiColors.DalamudRed:null, $"{Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(x.Value.Point)?.FancyDestination()}");
                             ImGui.PopID();
                         }
                     }

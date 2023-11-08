@@ -15,12 +15,11 @@ internal unsafe static class TaskRepairAll
         Type = type;
         Abort = false;
         var vesselIndex = VoyageUtils.GetVesselIndexByName(vesselName, type);
-        P.TaskManager.EnqueueImmediate(() => Utils.TrySelectSpecificEntry(new string[] { "Repair submersible components" , "Repair airship components"}, () => EzThrottler.Throttle("RepairAllSelectRepair")), "RepairAllSelectRepair");
+        P.TaskManager.EnqueueImmediate(() => Utils.TrySelectSpecificEntry(Lang.WorkshopRepair, () => EzThrottler.Throttle("RepairAllSelectRepair")), "RepairAllSelectRepair");
         foreach(int index in indexes)
         {
             if(index < 0 || index > 3) throw new ArgumentOutOfRangeException(nameof(index));
             P.TaskManager.EnqueueImmediate(() => VoyageScheduler.TryRepair(index), $"Repair {index}");
-            P.TaskManager.EnqueueImmediate(VoyageScheduler.ConfirmRepair, 5000, false);
             P.TaskManager.EnqueueImmediate(() => Abort || VoyageScheduler.WaitForYesNoDisappear() == true, 5000, false, "WaitForYesNoDisappear");
             P.TaskManager.EnqueueImmediate(() => Abort || VoyageUtils.GetVesselComponent(vesselIndex, type, index)->Condition > 0, "WaitUntilRepairComplete");
             P.TaskManager.DelayNextImmediate(C.FrameDelay * 2, true);

@@ -1,18 +1,94 @@
-﻿using AutoRetainer.Modules.Voyage;
+﻿using AutoRetainer.Internal;
+using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using System.Diagnostics;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AutoRetainer.UI.Dbg;
 
 internal static unsafe class DebugVoyage
 {
     static string data1 = "";
+    static VoyageType data2 = default;
     static int r1, r2, r3, r4, r5 = -1;
     internal static void Draw()
     {
+        if (ImGui.CollapsingHeader("Debug"))
+        {
+            try
+            {
+                var h = HousingManager.Instance()->WorkshopTerritory;
+                if (h != null)
+                {
+                    foreach (var x in h->Submersible.DataListSpan)
+                    {
+                        ImGuiEx.Text($"{MemoryHelper.ReadStringNullTerminated((nint)x.Name)}/{x.ReturnTime}/{*x.CurrentExplorationPoints}");
+                    }
+                }
+                if (ImGui.Button("Erase offline data"))
+                {
+                    Data.OfflineAirshipData.Clear();
+                    Data.OfflineSubmarineData.Clear();
+                }
+                if (ImGui.Button("Repair 1")) VoyageScheduler.TryRepair(0);
+                if (ImGui.Button("Repair 2")) VoyageScheduler.TryRepair(1);
+                if (ImGui.Button("Repair 3")) VoyageScheduler.TryRepair(2);
+                if (ImGui.Button("Repair 4")) VoyageScheduler.TryRepair(3);
+                if (ImGui.Button("Close repair")) VoyageScheduler.CloseRepair();
+                //if (ImGui.Button("Trigger auto repair")) TaskRepairAll.EnqueueImmediate();
+                ImGui.InputText("data1", ref data1, 50);
+                ImGuiEx.EnumCombo("data2", ref data2);
+                if (CurrentSubmarine.Get() != null)
+                {
+                    ImGuiEx.Text($"{CurrentSubmarine.Get()->CurrentExp}/{CurrentSubmarine.Get()->NextLevelExp}");
+                }
+                ImGuiEx.Text($"Is voyage panel: {VoyageUtils.IsInVoyagePanel()}, {Lang.PanelName}");
+                if (ImGui.Button("IsVesselNeedsRepair"))
+                {
+                    try
+                    {
+                        DuoLog.Information($"{VoyageUtils.GetIsVesselNeedsRepair(data1, data2, out var log).Print()}\n{log.Join("\n")}");
+                    }
+                    catch (Exception e)
+                    {
+                        e.LogDuo();
+                    }
+                }
+                if (ImGui.Button("GetSubmarineIndexByName"))
+                {
+                    try
+                    {
+                        DuoLog.Information($"{VoyageUtils.GetVesselIndexByName(data1, VoyageType.Submersible)}");
+                    }
+                    catch (Exception e)
+                    {
+                        e.LogDuo();
+                    }
+                }
+                ImGuiEx.Text($"Bell: {Utils.GetReachableRetainerBell(false)}");
+                ImGuiEx.Text($"Bell(true): {Utils.GetReachableRetainerBell(true)}");
+                ImGuiEx.TextWrapped($"Enabled subs: {Data.GetVesselData(VoyageType.Submersible).Select(x => $"{x.Name}, {x.GetRemainingSeconds()}").Print()}");
+                ImGuiEx.Text($"AnyEnabledVesselsAvailable: {Data.AnyEnabledVesselsAvailable()}");
+                ImGuiEx.Text($"Panel type: {VoyageUtils.GetCurrentWorkshopPanelType()}");
+                if (TryGetAddonByName<AtkUnitBase>("AirShipExplorationResult", out var addon) && IsAddonReady(addon))
+                {
+                    var button = addon->UldManager.NodeList[3]->GetAsAtkComponentButton();
+                    ImGuiEx.Text($"Button: {button->IsEnabled}");
+                }
+                if (ImGui.Button("Interact with nearest panel"))
+                {
+                    TaskInteractWithNearestPanel.Enqueue();
+                }
+            }
+            catch (Exception e)
+            {
+                ImGuiEx.TextWrapped(e.ToString());
+            }
+        }
         ImGuiEx.Text($"IsRetainerBlockedByVoyage: {VoyageUtils.IsRetainerBlockedByVoyage()}");
         if (ImGui.CollapsingHeader("data"))
         {
@@ -87,7 +163,7 @@ internal static unsafe class DebugVoyage
             if (ImGui.Button($"{nameof(VoyageScheduler.RedeployVessel)}")) DuoLog.Information($"{VoyageScheduler.RedeployVessel()}");
             if (ImGui.Button($"{nameof(VoyageScheduler.DeployVessel)}")) DuoLog.Information($"{VoyageScheduler.DeployVessel()}");
             if (ImGui.Button($"{nameof(TaskDeployOnBestExpVoyage.Deploy)}")) DuoLog.Information($"{TaskDeployOnBestExpVoyage.Deploy()}");
-            if (ImGui.Button($"{nameof(TaskDeployOnBestExpVoyage)}")) TaskDeployOnBestExpVoyage.Enqueue();
+            //if (ImGui.Button($"{nameof(TaskDeployOnBestExpVoyage)}")) TaskDeployOnBestExpVoyage.Enqueue();
             if (ImGui.Button($"{nameof(VoyageScheduler.Approach)}")) DuoLog.Information($"{VoyageScheduler.Approach}");
         }
         if(ImGui.CollapsingHeader("Test task manager"))

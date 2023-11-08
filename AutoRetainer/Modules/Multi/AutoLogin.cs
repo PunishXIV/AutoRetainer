@@ -7,6 +7,7 @@ using Dalamud.Memory;
 using Dalamud.Utility;
 using ECommons.Automation;
 using FFXIVClientStructs.FFXIV.Client.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
 using System.Diagnostics;
@@ -55,9 +56,9 @@ internal unsafe class AutoLogin
         actionQueue.Enqueue(SelectYesLogout);
     }
 
-    internal void Login(string WorldName, string characterName, int serviceAccount)
+    internal void Login(string WorldName, string characterName, uint charaWorld, int serviceAccount)
     {
-
+        this.charaWorld = charaWorld;
         var world = Svc.Data.Excel.GetSheet<World>()?.FirstOrDefault(w => w.Name.ToDalamudString().TextValue.Equals(WorldName, StringComparison.InvariantCultureIgnoreCase));
 
         if (world == null)
@@ -94,9 +95,9 @@ internal unsafe class AutoLogin
         actionQueue.Enqueue(ClearTemp);
     }
 
-    internal void SwapCharacter(string WorldName, string characterName, int serviceAccount)
+    internal void SwapCharacter(string WorldName, string characterName, uint charaWorld, int serviceAccount)
     {
-
+        this.charaWorld = charaWorld;
         var world = Svc.Data.Excel.GetSheet<World>()?.FirstOrDefault(w => w.Name.ToDalamudString().TextValue.Equals(WorldName, StringComparison.InvariantCultureIgnoreCase));
 
         if (world == null)
@@ -287,7 +288,9 @@ internal unsafe class AutoLogin
         // Select Character
         var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("_CharaSelectListMenu", 1);
         if (addon == null || tempCharacter == null) return false;
-        if (Utils.TryGetCharacterIndex(tempCharacter, out var index))
+        if (!AgentLobby.Instance()->AgentInterface.IsAgentActive()) return false;
+        if (AgentLobby.Instance()->TemporaryLocked) return false;
+        if (Utils.TryGetCharacterIndex(tempCharacter, charaWorld, out var index))
         {
             Callback.Fire(addon, false, (int)18, (int)0, (int)index);
             var nextAddon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("SelectYesno", 1);
@@ -349,6 +352,7 @@ internal unsafe class AutoLogin
     private uint? tempDc = null;
     private uint? tempWorld = null;
     private string? tempCharacter = null;
+    private uint charaWorld = 0;
     private int tempServiceAccount = 0;
 
     internal void DrawUI()

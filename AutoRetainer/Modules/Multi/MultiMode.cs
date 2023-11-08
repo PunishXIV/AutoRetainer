@@ -6,11 +6,13 @@ using AutoRetainer.UI;
 using AutoRetainerAPI.Configuration;
 using ECommons.CircularBuffers;
 using ECommons.Events;
+using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using Lumina.Data.Files.Excel;
 using static AutoRetainer.Modules.OfflineDataManager;
 
 namespace AutoRetainer.Modules.Multi;
@@ -31,7 +33,7 @@ internal unsafe static class MultiMode
     internal static CircularBuffer<long> Interactions = new(5);
 
     internal static Dictionary<ulong, int> CharaCnt = new();
-    internal static bool CanHET => Active && C.MultiAllowHET && ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType);
+    internal static bool CanHET => Active && C.ExpertMultiAllowHET && ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType);
 
     internal static void Init()
     {
@@ -221,7 +223,7 @@ internal unsafe static class MultiMode
                     }
                     else if(Data.AnyEnabledVesselsAvailable() && MultiMode.EnabledSubmarines)
                     {
-                        if (!C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn || Data.AreAnyVesselsReturnInNext(0, true))
+                        if (!C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn || Data.AreAnyEnabledVesselsReturnInNext(0, true))
                         {
                             DebugLog($"Enqueueing interaction with panel");
                             BlockInteraction(10);
@@ -346,7 +348,7 @@ internal unsafe static class MultiMode
                     TaskPostprocessCharacterIPC.Enqueue();
                     if (data != null)
                     {
-                        P.TaskManager.Enqueue(() => AutoLogin.Instance.SwapCharacter(data.WorldOverride ?? data.World, data.Name, data.ServiceAccount));
+                        P.TaskManager.Enqueue(() => AutoLogin.Instance.SwapCharacter(data.CurrentWorld, data.Name, ExcelWorldHelper.GetWorldByName(data.World).RowId, data.ServiceAccount));
                     }
                     else
                     {
@@ -359,7 +361,7 @@ internal unsafe static class MultiMode
             {
                 if (Utils.CanAutoLogin())
                 {
-                    AutoLogin.Instance.Login(data.World, data.Name, data.ServiceAccount);
+                    AutoLogin.Instance.Login(data.CurrentWorld, data.Name, ExcelWorldHelper.GetWorldByName(data.World).RowId, data.ServiceAccount);
                     return true;
                 }
                 else
@@ -385,7 +387,7 @@ internal unsafe static class MultiMode
                 if (x.CID == Player.CID) continue;
                 if (x.WorkshopEnabled && x.GetEnabledVesselsData(VoyageType.Airship).Count + x.GetEnabledVesselsData(VoyageType.Submersible).Count > 0)
                 {
-                    if (x.AreAnyVesselsReturnInNext(C.MultiModeWorkshopConfiguration.AdvanceTimer, C.MultiModeWorkshopConfiguration.MultiWaitForAll))
+                    if (x.AreAnyEnabledVesselsReturnInNext(C.MultiModeWorkshopConfiguration.AdvanceTimer, C.MultiModeWorkshopConfiguration.MultiWaitForAll))
                     {
                         return x;
                     }
@@ -431,7 +433,7 @@ internal unsafe static class MultiMode
     {
         if (!EnabledSubmarines) return true;
         if(!Data.WorkshopEnabled) return true;
-        return !Data.AreAnyVesselsReturnInNext(5 * 60, C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn);
+        return !Data.AreAnyEnabledVesselsReturnInNext(5 * 60, C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn);
     }
 
     internal static bool IsAnySelectedRetainerFinishesWithin(int seconds)

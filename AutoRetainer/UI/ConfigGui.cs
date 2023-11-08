@@ -5,6 +5,7 @@ using AutoRetainer.UI.Settings;
 using AutoRetainerAPI.Configuration;
 using AutoRetainerAPI;
 using AutoRetainer.Modules.Voyage;
+using AutoRetainer.UI.Settings.SettingsMain;
 
 namespace AutoRetainer.UI;
 
@@ -52,6 +53,11 @@ unsafe internal class ConfigGui : Window
                 SchedulerMain.DisablePlugin();
             }
         }
+        if (C.ShowDeployables && VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType) || VoyageScheduler.Enabled)
+        {
+            ImGui.SameLine();
+            ImGui.Checkbox($"Deployables", ref VoyageScheduler.Enabled);
+        }
         if (disabled)
         {
             ImGui.EndDisabled();
@@ -64,11 +70,6 @@ unsafe internal class ConfigGui : Window
             ImGuiEx.Text(GradientColor.Get(ImGuiColors.DalamudGrey, ImGuiColors.DalamudGrey3, 500), $"Paused");
         }
 
-        if (VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType) || VoyageScheduler.Enabled)
-        {
-            ImGui.SameLine();
-            ImGui.Checkbox($"Enable Deployables", ref VoyageScheduler.Enabled);
-        }
         ImGui.SameLine();
         if (ImGui.Checkbox("Multi", ref MultiMode.Enabled))
         {
@@ -118,7 +119,7 @@ unsafe internal class ConfigGui : Window
                 ("Settings", SettingsMain.Draw, null, true),
                 (C.Expert?"Expert":null, Expert.Draw, null, true),
                 //("Beta", Beta.Draw, null, true),
-                ("About", delegate { AboutTab.Draw(P); }, null, true),
+                ("About", delegate { AboutTab.Draw(P.Name); }, null, true),
                 (C.Verbose ? "Dev" : null, delegate
                 {
                     ImGuiEx.EzTabBar("DebugBar",
@@ -128,7 +129,8 @@ unsafe internal class ConfigGui : Window
                         ("WIP", SuperSecret.Draw, null, true)
                     );
                 }, null, true)
-                );
+                ); 
+
     }
 
     public override void PostDraw()

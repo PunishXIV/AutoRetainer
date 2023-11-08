@@ -32,7 +32,7 @@ internal unsafe static class TaskEntrustDuplicates
     {
         P.TaskManager.Enqueue(() => { NoDuplicates = CheckNoDuplicates(); return true; }) ;
         P.TaskManager.Enqueue(() => { NoDuplicates = false; return true; }) ;
-        P.TaskManager.Enqueue(YesAlready.WaitForYesAlreadyDisabledTask);
+        P.TaskManager.Enqueue(NewYesAlreadyManager.WaitForYesAlreadyDisabledTask);
         if (C.RetainerMenuDelay > 0)
         {
             TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);

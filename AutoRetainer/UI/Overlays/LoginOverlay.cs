@@ -1,4 +1,5 @@
 ﻿using Dalamud.Interface.GameFonts;
+using ECommons.ExcelServices;
 
 namespace AutoRetainer.UI.Overlays;
 
@@ -31,7 +32,7 @@ internal unsafe class LoginOverlay : Window
             }
             if (ImGui.Button(n, new(bWidth * C.LoginOverlayBPadding, dim.Y * C.LoginOverlayBPadding)))
             {
-                AutoLogin.Instance.Login(x.World, x.Name, x.ServiceAccount);
+                AutoLogin.Instance.Login(x.CurrentWorld, x.Name, ExcelWorldHelper.GetWorldByName(x.World).RowId, x.ServiceAccount);
             }
         }
         ImGui.PopFont();

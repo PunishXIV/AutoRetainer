@@ -13,8 +13,62 @@ internal static unsafe class VentureUtils
 
     private static bool IsNullOrEmpty(this string s) => GenericHelpers.IsNullOrEmpty(s);
 
+    internal static void BuildUnwrappedList(AdditionalRetainerData adata, OfflineCharacterData data, OfflineRetainerData ret)
+    {
+        try
+        {
+            if(adata.VenturePlan.ListUnwrapped.Count > 500)
+            {
+                ImGuiEx.Text($"The venture list is too large to show preview.");
+                ImGuiEx.Text($"Progress: {adata.VenturePlanIndex}/{adata.VenturePlan.ListUnwrapped.Count}");
+                return;
+            }
+            List<(Vector4? col, string str)> strings = [];
+            int focus = 0;
+            for (int j = 0; j < adata.VenturePlan.ListUnwrapped.Count; j++)
+            {
+                var v = adata.VenturePlan.ListUnwrapped[j];
+                if (j == adata.VenturePlanIndex - 1)
+                {
+                    focus = j;
+                    strings.Add((ImGuiColors.ParsedGreen, $"{VentureUtils.GetFancyVentureName(v, data, ret, out _)}"));
+                }
+                else if (j == adata.VenturePlanIndex || (j == 0 && adata.VenturePlan.PlanCompleteBehavior == PlanCompleteBehavior.Restart_plan && adata.VenturePlanIndex >= adata.VenturePlan.ListUnwrapped.Count))
+                {
+                    strings.Add((ImGuiColors.DalamudYellow, $"{VentureUtils.GetFancyVentureName(v, data, ret, out _)}"));
+                }
+                else
+                {
+                    strings.Add((null, $"{VentureUtils.GetFancyVentureName(v, data, ret, out _)}"));
+                }
+            }
+            var min = Math.Max(focus - 8, 0);
+            var max = Math.Min(focus + 10, strings.Count);
+            if (min != 0) ImGuiEx.Text($"... {min} more ...");
+            for (int i = min; i < max; i++)
+            {
+                var s = strings[i];
+                ImGuiEx.Text(s.col, s.str);
+            }
+            if (max != strings.Count) ImGuiEx.Text($"... {strings.Count - max} more ...");
+        }
+        catch(Exception e)
+        {
+            PluginLog.Error($"{e}");
+        }
+    }
+
     internal static void ProcessVenturePlanner(this SeRetainer ret, uint next)
     {
+        if(next != 0)
+        {
+            var adj = VentureUtils.GetAdjustedRetainerTask(next, (Job)ret.ClassJob);
+            if(adj != next)
+            {
+                PluginLog.Debug($"Adjusted venture ID {next}->{adj}");
+                next = adj;
+            }
+        }
         DebugLog($"Not completed or restarting");
         if (ret.VentureID != 0)
         {
@@ -176,14 +230,31 @@ internal static unsafe class VentureUtils
 
     internal static string GetFancyVentureName(this RetainerTask Task, OfflineCharacterData data, OfflineRetainerData retainer, out bool Available) => GetFancyVentureName(Task, data, retainer, out Available, out _, out _);
 
+    static Dictionary<string, FancyVentureCacheEntry> FancyVentureNameCache = [];
     internal static string GetFancyVentureName(this RetainerTask Task, OfflineCharacterData data, OfflineRetainerData retainer, out bool Available, out string left, out string right)
     {
+        var signature = $"{Task.RowId}/{data.Identity}/{retainer.Identity}";
+        if(FancyVentureNameCache.TryGetValue(signature, out var cached) && cached.IsValid)
+        {
+            left = cached.Left;
+            right = cached.Right;
+            Available = cached.Avail;
+            return cached.Entry;
+        }
         var r = Task.GetFancyVentureNameParts(data, retainer, out Available);
         left = Available ? "" : Lang.CharDeny + r.UnavailabilitySymbols + " ";
         var lvls = r.Level == 0 ? "" : $"{Lang.CharLevel}{r.Level} ";
         right = r.Yield == 0 ? "" : $"x{r.Yield} {r.YieldStars}";
         left = $"{left}{lvls}{r.Name}";
-        return (C.Verbose ? $"#{Task.RowId}/{Task.ClassJobCategory.Value.Name} " : "") + left + " " + right;
+        var ret = (C.Verbose ? $"#{Task.RowId}->{Task.GetAdjustedRetainerTask((Job)retainer.Job).RowId}/{Task.ClassJobCategory.Value.GetShortName()} " : "") + left + " " + right;
+        FancyVentureNameCache[signature] = new(ret, Available, left, right);
+        return ret;
+    }
+
+    internal static string GetShortName(this ClassJobCategory cat)
+    {
+        if (cat.RowId == GetCategory((uint)Job.BRD)) return "DoW";
+        return cat.Name;
     }
 
     internal static (string UnavailabilitySymbols, int Level, string Name, int Yield, int YieldRate, string YieldStars) GetFancyVentureNameParts(this RetainerTask Task, OfflineCharacterData data, OfflineRetainerData retainer, out bool Available)
@@ -264,6 +335,15 @@ internal static unsafe class VentureUtils
             retp.YieldStars = $"{"★".Repeat(retp.YieldRate)}{"☆".Repeat(4 - retp.YieldRate)}";
         }
         return retp;
+    }
+
+    internal static uint GetAdjustedRetainerTask(uint task, Job job) => GetAdjustedRetainerTask(Svc.Data.GetExcelSheet<RetainerTask>().GetRow(task), job).RowId;
+
+    internal static RetainerTask GetAdjustedRetainerTask(this RetainerTask task, Job job)
+    {
+        if (task.GetVentureItemId() == 0) return task;
+        var n = Svc.Data.GetExcelSheet<RetainerTask>().FirstOrDefault(x => x.GetVentureItemId() == task.GetVentureItemId() && x.ClassJobCategory.Value.RowId == GetCategory((uint)job));
+        return n ?? task;
     }
 
     internal static int GetCategory(uint ClassJob)
@@ -358,8 +438,8 @@ internal static unsafe class VentureUtils
 
     internal static List<string> GetAvailableVentureNames()
     {
-        List<string> ret = new();
-        var data = CSFramework.Instance()->UIModule->GetRaptureAtkModule()->AtkModule.GetStringArrayData(95);
+        List<string> ret = [];
+        var data = CSFramework.Instance()->UIModule->GetRaptureAtkModule()->AtkModule.GetStringArrayData(96);
         if (data != null)
         {
             for (int i = 0; i < data->AtkArrayData.Size; i++)

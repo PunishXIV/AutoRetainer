@@ -22,6 +22,8 @@ using ECommons.GameHelpers;
 using AutoRetainer.Modules.Voyage;
 using Dalamud.Game.Network;
 using AutoRetainer.Scheduler.Handlers;
+using System.Threading;
+using ECommons.ExcelServices;
 
 namespace AutoRetainer;
 
@@ -63,6 +65,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal uint ListUpdateFrame = 0;
 
     internal bool LogOpcodes = false;
+    internal int LastLoadedItems = 0;
 
     internal static OfflineCharacterData Data => Utils.GetCurrentCharacterData();
 
@@ -71,7 +74,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         //PluginLoader.CheckAndLoad(pi, "https://love.puni.sh/plugins/AutoRetainer/blacklist.txt", delegate
         {
             ECommonsMain.Init(pi, this, Module.DalamudReflector);
-            PunishLibMain.Init(pi, this, PunishOption.DefaultKoFi); // Default button
+            PunishLibMain.Init(pi, Name, PunishOption.DefaultKoFi); // Default button
             P = this;
             new TickScheduler(delegate
             {
@@ -97,7 +100,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 Svc.PluginInterface.UiBuilder.OpenConfigUi += delegate { configGui.IsOpen = true; };
                 Svc.ClientState.Logout += Logout;
                 Svc.Condition.ConditionChange += ConditionChange;
-                EzCmd.Add("/autoretainer", CommandHandler, "Open plugin interface\n/autoretainer e|enable → Enable plugin\n/autoretainer d|disable - Disable plugin\n/autoretainer t|toggle - toggle plugin\n/autoretainer m|multi - toggle MultiMode\n/autoretainer relog Character Name@WorldName - relog to the targeted character if configured\n/autoretainer b|browser - open venture browser\n/autoretainer expert - toggle expert settings\n/autoretainer debug - toggle debug menu and verbose output");
+                EzCmd.Add("/autoretainer", CommandHandler, "Open plugin interface\n/autoretainer e|enable → Enable plugin\n/autoretainer d|disable - Disable plugin\n/autoretainer t|toggle - toggle plugin\n/autoretainer m|multi - toggle MultiMode\n/autoretainer relog Character Name@WorldName - relog to the targeted character if configured\n/autoretainer b|browser - open venture browser\n/autoretainer expert - toggle expert settings\n/autoretainer debug - toggle debug menu and verbose output\n/autoretainer shutdown <hours> [minutes] [seconds] - schedule a game shutdown in this amount of time");
                 EzCmd.Add("/ays", CommandHandler);
                 Svc.Toasts.ErrorToast += Toasts_ErrorToast;
                 Svc.Toasts.Toast += Toasts_Toast;
@@ -127,13 +130,16 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 API = new();
                 ApiTest.Init();
                 FPSManager.UnlockChillFrames();
-                PluginLog.Information($"AutoRetainer v{P.GetType().Assembly.GetName().Version} is ready.");
                 Svc.GameNetwork.NetworkMessage += GameNetwork_NetworkMessage;
                 Utils.ResetEscIgnoreByWindows();
+                Svc.PluginInterface.UiBuilder.Draw += FPSLimiter.FPSLimit;
+                AutoCutsceneSkipper.Init(MiniTA.ProcessCutsceneSkip);
+                PluginLog.Information($"AutoRetainer v{P.GetType().Assembly.GetName().Version} is ready.");
             });
         }
         //);
     }
+
 
     private void GameNetwork_NetworkMessage(nint dataPtr, ushort opCode, uint sourceActorId, uint targetActorId, NetworkMessageDirection direction)
     {
@@ -213,11 +219,11 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 {
                     if (Svc.ClientState.IsLoggedIn)
                     {
-                        AutoLogin.Instance.SwapCharacter(target.WorldOverride ?? target.World, target.Name, target.ServiceAccount);
+                        AutoLogin.Instance.SwapCharacter(target.CurrentWorld, target.Name, ExcelWorldHelper.GetWorldByName(target.World).RowId, target.ServiceAccount);
                     }
                     else
                     {
-                        AutoLogin.Instance.Login(target.WorldOverride ?? target.World, target.Name, target.ServiceAccount);
+                        AutoLogin.Instance.Login(target.CurrentWorld, target.Name, ExcelWorldHelper.GetWorldByName(target.World).RowId, target.ServiceAccount);
                     }
                 }
             }
@@ -233,6 +239,41 @@ public unsafe class AutoRetainer : IDalamudPlugin
         else if (arguments.EqualsIgnoreCaseAny("deliver"))
         {
             GCHandlers.EnableDeliveringIfPossible();
+        }
+        else if (arguments.StartsWith("shutdown"))
+        {
+            var str = arguments.Split((char[])[' ', ',', ':', '-', '/', '.'], StringSplitOptions.RemoveEmptyEntries);
+            if(str.Length <= 1)
+            {
+                Shutdown.ShutdownAt = 0;
+                Shutdown.ForceShutdownAt = 0;
+                Svc.Chat.Print("Shutdown timer cleared");
+            }
+            else
+            {
+                try
+                {
+                    var time = new TimeSpan();
+                    time = time.Add(TimeSpan.FromHours(int.Parse(str[1])));
+                    if (str.Length > 2) time = time.Add(TimeSpan.FromMinutes(int.Parse(str[2])));
+                    if (str.Length > 3) time = time.Add(TimeSpan.FromSeconds(int.Parse(str[3])));
+                    if (time.TotalSeconds < 10)
+                    {
+                        DuoLog.Error("Timer can't be less than 10 seconds");
+                    }
+                    else
+                    {
+                        Svc.Chat.Print($"Shutting down in {time}");
+                        Shutdown.ShutdownAt = Environment.TickCount64 + (long)time.TotalMilliseconds;
+                        Shutdown.ForceShutdownAt = Environment.TickCount64 + (long)time.TotalMilliseconds + 10 * 60 * 1000;
+                    }
+                }
+                catch(Exception e)
+                {
+                    DuoLog.Error($"{e.Message}");
+                    PluginLog.Error($"{e.StackTrace}");
+                }
+            }
         }
         else
         {
@@ -252,26 +293,21 @@ public unsafe class AutoRetainer : IDalamudPlugin
                     C.SelectedRetainers[Svc.ClientState.LocalContentId] = new();
                 }
             }
-            if (P.TaskManager.IsBusy || (Svc.Condition[ConditionFlag.OccupiedSummoningBell] && (SchedulerMain.PluginEnabled || P.TaskManager.IsBusy || ConditionWasEnabled)))
-            {
-                if (TryGetAddonByName<AddonTalk>("Talk", out var addon) && addon->AtkUnitBase.IsVisible)
-                {
-                    ClickTalk.Using((IntPtr)addon).Click();
-                }
-            }
         }
+        MiniTA.Tick();
         OfflineDataManager.Tick();
         AutoGCHandin.Tick();
         MultiMode.Tick();
         NotificationHandler.Tick();
-        YesAlready.Tick();
+        NewYesAlreadyManager.Tick();
         Artisan.ArtisanTick();
         FPSManager.Tick();
         PriorityManager.Tick();
         TextAdvanceManager.Tick();
+        Shutdown.Tick();
         if (Svc.Condition[ConditionFlag.OccupiedSummoningBell] && Utils.TryGetCurrentRetainer(out var name) && Utils.TryGetRetainerByName(name, out var retainer))
         {
-            if(!retainer.VentureID.EqualsAny(0u, LastVentureID))
+            if (!retainer.VentureID.EqualsAny(0u, LastVentureID))
             {
                 LastVentureID = retainer.VentureID;
                 PluginLog.Debug($"Retainer {retainer.Name} current venture={LastVentureID}");
@@ -363,6 +399,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         {
             Safe(this.quickSellItems.Disable);
             Safe(this.quickSellItems.Dispose);
+            Svc.PluginInterface.UiBuilder.Draw -= FPSLimiter.FPSLimit;
             Svc.PluginInterface.UiBuilder.Draw -= ws.Draw;
             Svc.ClientState.Logout -= Logout;
             Svc.Condition.ConditionChange -= ConditionChange;
@@ -370,10 +407,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
             Svc.Toasts.ErrorToast -= Toasts_ErrorToast;
             Svc.Toasts.Toast -= Toasts_Toast;
             Svc.GameNetwork.NetworkMessage -= GameNetwork_NetworkMessage;
-            Safe(delegate
-            {
-                YesAlready.EnableIfNeeded();
-            });
+            Safe(NewYesAlreadyManager.Unlock);
+            Safe(TextAdvanceManager.UnlockTA);
             Safe(StatisticsManager.Dispose);
             Safe(AutoLogin.Dispose);
             Safe(Memory.Dispose);
