@@ -232,8 +232,8 @@ internal unsafe class SubmarineUnlockPlanUI : Window
                 {
                     ImGuiEx.Text(SelectedPlan.GetPrioritizedPointList().Select(x => $"{Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(x.point).Destination} ({x.justification})").Join("\n"));
                 }
-                ImGui.EndChild();
             }
+            ImGui.EndChild();
         }
     }
 }

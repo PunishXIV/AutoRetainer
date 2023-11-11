@@ -89,7 +89,7 @@ internal static unsafe class VoyageMain
                     }
                     else
                     {
-                        if (C.SubsAutoResend)
+                        if (C.SubsAutoResend2)
                         {
                             if (Data.AnyEnabledVesselsAvailable())
                             {

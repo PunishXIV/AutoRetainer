@@ -24,6 +24,7 @@ using Dalamud.Game.Network;
 using AutoRetainer.Scheduler.Handlers;
 using System.Threading;
 using ECommons.ExcelServices;
+using NotificationMasterAPI;
 
 namespace AutoRetainer;
 
@@ -66,6 +67,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
     internal bool LogOpcodes = false;
     internal int LastLoadedItems = 0;
+    internal NotificationMasterApi NotificationMasterApi;
 
     internal static OfflineCharacterData Data => Utils.GetCurrentCharacterData();
 
@@ -122,6 +124,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 SubmarinePointPlanUI = new();
                 ws.AddWindow(SubmarinePointPlanUI);
                 MultiMode.Init();
+                NotificationMasterApi = new(pi);
 
                 Safety.Check();
 
@@ -305,6 +308,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         PriorityManager.Tick();
         TextAdvanceManager.Tick();
         Shutdown.Tick();
+        BailoutManager.Tick();
         if (Svc.Condition[ConditionFlag.OccupiedSummoningBell] && Utils.TryGetCurrentRetainer(out var name) && Utils.TryGetRetainerByName(name, out var retainer))
         {
             if (!retainer.VentureID.EqualsAny(0u, LastVentureID))

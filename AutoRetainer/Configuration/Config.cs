@@ -124,10 +124,10 @@ internal unsafe class Config : IEzConfig
 
     public bool ManipulatePriority = false;
 
-    public bool SubsAutoResend = false;
+    public bool SubsAutoResend2 = true;
     //public bool SubsAutoRepair = true;
     //public bool SubsOnlyFinalize = false;
-    public bool SubsAutoEnable = false;
+    //public bool SubsAutoEnable = false;
     //public bool SubsRepairFinalize = true;
     public MultiModeType MultiModeType = MultiModeType.Everything;
     public bool NoErrorCheckPlanner2 = true;

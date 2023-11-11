@@ -53,7 +53,7 @@ unsafe internal class ConfigGui : Window
                 SchedulerMain.DisablePlugin();
             }
         }
-        if (C.ShowDeployables && VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType) || VoyageScheduler.Enabled)
+        if (C.ShowDeployables && (VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType) || VoyageScheduler.Enabled))
         {
             ImGui.SameLine();
             ImGui.Checkbox($"Deployables", ref VoyageScheduler.Enabled);
