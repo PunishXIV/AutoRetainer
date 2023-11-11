@@ -10,7 +10,7 @@ internal unsafe static class Debug
         ImGuiEx.TextWrapped(ImGuiColors.ParsedOrange, "Anything can happen here.");
         Safe(delegate
         {
-            ImGuiEx.EzTabBar("DebugBar",
+            ImGuiEx.EzTabBar("DebugBar", [
                 ("Beta", Beta.Draw, null, true),
                 ("Venture", DebugVenture.Draw, null, true),
                 ("Scheduler", DebugScheduler.Draw, null, true),
@@ -21,8 +21,10 @@ internal unsafe static class Debug
                 ("GCAuto", DebugGCAuto.Draw, null, true),
                 ("Artisan", DebugArtisan.Draw, null, true),
                 ("Voyage", DebugVoyage.Draw, null, true),
-                ("AtkReader", DebugReader.Draw, null, true)
-                );
+                ("AtkReader", DebugReader.Draw, null, true),
+                ("Bailout", DebugBailout.Draw, null, true),
+                ("NMAPI", DebugNMAPI.Draw, null, true),
+            ]);
         });
     }
 }

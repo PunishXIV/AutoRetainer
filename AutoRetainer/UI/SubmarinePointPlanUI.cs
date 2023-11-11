@@ -159,11 +159,12 @@ internal unsafe class SubmarinePointPlanUI : Window
                             }
                             if (disabled) ImGui.EndDisabled();
                         }
-                        ImGui.EndChild();
                     }
+                    ImGui.EndChild();
                 }, delegate
                 {
-                    if(ImGui.BeginChild("Col2")){
+                    if(ImGui.BeginChild("Col2"))
+                    {
                         var map = SelectedPlan.GetMap();
                         if(map != null)
                         {
@@ -195,8 +196,8 @@ internal unsafe class SubmarinePointPlanUI : Window
                         {
                             SelectedPlan.Points.RemoveAt(toRem);
                         }
-                    ImGui.EndChild();
                     }
+                    ImGui.EndChild();
                 }
             ]);
         }

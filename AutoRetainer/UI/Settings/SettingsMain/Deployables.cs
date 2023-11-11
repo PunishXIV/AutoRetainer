@@ -18,7 +18,7 @@ namespace AutoRetainer.UI.Settings.SettingsMain
             if (ImGuiGroup.BeginGroupBox("General"))
             {
 
-                ImGui.Checkbox($"Resend vessels when accessing the Voyage Control Panel", ref C.SubsAutoResend);
+                ImGui.Checkbox($"Resend vessels when accessing the Voyage Control Panel", ref C.SubsAutoResend2);
                 ImGui.Checkbox($"Finalize all vessels before resending them", ref C.FinalizeBeforeResend);
                 ImGui.Checkbox($"Hide Airships from Deployables UI", ref C.HideAirships);
                 ImGuiGroup.EndGroupBox();

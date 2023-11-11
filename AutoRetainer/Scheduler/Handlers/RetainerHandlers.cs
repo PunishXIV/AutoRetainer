@@ -28,6 +28,7 @@ internal unsafe static class RetainerHandlers
 
     internal static bool? SelectQuit()
     {
+        if (BailoutManager.SimulateStuckOnQuit) return false;
         if(TryGetAddonByName<AtkUnitBase>("RetainerTaskSupply", out var addon))
         {
             if (Utils.GenericThrottle)

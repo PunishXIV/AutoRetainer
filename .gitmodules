@@ -10,3 +10,6 @@
 [submodule "AutoRetainerAPI"]
 	path = AutoRetainerAPI
 	url = https://github.com/PunishXIV/AutoRetainerAPI
+[submodule "NotificationMasterAPI"]
+	path = NotificationMasterAPI
+	url = https://github.com/NightmareXIV/NotificationMasterAPI
