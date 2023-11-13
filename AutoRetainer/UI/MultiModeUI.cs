@@ -141,6 +141,11 @@ internal unsafe static class MultiModeUI
                     P.DuplicateBlacklistSelector.IsOpen = true;
                     P.DuplicateBlacklistSelector.SelectedData = data;
                 }
+                var inst = Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "TeleporterPlugin" && x.IsLoaded);
+                if (!inst) ImGui.BeginDisabled();
+                ImGui.Checkbox($"Teleport to FC house if not in housing zone upon logging in during multi mode", ref data.TeleportToFCHouse);
+                if (!inst) ImGui.EndDisabled();
+                ImGuiComponents.HelpMarker("You must have Teleporter plugin installed and enabled to use this function.");
                 ImGui.Separator();
                 if (ImGuiEx.ButtonCtrl("Exclude Character"))
                 {
