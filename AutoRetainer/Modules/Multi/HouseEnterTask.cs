@@ -6,6 +6,7 @@ using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
 namespace AutoRetainer.Modules.Multi;
 
@@ -14,6 +15,15 @@ internal unsafe static class HouseEnterTask
     internal static void EnqueueTask()
     {
         P.TaskManager.Enqueue(NewYesAlreadyManager.WaitForYesAlreadyDisabledTask);
+        P.TaskManager.Enqueue(() =>
+        {
+            if (Data.TeleportToFCHouse && !Svc.ClientState.TerritoryType.EqualsAny(ResidentalAreas.List))
+            {
+                P.TaskManager.EnqueueImmediate(() => Player.Interactable, $"WaitForPlayerInteractable");
+                P.TaskManager.EnqueueImmediate(() => ExecuteTPCommand(164), $"ExecuteTPCommand(164)");
+                P.TaskManager.EnqueueImmediate(() => Player.Interactable && Svc.ClientState.TerritoryType.EqualsAny(ResidentalAreas.List), 1000 * 60, "WaitUntilArrival");
+            }
+        });
         P.TaskManager.Enqueue(WaitUntilNotBusy, 180 * 1000);
         P.TaskManager.Enqueue(() =>
         {
@@ -38,6 +48,24 @@ internal unsafe static class HouseEnterTask
             return true;
         }, "Master HET");
         TaskEnterWorkshop.Enqueue();
+    }
+
+    internal static bool? ExecuteTPCommand(uint id)
+    {
+        if (!Player.Available) return false;
+        if (AgentMap.Instance()->IsPlayerMoving == 0 && !IsOccupied() && !Player.Object.IsCasting && EzThrottler.Throttle("ExecTP", 1000))
+        {
+            try
+            {
+                return Svc.PluginInterface.GetIpcSubscriber<uint, byte, bool>("Teleport").InvokeFunc(id, 0);
+            }
+            catch(Exception e)
+            {
+                e.Log();
+                DuoLog.Error($"You do not have Teleporter plugin installed");
+            }
+        }
+        return false;
     }
 
     internal static bool? WaitUntilNotBusy()
