@@ -21,7 +21,10 @@ internal unsafe static class VoyageUtils
     internal static bool DontReassign => (C.TempCollectB != LimitedKeys.None && IsKeyPressed(C.TempCollectB) && !CSFramework.Instance()->WindowInactive);
 
     internal static uint[] Workshops = [Houses.Company_Workshop_Empyreum, Houses.Company_Workshop_The_Goblet, Houses.Company_Workshop_Mist, Houses.Company_Workshop_Shirogane, Houses.Company_Workshop_The_Lavender_Beds];
-    
+
+    internal static bool ShouldEnterWorkshop() => Data.AreAnyEnabledVesselsReturnInNext(5 * 60, C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn) || (Utils.GetReachableRetainerBell(false) == null);
+
+
     internal static bool IsNotEnoughSubmarinesEnabled(this OfflineCharacterData data)
     {
         return data.GetVesselData(VoyageType.Submersible).Count > data.GetVesselData(VoyageType.Submersible).Where(x => data.GetEnabledVesselsData(VoyageType.Submersible).Contains(x.Name)).Count();
