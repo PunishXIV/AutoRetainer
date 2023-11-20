@@ -1,4 +1,6 @@
 ﻿using ECommons.Automation;
+using ECommons.ExcelServices.TerritoryEnumeration;
+using ECommons.GameHelpers;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 
@@ -12,11 +14,14 @@ internal unsafe static class TaskEnterWorkshop
         P.TaskManager.Enqueue(() => !IsOccupied(), 180 * 1000, "WaitUntilNotOccupied1");
         P.TaskManager.Enqueue(() =>
         {
-            if(Data.AreAnyEnabledVesselsReturnInNext(5 * 60, C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn) || (Utils.GetReachableRetainerBell(false) == null && Utils.GetNearestWorkshopEntrance(out _) != null))
+            if(VoyageUtils.ShouldEnterWorkshop())
             {
-                EnqueueImmediateEnterWorkshop();
+                if(Utils.GetNearestWorkshopEntrance(out _) != null)
+                {
+                    EnqueueImmediateEnterWorkshop();
+                }
             }
-        });
+        }); 
     }
 
     internal static void EnqueueImmediateEnterWorkshop()

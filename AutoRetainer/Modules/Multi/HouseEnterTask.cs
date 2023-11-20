@@ -1,4 +1,5 @@
-﻿using AutoRetainer.Modules.Voyage.Tasks;
+﻿using AutoRetainer.Modules.Voyage;
+using AutoRetainer.Modules.Voyage.Tasks;
 using ClickLib.Clicks;
 using ECommons.Automation;
 using ECommons.Events;
@@ -12,15 +13,15 @@ namespace AutoRetainer.Modules.Multi;
 
 internal unsafe static class HouseEnterTask
 {
-    internal static void EnqueueTask()
+    internal static void EnqueueTask(bool ignoreTeleportZoneCheck = false)
     {
         P.TaskManager.Enqueue(NewYesAlreadyManager.WaitForYesAlreadyDisabledTask);
         P.TaskManager.Enqueue(() =>
         {
-            if (Data.TeleportToFCHouse && !Svc.ClientState.TerritoryType.EqualsAny(ResidentalAreas.List))
+            if (Data.TeleportToFCHouse && (!Svc.ClientState.TerritoryType.EqualsAny([.. ResidentalAreas.List, .. Houses.List, .. VoyageUtils.Workshops.Select(x => (ushort)x)]) || ignoreTeleportZoneCheck))
             {
                 P.TaskManager.EnqueueImmediate(() => Player.Interactable, $"WaitForPlayerInteractable");
-                P.TaskManager.EnqueueImmediate(() => ExecuteTPCommand(164), $"ExecuteTPCommand(164)");
+                P.TaskManager.EnqueueImmediate(TeleportToFC);
                 P.TaskManager.EnqueueImmediate(() => Player.Interactable && Svc.ClientState.TerritoryType.EqualsAny(ResidentalAreas.List), 1000 * 60, "WaitUntilArrival");
             }
         });
@@ -50,14 +51,18 @@ internal unsafe static class HouseEnterTask
         TaskEnterWorkshop.Enqueue();
     }
 
-    internal static bool? ExecuteTPCommand(uint id)
+    static readonly uint[] FCAetherytes = [56, 57, 58, 96, 164];
+    internal static bool? TeleportToFC()
     {
         if (!Player.Available) return false;
         if (AgentMap.Instance()->IsPlayerMoving == 0 && !IsOccupied() && !Player.Object.IsCasting && EzThrottler.Throttle("ExecTP", 1000))
         {
             try
             {
-                return Svc.PluginInterface.GetIpcSubscriber<uint, byte, bool>("Teleport").InvokeFunc(id, 0);
+                foreach (var id in FCAetherytes)
+                {
+                    if (Svc.PluginInterface.GetIpcSubscriber<uint, byte, bool>("Teleport").InvokeFunc(id, 0)) return true;
+                }
             }
             catch(Exception e)
             {

@@ -4,6 +4,7 @@ using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using Lumina.Excel.GeneratedSheets;
 
 namespace AutoRetainer.UI.Dbg;
@@ -12,6 +13,9 @@ internal unsafe static class DebugMulti
 {
     internal static void Draw()
     {
+        ImGuiEx.Text($"Moving: {AgentMap.Instance()->IsPlayerMoving}");
+        ImGuiEx.Text($"Occupied: {IsOccupied()}");
+        ImGuiEx.Text($"Casting: {Player.Object?.IsCasting}");
         ImGuiEx.TextCopy($"CID: {Player.CID}");
         ImGuiEx.Text($"{Svc.Data.GetExcelSheet<Addon>()?.GetRow(115)?.Text.ToDalamudString().ExtractText()}");
         ImGuiEx.Text($"Server time: {Framework.GetServerTime()}");

@@ -450,6 +450,10 @@ internal static unsafe class WorkshopUI
                     ImGui.EndCombo();
                 }
             }
+            if (C.Verbose)
+            {
+                if(ImGui.Button("Fake ready")) vessel.ReturnTime = 1;
+            }
             ImGui.EndPopup();
         }
         ImGui.PopID();
