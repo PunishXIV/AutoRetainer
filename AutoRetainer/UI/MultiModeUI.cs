@@ -88,41 +88,9 @@ internal unsafe static class MultiModeUI
 
             if (ImGui.BeginPopup($"popup{data.CID}"))
             {
-                var b = true;
-                ImGui.CollapsingHeader($"{Censor.Character(data.Name)} Configuration##conf", ref b, ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.Bullet | ImGuiTreeNodeFlags.OpenOnArrow);
-                if(b == false)
-                {
-                    ImGui.CloseCurrentPopup();
-                }
-
-                //if (C.MultipleServiceAccounts)
-                {
-                    //ImGui.SameLine();
-                    ImGui.SetNextItemWidth(150);
-                    if (ImGui.BeginCombo("##sindex", $"Service Account {data.ServiceAccount + 1}"))
-                    {
-                        for (var i = 1; i <= 10; i++)
-                        {
-                            if (ImGui.Selectable($"Service Account {i}"))
-                            {
-                                data.ServiceAccount = i - 1;
-                            }
-                        }
-                        ImGui.EndCombo();
-                    }
-                }
-
-                if (ImGui.Checkbox("Preferred Character", ref data.Preferred))
-                {
-                    foreach (var z in C.OfflineData)
-                    {
-                        if (z.CID != data.CID)
-                        {
-                            z.Preferred = false;
-                        }
-                    }
-                }
-                ImGuiComponents.HelpMarker("When operating in multi mode, if there are no other characters with imminent ventures to collect, it will relog back to your preferred character.");
+                SharedUI.DrawMultiModeHeader(data);
+                SharedUI.DrawServiceAccSelector(data);
+                SharedUI.DrawPreferredCharacterUI(data);
 
                 ImGui.Checkbox("Show & Process Retainers in Display Order", ref data.ShowRetainersInDisplayOrder);
 
@@ -143,20 +111,22 @@ internal unsafe static class MultiModeUI
                 }
                 var inst = Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "TeleporterPlugin" && x.IsLoaded);
                 if (!inst) ImGui.BeginDisabled();
-                ImGui.Checkbox($"Teleport to FC house if not in housing zone upon logging in during multi mode", ref data.TeleportToFCHouse);
+                ImGui.Checkbox($"Enable Estate Hall Teleport", ref data.TeleportToRetainerHouse);
+                ImGui.SetNextItemWidth(150f);
+                ImGuiEx.EnumCombo("Estate Teleport Location Preference", ref data.HouseTeleportTarget);
+                if (data.HouseTeleportTarget == HouseTeleportTarget.Private_Estate_Hall)
+                {
+                    SharedUI.DrawEntranceConfig(ref data.PHouseEntrance, "Private Estate Entrance Override");
+                }
+                if (data.HouseTeleportTarget == HouseTeleportTarget.Free_Company_Estate_Hall)
+                {
+                    SharedUI.DrawEntranceConfig(ref data.FCHouseEntrance, "Free Company Estate Entrance Override");
+                }
+
                 if (!inst) ImGui.EndDisabled();
                 ImGuiComponents.HelpMarker("You must have Teleporter plugin installed and enabled to use this function.");
                 ImGui.Separator();
-                if (ImGuiEx.ButtonCtrl("Exclude Character"))
-                {
-                    C.Blacklist.Add((data.CID, data.Name));
-                }
-                ImGuiComponents.HelpMarker("Excluding this character will immediately reset it's settings, remove it from this list and exclude all retainers from being processed. You can still run manual tasks on it's retainers. You can cancel this action in settings.");
-                if (ImGuiEx.ButtonCtrl("Reset character data"))
-                {
-                    deleteData = data.CID;
-                }
-                ImGuiComponents.HelpMarker("Character's saved data will be removed without excluding it. Character data will be regenerated once you log back into this character.");
+                SharedUI.DrawExcludeReset(data, out deleteData);
                 ImGui.EndPopup();
             }
 
@@ -342,6 +312,17 @@ internal unsafe static class MultiModeUI
                             }
                             ImGui.Separator();
                             Svc.PluginInterface.GetIpcProvider<ulong, string, object>(ApiConsts.OnRetainerSettingsDraw).SendMessage(data.CID, ret.Name);
+                            if (C.Verbose)
+                            {
+                                if (ImGui.Button("Fake ready"))
+                                {
+                                    ret.VentureEndsAt = 1;
+                                }
+                                if (ImGui.Button("Fake unready"))
+                                {
+                                    ret.VentureEndsAt = P.Time + 60 * 60;
+                                }
+                            }
                             ImGui.EndPopup();
                         }
                         ImGui.SameLine();

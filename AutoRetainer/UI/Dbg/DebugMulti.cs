@@ -1,4 +1,5 @@
-﻿using Dalamud.Utility;
+﻿using AutoRetainerAPI.Configuration;
+using Dalamud.Utility;
 using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;

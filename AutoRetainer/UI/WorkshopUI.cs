@@ -66,6 +66,29 @@ internal static unsafe class WorkshopUI
                 }
             }
             ImGui.SameLine(0, 3);
+            if (ImGuiEx.IconButton(FontAwesomeIcon.Cog))
+            {
+                ImGui.OpenPopup($"popup{data.CID}");
+            }
+            ImGuiEx.Tooltip($"Configure Character");
+            ImGui.SameLine(0, 3);
+
+            if (ImGui.BeginPopup($"popup{data.CID}"))
+            {
+                SharedUI.DrawMultiModeHeader(data);
+                SharedUI.DrawServiceAccSelector(data);
+                SharedUI.DrawPreferredCharacterUI(data);
+
+
+                var inst = Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "TeleporterPlugin" && x.IsLoaded);
+                if (!inst) ImGui.BeginDisabled();
+                ImGui.Checkbox($"Enable Free Company Estate Hall Teleport", ref data.TeleportToFCHouse);
+                SharedUI.DrawEntranceConfig(ref data.FCHouseEntrance, "Free Company Estate Entrance Override");
+
+                if (!inst) ImGui.EndDisabled();
+                ImGuiComponents.HelpMarker("You must have Teleporter plugin installed and enabled to use this function.");
+                ImGui.EndPopup();
+            }
 
             var initCurpos = ImGui.GetCursorPos();
             var lst = data.GetVesselData(VoyageType.Airship).Where(s => data.GetEnabledVesselsData(VoyageType.Airship).Contains(s.Name))
