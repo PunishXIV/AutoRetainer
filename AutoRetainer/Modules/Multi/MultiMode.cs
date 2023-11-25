@@ -33,7 +33,7 @@ internal unsafe static class MultiMode
     internal static CircularBuffer<long> Interactions = new(5);
 
     internal static Dictionary<ulong, int> CharaCnt = new();
-    internal static bool CanHET => Active && C.ExpertMultiAllowHET && (ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType) || Data.TeleportToFCHouse);
+    internal static bool CanHET => Active && C.ExpertMultiAllowHET && (ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType) || Data.TeleportToFCHouse || Data.TeleportToRetainerHouse);
 
     internal static void Init()
     {
@@ -209,16 +209,26 @@ internal unsafe static class MultiMode
                     if (AnyRetainersAvailable() && EnabledRetainers)
                     {
                         //DuoLog.Information($"1234");
-                        EnsureCharacterValidity();
-                        RestoreValidityInWorkshop();
-                        if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data) && data.Enabled)
+                        if (CanHET && Data.TeleportToRetainerHouse && Utils.GetReachableRetainerBell(true) == null)
                         {
-                            DebugLog($"Enqueueing interaction with bell");
-                            TaskInteractWithNearestBell.Enqueue();
-                            P.TaskManager.Enqueue(() => { SchedulerMain.EnablePlugin(PluginEnableReason.MultiMode); return true; });
+                            HouseEnterTask.EnqueueTask();
                             BlockInteraction(10);
                             Interactions.PushBack(Environment.TickCount64);
-                            DebugLog($"Added interaction because of interacting (state: {Interactions.Print()})");
+                            DebugLog($"Added interaction because of HET teleport (state: {Interactions.Print()})");
+                        }
+                        else
+                        {
+                            EnsureCharacterValidity();
+                            RestoreValidityInWorkshop();
+                            if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data) && data.Enabled)
+                            {
+                                DebugLog($"Enqueueing interaction with bell");
+                                TaskInteractWithNearestBell.Enqueue();
+                                P.TaskManager.Enqueue(() => { SchedulerMain.EnablePlugin(PluginEnableReason.MultiMode); return true; });
+                                BlockInteraction(10);
+                                Interactions.PushBack(Environment.TickCount64);
+                                DebugLog($"Added interaction because of interacting (state: {Interactions.Print()})");
+                            }
                         }
                     }
                     else if(Data.AnyEnabledVesselsAvailable() && MultiMode.EnabledSubmarines)

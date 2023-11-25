@@ -504,13 +504,43 @@ internal static unsafe class Utils
         return obj.Name.ToString().EqualsIgnoreCase(Lang.ApartmentEntrance);
     }
 
-    internal static GameObject GetNearestEntrance(out float Distance)
+    internal static GameObject GetNearestEntrance(out float Distance, bool bypassPredefined = false)
     {
         var currentDistance = float.MaxValue;
         GameObject currentObject = null;
+
+        var fcOverride = Data.FCHouseEntrance == default ? null : GetEntranceAtLocation(Data.FCHouseEntrance);
+        var pOverride = Data.FCHouseEntrance == default ? null : GetEntranceAtLocation(Data.PHouseEntrance);
+
+        if(fcOverride != null && pOverride != null)
+        {
+            var fcd = Vector3.Distance(Player.Object.Position, fcOverride.Position);
+            var pd = Vector3.Distance(Player.Object.Position, pOverride.Position);
+            if(fcd > pd)
+            {
+                Distance = pd;
+                return pOverride;
+            }
+            else
+            {
+                Distance = fcd;
+                return fcOverride;
+            }
+        }
+        if (fcOverride != null)
+        {
+            Distance = Vector3.Distance(Player.Object.Position, fcOverride.Position);
+            return fcOverride;
+        }
+        if (pOverride != null)
+        {
+            Distance = Vector3.Distance(Player.Object.Position, pOverride.Position);
+            return pOverride;
+        }
+
         foreach (var x in Svc.Objects)
         {
-            if (x.IsTargetable() && x.Name.ToString().EqualsIgnoreCaseAny(Lang.Entrance.Together(Lang.ApartmentEntrance)))
+            if (x.IsTargetable && x.Name.ToString().EqualsIgnoreCaseAny([.. Lang.Entrance, Lang.ApartmentEntrance]))
             {
                 var distance = Vector3.Distance(Svc.ClientState.LocalPlayer.Position, x.Position);
                 if (distance < currentDistance)
@@ -522,6 +552,22 @@ internal static unsafe class Utils
         }
         Distance = currentDistance;
         return currentObject;
+    }
+
+    internal static GameObject GetEntranceAtLocation(Vector3 pos)
+    {
+        foreach (var x in Svc.Objects)
+        {
+            if (x.IsTargetable && x.Name.ToString().EqualsIgnoreCaseAny(Lang.Entrance))
+            {
+                var distance = Vector3.Distance(pos, x.Position);
+                if (distance < 1f)
+                {
+                    return x;
+                }
+            }
+        }
+        return null;
     }
 
     internal static AtkUnitBase* GetSpecificYesno(Predicate<string> compare)

@@ -1,5 +1,6 @@
 ﻿using AutoRetainerAPI;
 using AutoRetainerAPI.Configuration;
+using System.Diagnostics.Metrics;
 
 namespace AutoRetainer.Modules;
 
@@ -95,8 +96,15 @@ internal static class IPC
 
     static void SetOCD(OfflineCharacterData OCD)
     {
-        C.OfflineData.RemoveAll(x => x.CID == OCD.CID);
-        C.OfflineData.Add(OCD);
+        var index = C.OfflineData.IndexOf(x => x.CID == OCD.CID);
+        if (index != -1)
+        {
+            C.OfflineData[index] = OCD;
+        }
+        else
+        {
+            C.OfflineData.Add(OCD);
+        }
     }
 
     static AdditionalRetainerData GetARD(ulong cid, string name)

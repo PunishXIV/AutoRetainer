@@ -1,5 +1,6 @@
 ﻿using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Modules.Voyage.Tasks;
+using AutoRetainerAPI.Configuration;
 using ClickLib.Clicks;
 using ECommons.Automation;
 using ECommons.Events;
@@ -13,15 +14,26 @@ namespace AutoRetainer.Modules.Multi;
 
 internal unsafe static class HouseEnterTask
 {
+    static readonly uint[] FCAetherytes = [56, 57, 58, 96, 164];
+    static readonly uint[] PrivateAetherytes = [59,60,61,97,165];
     internal static void EnqueueTask(bool ignoreTeleportZoneCheck = false)
     {
         P.TaskManager.Enqueue(NewYesAlreadyManager.WaitForYesAlreadyDisabledTask);
         P.TaskManager.Enqueue(() =>
         {
-            if (Data.TeleportToFCHouse && (!Svc.ClientState.TerritoryType.EqualsAny([.. ResidentalAreas.List, .. Houses.List, .. VoyageUtils.Workshops.Select(x => (ushort)x)]) || ignoreTeleportZoneCheck))
+            if ((Data.TeleportToFCHouse || Data.TeleportToRetainerHouse) && (!Svc.ClientState.TerritoryType.EqualsAny([.. ResidentalAreas.List, .. Houses.List, .. VoyageUtils.Workshops.Select(x => (ushort)x)]) || ignoreTeleportZoneCheck))
             {
                 P.TaskManager.EnqueueImmediate(() => Player.Interactable, $"WaitForPlayerInteractable");
-                P.TaskManager.EnqueueImmediate(TeleportToFC);
+                var canTpToFc = (Data.TeleportToFCHouse && !MultiMode.IsCurrentCharacterCaptainDone()) || (Data.TeleportToRetainerHouse && Data.HouseTeleportTarget == HouseTeleportTarget.Free_Company_Estate_Hall);
+                var canTpToPrivate = (Data.TeleportToRetainerHouse && Data.HouseTeleportTarget == HouseTeleportTarget.Private_Estate_Hall);
+                if (canTpToFc)
+                {
+                    P.TaskManager.EnqueueImmediate(() => TeleportTo(FCAetherytes), $"TeleportTo(FCAetherytes)");
+                }
+                else if (canTpToPrivate)
+                {
+                    P.TaskManager.EnqueueImmediate(() => TeleportTo(PrivateAetherytes), "TeleportTo(PrivateAetherytes)");
+                }
                 P.TaskManager.EnqueueImmediate(() => Player.Interactable && Svc.ClientState.TerritoryType.EqualsAny(ResidentalAreas.List), 1000 * 60, "WaitUntilArrival");
             }
         });
@@ -51,15 +63,14 @@ internal unsafe static class HouseEnterTask
         TaskEnterWorkshop.Enqueue();
     }
 
-    static readonly uint[] FCAetherytes = [56, 57, 58, 96, 164];
-    internal static bool? TeleportToFC()
+    internal static bool? TeleportTo(params uint[] Destinations)
     {
         if (!Player.Available) return false;
         if (AgentMap.Instance()->IsPlayerMoving == 0 && !IsOccupied() && !Player.Object.IsCasting && EzThrottler.Throttle("ExecTP", 1000))
         {
             try
             {
-                foreach (var id in FCAetherytes)
+                foreach (var id in Destinations)
                 {
                     if (Svc.PluginInterface.GetIpcSubscriber<uint, byte, bool>("Teleport").InvokeFunc(id, 0)) return true;
                 }

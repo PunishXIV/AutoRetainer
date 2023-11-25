@@ -1,4 +1,5 @@
-﻿using ECommons.ExcelServices.TerritoryEnumeration;
+﻿using AutoRetainerAPI.Configuration;
+using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
 
 namespace AutoRetainer.Modules.Voyage.Tasks;
@@ -8,13 +9,16 @@ internal static class TaskInteractWithNearestPanel
     internal static void Enqueue(bool interact = true)
     {
         VoyageUtils.Log($"Task enqueued: {nameof(TaskInteractWithNearestPanel)} interact={interact}");
-        if(Houses.List.Contains(Svc.ClientState.TerritoryType) && Utils.GetNearestWorkshopEntrance(out _) == null && Data.TeleportToFCHouse)
+        if (!VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType))
         {
-            HouseEnterTask.EnqueueTask(true);
-        }
-        else if (!VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType))
-        {
-            TaskEnterWorkshop.EnqueueEnterWorkshop();
+            if ((!Houses.List.Contains(Svc.ClientState.TerritoryType) || Utils.GetNearestWorkshopEntrance(out _) == null) && (Data.TeleportToFCHouse || Data.TeleportToRetainerHouse))
+            {
+                HouseEnterTask.EnqueueTask(true);
+            }
+            else
+            {
+                TaskEnterWorkshop.EnqueueEnterWorkshop();
+            }
         }
         P.TaskManager.Enqueue(() =>
         {
