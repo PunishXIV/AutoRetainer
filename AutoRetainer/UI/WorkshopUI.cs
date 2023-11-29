@@ -87,24 +87,10 @@ internal static unsafe class WorkshopUI
 
                 if (!inst) ImGui.EndDisabled();
                 ImGuiComponents.HelpMarker("You must have Teleporter plugin installed and enabled to use this function.");
-                ImGui.EndPopup();
-            }
 
-            var initCurpos = ImGui.GetCursorPos();
-            var lst = data.GetVesselData(VoyageType.Airship).Where(s => data.GetEnabledVesselsData(VoyageType.Airship).Contains(s.Name))
-                .Union(data.GetVesselData(VoyageType.Submersible).Where(x => data.GetEnabledVesselsData(VoyageType.Submersible).Contains(x.Name)))
-                .Where(x => x.ReturnTime != 0).OrderBy(z => z.GetRemainingSeconds());
-            //if (EzThrottler.Throttle("log")) PluginLog.Information($"{lst.Select(x => x.Name).Print()}");
-            var lowestRetainer = C.MultiModeWorkshopConfiguration.MultiWaitForAll?lst.LastOrDefault():lst.FirstOrDefault();
-            if (lowestRetainer != default)
-            {
-                var prog = 1f - ((float)lowestRetainer.GetRemainingSeconds() / (60f * 60f * 24f));
-                prog.ValidateRange(0f, 1f);
-                var pcol = prog == 1f ? GradientColor.Get(0xbb500000.ToVector4(), 0xbb005000.ToVector4()) : 0xbb500000.ToVector4();
-                ImGui.PushStyleColor(ImGuiCol.PlotHistogram, pcol);
-                ImGui.ProgressBar(prog, new(ImGui.GetContentRegionAvail().X, ImGui.CalcTextSize("A").Y + ImGui.GetStyle().FramePadding.Y * 2), "");
-                ImGui.PopStyleColor();
-                ImGui.SetCursorPos(initCurpos);
+                ImGui.Checkbox($"Wait for all deployables to return before processing this character", ref data.MultiWaitForAllDeployables);
+
+                ImGui.EndPopup();
             }
 
             if (data.NumSubSlots > data.GetVesselData(VoyageType.Submersible).Count)
@@ -141,6 +127,52 @@ internal static unsafe class WorkshopUI
                 ImGui.PopFont();
                 ImGuiEx.Tooltip($"Unoptimal configurations are found");
                 ImGui.SameLine(0, 3);
+            }
+
+            
+            if (C.MultiModeWorkshopConfiguration.MultiWaitForAll)
+            {
+                ImGui.PushFont(UiBuilder.IconFont);
+                ImGuiEx.TextV("\uf252");
+                ImGui.PopFont();
+                ImGuiEx.Tooltip($"Wait for all deployables is globally enabled.");
+                ImGui.SameLine(0, 3);
+            }
+            else if (data.MultiWaitForAllDeployables)
+            {
+                ImGui.PushFont(UiBuilder.IconFont);
+                ImGuiEx.TextV("\uf252");
+                ImGui.PopFont();
+                ImGuiEx.Tooltip($"Wait for all deployables is enabled for this character.");
+                ImGui.SameLine(0, 3);
+            }
+
+            if (data.TeleportToFCHouse)
+            {
+                ImGui.PushFont(UiBuilder.IconFont);
+                ImGuiEx.TextV("\uf1ad");
+                ImGui.PopFont();
+                ImGuiEx.Tooltip($"This character is allowed to teleport to FC house upon readiness");
+                ImGui.SameLine(0, 3);
+            }
+
+
+
+            var initCurpos = ImGui.GetCursorPos();
+            var lst = data.GetVesselData(VoyageType.Airship).Where(s => data.GetEnabledVesselsData(VoyageType.Airship).Contains(s.Name))
+                .Union(data.GetVesselData(VoyageType.Submersible).Where(x => data.GetEnabledVesselsData(VoyageType.Submersible).Contains(x.Name)))
+                .Where(x => x.ReturnTime != 0).OrderBy(z => z.GetRemainingSeconds());
+            //if (EzThrottler.Throttle("log")) PluginLog.Information($"{lst.Select(x => x.Name).Print()}");
+            var lowestRetainer = C.MultiModeWorkshopConfiguration.MultiWaitForAll ? lst.LastOrDefault() : lst.FirstOrDefault();
+            if (lowestRetainer != default)
+            {
+                var prog = 1f - ((float)lowestRetainer.GetRemainingSeconds() / (60f * 60f * 24f));
+                prog.ValidateRange(0f, 1f);
+                var pcol = prog == 1f ? GradientColor.Get(0xbb500000.ToVector4(), 0xbb005000.ToVector4()) : 0xbb500000.ToVector4();
+                ImGui.PushStyleColor(ImGuiCol.PlotHistogram, pcol);
+                ImGui.ProgressBar(prog, new(ImGui.GetContentRegionAvail().X, ImGui.CalcTextSize("A").Y + ImGui.GetStyle().FramePadding.Y * 2), "");
+                ImGui.PopStyleColor();
+                ImGui.SetCursorPos(initCurpos);
             }
 
             if (ImGuiEx.CollapsingHeader(Censor.Character(data.Name, data.World)))

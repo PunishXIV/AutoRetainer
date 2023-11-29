@@ -555,7 +555,7 @@ internal unsafe static class VoyageUtils
 
     internal static bool AreAnyEnabledVesselsReturnInNext(this OfflineCharacterData data, VoyageType type, int seconds, bool all = false)
     {
-        if (all)
+        if (all || data.MultiWaitForAllDeployables)
         {
             var v = data.GetVesselData(type).Where(x => data.GetEnabledVesselsData(type).Contains(x.Name));
             return v.Any() && v.All(x => data.IsVesselAvailable(x, type, seconds));
