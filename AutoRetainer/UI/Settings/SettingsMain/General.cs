@@ -54,15 +54,8 @@ namespace AutoRetainer.UI.Settings.SettingsMain
                 }
                 ImGuiComponents.HelpMarker("Only reassign ventures that retainers are undertaking.");
 
-                var d = MultiMode.GetAutoAfkOpt() != 0;
-                if (d) ImGui.BeginDisabled();
                 ImGui.Checkbox("RetainerSense", ref C.RetainerSense);
                 ImGuiComponents.HelpMarker($"AutoRetainer will automatically enable itself when the player is within interaction range of a Summoning Bell. You must remain stationary or the activation will be cancelled.");
-                if (d)
-                {
-                    ImGui.EndDisabled();
-                    ImGuiComponents.HelpMarker("Using RetainerSense requires Auto-afk option to be turned off.");
-                }
                 ImGui.SetNextItemWidth(200f);
                 ImGuiEx.SliderIntAsFloat("Activation Time", ref C.RetainerSenseThreshold, 1000, 100000);
                 ImGuiGroup.EndGroupBox();

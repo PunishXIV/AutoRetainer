@@ -50,15 +50,13 @@ internal unsafe static class SchedulerMain
     {
         if (PluginEnabled)
         {
-            if (C.RetainerSense && MultiMode.GetAutoAfkOpt() != 0)
+            if (C.RetainerSense)
             {
-                C.RetainerSense = false;
-                DuoLog.Warning("Using RetainerSense requires Auto-afk option to be turned off. That option has been automatically disabled.");
+                MultiMode.ValidateAutoAfkSettings();
             }
-            if (C.OldRetainerSense && MultiMode.GetAutoAfkOpt() != 0)
+            if (C.OldRetainerSense)
             {
-                C.OldRetainerSense = false;
-                DuoLog.Warning("Using old RetainerSense requires Auto-afk option to be turned off. That option has been automatically disabled.");
+                MultiMode.ValidateAutoAfkSettings();
             }
             if (TryGetAddonByName<AtkUnitBase>("RetainerList", out var addon) && addon->IsVisible)
             {

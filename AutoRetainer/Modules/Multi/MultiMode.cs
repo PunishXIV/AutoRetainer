@@ -4,6 +4,7 @@ using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainer.Scheduler.Tasks;
 using AutoRetainer.UI;
 using AutoRetainerAPI.Configuration;
+using Dalamud.Game.Config;
 using ECommons.CircularBuffers;
 using ECommons.Events;
 using ECommons.ExcelServices;
@@ -77,15 +78,35 @@ internal unsafe static class MultiMode
         }
     }
 
-    internal static int GetAutoAfkOpt()
+    internal static void ValidateAutoAfkSettings()
     {
-        return (int)(Svc.GameConfig.System.TryGetUInt("AutoAfkSwitchingTime", out var val) ? val : 1);
+        {
+            if (Svc.GameConfig.TryGet(SystemConfigOption.AutoAfkSwitchingTime, out uint val))
+            {
+                if (val != 0)
+                {
+                    Svc.GameConfig.Set(SystemConfigOption.AutoAfkSwitchingTime, 0u);
+                    DuoLog.Warning($"Your Auto Afk Switching Time option was incompatible with current AutoRetainer configuration and was set to (Never). This is not an error.");
+                }
+            }
+        }
+        {
+            if (Svc.GameConfig.TryGet(SystemConfigOption.IdlingCameraAFK, out uint val))
+            {
+                if (val != 0)
+                {
+                    Svc.GameConfig.Set(SystemConfigOption.IdlingCameraAFK, 0u);
+                    DuoLog.Warning($"Your Idling Camera AFK option was incompatible with current AutoRetainer configuration and was set to (Disabled). This is not an error.");
+                }
+            }
+        }
     }
 
     internal static void Tick()
     {
         if (Active)
         {
+            ValidateAutoAfkSettings();
             if(!C.MultiModeWorkshopConfiguration.MultiWaitForAll && C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn)
             {
                 DuoLog.Warning($"Invalid configuration: {nameof(C.MultiModeWorkshopConfiguration.MultiWaitForAll)} was not activated but {nameof(C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn)} was. The configuration was fixed.");
@@ -94,12 +115,6 @@ internal unsafe static class MultiMode
             if(!Svc.ClientState.IsLoggedIn && TryGetAddonByName<AtkUnitBase>("Title", out _) && !AutoLogin.Instance.IsRunning)
             {
                 LastLogin = 0;
-            }
-            if (GetAutoAfkOpt() != 0)
-            {
-                DuoLog.Warning("Using Multi Mode requires Auto-afk option to be turned off");
-                Enabled = false;
-                return;
             }
             if (IsOccupied() || !ProperOnLogin.PlayerPresent)
             {
