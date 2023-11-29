@@ -42,6 +42,9 @@ internal static class Expert
             ImGui.Checkbox($"Display multi mode type selector", ref C.DisplayMMType);
             ImGui.Checkbox($"Display deployables checkbox in workshop", ref C.ShowDeployables);
 
+            ImGui.Checkbox("Enable bailout module", ref C.EnableBailout);
+            ImGui.SetNextItemWidth(150f);
+            ImGui.InputInt("Timeout before AutoRetainer will attempt to unstuck, seconds", ref C.BailoutTimeout);
 
         });
 

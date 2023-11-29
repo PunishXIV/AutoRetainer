@@ -90,6 +90,8 @@ internal unsafe class Config : IEzConfig
     public bool FpsLockOnlyShutdownTimer = false;
 
     public bool ShowDeployables = false;
+    public int BailoutTimeout = 5;
+    public bool EnableBailout = true;
 
     internal bool ExtraDebug = false;
 

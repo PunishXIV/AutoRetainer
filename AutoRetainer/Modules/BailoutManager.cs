@@ -17,23 +17,26 @@ namespace AutoRetainer.Modules
 
         internal static void Tick()
         {
-            if(SchedulerMain.PluginEnabled || (MultiMode.Enabled && VoyageUtils.IsInVoyagePanel()))
+            if (C.EnableBailout)
             {
-                if (!Utils.IsBusy && !VoyageScheduler.Enabled && TryGetAddonByName<AtkUnitBase>("SelectString", out var addon) && IsAddonReady(addon))
+                if (SchedulerMain.PluginEnabled || (MultiMode.Enabled && VoyageUtils.IsInVoyagePanel()))
                 {
-                    if(Environment.TickCount64 - NoSelectString > 5000)
+                    if (!Utils.IsBusy && !VoyageScheduler.Enabled && TryGetAddonByName<AtkUnitBase>("SelectString", out var addon) && IsAddonReady(addon))
                     {
-                        if (Utils.GenericThrottle)
+                        if (Environment.TickCount64 - NoSelectString > C.BailoutTimeout * 1000)
                         {
-                            DuoLog.Warning($"[Bailout] Closing stuck SelectString window");
-                            Callback.Fire(addon, true, -1);
-                            NoSelectString = Environment.TickCount64;
+                            if (Utils.GenericThrottle)
+                            {
+                                DuoLog.Warning($"[Bailout] Closing stuck SelectString window");
+                                Callback.Fire(addon, true, -1);
+                                NoSelectString = Environment.TickCount64;
+                            }
                         }
                     }
-                }
-                else
-                {
-                    NoSelectString = Environment.TickCount64;
+                    else
+                    {
+                        NoSelectString = Environment.TickCount64;
+                    }
                 }
             }
         }

@@ -69,6 +69,13 @@ namespace AutoRetainer.UI.Settings.SettingsMain
                 ImGuiComponents.HelpMarker("No support is provided if you enable this and run into ANY errors in Multi Mode");
                 ImGuiGroup.EndGroupBox();
             }
+
+            if(ImGuiGroup.BeginGroupBox("Bailout Module"))
+            {
+                ImGui.SetNextItemWidth(150f);
+                ImGui.SliderInt("Timeout before AutoRetainer will attempt to unstuck, seconds", ref C.BailoutTimeout.ValidateRange(5, 60), 5, 30);
+                ImGuiGroup.EndGroupBox();
+            }
         }
 
 
