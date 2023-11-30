@@ -185,7 +185,7 @@ internal static unsafe class VoyageMain
         {
             var adata = Data.GetAdditionalVesselData(next, type);
             var data = Data.GetOfflineVesselData(next, type) ?? throw new NullReferenceException($"Offline vessel data for {next}, {type} is null");
-            if ((VoyageUtils.DontReassign || adata.VesselBehavior == VesselBehavior.Finalize || (C.FinalizeBeforeResend && Data.AreAnyEnabledVesselsReturnInNext(0))) && data.ReturnTime != 0)
+            if ((VoyageUtils.DontReassign || adata.VesselBehavior == VesselBehavior.Finalize || (C.FinalizeBeforeResend && Data.AreAnyEnabledVesselsReturnInNext(0, false, true))) && data.ReturnTime != 0)
             {
                 if (EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResend", 1000))
                 {

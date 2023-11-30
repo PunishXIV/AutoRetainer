@@ -25,6 +25,7 @@ internal static class StatisticsManager
     private static void ClientState_TerritoryChanged(ushort e)
     {
         Files.Clear();
+        OfflineDataManager.EnqueueWriteWhenPlayerAvailable();
     }
 
     private static void Chat_ChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)

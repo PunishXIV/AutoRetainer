@@ -1,6 +1,7 @@
 ﻿using AutoRetainerAPI.Configuration;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.Text.SeStringHandling;
+using ECommons.Automation;
 using ECommons.Configuration;
 using ECommons.Events;
 using ECommons.ExcelServices;
@@ -14,6 +15,17 @@ namespace AutoRetainer.Modules;
 
 internal unsafe static class OfflineDataManager
 {
+    internal static void EnqueueWriteWhenPlayerAvailable()
+    {
+        P.ODMTaskManager.Abort();
+        P.ODMTaskManager.Enqueue(() =>
+        {
+            if (!Player.Available) return false;
+            WriteOfflineData(false, false);
+            return true;
+        });
+    }
+
     internal static void Tick()
     {
         if (Svc.Condition[ConditionFlag.OccupiedSummoningBell])
@@ -83,9 +95,12 @@ internal unsafe static class OfflineDataManager
         }
         if (P.retainerManager.Ready && P.retainerManager.Count > 0)
         {
-            data.RetainerData.Clear();
             for (var i = 0; i < P.retainerManager.Count; i++)
             {
+                if(i == 0)
+                {
+                    data.RetainerData.Clear();
+                }
                 var ret = P.retainerManager.Retainer(i);
                 data.RetainerData.Add(new()
                 {

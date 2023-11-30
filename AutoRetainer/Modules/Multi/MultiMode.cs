@@ -68,7 +68,7 @@ internal unsafe static class MultiMode
             return;
         }
         LastLogin = 0;
-        if (C.MultiHETOnEnable && CanHET && Player.Available)
+        if (C.MultiHETOnEnable && Player.Available && CanHET)
         {
             HouseEnterTask.EnqueueTask();
         }

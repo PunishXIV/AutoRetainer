@@ -1,4 +1,5 @@
 using AutoRetainerAPI.Configuration;
+using ECommons.GameHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
@@ -45,6 +46,11 @@ internal unsafe class AutoGCHandinOverlay : Window
         {
             ImGui.SameLine();
             ImGuiEx.Text(GradientColor.Get(ImGuiColors.DalamudRed, ImGuiColors.DalamudYellow), $"You can use Priority Seal Allowance");
+        }
+        if (!Player.IsInHomeWorld)
+        {
+            ImGui.SameLine();
+            ImGuiEx.Text(GradientColor.Get(ImGuiColors.DalamudRed, ImGuiColors.DalamudYellow), $"Foreign world. No FC points will be granted.");
         }
         height = ImGui.GetWindowSize().Y;
     }

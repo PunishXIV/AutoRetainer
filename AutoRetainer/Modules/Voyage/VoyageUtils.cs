@@ -357,7 +357,7 @@ internal unsafe static class VoyageUtils
     internal static bool IsRetainerBlockedByVoyage()
     {
         if (C.DisableRetainerVesselReturn == 0) return false;
-        foreach(var x in C.OfflineData)
+        foreach(var x in C.OfflineData.Where(x => x.WorkshopEnabled))
         {
             if (x.AreAnyEnabledVesselsReturnInNext(C.DisableRetainerVesselReturn * 60)) return true;
         }
@@ -546,16 +546,16 @@ internal unsafe static class VoyageUtils
         var v = data.GetVesselData(type).Where(x => data.IsVesselAvailable(x, type) && data.GetEnabledVesselsData(type).Contains(x.Name));
         if (v.Any())
         {
-            return v.First().Name;
+            return v.FirstOrDefault(x => x.ReturnTime != 0)?.Name ?? v.First().Name;
         }
         return null;
     }
 
-    internal static bool AreAnyEnabledVesselsReturnInNext(this OfflineCharacterData data, int seconds, bool all = false) => data.AreAnyEnabledVesselsReturnInNext(VoyageType.Airship, seconds, all) || data.AreAnyEnabledVesselsReturnInNext(VoyageType.Submersible, seconds, all);
+    internal static bool AreAnyEnabledVesselsReturnInNext(this OfflineCharacterData data, int seconds, bool all = false, bool ignorePerCharaSetting = false) => data.AreAnyEnabledVesselsReturnInNext(VoyageType.Airship, seconds, all, ignorePerCharaSetting) || data.AreAnyEnabledVesselsReturnInNext(VoyageType.Submersible, seconds, all, ignorePerCharaSetting);
 
-    internal static bool AreAnyEnabledVesselsReturnInNext(this OfflineCharacterData data, VoyageType type, int seconds, bool all = false)
+    internal static bool AreAnyEnabledVesselsReturnInNext(this OfflineCharacterData data, VoyageType type, int seconds, bool all = false, bool ignorePerCharaSetting = false)
     {
-        if (all || data.MultiWaitForAllDeployables)
+        if (all || (!ignorePerCharaSetting && data.MultiWaitForAllDeployables))
         {
             var v = data.GetVesselData(type).Where(x => data.GetEnabledVesselsData(type).Contains(x.Name));
             return v.Any() && v.All(x => data.IsVesselAvailable(x, type, seconds));

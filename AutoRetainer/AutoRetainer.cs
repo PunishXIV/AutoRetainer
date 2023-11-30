@@ -40,6 +40,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal bool IsInteractionAutomatic = false;
     internal QuickSellItems quickSellItems;
     internal TaskManager TaskManager;
+    internal TaskManager ODMTaskManager;
     internal Memory Memory;
     internal bool WasEnabled = false;
     internal bool IsCloseActionAutomatic = false;
@@ -125,6 +126,11 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 ws.AddWindow(SubmarinePointPlanUI);
                 MultiMode.Init();
                 NotificationMasterApi = new(pi);
+                ODMTaskManager = new()
+                {
+                    TimeLimitMS = 60 * 1000,
+                    AbortOnTimeout = true,
+                };
 
                 Safety.Check();
 
@@ -555,6 +561,11 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
     void Logout()
     {
+        if (Player.Available)
+        {
+            PluginLog.Verbose($"Writing logout offline data...");
+            OfflineDataManager.WriteOfflineData(true, true);
+        }
         SchedulerMain.DisablePlugin();
 
         if (!AutoLogin.Instance.IsRunning)
