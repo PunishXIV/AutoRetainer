@@ -23,7 +23,31 @@ internal class MultiModeOverlay : Window
     public override void Draw()
     {
         CImGui.igBringWindowToDisplayBack(CImGui.igGetCurrentWindow());
-        if (Shutdown.Active)
+        if (BailoutManager.IsLogOnTitleEnabled)
+        {
+            if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "bailoutTitleRestart.png"), out var t))
+            {
+                ImGui.Image(t.ImGuiHandle, new(128, 128));
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+                    if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
+                    {
+                        Svc.Commands.ProcessCommand("/ays");
+                    }
+                    if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                    {
+                        BailoutManager.IsLogOnTitleEnabled = false;
+                    }
+                    ImGui.SetTooltip($"AutoRetainer detected stuck login.\nTemporarily waiting for valid character on login screen. \nLeft click - open AutoRetainer. \nRight click - abort.");
+                }
+            }
+            else
+            {
+                ImGuiEx.Text($"loading bailoutTitleRestart.png");
+            }
+        }
+        else if (Shutdown.Active)
         {
             if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "timer.png"), out var t))
             {

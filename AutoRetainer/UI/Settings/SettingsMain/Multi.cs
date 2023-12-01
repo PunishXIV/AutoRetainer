@@ -74,6 +74,7 @@ namespace AutoRetainer.UI.Settings.SettingsMain
             {
                 ImGui.SetNextItemWidth(150f);
                 ImGui.SliderInt("Timeout before AutoRetainer will attempt to unstuck, seconds", ref C.BailoutTimeout.ValidateRange(5, 60), 5, 30);
+                ImGui.Checkbox($"Attempt to unstuck from stuck character selection screen", ref C.EnableCharaSelectBailout);
                 ImGuiGroup.EndGroupBox();
             }
         }

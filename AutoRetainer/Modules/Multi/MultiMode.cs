@@ -24,6 +24,8 @@ internal unsafe static class MultiMode
 
     internal static bool Enabled = false;
 
+    internal static bool WaitOnLoginScreen => C.MultiWaitOnLoginScreen || BailoutManager.IsLogOnTitleEnabled;
+
     internal static bool EnabledRetainers => C.MultiModeType.EqualsAny(MultiModeType.Retainers, MultiModeType.Everything) && !VoyageUtils.IsRetainerBlockedByVoyage();
     internal static bool EnabledSubmarines => C.MultiModeType.EqualsAny(MultiModeType.Submersibles, MultiModeType.Everything);
 
@@ -40,6 +42,7 @@ internal unsafe static class MultiMode
     {
         ProperOnLogin.Register(delegate
         {
+            BailoutManager.IsLogOnTitleEnabled = false;
             WriteOfflineData(true, true);
             if (LastLogin == Svc.ClientState.LocalContentId && Active)
             {
@@ -124,7 +127,7 @@ internal unsafe static class MultiMode
             {
                 return;
             }
-            if(C.MultiWaitOnLoginScreen)
+            if(MultiMode.WaitOnLoginScreen)
             {
                 if(!Player.Available && Utils.CanAutoLogin())
                 {
@@ -200,7 +203,7 @@ internal unsafe static class MultiMode
                     }
                     else
                     {
-                        if(C.MultiWaitOnLoginScreen)
+                        if(MultiMode.WaitOnLoginScreen)
                         {
                             DebugLog($"Enqueueing logoff");
                             BlockInteraction(20);

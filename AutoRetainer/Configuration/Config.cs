@@ -92,6 +92,7 @@ internal unsafe class Config : IEzConfig
     public bool ShowDeployables = false;
     public int BailoutTimeout = 5;
     public bool EnableBailout = true;
+    public bool EnableCharaSelectBailout = true;
 
     internal bool ExtraDebug = false;
 

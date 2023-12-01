@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<Authors>Puni.sh</Authors>
-		<Version>4.2.2.9</Version>
+		<Version>4.2.3.0</Version>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -82,6 +82,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Update="res\bailoutTitleRestart.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	  <None Update="res\bell.png">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
