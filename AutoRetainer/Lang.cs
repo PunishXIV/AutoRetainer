@@ -247,4 +247,10 @@ internal static class Lang
             "要修理下列部件吗",
             "要修理下列部件嗎"
         ];
+
+    //Your retainer will be unable to process item buyback requests once recalled. Are you sure you wish to proceed?
+    internal static readonly string[] WillBeUnableToProcessBuyback = [
+        "Your retainer will be unable to process item buyback requests once recalled. Are you sure you wish to proceed?"
+        ];
+
 }

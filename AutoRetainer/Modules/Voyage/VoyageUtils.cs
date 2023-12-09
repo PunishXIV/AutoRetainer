@@ -22,7 +22,7 @@ internal unsafe static class VoyageUtils
 
     internal static uint[] Workshops = [Houses.Company_Workshop_Empyreum, Houses.Company_Workshop_The_Goblet, Houses.Company_Workshop_Mist, Houses.Company_Workshop_Shirogane, Houses.Company_Workshop_The_Lavender_Beds];
 
-    internal static bool ShouldEnterWorkshop() => Data.AreAnyEnabledVesselsReturnInNext(5 * 60, C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn) || (Utils.GetReachableRetainerBell(false) == null);
+    internal static bool ShouldEnterWorkshop() => Data.WorkshopEnabled && Data.AreAnyEnabledVesselsReturnInNext(5 * 60, C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn) || (Utils.GetReachableRetainerBell(false) == null);
 
 
     internal static bool IsNotEnoughSubmarinesEnabled(this OfflineCharacterData data)
@@ -359,7 +359,7 @@ internal unsafe static class VoyageUtils
         if (C.DisableRetainerVesselReturn == 0) return false;
         foreach(var x in C.OfflineData.Where(x => x.WorkshopEnabled))
         {
-            if (x.AreAnyEnabledVesselsReturnInNext(C.DisableRetainerVesselReturn * 60)) return true;
+            if (x.WorkshopEnabled && x.AreAnyEnabledVesselsReturnInNext(C.DisableRetainerVesselReturn * 60)) return true;
         }
         return false;
     }

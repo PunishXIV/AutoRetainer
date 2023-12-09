@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FFXIVClientStructs.FFXIV.Client.Game;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace AutoRetainer.Modules
             {
                 if (
                     (!C.NoFPSLockWhenActive || CSFramework.Instance()->WindowInactive)
-                    && (!C.FpsLockOnlyShutdownTimer || Shutdown.Active)
+                    && (!C.FpsLockOnlyShutdownTimer || Shutdown.Active || (P.NightMode && C.NightModeFPSLimit))
                     )
                 {
                     if (Utils.IsBusy)
@@ -35,8 +36,13 @@ namespace AutoRetainer.Modules
                     {
                         if (C.TargetMSPTIdle > 0)
                         {
-                            int ms = (int)(C.TargetMSPTIdle - Stopwatch.ElapsedMilliseconds);
-                            if (ms > 0 && ms <= C.TargetMSPTIdle)
+                            var targetMSPT = C.TargetMSPTIdle;
+                            if (P.NightMode && Utils.CanAutoLogin() && MultiMode.Active)
+                            {
+                                targetMSPT = CSFramework.Instance()->WindowInactive? 5000:100;
+                            }
+                            int ms = (int)(targetMSPT - Stopwatch.ElapsedMilliseconds);
+                            if (ms > 0 && ms <= targetMSPT)
                             {
                                 Thread.Sleep(ms);
                             }

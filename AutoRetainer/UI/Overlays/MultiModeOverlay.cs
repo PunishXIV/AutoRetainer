@@ -27,7 +27,7 @@ internal class MultiModeOverlay : Window
         {
             if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "bailoutTitleRestart.png"), out var t))
             {
-                ImGui.Image(t.ImGuiHandle, new(128, 128));
+                ImGui.Image(t.ImGuiHandle, C.StatusPanelSize);
                 if (ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
@@ -46,12 +46,13 @@ internal class MultiModeOverlay : Window
             {
                 ImGuiEx.Text($"loading bailoutTitleRestart.png");
             }
+            ImGui.SameLine();
         }
-        else if (Shutdown.Active)
+        if (Shutdown.Active)
         {
             if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "timer.png"), out var t))
             {
-                ImGui.Image(t.ImGuiHandle, new(128, 128));
+                ImGui.Image(t.ImGuiHandle, C.StatusPanelSize);
                 if (ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
@@ -71,12 +72,13 @@ internal class MultiModeOverlay : Window
             {
                 ImGuiEx.Text($"loading timer.png");
             }
+            ImGui.SameLine();
         }
-        else if (P.TaskManager.IsBusy)
+        if (P.TaskManager.IsBusy)
         {
             if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "processing.png"), out var t))
             {
-                ImGui.Image(t.ImGuiHandle, new(128, 128));
+                ImGui.Image(t.ImGuiHandle, C.StatusPanelSize);
                 if (ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
@@ -95,12 +97,13 @@ internal class MultiModeOverlay : Window
             {
                 ImGuiEx.Text($"loading multi.png");
             }
+            ImGui.SameLine();
         }
-        else if (P.IsNextToBell)
+        if (P.IsNextToBell)
         {
             if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "bellalert.png"), out var t))
             {
-                ImGui.Image(t.ImGuiHandle, new(128, 128));
+                ImGui.Image(t.ImGuiHandle, C.StatusPanelSize);
                 if (ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
@@ -117,12 +120,13 @@ internal class MultiModeOverlay : Window
             {
                 ImGuiEx.Text($"loading bellalert.png");
             }
+            ImGui.SameLine();
         }
-        else if (MultiMode.Enabled)
+        if (MultiMode.Enabled)
         {
             if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "multi.png"), out var t))
             {
-                ImGui.Image(t.ImGuiHandle, new(128, 128));
+                ImGui.Image(t.ImGuiHandle, C.StatusPanelSize);
                 if (ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
@@ -141,12 +145,39 @@ internal class MultiModeOverlay : Window
             {
                 ImGuiEx.Text($"loading multi.png");
             }
+            ImGui.SameLine();
         }
-        else if (AutoLogin.Instance.IsRunning)
+        if (P.NightMode && MultiMode.Enabled)
+        {
+            if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "Night.png"), out var t))
+            {
+                ImGui.Image(t.ImGuiHandle, C.StatusPanelSize);
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+                    if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
+                    {
+                        Svc.Commands.ProcessCommand("/ays");
+                    }
+                    if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                    {
+                        P.NightMode = false;
+                        MultiMode.BailoutNightMode();
+                    }
+                    ImGui.SetTooltip($"Night mode enabled. \nLeft click - open AutoRetainer. \nRight click - disable.");
+                }
+            }
+            else
+            {
+                ImGuiEx.Text($"loading Night.png");
+            }
+            ImGui.SameLine();
+        }
+        if (AutoLogin.Instance.IsRunning)
         {
             if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "login.png"), out var t))
             {
-                ImGui.Image(t.ImGuiHandle, new(128, 128));
+                ImGui.Image(t.ImGuiHandle, C.StatusPanelSize);
                 if (ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
@@ -165,12 +196,13 @@ internal class MultiModeOverlay : Window
             {
                 ImGuiEx.Text($"loading login.png");
             }
+            ImGui.SameLine();
         }
-        else if (VoyageScheduler.Enabled)
+        if (VoyageScheduler.Enabled)
         {
             if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "submarine.png"), out var t))
             {
-                ImGui.Image(t.ImGuiHandle, new(128, 128));
+                ImGui.Image(t.ImGuiHandle, C.StatusPanelSize);
                 if (ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
@@ -189,12 +221,13 @@ internal class MultiModeOverlay : Window
             {
                 ImGuiEx.Text($"loading submarine.png");
             }
+            ImGui.SameLine();
         }
-        else if (SchedulerMain.PluginEnabled)
+        if (SchedulerMain.PluginEnabled)
         {
             if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", Utils.GetReachableRetainerBell(false) == null ? "bellcrossed.png" : "bell.png"), out var t))
             {
-                ImGui.Image(t.ImGuiHandle, new(128, 128));
+                ImGui.Image(t.ImGuiHandle, C.StatusPanelSize);
                 if (ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
@@ -213,12 +246,13 @@ internal class MultiModeOverlay : Window
             {
                 ImGuiEx.Text($"loading bell.png");
             }
+            ImGui.SameLine();
         }
-        else if (DisplayNotify)
+        if (DisplayNotify)
         {
             if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "notify.png"), out var t))
             {
-                ImGui.Image(t.ImGuiHandle, new(128, 128));
+                ImGui.Image(t.ImGuiHandle, C.StatusPanelSize);
                 if (ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
@@ -238,6 +272,7 @@ internal class MultiModeOverlay : Window
             {
                 ImGuiEx.Text($"loading notify.png");
             }
+            ImGui.SameLine();
         }
 
         Position = new(ImGuiHelpers.MainViewport.Size.X / 2 - ImGui.GetWindowSize().X / 2, 20);

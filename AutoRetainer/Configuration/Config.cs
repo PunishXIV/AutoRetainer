@@ -94,6 +94,12 @@ internal unsafe class Config : IEzConfig
     public bool EnableBailout = true;
     public bool EnableCharaSelectBailout = true;
 
+    internal Vector2 StatusPanelSize = new(96, 96);
+
+    internal bool NightModeRetainers = false;
+    internal bool NightModeSubmarines = true;
+    internal bool NightModeFPSLimit = true;
+
     internal bool ExtraDebug = false;
 
     internal bool DontReassign

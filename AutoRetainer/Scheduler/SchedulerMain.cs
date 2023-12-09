@@ -182,6 +182,7 @@ internal unsafe static class SchedulerMain
                                         TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
                                     }
                                     P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
+                                    P.TaskManager.Enqueue(RetainerHandlers.ConfirmCantBuyback);
                                 }
                             }
                             else

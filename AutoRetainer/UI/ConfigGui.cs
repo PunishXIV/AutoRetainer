@@ -75,6 +75,11 @@ unsafe internal class ConfigGui : Window
         {
             MultiMode.OnMultiModeEnabled();
         }
+        ImGui.SameLine();
+        if(ImGui.Checkbox("Night", ref P.NightMode))
+        {
+            MultiMode.BailoutNightMode();
+        }
         if (C.DisplayMMType)
         {
             ImGui.SameLine();

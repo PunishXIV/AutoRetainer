@@ -147,6 +147,7 @@ internal unsafe class RetainerListOverlay : Window
                             TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
                         }
                         P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
+                        P.TaskManager.Enqueue(RetainerHandlers.ConfirmCantBuyback);
                     }
                 }
             }

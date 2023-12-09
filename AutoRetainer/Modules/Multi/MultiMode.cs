@@ -24,10 +24,10 @@ internal unsafe static class MultiMode
 
     internal static bool Enabled = false;
 
-    internal static bool WaitOnLoginScreen => C.MultiWaitOnLoginScreen || BailoutManager.IsLogOnTitleEnabled;
+    internal static bool WaitOnLoginScreen => C.MultiWaitOnLoginScreen || BailoutManager.IsLogOnTitleEnabled || P.NightMode;
 
-    internal static bool EnabledRetainers => C.MultiModeType.EqualsAny(MultiModeType.Retainers, MultiModeType.Everything) && !VoyageUtils.IsRetainerBlockedByVoyage();
-    internal static bool EnabledSubmarines => C.MultiModeType.EqualsAny(MultiModeType.Submersibles, MultiModeType.Everything);
+    internal static bool EnabledRetainers => C.MultiModeType.EqualsAny(MultiModeType.Retainers, MultiModeType.Everything) && !VoyageUtils.IsRetainerBlockedByVoyage() && (!P.NightMode || C.NightModeRetainers);
+    internal static bool EnabledSubmarines => C.MultiModeType.EqualsAny(MultiModeType.Submersibles, MultiModeType.Everything) && (!P.NightMode || C.NightModeSubmarines);
 
     internal static bool Synchronize = false;
     internal static long NextInteractionAt { get; private set; } = 0;
@@ -61,6 +61,14 @@ internal unsafe static class MultiMode
         if (ProperOnLogin.PlayerPresent)
         {
             WriteOfflineData(true, true);
+        }
+    }
+
+    internal static void BailoutNightMode()
+    {
+        if (!P.NightMode && !C.MultiWaitOnLoginScreen && C.EnableBailout)
+        {
+            BailoutManager.IsLogOnTitleEnabled = true;
         }
     }
 
@@ -249,7 +257,7 @@ internal unsafe static class MultiMode
                             }
                         }
                     }
-                    else if(Data.AnyEnabledVesselsAvailable() && MultiMode.EnabledSubmarines)
+                    else if(Data.WorkshopEnabled && Data.AnyEnabledVesselsAvailable() && MultiMode.EnabledSubmarines)
                     {
                         if (!C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn || Data.AreAnyEnabledVesselsReturnInNext(0, true))
                         {
