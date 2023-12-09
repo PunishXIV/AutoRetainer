@@ -96,8 +96,9 @@ internal unsafe class Config : IEzConfig
 
     internal Vector2 StatusPanelSize = new(96, 96);
 
-    internal bool NightModeRetainers = false;
-    internal bool NightModeSubmarines = true;
+    public bool ShowNightMode = false;
+    public bool NightModeRetainers = false;
+    public bool NightModeDeployables = true;
     internal bool NightModeFPSLimit = true;
 
     internal bool ExtraDebug = false;

@@ -29,7 +29,8 @@ unsafe internal class ConfigGui : Window
             P.StylePushed = true;
         }
         var prefix = SchedulerMain.PluginEnabled ? $" [{SchedulerMain.Reason}]" : "";
-        this.WindowName = $"{P.Name} {P.GetType().Assembly.GetName().Version}{prefix}###AutoRetainer";
+        var tokenRem = TimeSpan.FromMilliseconds(P.TimeLaunched[0] + 3*24*60*60*1000 - DateTimeOffset.Now.ToUnixTimeMilliseconds());
+        this.WindowName = $"{P.Name} {P.GetType().Assembly.GetName().Version}{prefix} | Token expires in {tokenRem}###AutoRetainer";
     }
 
     public override void Draw()
@@ -75,10 +76,13 @@ unsafe internal class ConfigGui : Window
         {
             MultiMode.OnMultiModeEnabled();
         }
-        ImGui.SameLine();
-        if(ImGui.Checkbox("Night", ref P.NightMode))
+        if (C.ShowNightMode)
         {
-            MultiMode.BailoutNightMode();
+            ImGui.SameLine();
+            if (ImGui.Checkbox("Night", ref P.NightMode))
+            {
+                MultiMode.BailoutNightMode();
+            }
         }
         if (C.DisplayMMType)
         {

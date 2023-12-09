@@ -1,4 +1,5 @@
-﻿using AutoRetainerAPI.Configuration;
+﻿using AutoRetainer.UI.Experiments;
+using AutoRetainerAPI.Configuration;
 using Dalamud.Interface.Components;
 using ECommons.Interop;
 using PunishLib.ImGuiMethods;
@@ -7,8 +8,6 @@ namespace AutoRetainer.UI.Settings.SettingsMain;
 
 internal static class SettingsMain
 {
-    
-
     internal static void Draw()
     {
         ImGuiEx.EzTabBar("GeneralSettings", [
@@ -18,6 +17,7 @@ internal static class SettingsMain
             ("Character Order", CharaOrder.Draw, null, true),
             ("Exclusions", Exclusions.Draw, null, true),
             ("Other", Other.Draw, null, true),
+            ("Experiments", ExperimentsMain.Draw, null, true),
             ]);
     }
 

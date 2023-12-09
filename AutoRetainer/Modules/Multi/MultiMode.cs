@@ -27,7 +27,7 @@ internal unsafe static class MultiMode
     internal static bool WaitOnLoginScreen => C.MultiWaitOnLoginScreen || BailoutManager.IsLogOnTitleEnabled || P.NightMode;
 
     internal static bool EnabledRetainers => C.MultiModeType.EqualsAny(MultiModeType.Retainers, MultiModeType.Everything) && !VoyageUtils.IsRetainerBlockedByVoyage() && (!P.NightMode || C.NightModeRetainers);
-    internal static bool EnabledSubmarines => C.MultiModeType.EqualsAny(MultiModeType.Submersibles, MultiModeType.Everything) && (!P.NightMode || C.NightModeSubmarines);
+    internal static bool EnabledSubmarines => C.MultiModeType.EqualsAny(MultiModeType.Submersibles, MultiModeType.Everything) && (!P.NightMode || C.NightModeDeployables);
 
     internal static bool Synchronize = false;
     internal static long NextInteractionAt { get; private set; } = 0;
@@ -69,6 +69,10 @@ internal unsafe static class MultiMode
         if (!P.NightMode && !C.MultiWaitOnLoginScreen && C.EnableBailout)
         {
             BailoutManager.IsLogOnTitleEnabled = true;
+        }
+        if (P.NightMode)
+        {
+            MultiMode.Enabled = true;
         }
     }
 
