@@ -93,7 +93,7 @@ internal unsafe static class OfflineDataManager
                 e.Log();
             }
         }
-        if (P.retainerManager.Ready && P.retainerManager.Count > 0)
+        if (P.retainerManager.Ready && P.retainerManager.Count > 0 && Player.IsInHomeWorld)
         {
             for (var i = 0; i < P.retainerManager.Count; i++)
             {
@@ -111,6 +111,7 @@ internal unsafe static class OfflineDataManager
                     Job = ret.ClassJob,
                     VentureID = ret.VentureID, 
                     Gil = ret.Gil,
+                    RetainerID = ret.RetainerID,
                 });
 
                 for (int p = 0; p < P.retainerManager.Count; p++)
