@@ -274,6 +274,52 @@ internal class MultiModeOverlay : Window
             }
             ImGui.SameLine();
         }
+        ImGui.Dummy(Vector2.One);
+        if (Data != null)
+        {
+            ImGuiEx.ImGuiLineCentered("Status", delegate
+            {
+                if (C.MultiModeWorkshopConfiguration.MultiWaitForAll)
+                {
+                    if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "wait.png"), out var t))
+                    {
+                        ImGui.Image(t.ImGuiHandle, C.StatusPanelSize / 2);
+                        ImGuiEx.Tooltip("Wait for all deployables is globally enabled.");
+                    }
+                    else
+                    {
+                        ImGuiEx.Text($"loading wait.png");
+                    }
+                    ImGui.SameLine();
+                }
+                else if (Data.MultiWaitForAllDeployables)
+                {
+                    if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "wait.png"), out var t))
+                    {
+                        ImGui.Image(t.ImGuiHandle, C.StatusPanelSize / 2);
+                        ImGuiEx.Tooltip("Wait for all deployables is enabled for this character.");
+                    }
+                    else
+                    {
+                        ImGuiEx.Text($"loading wait.png");
+                    }
+                    ImGui.SameLine();
+                }
+
+                if (Data.TeleportToFCHouse || Data.TeleportToRetainerHouse)
+                {
+                    if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "home.png"), out var t))
+                    {
+                        ImGui.Image(t.ImGuiHandle, C.StatusPanelSize / 2);
+                        ImGuiEx.Tooltip("This character is allowed to teleport to house upon readiness.");
+                    }
+                    else
+                    {
+                        ImGuiEx.Text($"loading home.png");
+                    }
+                }
+            });
+        }
 
         Position = new(ImGuiHelpers.MainViewport.Size.X / 2 - ImGui.GetWindowSize().X / 2, 20);
     }

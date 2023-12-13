@@ -25,6 +25,7 @@ using AutoRetainer.Scheduler.Handlers;
 using System.Threading;
 using ECommons.ExcelServices;
 using NotificationMasterAPI;
+using ECommons.EzSharedDataManager;
 
 namespace AutoRetainer;
 
@@ -70,7 +71,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal int LastLoadedItems = 0;
     internal NotificationMasterApi NotificationMasterApi;
     internal bool NightMode = false;
-    internal long[] TimeLaunched;
+    internal long TimeLaunched;
 
     internal static OfflineCharacterData Data => Utils.GetCurrentCharacterData();
 
@@ -145,7 +146,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 Utils.ResetEscIgnoreByWindows();
                 Svc.PluginInterface.UiBuilder.Draw += FPSLimiter.FPSLimit;
                 AutoCutsceneSkipper.Init(MiniTA.ProcessCutsceneSkip);
-                TimeLaunched = Svc.PluginInterface.GetOrCreateData<long[]>("AutoRetainer.Started", () => [DateTimeOffset.Now.ToUnixTimeMilliseconds()]);
+                EzSharedData.TryGetValueType("AutoRetainer.Started", out TimeLaunched, CreationMode.CreateAndKeep, DateTimeOffset.Now.ToUnixTimeMilliseconds());
                 PluginLog.Information($"AutoRetainer v{P.GetType().Assembly.GetName().Version} is ready.");
             });
         }

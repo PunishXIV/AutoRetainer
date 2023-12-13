@@ -30,7 +30,7 @@ unsafe internal class ConfigGui : Window
             P.StylePushed = true;
         }
         var prefix = SchedulerMain.PluginEnabled ? $" [{SchedulerMain.Reason}]" : "";
-        var tokenRem = TimeSpan.FromMilliseconds(P.TimeLaunched[0] + 3*24*60*60*1000 - DateTimeOffset.Now.ToUnixTimeMilliseconds());
+        var tokenRem = TimeSpan.FromMilliseconds(P.TimeLaunched + 3*24*60*60*1000 - DateTimeOffset.Now.ToUnixTimeMilliseconds());
         this.WindowName = $"{P.Name} {P.GetType().Assembly.GetName().Version}{prefix} | {FormatToken(tokenRem)}###AutoRetainer";
     }
 

@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.Modules.Voyage;
+using ECommons.EzSharedDataManager;
 
 namespace AutoRetainer.Modules;
 
@@ -29,7 +30,7 @@ internal static class NewYesAlreadyManager
     }
     internal static void Lock()
     {
-        if (Svc.PluginInterface.TryGetData<HashSet<string>>("YesAlready.StopRequests", out var data))
+        if (EzSharedData.TryGet<HashSet<string>>("YesAlready.StopRequests", out var data))
         {
             data.Add(P.Name);
         }
@@ -37,7 +38,7 @@ internal static class NewYesAlreadyManager
 
     internal static void Unlock()
     {
-        if (Svc.PluginInterface.TryGetData<HashSet<string>>("YesAlready.StopRequests", out var data))
+        if (EzSharedData.TryGet<HashSet<string>>("YesAlready.StopRequests", out var data))
         {
             data.Remove(P.Name);
         }

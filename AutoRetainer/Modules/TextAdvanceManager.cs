@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.Modules.Voyage;
+using ECommons.EzSharedDataManager;
 
 namespace AutoRetainer.Modules;
 
@@ -29,7 +30,7 @@ internal static class TextAdvanceManager
     }
     internal static void LockTA()
     {
-        if (Svc.PluginInterface.TryGetData<HashSet<string>>("TextAdvance.StopRequests", out var data))
+        if (EzSharedData.TryGet<HashSet<string>>("TextAdvance.StopRequests", out var data))
         {
             data.Add(P.Name);
         }
@@ -37,7 +38,7 @@ internal static class TextAdvanceManager
 
     internal static void UnlockTA()
     {
-        if (Svc.PluginInterface.TryGetData<HashSet<string>>("TextAdvance.StopRequests", out var data))
+        if (EzSharedData.TryGet<HashSet<string>>("TextAdvance.StopRequests", out var data))
         {
             data.Remove(P.Name);
         }

@@ -95,13 +95,15 @@ internal unsafe static class OfflineDataManager
         }
         if (P.retainerManager.Ready && P.retainerManager.Count > 0 && Player.IsInHomeWorld)
         {
+            var cleared = false;
             for (var i = 0; i < P.retainerManager.Count; i++)
             {
-                if(i == 0)
+                var ret = P.retainerManager.Retainer(i);
+                if (ret.RetainerID != 0 && !cleared)
                 {
                     data.RetainerData.Clear();
+                    cleared = true;
                 }
-                var ret = P.retainerManager.Retainer(i);
                 data.RetainerData.Add(new()
                 {
                     Name = ret.Name.ToString(),

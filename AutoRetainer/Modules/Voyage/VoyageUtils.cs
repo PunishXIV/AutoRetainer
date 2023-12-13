@@ -102,6 +102,8 @@ internal unsafe static class VoyageUtils
     {
         var w = HousingManager.Instance()->WorkshopTerritory;
         if (w == null) return null;
+        var adata = GetAdditionalVesselData(Data, name, type);
+        if (adata.IndexOverride > 0) return adata.IndexOverride - 1;
         if (type == VoyageType.Airship)
         {
             var v = w->Airship.DataListSpan;

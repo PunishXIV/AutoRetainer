@@ -103,6 +103,8 @@ internal unsafe class Config : IEzConfig
 
     internal bool ExtraDebug = false;
 
+    public bool OldStatusIcons = false;
+
     internal bool DontReassign
     {
         get

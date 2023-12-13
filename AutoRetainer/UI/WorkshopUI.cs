@@ -129,31 +129,33 @@ internal static unsafe class WorkshopUI
                 ImGui.SameLine(0, 3);
             }
 
-            
-            if (C.MultiModeWorkshopConfiguration.MultiWaitForAll)
+            if (C.OldStatusIcons)
             {
-                ImGui.PushFont(UiBuilder.IconFont);
-                ImGuiEx.TextV("\uf252");
-                ImGui.PopFont();
-                ImGuiEx.Tooltip($"Wait for all deployables is globally enabled.");
-                ImGui.SameLine(0, 3);
-            }
-            else if (data.MultiWaitForAllDeployables)
-            {
-                ImGui.PushFont(UiBuilder.IconFont);
-                ImGuiEx.TextV("\uf252");
-                ImGui.PopFont();
-                ImGuiEx.Tooltip($"Wait for all deployables is enabled for this character.");
-                ImGui.SameLine(0, 3);
-            }
+                if (C.MultiModeWorkshopConfiguration.MultiWaitForAll)
+                {
+                    ImGui.PushFont(UiBuilder.IconFont);
+                    ImGuiEx.TextV("\uf252");
+                    ImGui.PopFont();
+                    ImGuiEx.Tooltip($"Wait for all deployables is globally enabled.");
+                    ImGui.SameLine(0, 3);
+                }
+                else if (data.MultiWaitForAllDeployables)
+                {
+                    ImGui.PushFont(UiBuilder.IconFont);
+                    ImGuiEx.TextV("\uf252");
+                    ImGui.PopFont();
+                    ImGuiEx.Tooltip($"Wait for all deployables is enabled for this character.");
+                    ImGui.SameLine(0, 3);
+                }
 
-            if (data.TeleportToFCHouse)
-            {
-                ImGui.PushFont(UiBuilder.IconFont);
-                ImGuiEx.TextV("\uf1ad");
-                ImGui.PopFont();
-                ImGuiEx.Tooltip($"This character is allowed to teleport to FC house upon readiness");
-                ImGui.SameLine(0, 3);
+                if (data.TeleportToFCHouse)
+                {
+                    ImGui.PushFont(UiBuilder.IconFont);
+                    ImGuiEx.TextV("\uf1ad");
+                    ImGui.PopFont();
+                    ImGuiEx.Tooltip($"This character is allowed to teleport to FC house upon readiness");
+                    ImGui.SameLine(0, 3);
+                }
             }
 
 
@@ -393,6 +395,11 @@ internal static unsafe class WorkshopUI
             ImGuiEx.Text(Lang.IconWarning);
         }
         ImGui.PopFont();
+        if(adata.IndexOverride > 0)
+        {
+            ImGui.SameLine();
+            ImGuiEx.Text(ImGuiColors.DalamudGrey3, $"Index override: {adata.IndexOverride}");
+        }
         var end = ImGui.GetCursorPos();
         var p = (float)vessel.GetRemainingSeconds() / (60f * 60f * 24f);
         if(vessel.ReturnTime != 0) bars.Add((data.CID, Svc.PluginInterface.UiBuilder.FrameCount, start, end, vessel.ReturnTime==0?0:p.ValidateRange(0f, 1f)));
@@ -505,6 +512,10 @@ internal static unsafe class WorkshopUI
                     ImGui.EndCombo();
                 }
             }
+            ImGui.Separator();
+            ImGui.SetNextItemWidth(150f);
+            ImGui.SliderInt("Index override", ref adata.IndexOverride, 0, 4, adata.IndexOverride == 0 ? "Disabled" : $"{adata.IndexOverride}");
+            ImGuiComponents.HelpMarker($"If your vessel order in AutoRetainer is different than in voyage panel menu, you must use this feature to set correct index to incorrectly ordered vessels. Make sure that index is matching order in control panel.");
             if (C.Verbose)
             {
                 if(ImGui.Button("Fake ready")) vessel.ReturnTime = 1;
