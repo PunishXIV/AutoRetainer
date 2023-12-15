@@ -11,7 +11,8 @@ namespace AutoRetainer.UI.Experiments
         internal static void Draw()
         {
             ImGuiEx.EzTabBar("Experiments", [
-                ("Night mode", Night.Draw, null, true)
+                ("Night mode", Night.Draw, null, true),
+                ("Gil display", GilDisplay.Draw, null, true),
                 ]);
         }
     }

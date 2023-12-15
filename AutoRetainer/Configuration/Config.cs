@@ -104,6 +104,8 @@ internal unsafe class Config : IEzConfig
     internal bool ExtraDebug = false;
 
     public bool OldStatusIcons = false;
+    public int MinGilDisplay = 10000;
+    public bool GilOnlyChars = false;
 
     internal bool DontReassign
     {

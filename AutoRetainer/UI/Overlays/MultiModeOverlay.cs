@@ -1,5 +1,6 @@
 ﻿using AutoRetainer.Modules.Voyage;
 using Dalamud.Game.ClientState.Conditions;
+using ECommons.EzSharedDataManager;
 using System.IO;
 
 namespace AutoRetainer.UI.Overlays;
