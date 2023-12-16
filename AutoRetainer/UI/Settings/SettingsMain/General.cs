@@ -85,6 +85,10 @@ namespace AutoRetainer.UI.Settings.SettingsMain
                 ImGui.InputInt($"Deployables list: remaining fuel warning", ref C.UIWarningDepTanksNum.ValidateRange(20, 1000));
                 ImGui.SetNextItemWidth(100f);
                 ImGui.InputInt($"Deployables list: remaining repair kit warning", ref C.UIWarningDepRepairNum.ValidateRange(5, 1000));
+                ImGui.Separator();
+                ImGui.Checkbox("Display only most significant icon in status bar", ref C.StatusBarMSI);
+                ImGui.SetNextItemWidth(100f);
+                ImGui.SliderInt("Status bar icon size", ref C.StatusBarIconWidth, 32, 128);
                 ImGuiGroup.EndGroupBox();
             }
             if (ImGuiGroup.BeginGroupBox("Keybinds"))

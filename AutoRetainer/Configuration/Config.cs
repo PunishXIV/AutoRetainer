@@ -94,8 +94,8 @@ internal unsafe class Config : IEzConfig
     public bool EnableBailout = true;
     public bool EnableCharaSelectBailout = true;
 
-    internal Vector2 StatusPanelSize = new(96, 96);
-
+    public bool NightMode = false;
+    public bool NightModePersistent = false;
     public bool ShowNightMode = false;
     public bool NightModeRetainers = false;
     public bool NightModeDeployables = true;
@@ -165,4 +165,7 @@ internal unsafe class Config : IEzConfig
         MultiWaitForAll = false,
         AdvanceTimer = 120,
     };
+
+    public bool StatusBarMSI = false;
+    public int StatusBarIconWidth = 96;
 }

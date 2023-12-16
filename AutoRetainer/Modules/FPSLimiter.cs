@@ -18,7 +18,7 @@ namespace AutoRetainer.Modules
             {
                 if (
                     (!C.NoFPSLockWhenActive || CSFramework.Instance()->WindowInactive)
-                    && (!C.FpsLockOnlyShutdownTimer || Shutdown.Active || (P.NightMode && C.NightModeFPSLimit))
+                    && (!C.FpsLockOnlyShutdownTimer || Shutdown.Active || (C.NightMode && C.NightModeFPSLimit))
                     )
                 {
                     if (Utils.IsBusy)
@@ -37,7 +37,7 @@ namespace AutoRetainer.Modules
                         if (C.TargetMSPTIdle > 0)
                         {
                             var targetMSPT = C.TargetMSPTIdle;
-                            if (P.NightMode && Utils.CanAutoLogin() && MultiMode.Active)
+                            if (C.NightMode && Utils.CanAutoLogin() && MultiMode.Active)
                             {
                                 targetMSPT = CSFramework.Instance()->WindowInactive? 5000:100;
                             }

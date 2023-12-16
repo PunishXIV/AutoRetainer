@@ -70,8 +70,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal bool LogOpcodes = false;
     internal int LastLoadedItems = 0;
     internal NotificationMasterApi NotificationMasterApi;
-    internal bool NightMode = false;
-    internal long TimeLaunched;
+    internal long[] TimeLaunched;
 
     internal static OfflineCharacterData Data => Utils.GetCurrentCharacterData();
 
@@ -146,7 +145,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 Utils.ResetEscIgnoreByWindows();
                 Svc.PluginInterface.UiBuilder.Draw += FPSLimiter.FPSLimit;
                 AutoCutsceneSkipper.Init(MiniTA.ProcessCutsceneSkip);
-                EzSharedData.TryGetValueType("AutoRetainer.Started", out TimeLaunched, CreationMode.CreateAndKeep, DateTimeOffset.Now.ToUnixTimeMilliseconds());
+                EzSharedData.TryGet("AutoRetainer.Started", out TimeLaunched, CreationMode.CreateAndKeep, [DateTimeOffset.Now.ToUnixTimeMilliseconds()]);
+                if (!C.NightModePersistent) C.NightMode = false;
                 PluginLog.Information($"AutoRetainer v{P.GetType().Assembly.GetName().Version} is ready.");
             });
         }
