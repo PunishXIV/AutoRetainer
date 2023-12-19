@@ -116,12 +116,13 @@ internal unsafe static class MultiModeUI
                 ImGuiEx.EnumCombo("Estate Teleport Location Preference", ref data.HouseTeleportTarget);
                 if (data.HouseTeleportTarget == HouseTeleportTarget.Private_Estate_Hall)
                 {
-                    SharedUI.DrawEntranceConfig(ref data.PHouseEntrance, "Private Estate Entrance Override");
+                    SharedUI.DrawEntranceConfig(ref data.PrivateHouseEntrance, "Private Estate Entrance Override");
                 }
                 if (data.HouseTeleportTarget == HouseTeleportTarget.Free_Company_Estate_Hall)
                 {
-                    SharedUI.DrawEntranceConfig(ref data.FCHouseEntrance, "Free Company Estate Entrance Override");
+                    SharedUI.DrawEntranceConfig(ref data.FreeCompanyHouseEntrance, "Free Company Estate Entrance Override");
                 }
+                ImGui.Checkbox($"Enforce teleport to registered FC and Private houses at login", ref data.EnforceTeleportsOnLogin);
 
                 if (!inst) ImGui.EndDisabled();
                 ImGuiComponents.HelpMarker("You must have Teleporter plugin installed and enabled to use this function.");

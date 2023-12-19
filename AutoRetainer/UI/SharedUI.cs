@@ -12,17 +12,31 @@ namespace AutoRetainer.UI
 {
     internal static class SharedUI
     {
-        internal static void DrawEntranceConfig(ref Vector3 vector, string name)
+        internal static void DrawEntranceConfig(ref HouseEntrance entrance, string name)
         {
-            ImGuiEx.Text(name + ": " + (vector == default ? "N/A" : $"Override at {vector}"));
-            if (ImGui.Button("Register Entrance"))
+            if (ImGui.Button("Register closest entrance"))
             {
-                vector = Utils.GetNearestEntrance(out _, true)?.Position ?? vector;
+                var door = Utils.GetNearestEntrance(out _, true);
+                if (HousingUtils.TryGetCurrentDescriptor(out var d) && door != null)
+                {
+                    entrance = new()
+                    {
+                        Descriptor = d,
+                        Entrance = door.Position,
+                    };
+                }
+                else
+                {
+                    Notify.Error($"Please stand inside your plot and close to the entrance");
+                }
             }
-            ImGui.SameLine();
-            if (ImGui.Button("Delete"))
+            if(entrance != null)
             {
-                vector = default;
+                ImGuiEx.TextWrapped($"Currently registered: {entrance}");
+                if (ImGui.Button("Unregister"))
+                {
+                    entrance = null;
+                }
             }
         }
 

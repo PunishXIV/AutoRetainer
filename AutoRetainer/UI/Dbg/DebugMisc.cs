@@ -1,5 +1,7 @@
-﻿using ECommons.MathHelpers;
+﻿using ECommons.Events;
+using ECommons.MathHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
+using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PInvoke;
 using ItemLevel = AutoRetainer.Helpers.ItemLevel;
@@ -11,6 +13,19 @@ internal static unsafe class DebugMisc
 
     internal static void Draw()
     {
+        if (ImGui.CollapsingHeader("Housing"))
+        {
+            var h = HousingManager.Instance();
+            ImGuiEx.Text($"GetCurrentDivision {h->GetCurrentDivision()}");
+            ImGuiEx.Text($"GetCurrentHouseId {h->GetCurrentHouseId()}");
+            ImGuiEx.Text($"GetCurrentPlot {h->GetCurrentPlot()}");
+            ImGuiEx.Text($"GetCurrentRoom {h->GetCurrentRoom()}");
+            ImGuiEx.Text($"GetCurrentWard {h->GetCurrentWard()}");
+            if(ImGui.Button("Simulate login"))
+            {
+                ProperOnLogin.FireArtificially();
+            }
+        }
         if (ImGui.Button("Install callback hook")) Callback.InstallHook();
         if (ImGui.Button("Disable callback hook")) Callback.UninstallHook();
         ImGuiEx.TextCopy($"{(nint)(&TargetSystem.Instance()->Target):X16}");

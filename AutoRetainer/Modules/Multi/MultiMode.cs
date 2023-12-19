@@ -40,7 +40,7 @@ internal unsafe static class MultiMode
 
     internal static void Init()
     {
-        ProperOnLogin.Register(delegate
+        ProperOnLogin.RegisterInteractable(delegate
         {
             BailoutManager.IsLogOnTitleEnabled = false;
             WriteOfflineData(true, true);
@@ -54,6 +54,10 @@ internal unsafe static class MultiMode
             if (CanHET)
             {
                 DebugLog($"ProperOnLogin: {Svc.ClientState.LocalPlayer}, residential area, scheduling HET");
+                if (Data.EnforceTeleportsOnLogin)
+                {
+                    HouseEnterTask.EnqueueForcedTeleport();
+                }
                 HouseEnterTask.EnqueueTask();
             }
             MultiModeUI.JustRelogged = true;

@@ -509,8 +509,8 @@ internal static unsafe class Utils
         var currentDistance = float.MaxValue;
         GameObject currentObject = null;
 
-        var fcOverride = Data.FCHouseEntrance == default ? null : GetEntranceAtLocation(Data.FCHouseEntrance);
-        var pOverride = Data.FCHouseEntrance == default ? null : GetEntranceAtLocation(Data.PHouseEntrance);
+        var fcOverride = Data.FreeCompanyHouseEntrance == null ? null : GetEntranceAtLocation(Data.FreeCompanyHouseEntrance.Entrance);
+        var pOverride = Data.PrivateHouseEntrance == null ? null : GetEntranceAtLocation(Data.PrivateHouseEntrance.Entrance);
 
         if(fcOverride != null && pOverride != null)
         {
