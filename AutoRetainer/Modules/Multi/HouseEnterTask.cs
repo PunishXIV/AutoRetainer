@@ -9,6 +9,7 @@ using ECommons.GameHelpers;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using System.Diagnostics;
 
 namespace AutoRetainer.Modules.Multi;
 
@@ -18,10 +19,11 @@ internal unsafe static class HouseEnterTask
     internal static readonly uint[] PrivateAetherytes = [59,60,61,97,165];
     internal static void EnqueueTask(bool ignoreTeleportZoneCheck = false)
     {
+        PluginLog.Debug($"Enqueued HouseEnterTast(ignoreTeleportZoneCheck={ignoreTeleportZoneCheck}) from {new StackTrace().GetFrames().Select(x => x.GetMethod()?.Name).Prepend("      ").Print("\n")}");
         P.TaskManager.Enqueue(NewYesAlreadyManager.WaitForYesAlreadyDisabledTask);
         P.TaskManager.Enqueue(() =>
         {
-            if ((Data.TeleportToFCHouse || Data.TeleportToRetainerHouse) && (!(Player.Territory.EqualsAny([Utils.GetFCHouseTerritory(), Utils.GetPrivateHouseTerritory(), .. VoyageUtils.Workshops]) || ignoreTeleportZoneCheck)))
+            if ((Data.TeleportToFCHouse || Data.TeleportToRetainerHouse) && (!Player.Territory.EqualsAny([Utils.GetFCHouseTerritory(), Utils.GetPrivateHouseTerritory(), .. VoyageUtils.Workshops]) || ignoreTeleportZoneCheck))
             {
                 P.TaskManager.EnqueueImmediate(() => Player.Interactable, $"WaitForPlayerInteractable");
                 var canTpToFc = (Data.TeleportToFCHouse && !MultiMode.IsCurrentCharacterCaptainDone()) || (Data.TeleportToRetainerHouse && Data.HouseTeleportTarget == HouseTeleportTarget.Free_Company_Estate_Hall);

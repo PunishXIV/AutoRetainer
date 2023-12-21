@@ -167,6 +167,7 @@ internal unsafe static class MultiMode
                 if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data) && data.Enabled)
                 {
                     data.Enabled = false;
+                    data.WorkshopEnabled = false;
                     DuoLog.Warning("Too many errors, current character is excluded.");
                     Interactions.Clear();
                     return;
@@ -174,6 +175,7 @@ internal unsafe static class MultiMode
                 else
                 {
                     Enabled = false;
+                    data.WorkshopEnabled = false;
                     DuoLog.Error("Fatal error. Please report this with logs.");
                     Interactions.Clear();
                     return;

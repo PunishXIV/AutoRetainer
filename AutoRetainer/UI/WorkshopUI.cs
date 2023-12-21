@@ -528,7 +528,8 @@ internal static unsafe class WorkshopUI
             ImGuiComponents.HelpMarker($"If your vessel order in AutoRetainer is different than in voyage panel menu, you must use this feature to set correct index to incorrectly ordered vessels. Make sure that index is matching order in control panel.");
             if (C.Verbose)
             {
-                if(ImGui.Button("Fake ready")) vessel.ReturnTime = 1;
+                if (ImGui.Button("Fake ready")) vessel.ReturnTime = 1;
+                if (ImGui.Button("Fake unready")) vessel.ReturnTime = (uint)(P.Time + 9999);
             }
             ImGui.EndPopup();
         }

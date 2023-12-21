@@ -477,7 +477,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal static string LastLogMsg = string.Empty;
     internal static void DebugLog(string message)
     {
-        if (LastLogMsg != message)
+        //if (LastLogMsg != message)
         {
             PluginLog.Debug(message);
         }
