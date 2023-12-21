@@ -1,4 +1,5 @@
 ﻿using ECommons.Events;
+using ECommons.ExcelServices;
 using ECommons.MathHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
@@ -15,6 +16,8 @@ internal static unsafe class DebugMisc
     {
         if (ImGui.CollapsingHeader("Housing"))
         {
+            ImGuiEx.Text($"FC aetheryte: {ExcelTerritoryHelper.GetName(Utils.GetFCHouseTerritory())} / {Utils.IsSureNotInFcTerritory()}");
+            ImGuiEx.Text($"Private aetheryte: {ExcelTerritoryHelper.GetName(Utils.GetPrivateHouseTerritory())} / {Utils.IsSureNotInPrivateTerritory()}");
             var h = HousingManager.Instance();
             ImGuiEx.Text($"GetCurrentDivision {h->GetCurrentDivision()}");
             ImGuiEx.Text($"GetCurrentHouseId {h->GetCurrentHouseId()}");
@@ -24,6 +27,13 @@ internal static unsafe class DebugMisc
             if(ImGui.Button("Simulate login"))
             {
                 ProperOnLogin.FireArtificially();
+            }
+            if(h->OutdoorTerritory != null)
+            {
+                for(int i = 0; i < 30; i++)
+                {
+                    ImGuiEx.Text($"IsEstateResident {i}: {P.Memory.OutdoorTerritory_IsEstateResident((nint)h->OutdoorTerritory, (byte)i)}");
+                }
             }
         }
         if (ImGui.Button("Install callback hook")) Callback.InstallHook();

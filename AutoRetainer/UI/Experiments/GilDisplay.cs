@@ -33,7 +33,7 @@ namespace AutoRetainer.UI.Experiments
             foreach(var x in data)
             {
                 ImGuiEx.Text($"{x.Key}:");
-                var dcTotal = 0u;
+                var dcTotal = 0L;
                 foreach(var c in x.Value)
                 {
                     var charTotal = c.Gil + c.RetainerData.Sum(s => s.Gil);
@@ -48,7 +48,7 @@ namespace AutoRetainer.UI.Experiments
                             }
                         }
                         ImGuiEx.Text(ImGuiColors.DalamudViolet, $"    {Censor.Character(c.Name, c.World)} total: {charTotal:N0}");
-                        dcTotal += (uint)charTotal;
+                        dcTotal += charTotal;
                         ImGui.Separator();
                     }
                 }

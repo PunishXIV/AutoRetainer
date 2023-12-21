@@ -14,14 +14,14 @@ namespace AutoRetainer.Modules.Multi;
 
 internal unsafe static class HouseEnterTask
 {
-    static readonly uint[] FCAetherytes = [56, 57, 58, 96, 164];
-    static readonly uint[] PrivateAetherytes = [59,60,61,97,165];
+    internal static readonly uint[] FCAetherytes = [56, 57, 58, 96, 164];
+    internal static readonly uint[] PrivateAetherytes = [59,60,61,97,165];
     internal static void EnqueueTask(bool ignoreTeleportZoneCheck = false)
     {
         P.TaskManager.Enqueue(NewYesAlreadyManager.WaitForYesAlreadyDisabledTask);
         P.TaskManager.Enqueue(() =>
         {
-            if ((Data.TeleportToFCHouse || Data.TeleportToRetainerHouse) && (!Svc.ClientState.TerritoryType.EqualsAny([.. ResidentalAreas.List, .. Houses.List, .. VoyageUtils.Workshops.Select(x => (ushort)x)]) || ignoreTeleportZoneCheck))
+            if ((Data.TeleportToFCHouse || Data.TeleportToRetainerHouse) && (!(Player.Territory.EqualsAny([Utils.GetFCHouseTerritory(), Utils.GetPrivateHouseTerritory(), .. VoyageUtils.Workshops]) || ignoreTeleportZoneCheck)))
             {
                 P.TaskManager.EnqueueImmediate(() => Player.Interactable, $"WaitForPlayerInteractable");
                 var canTpToFc = (Data.TeleportToFCHouse && !MultiMode.IsCurrentCharacterCaptainDone()) || (Data.TeleportToRetainerHouse && Data.HouseTeleportTarget == HouseTeleportTarget.Free_Company_Estate_Hall);
@@ -72,7 +72,7 @@ internal unsafe static class HouseEnterTask
     {
         if (Data.WorkshopEnabled && Data.AreAnyEnabledVesselsReturnInNext(60 * 60, C.MultiModeWorkshopConfiguration.MultiWaitForAll))
         {
-            if(Data.FreeCompanyHouseEntrance != null && !Data.FreeCompanyHouseEntrance.Descriptor.IsInThisHouse())
+            if(((Data.FreeCompanyHouseEntrance != null && !Data.FreeCompanyHouseEntrance.Descriptor.IsInThisHouse()) || Utils.IsSureNotInFcTerritory()) && Utils.GetFCHouseTerritory() != 0)
             {
                 EnqueueForcedTeleportIntl(FCAetherytes, Data.FreeCompanyHouseEntrance.Descriptor);
             }
@@ -81,12 +81,12 @@ internal unsafe static class HouseEnterTask
         {
             if (Data.HouseTeleportTarget == HouseTeleportTarget.Private_Estate_Hall)
             {
-                if (Data.PrivateHouseEntrance != null && !Data.PrivateHouseEntrance.Descriptor.IsInThisHouse())
+                if (((Data.PrivateHouseEntrance != null && !Data.PrivateHouseEntrance.Descriptor.IsInThisHouse()) || Utils.IsSureNotInPrivateTerritory()) && Utils.GetPrivateHouseTerritory() != 0)
                 {
                     EnqueueForcedTeleportIntl(PrivateAetherytes, Data.PrivateHouseEntrance.Descriptor);
                 }
             }
-            else if (Data.HouseTeleportTarget == HouseTeleportTarget.Free_Company_Estate_Hall)
+            else if (((Data.FreeCompanyHouseEntrance != null && !Data.FreeCompanyHouseEntrance.Descriptor.IsInThisHouse()) || Utils.IsSureNotInFcTerritory()) && Utils.GetFCHouseTerritory() != 0)
             {
                 if (Data.FreeCompanyHouseEntrance != null && !Data.FreeCompanyHouseEntrance.Descriptor.IsInThisHouse())
                 {

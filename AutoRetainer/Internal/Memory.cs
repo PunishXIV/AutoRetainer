@@ -1,6 +1,7 @@
 ﻿using Dalamud.Hooking;
 using Dalamud.Memory;
 using Dalamud.Utility.Signatures;
+using ECommons.EzHookManager;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -26,6 +27,10 @@ internal unsafe class Memory : IDisposable
     internal delegate nint OnReceiveMarketPricePacketDelegate(nint a1, nint data);
     [Signature("48 89 5C 24 ?? 57 48 83 EC 40 48 8B 0D ?? ?? ?? ?? 48 8B DA E8 ?? ?? ?? ?? 48 8B F8", DetourName = nameof(AddonItemSearchResult_OnRequestedUpdateDelegateDetour), Fallibility =Fallibility.Fallible)]
     internal Hook<OnReceiveMarketPricePacketDelegate> OnReceiveMarketPricePacketHook;
+
+    internal delegate byte OutdoorTerritory_IsEstateResidentDelegate(nint a1, byte a2);
+    [Signature("8B 05 ?? ?? ?? ?? 44 0F B6 CA 44 8B 81")]
+    internal OutdoorTerritory_IsEstateResidentDelegate OutdoorTerritory_IsEstateResident;
 
     internal bool IsGatheringItemGathered(uint item) => GetIsGatheringItemGathered((ushort)item) != 0;
 

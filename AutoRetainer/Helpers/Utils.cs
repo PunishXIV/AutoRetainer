@@ -17,6 +17,8 @@ using ECommons.MathHelpers;
 using ECommons.Reflection;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Client.Game.Housing;
+using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -29,6 +31,55 @@ namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
+    internal static bool IsSureNotInFcTerritory()
+    {
+        var h = HousingManager.Instance();
+        if (h->OutdoorTerritory != null)
+        {
+            var success = false;
+            for (int i = 0; i < 30; i++)
+            {
+                if(P.Memory.OutdoorTerritory_IsEstateResident((nint)h->OutdoorTerritory, (byte)i) == 1) success = true;
+            }
+            if (!success) return false;
+        }
+        if (GetFCHouseTerritory() == GetPrivateHouseTerritory()) return false;
+        return Player.Territory != GetFCHouseTerritory();
+    }
+
+    internal static bool IsSureNotInPrivateTerritory()
+    {
+        var h = HousingManager.Instance();
+        if (h->OutdoorTerritory != null)
+        {
+            var success = false;
+            for (int i = 0; i < 30; i++)
+            {
+                if (P.Memory.OutdoorTerritory_IsEstateResident((nint)h->OutdoorTerritory, (byte)i) == 1) success = true;
+            }
+            if (!success) return false;
+        }
+        if (GetFCHouseTerritory() == GetPrivateHouseTerritory()) return false;
+        return Player.Territory != GetPrivateHouseTerritory();
+    }
+
+    internal static uint GetFCHouseTerritory()
+    {
+        foreach(var x in Svc.AetheryteList) 
+        {
+            if (HouseEnterTask.FCAetherytes.Contains(x.AetheryteId) && !x.IsAppartment && !x.IsSharedHouse) return x.TerritoryId;
+        }
+        return 0;
+    }
+
+    internal static uint GetPrivateHouseTerritory()
+    {
+        foreach (var x in Svc.AetheryteList)
+        {
+            if (HouseEnterTask.PrivateAetherytes.Contains(x.AetheryteId) && !x.IsAppartment && !x.IsSharedHouse) return x.TerritoryId;
+        }
+        return 0;
+    }
 
     internal static int LoadedItems => AtkStage.GetSingleton()->GetNumberArrayData()[36]->IntArray[401];
 

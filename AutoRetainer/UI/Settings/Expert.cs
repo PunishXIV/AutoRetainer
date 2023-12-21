@@ -1,4 +1,5 @@
 ﻿using Dalamud.Interface.Components;
+using ECommons.ChatMethods;
 using PunishLib.ImGuiMethods;
 
 namespace AutoRetainer.UI.Settings;
@@ -81,5 +82,14 @@ internal static class Expert
         {
             ImGui.Checkbox($"Use server time instead of PC time", ref C.UseServerTime);
         });
+        if(ImGui.Button("Cleanup ghost retainers"))
+        {
+            var i = 0;
+            foreach(var d in C.OfflineData)
+            {
+                i += d.RetainerData.RemoveAll(x => x.Name == "");
+            }
+            DuoLog.Information($"Cleaned {i} entries");
+        }
     }
 }

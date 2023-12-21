@@ -99,6 +99,7 @@ internal unsafe static class OfflineDataManager
             for (var i = 0; i < P.retainerManager.Count; i++)
             {
                 var ret = P.retainerManager.Retainer(i);
+                if (ret.RetainerID == 0) continue;
                 if (ret.RetainerID != 0 && !cleared)
                 {
                     data.RetainerData.Clear();
