@@ -1,6 +1,8 @@
 ﻿using AutoRetainerAPI;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Interface.Components;
+using PunishLib.ImGuiMethods;
+using ThreadLoadImageHandler = ECommons.ImGuiMethods.ThreadLoadImageHandler;
 
 namespace AutoRetainer.UI;
 
@@ -34,7 +36,6 @@ internal unsafe static class MultiModeUI
                 }
             }
         }
-        ulong deleteData = 0;
         for (var index = 0; index < sortedData.Count; index++)
         {
             var data = sortedData[index];
@@ -89,45 +90,54 @@ internal unsafe static class MultiModeUI
             if (ImGui.BeginPopup($"popup{data.CID}"))
             {
                 SharedUI.DrawMultiModeHeader(data);
-                SharedUI.DrawServiceAccSelector(data);
-                SharedUI.DrawPreferredCharacterUI(data);
+                if (ImGuiGroup.BeginGroupBox("General Character Specific Settings"))
+                {
+                    SharedUI.DrawServiceAccSelector(data);
+                    SharedUI.DrawPreferredCharacterUI(data);
+                    ImGui.Checkbox("List & Process Retainers in Display Order", ref data.ShowRetainersInDisplayOrder);
 
-                ImGui.Checkbox("Show & Process Retainers in Display Order", ref data.ShowRetainersInDisplayOrder);
+                    ImGuiEx.Text($"Automatic Grand Company Expert Delivery:");
+                    if (!AutoGCHandin.Operation)
+                    {
+                        ImGui.SetNextItemWidth(200f);
+                        ImGuiEx.EnumCombo("##gcHandin", ref data.GCDeliveryType);
+                    }
+                    else
+                    {
+                        ImGuiEx.Text($"Can't change this now");
+                    }
+                    if(ImGui.Button("Entrust Duplicates Exclusions"))
+                    {
+                        P.DuplicateBlacklistSelector.IsOpen = true;
+                        P.DuplicateBlacklistSelector.SelectedData = data;
+                    }
+                    ImGuiGroup.EndGroupBox();
+                }
 
-                ImGuiEx.Text($"Automatic Grand Company Expert Delivery:");
-                if (!AutoGCHandin.Operation)
-                {
-                    ImGui.SetNextItemWidth(200f);
-                    ImGuiEx.EnumCombo("##gcHandin", ref data.GCDeliveryType);
-                }
-                else
-                {
-                    ImGuiEx.Text($"Can't change this now");
-                }
-                if(ImGui.Button("Configure entrust duplicates exclusions"))
-                {
-                    P.DuplicateBlacklistSelector.IsOpen = true;
-                    P.DuplicateBlacklistSelector.SelectedData = data;
-                }
-                var inst = Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "TeleporterPlugin" && x.IsLoaded);
-                if (!inst) ImGui.BeginDisabled();
-                ImGui.Checkbox($"Enable Estate Hall Teleport", ref data.TeleportToRetainerHouse);
-                ImGui.SetNextItemWidth(150f);
-                ImGuiEx.EnumCombo("Estate Teleport Location Preference", ref data.HouseTeleportTarget);
-                if (data.HouseTeleportTarget == HouseTeleportTarget.Private_Estate_Hall)
-                {
-                    SharedUI.DrawEntranceConfig(ref data.PrivateHouseEntrance, "Private Estate Entrance Override");
-                }
-                if (data.HouseTeleportTarget == HouseTeleportTarget.Free_Company_Estate_Hall)
-                {
-                    SharedUI.DrawEntranceConfig(ref data.FreeCompanyHouseEntrance, "Free Company Estate Entrance Override");
-                }
-                ImGui.Checkbox($"Enforce teleport to registered FC and Private houses at login", ref data.EnforceTeleportsOnLogin);
 
-                if (!inst) ImGui.EndDisabled();
-                ImGuiComponents.HelpMarker("You must have Teleporter plugin installed and enabled to use this function.");
-                ImGui.Separator();
-                SharedUI.DrawExcludeReset(data, out deleteData);
+                if(ImGuiGroup.BeginGroupBox("Retainer Task Estate Teleportation Settings"))
+                {
+                    var inst = Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "TeleporterPlugin" && x.IsLoaded);
+                    if (!inst) ImGui.BeginDisabled();
+                    ImGui.Checkbox($"Enable Estate Hall Teleport", ref data.TeleportToRetainerHouse);
+                    ImGui.SetNextItemWidth(150f);
+                    ImGuiEx.EnumCombo("Estate Teleport Location Preference", ref data.HouseTeleportTarget);
+
+                    if (data.HouseTeleportTarget == HouseTeleportTarget.Private_Estate_Hall)
+                    {
+                        SharedUI.DrawEntranceConfig(data, ref data.PrivateHouseEntrance);
+                    }
+                    if (data.HouseTeleportTarget == HouseTeleportTarget.Free_Company_Estate_Hall)
+                    {
+                        SharedUI.DrawEntranceConfig(data, ref data.FreeCompanyHouseEntrance);
+                    }
+                    ImGui.Checkbox($"Enforce teleport to registered FC and Private houses at login", ref data.EnforceTeleportsOnLogin);
+
+                    if (!inst) ImGui.EndDisabled();
+                    ImGuiComponents.HelpMarker("You must have Teleporter plugin installed and enabled to use this function.");
+                    ImGuiGroup.EndGroupBox();
+                }
+                SharedUI.DrawExcludeReset(data);
                 ImGui.EndPopup();
             }
 
@@ -353,11 +363,6 @@ internal unsafe static class MultiModeUI
             ImGui.SetCursorPos(new(ImGui.GetContentRegionMax().X - ImGui.CalcTextSize(rightText).X - ImGui.GetStyle().FramePadding.X, rCurPos.Y + pad));
             ImGuiEx.Text(rCol, rightText);
             ImGui.PopID();
-        }
-
-        if(deleteData > 0)
-        {
-            C.OfflineData.RemoveAll(x => x.CID == deleteData);
         }
 
         if (C.Verbose && ImGui.CollapsingHeader("Debug"))

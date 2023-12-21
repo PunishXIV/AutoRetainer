@@ -8,6 +8,7 @@ using Dalamud.Interface.Components;
 using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using PunishLib.ImGuiMethods;
 
 namespace AutoRetainer.UI;
 
@@ -75,20 +76,29 @@ internal static unsafe class WorkshopUI
 
             if (ImGui.BeginPopup($"popup{data.CID}"))
             {
-                SharedUI.DrawMultiModeHeader(data);
-                SharedUI.DrawServiceAccSelector(data);
-                SharedUI.DrawPreferredCharacterUI(data);
+                SharedUI.DrawMultiModeHeader(data, "Deployable Configuration");
+                if (ImGuiGroup.BeginGroupBox("General Character Specific Settings"))
+                {
+                    SharedUI.DrawServiceAccSelector(data);
+                    SharedUI.DrawPreferredCharacterUI(data);
+                    ImGui.Checkbox($"Wait For All Pending Deployables", ref data.MultiWaitForAllDeployables);
+                    ImGuiComponents.HelpMarker("Prevent processing this character until all enabled deployables have returned from their voyages.");
+                    ImGuiGroup.EndGroupBox();
+                }
 
+                if (ImGuiGroup.BeginGroupBox("Deployable Task Estate Teleportation Settings"))
+                {
+                    var inst = Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "TeleporterPlugin" && x.IsLoaded);
+                    if (!inst) ImGui.BeginDisabled();
+                    ImGui.Checkbox($"Enable Estate Hall Teleport", ref data.TeleportToFCHouse);
+                    SharedUI.DrawEntranceConfig(data, ref data.FreeCompanyHouseEntrance);
 
-                var inst = Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "TeleporterPlugin" && x.IsLoaded);
-                if (!inst) ImGui.BeginDisabled();
-                ImGui.Checkbox($"Enable Free Company Estate Hall Teleport", ref data.TeleportToFCHouse);
-                SharedUI.DrawEntranceConfig(ref data.FreeCompanyHouseEntrance, "Free Company Estate Entrance Override");
+                    if (!inst) ImGui.EndDisabled();
+                    ImGuiComponents.HelpMarker("You must have Teleporter plugin installed and enabled to use this function.");
+                    ImGuiGroup.EndGroupBox();
+                }
 
-                if (!inst) ImGui.EndDisabled();
-                ImGuiComponents.HelpMarker("You must have Teleporter plugin installed and enabled to use this function.");
-
-                ImGui.Checkbox($"Wait for all deployables to return before processing this character", ref data.MultiWaitForAllDeployables);
+                SharedUI.DrawExcludeReset(data);
 
                 ImGui.EndPopup();
             }

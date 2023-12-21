@@ -1,59 +1,64 @@
 ﻿using AutoRetainerAPI.Configuration;
 using Dalamud.Interface.Components;
-using NotificationMasterAPI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using PunishLib.ImGuiMethods;
 
 namespace AutoRetainer.UI
 {
     internal static class SharedUI
     {
-        internal static void DrawEntranceConfig(ref HouseEntrance entrance, string name)
+        internal static void DrawEntranceConfig(this OfflineCharacterData data, ref HouseEntrance entrance)
         {
-            if (ImGui.Button("Register closest entrance"))
+            if (ImGui.Button("Register Entrance"))
             {
-                var door = Utils.GetNearestEntrance(out _, true);
-                if (HousingUtils.TryGetCurrentDescriptor(out var d) && door != null)
+                if (data != Data)
                 {
-                    entrance = new()
-                    {
-                        Descriptor = d,
-                        Entrance = door.Position,
-                    };
+                    Notify.Error("You are not logged in on this character");
                 }
                 else
                 {
-                    Notify.Error($"Please stand inside your plot and close to the entrance");
+                    var door = Utils.GetNearestEntrance(out _, true);
+                    if (HousingUtils.TryGetCurrentDescriptor(out var d) && door != null)
+                    {
+                        entrance = new()
+                        {
+                            Descriptor = d,
+                            Entrance = door.Position,
+                        };
+                    }
+                    else
+                    {
+                        Notify.Error($"Please stand inside your plot and close to the entrance");
+                    }
                 }
             }
-            if(entrance != null)
+            ImGuiComponents.HelpMarker("If your estate entrance is not the closest to the teleport destination you can override it manually here by standing next to the door and clicking the register button.");
+            if (entrance != null)
             {
-                ImGuiEx.TextWrapped($"Currently registered: {entrance}");
-                if (ImGui.Button("Unregister"))
+                ImGui.SameLine();
+                if (ImGuiEx.IconButton(FontAwesomeIcon.Trash))
                 {
                     entrance = null;
                 }
+                ImGuiEx.Tooltip($"Currently registered:\n{entrance}");
             }
         }
 
-        internal static void DrawMultiModeHeader(OfflineCharacterData data)
+        internal static void DrawMultiModeHeader(OfflineCharacterData data, string overrideTitle = null)
         {
             var b = true;
-            ImGui.CollapsingHeader($"{Censor.Character(data.Name)} Configuration##conf", ref b, ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.Bullet | ImGuiTreeNodeFlags.OpenOnArrow);
+            ImGui.CollapsingHeader($"{Censor.Character(data.Name)} {overrideTitle ?? "Configuration"}##conf", ref b, ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.Bullet | ImGuiTreeNodeFlags.OpenOnArrow);
             if (b == false)
             {
                 ImGui.CloseCurrentPopup();
             }
+            ImGui.Dummy(new(500, 1));
         }
 
         internal static void DrawServiceAccSelector(OfflineCharacterData data)
         {
+            ImGuiEx.Text($"Service Account Selection");
             ImGui.SetNextItemWidth(150);
-            if (ImGui.BeginCombo("##sindex", $"Service Account {data.ServiceAccount + 1}"))
+            if (ImGui.BeginCombo("##Service Account Selection", $"Service Account {data.ServiceAccount + 1}"))
             {
                 for (var i = 1; i <= 10; i++)
                 {
@@ -81,19 +86,22 @@ namespace AutoRetainer.UI
             ImGuiComponents.HelpMarker("When operating in multi mode, if there are no other characters with imminent ventures to collect, it will relog back to your preferred character.");
         }
 
-        internal static void DrawExcludeReset(OfflineCharacterData data, out ulong deleteData)
+        internal static void DrawExcludeReset(OfflineCharacterData data)
         {
-            deleteData = 0;
-            if (ImGuiEx.ButtonCtrl("Exclude Character"))
+            if (ImGuiGroup.BeginGroupBox("Character Data Expunge/Reset"))
             {
-                C.Blacklist.Add((data.CID, data.Name));
+                if (ImGuiEx.ButtonCtrl("Exclude Character"))
+                {
+                    C.Blacklist.Add((data.CID, data.Name));
+                }
+                ImGuiComponents.HelpMarker("Excluding this character will immediately reset it's settings, remove it from this list and exclude all retainers from being processed. You can still run manual tasks on it's retainers. You can cancel this action in settings.");
+                if (ImGuiEx.ButtonCtrl("Reset character data"))
+                {
+                    new TickScheduler(() => C.OfflineData.RemoveAll(x => x.CID == data.CID));
+                }
+                ImGuiComponents.HelpMarker("Character's saved data will be removed without excluding it. Character data will be regenerated once you log back into this character.");
+                ImGuiGroup.EndGroupBox();
             }
-            ImGuiComponents.HelpMarker("Excluding this character will immediately reset it's settings, remove it from this list and exclude all retainers from being processed. You can still run manual tasks on it's retainers. You can cancel this action in settings.");
-            if (ImGuiEx.ButtonCtrl("Reset character data"))
-            {
-                deleteData = data.CID;
-            }
-            ImGuiComponents.HelpMarker("Character's saved data will be removed without excluding it. Character data will be regenerated once you log back into this character.");
         }
     }
 }
