@@ -26,6 +26,7 @@ using System.Threading;
 using ECommons.ExcelServices;
 using NotificationMasterAPI;
 using ECommons.EzSharedDataManager;
+using AutoRetainer.UI.Experiments.Inventory;
 
 namespace AutoRetainer;
 
@@ -71,6 +72,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal int LastLoadedItems = 0;
     internal NotificationMasterApi NotificationMasterApi;
     internal long[] TimeLaunched;
+    internal ContextMenuManager ContextMenuManager;
 
     internal static OfflineCharacterData Data => Utils.GetCurrentCharacterData();
 
@@ -147,6 +149,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 AutoCutsceneSkipper.Init(MiniTA.ProcessCutsceneSkip);
                 EzSharedData.TryGet("AutoRetainer.Started", out TimeLaunched, CreationMode.CreateAndKeep, [DateTimeOffset.Now.ToUnixTimeMilliseconds()]);
                 if (!C.NightModePersistent) C.NightMode = false;
+                ContextMenuManager = new();
                 PluginLog.Information($"AutoRetainer v{P.GetType().Assembly.GetName().Version} is ready.");
             });
         }
@@ -288,6 +291,30 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 }
             }
         }
+        else if (arguments.StartsWith("modifySoftVendorList"))
+        {
+            if(int.TryParse(arguments.Split(" ")[1], out var num))
+            {
+                if(num > 0)
+                {
+                    var id = (uint)num;
+                    if (!C.IMAutoVendorSoft.Contains(id))
+                    {
+                        C.IMAutoVendorSoft.Add(id);
+                        PluginLog.Warning($"External addition to soft vendor list: {ExcelItemHelper.GetName(id)}");
+                    }
+                }
+                else if(num < 0)
+                {
+                    var id = (uint)-num;
+                    if (C.IMAutoVendorSoft.Contains(id))
+                    {
+                        C.IMAutoVendorSoft.Remove(id);
+                        PluginLog.Warning($"External removal from soft vendor list: {ExcelItemHelper.GetName(id)}");
+                    }
+                }
+            }
+        }
         else
         {
             configGui.IsOpen = !configGui.IsOpen;
@@ -411,8 +438,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
     {
         //if (PluginLoader.IsLoaded)
         {
-            Safe(this.quickSellItems.Disable);
-            Safe(this.quickSellItems.Dispose);
+            Safe(() => this.quickSellItems.Disable());
+            Safe(() => this.quickSellItems.Dispose());
             Svc.PluginInterface.UiBuilder.Draw -= FPSLimiter.FPSLimit;
             Svc.PluginInterface.UiBuilder.Draw -= ws.Draw;
             Svc.ClientState.Logout -= Logout;
@@ -423,14 +450,15 @@ public unsafe class AutoRetainer : IDalamudPlugin
             Svc.GameNetwork.NetworkMessage -= GameNetwork_NetworkMessage;
             Safe(NewYesAlreadyManager.Unlock);
             Safe(TextAdvanceManager.UnlockTA);
-            Safe(StatisticsManager.Dispose);
-            Safe(AutoLogin.Dispose);
-            Safe(Memory.Dispose);
+            Safe(() => StatisticsManager.Shutdown());
+            Safe(() => AutoLogin.Dispose());
+            Safe(() => Memory.Dispose());
             Safe(IPC.Shutdown);
-            Safe(API.Dispose);
+            Safe(() => API.Dispose());
             Safe(FPSManager.ForceRestore);
             Safe(PriorityManager.RestorePriority);
             Safe(VoyageMain.Shutdown);
+            Safe(() => ContextMenuManager.Dispose());
             PunishLibMain.Dispose();
             ECommonsMain.Dispose();
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AutoRetainer.UI.Experiments.Inventory;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,7 @@ namespace AutoRetainer.UI.Experiments
             ImGuiEx.EzTabBar("Experiments", [
                 ("Night mode", Night.Draw, null, true),
                 ("Gil display", GilDisplay.Draw, null, true),
+                (C.IMDisplayTab?"Inventory management":null, InventoryManagement.Draw, null, true),
                 ]);
         }
     }

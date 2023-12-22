@@ -1,7 +1,9 @@
-﻿using Dalamud.Hooking;
+﻿using AutoRetainer.Internal.InventoryManagement;
+using Dalamud.Hooking;
 using Dalamud.Memory;
 using Dalamud.Utility.Signatures;
 using ECommons.EzHookManager;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -32,6 +34,9 @@ internal unsafe class Memory : IDisposable
     [Signature("8B 05 ?? ?? ?? ?? 44 0F B6 CA 44 8B 81")]
     internal OutdoorTerritory_IsEstateResidentDelegate OutdoorTerritory_IsEstateResident;
 
+    internal delegate void RetainerItemCommandDelegate(nint AgentRetainerItemCommandModule, uint slot, InventoryType inventoryType, uint a4, RetainerItemCommand command);
+    internal EzHook<RetainerItemCommandDelegate> RetainerItemCommandHook;
+
     internal bool IsGatheringItemGathered(uint item) => GetIsGatheringItemGathered((ushort)item) != 0;
 
     internal Memory()
@@ -39,6 +44,20 @@ internal unsafe class Memory : IDisposable
         Svc.Hook.InitializeFromAttributes(this);
         if (C.MarketCooldownOverlay) OnReceiveMarketPricePacketHook?.Enable();
         ReceiveRetainerVentureListUpdateHook?.Enable();
+        RetainerItemCommandHook = new("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 48 83 EC 30 48 8B 6C 24", RetainerItemCommandDetour, false);
+    }
+
+    internal void RetainerItemCommandDetour(nint AgentRetainerItemCommandModule, uint slot, InventoryType inventoryType, uint a4, RetainerItemCommand command)
+    {
+        try
+        {
+            PluginLog.Debug($"RetainerItemCommandDetour: {AgentRetainerItemCommandModule:X16}, slot={slot}, type={inventoryType}, a4={a4}, command={command}");
+        }
+        catch (Exception e)
+        {
+            e.Log();
+        }
+        RetainerItemCommandHook.Original(AgentRetainerItemCommandModule, slot, inventoryType, a4, command);
     }
 
     delegate nint ReceiveRetainerVentureListUpdateDelegate(nint a1, int a2, nint a3);

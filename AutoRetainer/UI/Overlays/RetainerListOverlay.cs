@@ -130,6 +130,30 @@ internal unsafe class RetainerListOverlay : Window
             }
             ImGuiEx.Tooltip("Quick Withdraw Gil");
 
+            if (C.IMDisplayTab)
+            {
+                ImGui.SameLine();
+                if (ImGuiEx.IconButton($"{Lang.IconFire}##vendoritems"))
+                {
+                    for (var i = 0; i < P.retainerManager.Count; i++)
+                    {
+                        var ret = P.retainerManager.Retainer(i);
+                        if (ret.Available)
+                        {
+                            P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
+                            TaskVendorItems.Enqueue();
+
+                            if (C.RetainerMenuDelay > 0)
+                            {
+                                TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
+                            }
+                            P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
+                        }
+                    }
+                }
+                ImGuiEx.Tooltip("Quick Vendor Items");
+            }
+
             PluginToProcess = null;
             Svc.PluginInterface.GetIpcProvider<object>(ApiConsts.OnRetainerListTaskButtonsDraw).SendMessage();
             if(PluginToProcess != null)

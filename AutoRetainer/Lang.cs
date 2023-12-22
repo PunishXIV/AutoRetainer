@@ -31,6 +31,7 @@ internal static class Lang
     internal const string IconUnlock = "\uf13e";
     internal const string IconRepeat = "\uf363";
     internal const string IconPath = "\uf55b";
+    internal const string IconFire = "\uf06d";
 
     internal static string LogOutAndExitGame => Svc.Data.GetExcelSheet<Addon>().GetRow(116).Text.ExtractText();
 

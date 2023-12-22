@@ -22,6 +22,7 @@ namespace AutoRetainer.UI.Experiments
             ImGui.Checkbox("Do retainers in Night mode", ref C.NightModeRetainers);
             ImGui.Checkbox("Do deployables in Night mode", ref C.NightModeDeployables);
             ImGui.Checkbox("Make night mode status persistent", ref C.NightModePersistent);
+            ImGui.Checkbox("Make shutdown command activate night mode instead of shutting down the game", ref C.ShutdownMakesNightMode);
         }
     }
 }

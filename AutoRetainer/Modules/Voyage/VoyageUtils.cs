@@ -438,7 +438,7 @@ internal unsafe static class VoyageUtils
             throw new ArgumentOutOfRangeException(nameof(type));
         }
         var index = begin + slotIndex;
-        var slot = InventoryManager.Instance()->GetInventoryContainer(itype)->GetInventorySlot(index);
+        var slot = FFXIVClientStructs.FFXIV.Client.Game.InventoryManager.Instance()->GetInventoryContainer(itype)->GetInventorySlot(index);
         return slot;
     }
 

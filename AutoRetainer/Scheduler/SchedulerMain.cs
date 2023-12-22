@@ -1,4 +1,5 @@
-﻿using AutoRetainer.Scheduler.Handlers;
+﻿using AutoRetainer.Internal.InventoryManagement;
+using AutoRetainer.Scheduler.Handlers;
 using AutoRetainer.Scheduler.Tasks;
 using AutoRetainerAPI.Configuration;
 using ECommons.Throttlers;
@@ -172,6 +173,11 @@ internal unsafe static class SchedulerMain
                                         {
                                             TaskWithdrawGil.Enqueue(adata.WithdrawGilPercent);
                                         }
+                                    }
+
+                                    if (C.IMEnableAutoVendor)
+                                    {
+                                        TaskVendorItems.Enqueue();
                                     }
 
                                     //fire event, let other plugins deal with retainer

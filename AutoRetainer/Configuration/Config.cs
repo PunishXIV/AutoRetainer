@@ -88,6 +88,7 @@ internal unsafe class Config : IEzConfig
     public bool NoFPSLockWhenActive = true;
     public bool ExtraFPSLockRange = false;
     public bool FpsLockOnlyShutdownTimer = false;
+    public bool ShutdownMakesNightMode = false;
 
     public bool ShowDeployables = false;
     public int BailoutTimeout = 5;
@@ -168,4 +169,15 @@ internal unsafe class Config : IEzConfig
 
     public bool StatusBarMSI = false;
     public int StatusBarIconWidth = 96;
+
+    public bool IMDisplayTab = false;
+    public bool IMEnableCofferAutoOpen = false;
+    public bool IMEnableAutoVendor = false;
+    public bool IMEnableContextMenu = false;
+    public List<uint> IMAutoVendorHard = [];
+    public List<uint> IMAutoVendorSoft = [];
+    public List<uint> IMProtectList = [];
+    public int IMAutoVendorHardStackLimit = 20;
+    public bool IMDry = false;
+    public bool TreatSoftAsHard = false;
 }
