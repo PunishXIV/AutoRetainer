@@ -21,6 +21,10 @@ namespace AutoRetainer.UI.Settings.SettingsMain
                 ImGuiComponents.HelpMarker($"If no character is available for ventures, you will be logged off until any character is available again. Title screen movie will be disabled while this option and MultiMode are enabled.");
                 ImGui.Checkbox("Synchronise Retainers (one time)", ref MultiMode.Synchronize);
                 ImGuiComponents.HelpMarker("AutoRetainer will wait until all enabled retainers have completed their ventures. After that this setting will be disabled automatically and all characters will be processed.");
+
+                ImGui.Checkbox($"Disable Multi Mode on Manual Login", ref C.MultiDisableOnRelog);
+                ImGui.Checkbox($"Enable Multi Mode on Plugin Boot", ref C.MultiAutoStart);
+                ImGui.Checkbox($"Do not reset Preferred Character on Manual Login", ref C.MultiNoPreferredReset);
                 ImGuiGroup.EndGroupBox();
             }
 

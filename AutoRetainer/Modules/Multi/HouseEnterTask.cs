@@ -76,7 +76,7 @@ internal unsafe static class HouseEnterTask
         {
             if(((Data.FreeCompanyHouseEntrance != null && !Data.FreeCompanyHouseEntrance.Descriptor.IsInThisHouse()) || Utils.IsSureNotInFcTerritory()) && Utils.GetFCHouseTerritory() != 0)
             {
-                EnqueueForcedTeleportIntl(FCAetherytes, Data.FreeCompanyHouseEntrance.Descriptor);
+                EnqueueForcedTeleportInternal(FCAetherytes, Data.FreeCompanyHouseEntrance.Descriptor);
             }
         }
         else if (Data.Enabled)
@@ -85,27 +85,27 @@ internal unsafe static class HouseEnterTask
             {
                 if (((Data.PrivateHouseEntrance != null && !Data.PrivateHouseEntrance.Descriptor.IsInThisHouse()) || Utils.IsSureNotInPrivateTerritory()) && Utils.GetPrivateHouseTerritory() != 0)
                 {
-                    EnqueueForcedTeleportIntl(PrivateAetherytes, Data.PrivateHouseEntrance.Descriptor);
+                    EnqueueForcedTeleportInternal(PrivateAetherytes, Data.PrivateHouseEntrance.Descriptor);
                 }
             }
             else if (((Data.FreeCompanyHouseEntrance != null && !Data.FreeCompanyHouseEntrance.Descriptor.IsInThisHouse()) || Utils.IsSureNotInFcTerritory()) && Utils.GetFCHouseTerritory() != 0)
             {
                 if (Data.FreeCompanyHouseEntrance != null && !Data.FreeCompanyHouseEntrance.Descriptor.IsInThisHouse())
                 {
-                    EnqueueForcedTeleportIntl(FCAetherytes, Data.FreeCompanyHouseEntrance.Descriptor);
+                    EnqueueForcedTeleportInternal(FCAetherytes, Data.FreeCompanyHouseEntrance.Descriptor);
                 }
             }
             else if (Data.HouseTeleportTarget == HouseTeleportTarget.Apartment)
             {
                 if (Utils.GetNearestEntrance(out _)?.Name.ExtractText().EqualsAny(Lang.ApartmentEntrance) != true)
                 {
-                    EnqueueForcedTeleportIntl("Apartment", Data.FreeCompanyHouseEntrance.Descriptor);
+                    EnqueueForcedTeleportInternal("Apartment");
                 }
             }
         }
     }
 
-    static void EnqueueForcedTeleportIntl(uint[] Aetherytes, HouseDescriptor d)
+    static void EnqueueForcedTeleportInternal(uint[] Aetherytes, HouseDescriptor d)
     {
         P.TaskManager.Enqueue(NewYesAlreadyManager.WaitForYesAlreadyDisabledTask);
         P.TaskManager.EnqueueImmediate(() => Player.Interactable, $"WaitForPlayerInteractable");
@@ -113,7 +113,7 @@ internal unsafe static class HouseEnterTask
         P.TaskManager.EnqueueImmediate(() => Player.Interactable && Svc.ClientState.TerritoryType == d.TerritoryType, 1000 * 60, "WaitUntilArrival");
     }
 
-    static void EnqueueForcedTeleportIntl(string destination, HouseDescriptor d)
+    static void EnqueueForcedTeleportInternal(string destination)
     {
         P.TaskManager.Enqueue(NewYesAlreadyManager.WaitForYesAlreadyDisabledTask);
         P.TaskManager.EnqueueImmediate(() => Player.Interactable, $"WaitForPlayerInteractable");

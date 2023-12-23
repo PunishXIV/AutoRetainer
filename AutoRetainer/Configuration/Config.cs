@@ -108,6 +108,10 @@ internal unsafe class Config : IEzConfig
     public int MinGilDisplay = 10000;
     public bool GilOnlyChars = false;
 
+    public bool MultiAutoStart = false;
+    public bool MultiDisableOnRelog = false;
+    public bool MultiNoPreferredReset = false;
+
     internal bool DontReassign
     {
         get

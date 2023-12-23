@@ -1,4 +1,5 @@
-﻿using AutoRetainerAPI;
+﻿using AutoRetainer.Internal;
+using AutoRetainerAPI;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Interface.Components;
 using PunishLib.ImGuiMethods;
@@ -57,15 +58,7 @@ internal unsafe static class MultiModeUI
             ImGui.SameLine(0, 3);
             if (ImGuiEx.IconButton(FontAwesomeIcon.DoorOpen))
             {
-                if (MultiMode.Active)
-                {
-                    foreach(var z in C.OfflineData)
-                    {
-                        z.Preferred = false;
-                    }
-                    Notify.Warning("Preferred character has been reset");
-                }
-                if(MultiMode.Relog(data, out var error))
+                if(MultiMode.Relog(data, out var error, RelogReason.ConfigGUI))
                 {
                     Notify.Success("Relogging...");
                 }
@@ -133,8 +126,11 @@ internal unsafe static class MultiModeUI
                     }
                     ImGui.Checkbox($"Enforce teleport to registered FC and Private houses at login", ref data.EnforceTeleportsOnLogin);
 
-                    if (!inst) ImGui.EndDisabled();
-                    ImGuiComponents.HelpMarker("You must have Teleporter plugin installed and enabled to use this function.");
+                    if (!inst)
+                    {
+                        ImGui.EndDisabled();
+                        ImGuiComponents.HelpMarker("You must have Teleporter plugin installed and enabled to use this function.");
+                    }
                     ImGuiGroup.EndGroupBox();
                 }
                 SharedUI.DrawExcludeReset(data);

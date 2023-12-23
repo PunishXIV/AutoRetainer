@@ -28,6 +28,7 @@ using NotificationMasterAPI;
 using ECommons.EzSharedDataManager;
 using AutoRetainer.UI.Experiments.Inventory;
 using ECommons.Reflection;
+using Dalamud.Interface.Internal.Notifications;
 
 namespace AutoRetainer;
 
@@ -152,6 +153,10 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 if (!C.NightModePersistent) C.NightMode = false;
                 ContextMenuManager = new();
                 PluginLog.Information($"AutoRetainer v{P.GetType().Assembly.GetName().Version} is ready.");
+                if (!EzSharedData.TryGet<object>("AutoRetainer.WasLoaded", out _, CreationMode.CreateAndKeep, new()) && C.MultiAutoStart)
+                {
+                    MultiMode.PerformAutoStart();
+                }
             });
         }
         //);
@@ -232,7 +237,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
             var target = C.OfflineData.Where(x => $"{x.Name}@{x.World}" == arguments[6..]).FirstOrDefault();
             if (target != null)
             {
-                if (!AutoLogin.Instance.IsRunning)
+                MultiMode.Relog(target, out _, RelogReason.Command);
+                /*if (!AutoLogin.Instance.IsRunning)
                 {
                     if (Svc.ClientState.IsLoggedIn)
                     {
@@ -242,7 +248,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                     {
                         AutoLogin.Instance.Login(target.CurrentWorld, target.Name, ExcelWorldHelper.GetWorldByName(target.World).RowId, target.ServiceAccount);
                     }
-                }
+                }*/
             }
             else
             {

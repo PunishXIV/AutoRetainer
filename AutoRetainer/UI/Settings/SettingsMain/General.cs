@@ -31,6 +31,8 @@ namespace AutoRetainer.UI.Settings.SettingsMain
                 ImGuiComponents.HelpMarker("The lower this value is the faster plugin will use actions. When dealing with low FPS or high latency you may want to increase this value. If you want the plugin to operate faster you may decrease it. ");
                 ImGui.Checkbox("Extra logging", ref C.ExtraDebug);
                 ImGuiComponents.HelpMarker("This option enables excessive logging for debugging purposes. It will spam your log and cause performance issues while enabled. This option will disable itself upon plugin reload or game restart.");
+
+
                 ImGuiGroup.EndGroupBox();
             };
             if (ImGuiGroup.BeginGroupBox("Operation"))

@@ -5,6 +5,7 @@ using AutoRetainer.Scheduler.Tasks;
 using AutoRetainer.UI;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game.Config;
+using Dalamud.Interface.Internal.Notifications;
 using ECommons.CircularBuffers;
 using ECommons.Events;
 using ECommons.ExcelServices;
@@ -14,6 +15,7 @@ using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Data.Files.Excel;
+using System.Xml.Linq;
 using static AutoRetainer.Modules.OfflineDataManager;
 
 namespace AutoRetainer.Modules.Multi;
@@ -153,7 +155,7 @@ internal unsafe static class MultiMode
                     {
                         if(EzThrottler.Throttle("MultiModeAfkOnTitleLogin", 20000))
                         {
-                            if(!Relog(next, out var error))
+                            if(!Relog(next, out var error, RelogReason.MultiMode))
                             {
                                 PluginLog.Error($"Error while automatically logging in: {error}");
                                 Notify.Error($"{error}");
@@ -208,7 +210,7 @@ internal unsafe static class MultiMode
                         BlockInteraction(20);
                         EnsureCharacterValidity();
                         RestoreValidityInWorkshop();
-                        if (!Relog(next, out var error))
+                        if (!Relog(next, out var error, RelogReason.MultiMode))
                         {
                             DuoLog.Error(error);
                         }
@@ -227,7 +229,7 @@ internal unsafe static class MultiMode
                             BlockInteraction(20);
                             EnsureCharacterValidity();
                             RestoreValidityInWorkshop();
-                            if (!Relog(null, out var error))
+                            if (!Relog(null, out var error, RelogReason.MultiMode))
                             {
                                 DuoLog.Error(error);
                             }
@@ -353,8 +355,19 @@ internal unsafe static class MultiMode
         return Array.Empty<OfflineRetainerData>();
     }
 
-    internal static bool Relog(OfflineCharacterData data, out string ErrorMessage)
+    internal static bool Relog(OfflineCharacterData data, out string ErrorMessage, RelogReason reason)
     {
+        if(reason.EqualsAny(RelogReason.Overlay, RelogReason.Command, RelogReason.ConfigGUI))
+        {
+            if (MultiMode.Active && !C.MultiNoPreferredReset)
+            {
+                foreach (var z in C.OfflineData)
+                {
+                    z.Preferred = false;
+                }
+                Notify.Warning("Preferred character has been reset");
+            }
+        }
         ErrorMessage = string.Empty;
         if (AutoLogin.Instance.IsRunning)
         {
@@ -530,5 +543,20 @@ internal unsafe static class MultiMode
     internal static int GetNeededVentureAmount(this OfflineCharacterData data)
     {
         return data.GetEnabledRetainers().Length * 2;
+    }
+
+    internal static void PerformAutoStart()
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            var seconds = 10 - i;
+            P.TaskManager.Enqueue(() => Svc.PluginInterface.UiBuilder.AddNotification($"MultiMode autostarts in {seconds} seconds!", P.Name, NotificationType.Warning, 0));
+            P.TaskManager.DelayNext(1000);
+        }
+        P.TaskManager.Enqueue(() =>
+        {
+            MultiMode.Enabled = true;
+            BailoutManager.IsLogOnTitleEnabled = true;
+        });
     }
 }

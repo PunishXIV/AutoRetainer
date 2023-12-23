@@ -49,15 +49,7 @@ internal static unsafe class WorkshopUI
             ImGui.SameLine(0,3);
             if (ImGuiEx.IconButton(FontAwesomeIcon.DoorOpen))
             {
-                if (MultiMode.Active)
-                {
-                    foreach (var z in C.OfflineData)
-                    {
-                        z.Preferred = false;
-                    }
-                    Notify.Warning("Preferred character has been reset");
-                }
-                if (MultiMode.Relog(data, out var error))
+                if (MultiMode.Relog(data, out var error, RelogReason.ConfigGUI))
                 {
                     Notify.Success("Relogging...");
                 }
@@ -93,9 +85,12 @@ internal static unsafe class WorkshopUI
                     ImGui.Checkbox($"Enable Estate Hall Teleport", ref data.TeleportToFCHouse);
                     SharedUI.DrawEntranceConfig(data, ref data.FreeCompanyHouseEntrance);
 
-                    if (!inst) ImGui.EndDisabled();
-                    ImGuiComponents.HelpMarker("You must have Teleporter plugin installed and enabled to use this function.");
-                    ImGuiGroup.EndGroupBox();
+                    if (!inst)
+                    {
+                        ImGui.EndDisabled();
+                        ImGuiComponents.HelpMarker("You must have Teleporter plugin installed and enabled to use this function.");
+                    }
+                        ImGuiGroup.EndGroupBox();
                 }
 
                 SharedUI.DrawExcludeReset(data);
