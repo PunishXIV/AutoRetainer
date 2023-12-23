@@ -35,7 +35,7 @@ namespace AutoRetainer.UI.Settings.SettingsMain
                 ImGuiEx.SetNextItemWidthScaled(60);
                 ImGui.DragInt("Advance Relog Threshold", ref C.MultiModeRetainerConfiguration.AdvanceTimer.ValidateRange(0, 300), 0.1f, 0, 300);
                 ImGuiEx.SetNextItemWidthScaled(100);
-                ImGui.SliderInt("Minimum inventory slots to continue operation", ref C.MultiMinInventorySlots.ValidateRange(2, 9999), 2, 30);
+                ImGuiEx.SliderInt("Minimum inventory slots to continue operation", ref C.MultiMinInventorySlots.ValidateRange(2, 9999), 2, 30);
                 ImGuiGroup.EndGroupBox();
             }
 
@@ -77,7 +77,7 @@ namespace AutoRetainer.UI.Settings.SettingsMain
             if(ImGuiGroup.BeginGroupBox("Bailout Module"))
             {
                 ImGuiEx.SetNextItemWidthScaled(150f);
-                ImGui.SliderInt("Timeout before AutoRetainer will attempt to unstuck, seconds", ref C.BailoutTimeout.ValidateRange(5, 60), 5, 30);
+                ImGuiEx.SliderInt("Timeout before AutoRetainer will attempt to unstuck, seconds", ref C.BailoutTimeout.ValidateRange(5, 60), 5, 30);
                 ImGui.Checkbox($"Attempt to unstuck from stuck character selection screen", ref C.EnableCharaSelectBailout);
                 ImGuiGroup.EndGroupBox();
             }

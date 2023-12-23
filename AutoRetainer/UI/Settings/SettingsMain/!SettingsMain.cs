@@ -28,7 +28,7 @@ internal static class SettingsMain
         {
             fps = (int)(1000f / frameTime);
         }
-        ImGui.SliderInt(name, ref fps, min, 60, fps == 60 ? "Unlimited" : null, ImGuiSliderFlags.AlwaysClamp);
+        ImGuiEx.SliderInt(name, ref fps, min, 60, fps == 60 ? "Unlimited" : null, ImGuiSliderFlags.AlwaysClamp);
         frameTime = fps == 60 ? 0 : (int)(1000f / fps);
     }
 

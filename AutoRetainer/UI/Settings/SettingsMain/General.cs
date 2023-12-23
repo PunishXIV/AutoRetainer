@@ -16,7 +16,7 @@ namespace AutoRetainer.UI.Settings.SettingsMain
             if (ImGuiGroup.BeginGroupBox("Settings"))
             {
                 ImGuiEx.SetNextItemWidthScaled(100f);
-                ImGui.SliderInt("Time Desynchronization Compensation", ref C.UnsyncCompensation.ValidateRange(-60, 0), -10, 0);
+                ImGuiEx.SliderInt("Time Desynchronization Compensation", ref C.UnsyncCompensation.ValidateRange(-60, 0), -10, 0);
                 ImGuiComponents.HelpMarker("Additional amount of seconds that will be subtracted from venture ending time to help mitigate possible issues of time desynchronization between the game and your PC. ");
                 ImGui.Checkbox($"Enable frame delay", ref C.UseFrameDelay);
                 ImGuiEx.SetNextItemWidthScaled(100f);
@@ -26,7 +26,7 @@ namespace AutoRetainer.UI.Settings.SettingsMain
                 }
                 else
                 {
-                    ImGui.SliderInt("Interaction Delay, frames", ref C.FrameDelay.ValidateRange(2, 500), 2, 12);
+                    ImGuiEx.SliderInt("Interaction Delay, frames", ref C.FrameDelay.ValidateRange(2, 500), 2, 12);
                 }
                 ImGuiComponents.HelpMarker("The lower this value is the faster plugin will use actions. When dealing with low FPS or high latency you may want to increase this value. If you want the plugin to operate faster you may decrease it. ");
                 ImGui.Checkbox("Extra logging", ref C.ExtraDebug);
@@ -90,7 +90,7 @@ namespace AutoRetainer.UI.Settings.SettingsMain
                 ImGui.Separator();
                 ImGui.Checkbox("Display only most significant icon in status bar", ref C.StatusBarMSI);
                 ImGuiEx.SetNextItemWidthScaled(100f);
-                ImGui.SliderInt("Status bar icon size", ref C.StatusBarIconWidth, 32, 128);
+                ImGuiEx.SliderInt("Status bar icon size", ref C.StatusBarIconWidth, 32, 128);
                 ImGuiGroup.EndGroupBox();
             }
             if (ImGuiGroup.BeginGroupBox("Keybinds"))
@@ -105,9 +105,9 @@ namespace AutoRetainer.UI.Settings.SettingsMain
         {
             ImGui.Checkbox($"Display Login Overlay", ref C.LoginOverlay);
             ImGuiEx.SetNextItemWidthScaled(150f);
-            if (ImGui.SliderFloat($"Login overlay scale multiplier", ref C.LoginOverlayScale.ValidateRange(0.1f, 5f), 0.2f, 2f)) P.LoginOverlay.bWidth = 0;
+            if (ImGuiEx.SliderFloat($"Login overlay scale multiplier", ref C.LoginOverlayScale.ValidateRange(0.1f, 5f), 0.2f, 2f)) P.LoginOverlay.bWidth = 0;
             ImGuiEx.SetNextItemWidthScaled(150f);
-            if (ImGui.SliderFloat($"Login overlay button padding", ref C.LoginOverlayBPadding.ValidateRange(0.5f, 5f), 1f, 1.5f)) P.LoginOverlay.bWidth = 0;
+            if (ImGuiEx.SliderFloat($"Login overlay button padding", ref C.LoginOverlayBPadding.ValidateRange(0.5f, 5f), 1f, 1.5f)) P.LoginOverlay.bWidth = 0;
         }
 
         

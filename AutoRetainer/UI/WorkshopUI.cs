@@ -519,7 +519,7 @@ internal static unsafe class WorkshopUI
             }
             ImGui.Separator();
             ImGuiEx.SetNextItemWidthScaled(150f);
-            ImGui.SliderInt("Index override", ref adata.IndexOverride, 0, 4, adata.IndexOverride == 0 ? "Disabled" : $"{adata.IndexOverride}");
+            ImGuiEx.SliderInt("Index override", ref adata.IndexOverride, 0, 4, adata.IndexOverride == 0 ? "Disabled" : $"{adata.IndexOverride}");
             ImGuiComponents.HelpMarker($"If your vessel order in AutoRetainer is different than in voyage panel menu, you must use this feature to set correct index to incorrectly ordered vessels. Make sure that index is matching order in control panel.");
             if (C.Verbose)
             {
