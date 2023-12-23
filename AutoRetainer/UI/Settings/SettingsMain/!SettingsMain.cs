@@ -50,7 +50,7 @@ internal static class SettingsMain
         ImGuiEx.Text($"{text}:");
         ImGui.Dummy(new(20, 1));
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(200f);
+        ImGuiEx.SetNextItemWidthScaled(200f);
         if (ImGui.BeginCombo("##inputKey", $"{key}"))
         {
             if (text == KeyInputActive)

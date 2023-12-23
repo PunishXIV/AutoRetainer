@@ -57,7 +57,7 @@ namespace AutoRetainer.UI
         internal static void DrawServiceAccSelector(OfflineCharacterData data)
         {
             ImGuiEx.Text($"Service Account Selection");
-            ImGui.SetNextItemWidth(150);
+            ImGuiEx.SetNextItemWidthScaled(150);
             if (ImGui.BeginCombo("##Service Account Selection", $"Service Account {data.ServiceAccount + 1}"))
             {
                 for (var i = 1; i <= 10; i++)

@@ -99,7 +99,7 @@ internal unsafe static class MultiModeUI
                     ImGuiEx.Text($"Automatic Grand Company Expert Delivery:");
                     if (!AutoGCHandin.Operation)
                     {
-                        ImGui.SetNextItemWidth(200f);
+                        ImGuiEx.SetNextItemWidthScaled(200f);
                         ImGuiEx.EnumCombo("##gcHandin", ref data.GCDeliveryType);
                     }
                     else
@@ -120,7 +120,7 @@ internal unsafe static class MultiModeUI
                     var inst = Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "TeleporterPlugin" && x.IsLoaded);
                     if (!inst) ImGui.BeginDisabled();
                     ImGui.Checkbox($"Enable Estate Hall Teleport", ref data.TeleportToRetainerHouse);
-                    ImGui.SetNextItemWidth(150f);
+                    ImGuiEx.SetNextItemWidthScaled(150f);
                     ImGuiEx.EnumCombo("Estate Teleport Location Preference", ref data.HouseTeleportTarget);
 
                     if (data.HouseTeleportTarget == HouseTeleportTarget.Private_Estate_Hall)
@@ -318,7 +318,7 @@ internal unsafe static class MultiModeUI
                             {
                                 if (ImGui.RadioButton("Withdraw", !adata.Deposit)) adata.Deposit = false;
                                 if (ImGui.RadioButton("Deposit", adata.Deposit)) adata.Deposit = true;
-                                ImGui.SetNextItemWidth(200f);
+                                ImGuiEx.SetNextItemWidthScaled(200f);
                                 ImGui.InputInt($"Amount, %", ref adata.WithdrawGilPercent.ValidateRange(1, 100), 1, 10);
                             }
                             ImGui.Separator();

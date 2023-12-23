@@ -24,7 +24,7 @@ internal unsafe class AutoGCHandinOverlay : Window
         if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var d) && !AutoGCHandin.Operation) 
         {
             ImGui.SameLine();
-            ImGui.SetNextItemWidth(200);
+            ImGuiEx.SetNextItemWidthScaled(200);
             ImGuiEx.EnumCombo("##mode", ref d.GCDeliveryType);
             if (d.GCDeliveryType == GCDeliveryType.Hide_Gear_Set_Items)
             {

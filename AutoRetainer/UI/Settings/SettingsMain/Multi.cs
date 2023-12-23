@@ -28,9 +28,9 @@ namespace AutoRetainer.UI.Settings.SettingsMain
             {
                 ImGui.Checkbox("Wait For Venture Completion", ref C.MultiModeRetainerConfiguration.MultiWaitForAll);
                 ImGuiComponents.HelpMarker("AutoRetainer will wait for all retainers to return before cycling to the next character in multi mode operation.");
-                ImGui.SetNextItemWidth(60);
+                ImGuiEx.SetNextItemWidthScaled(60);
                 ImGui.DragInt("Advance Relog Threshold", ref C.MultiModeRetainerConfiguration.AdvanceTimer.ValidateRange(0, 300), 0.1f, 0, 300);
-                ImGui.SetNextItemWidth(100);
+                ImGuiEx.SetNextItemWidthScaled(100);
                 ImGui.SliderInt("Minimum inventory slots to continue operation", ref C.MultiMinInventorySlots.ValidateRange(2, 9999), 2, 30);
                 ImGuiGroup.EndGroupBox();
             }
@@ -40,10 +40,10 @@ namespace AutoRetainer.UI.Settings.SettingsMain
                 ImGui.PushID("workshop");
                 ImGui.Checkbox("Wait For Voyage Completion", ref C.MultiModeWorkshopConfiguration.MultiWaitForAll);
                 ImGuiComponents.HelpMarker("AutoRetainer will wait for all deployables to return before cycling to the next character in multi mode operation.");
-                ImGui.SetNextItemWidth(60);
+                ImGuiEx.SetNextItemWidthScaled(60);
                 ImGui.DragInt("Advance Relog Threshold", ref C.MultiModeWorkshopConfiguration.AdvanceTimer.ValidateRange(0, 300), 0.1f, 0, 300);
                 ImGui.Checkbox("Wait even when already logged in", ref C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn);
-                ImGui.SetNextItemWidth(60);
+                ImGuiEx.SetNextItemWidthScaled(60);
                 ImGui.DragInt("Retainer venture processing cutoff", ref C.DisableRetainerVesselReturn.ValidateRange(0, 60));
                 ImGuiComponents.HelpMarker("The number of minutes remaining on deployable voyages to prevent processing of retainer tasks.");
                 ImGui.PopID();
@@ -59,9 +59,9 @@ namespace AutoRetainer.UI.Settings.SettingsMain
             if (ImGuiGroup.BeginGroupBox("FPS Limiter"))
             {
                 ImGuiEx.Text($"FPS Limiter is only active when Multi Mode is enabled");
-                ImGui.SetNextItemWidth(100f);
+                ImGuiEx.SetNextItemWidthScaled(100f);
                 SettingsMain.SliderIntFrameTimeAsFPS("Target frame rate when idling", ref C.TargetMSPTIdle, C.ExtraFPSLockRange ? 1 : 10);
-                ImGui.SetNextItemWidth(100f);
+                ImGuiEx.SetNextItemWidthScaled(100f);
                 SettingsMain.SliderIntFrameTimeAsFPS("Target frame rate when operating", ref C.TargetMSPTRunning, C.ExtraFPSLockRange ? 1 : 20);
                 ImGui.Checkbox("Release FPS lock when game is active", ref C.NoFPSLockWhenActive);
                 ImGui.Checkbox($"Allow extra low FPS limiter values", ref C.ExtraFPSLockRange);
@@ -72,7 +72,7 @@ namespace AutoRetainer.UI.Settings.SettingsMain
 
             if(ImGuiGroup.BeginGroupBox("Bailout Module"))
             {
-                ImGui.SetNextItemWidth(150f);
+                ImGuiEx.SetNextItemWidthScaled(150f);
                 ImGui.SliderInt("Timeout before AutoRetainer will attempt to unstuck, seconds", ref C.BailoutTimeout.ValidateRange(5, 60), 5, 30);
                 ImGui.Checkbox($"Attempt to unstuck from stuck character selection screen", ref C.EnableCharaSelectBailout);
                 ImGuiGroup.EndGroupBox();
