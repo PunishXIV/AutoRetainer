@@ -27,6 +27,7 @@ using ECommons.ExcelServices;
 using NotificationMasterAPI;
 using ECommons.EzSharedDataManager;
 using AutoRetainer.UI.Experiments.Inventory;
+using ECommons.Reflection;
 
 namespace AutoRetainer;
 
@@ -313,6 +314,63 @@ public unsafe class AutoRetainer : IDalamudPlugin
                         PluginLog.Warning($"External removal from soft vendor list: {ExcelItemHelper.GetName(id)}");
                     }
                 }
+            }
+        }
+        else if (arguments.StartsWith("set"))
+        {
+            try
+            {
+                var field = arguments.Split(" ")[1];
+                var value = arguments.Split(" ")[2];
+                if (C.GetFoP(field).GetType() == typeof(bool))
+                {
+                    C.SetFoP(field, bool.Parse(value));
+                    DuoLog.Information($"Set bool {field}={value}");
+                }
+                else if (C.GetFoP(field).GetType() == typeof(int))
+                {
+                    C.SetFoP(field, int.Parse(value));
+                    DuoLog.Information($"Set int {field}={value}");
+                }
+                else if (C.GetFoP(field).GetType() == typeof(uint))
+                {
+                    C.SetFoP(field, uint.Parse(value));
+                    DuoLog.Information($"Set uint {field}={value}");
+                }
+                else if (C.GetFoP(field).GetType() == typeof(float))
+                {
+                    C.SetFoP(field, float.Parse(value));
+                    DuoLog.Information($"Set float {field}={value}");
+                }
+                else if (C.GetFoP(field).GetType() == typeof(double))
+                {
+                    C.SetFoP(field, double.Parse(value));
+                    DuoLog.Information($"Set double {field}={value}");
+                }
+                else if (C.GetFoP(field).GetType() == typeof(nint))
+                {
+                    C.SetFoP(field, nint.Parse(value));
+                    DuoLog.Information($"Set nint {field}={value}");
+                }
+                else if (C.GetFoP(field).GetType() == typeof(long))
+                {
+                    C.SetFoP(field, long.Parse(value));
+                    DuoLog.Information($"Set long {field}={value}");
+                }
+                else if (C.GetFoP(field).GetType() == typeof(ulong))
+                {
+                    C.SetFoP(field, ulong.Parse(value));
+                    DuoLog.Information($"Set ulong {field}={value}");
+                }
+                else if (C.GetFoP(field).GetType() == typeof(string))
+                {
+                    C.SetFoP(field, value);
+                    DuoLog.Information($"Set string {field}={value}");
+                }
+            }
+            catch(Exception e)
+            {
+                e.LogDuo();
             }
         }
         else

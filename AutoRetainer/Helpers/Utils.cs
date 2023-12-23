@@ -31,6 +31,8 @@ namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
+    internal static float AnimationLock => *(float*)((nint)ActionManager.Instance() + 8);
+
     internal static bool IsSureNotInFcTerritory()
     {
         var h = HousingManager.Instance();

@@ -29,6 +29,11 @@ namespace AutoRetainer.Internal.InventoryManagement
                     DuoLog.Warning($"Inventory {Task.InventoryType} is null");
                     return true;
                 }
+                if (C.IMProtectList.Contains(Task.ItemID))
+                {
+                    DuoLog.Warning($"Item {Task} is protected and won't be sold.");
+                    return true;
+                }
                 var slot = inv->Items[Task.Slot];
                 if (Task.ItemID != slot.ItemID || slot.ItemID == 0 || slot.Quantity != Task.Quantity)
                 {

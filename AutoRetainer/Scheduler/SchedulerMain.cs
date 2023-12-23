@@ -204,6 +204,7 @@ internal unsafe static class SchedulerMain
                                         DebugLog($"Scheduling closing and disabling plugin as MultiMode is running");
                                         P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
                                         P.TaskManager.Enqueue(DisablePlugin);
+                                        if (C.IMEnableCofferAutoOpen) TaskOpenAllCoffers.Enqueue();
                                     }
                                     else if (Reason == PluginEnableReason.Artisan)
                                     {
