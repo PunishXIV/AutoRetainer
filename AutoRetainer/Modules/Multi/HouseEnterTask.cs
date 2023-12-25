@@ -17,11 +17,11 @@ internal unsafe static class HouseEnterTask
 {
     internal static readonly uint[] FCAetherytes = [56, 57, 58, 96, 164];
     internal static readonly uint[] PrivateAetherytes = [59,60,61,97,165];
-    internal static void EnqueueTask(bool ignoreTeleportZoneCheck = false)
+    internal static void EnqueueTask(bool ignoreTeleportZoneCheck = false, bool noTeleport = false)
     {
         PluginLog.Debug($"Enqueued HouseEnterTast(ignoreTeleportZoneCheck={ignoreTeleportZoneCheck}) from {new StackTrace().GetFrames().Select(x => x.GetMethod()?.Name).Prepend("      ").Print("\n")}");
         P.TaskManager.Enqueue(NewYesAlreadyManager.WaitForYesAlreadyDisabledTask);
-        P.TaskManager.Enqueue(() =>
+        if(!noTeleport) P.TaskManager.Enqueue(() =>
         {
             if ((Data.TeleportToFCHouse || Data.TeleportToRetainerHouse) && (!Player.Territory.EqualsAny([Utils.GetFCHouseTerritory(), Utils.GetPrivateHouseTerritory(), .. VoyageUtils.Workshops]) || ignoreTeleportZoneCheck))
             {

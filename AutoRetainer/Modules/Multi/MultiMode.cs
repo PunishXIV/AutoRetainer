@@ -92,7 +92,7 @@ internal unsafe static class MultiMode
         LastLogin = 0;
         if (C.MultiHETOnEnable && Player.Available && CanHET)
         {
-            HouseEnterTask.EnqueueTask();
+            HouseEnterTask.EnqueueTask(noTeleport:true);
         }
         if(Utils.GetNearestWorkshopEntrance(out _) && Utils.GetReachableRetainerBell(false) == null)
         {
