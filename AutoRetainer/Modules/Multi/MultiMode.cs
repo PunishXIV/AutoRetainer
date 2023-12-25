@@ -10,6 +10,7 @@ using ECommons.CircularBuffers;
 using ECommons.Events;
 using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
+using ECommons.EzSharedDataManager;
 using ECommons.GameHelpers;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
@@ -359,6 +360,10 @@ internal unsafe static class MultiMode
     {
         if(reason.EqualsAny(RelogReason.Overlay, RelogReason.Command, RelogReason.ConfigGUI))
         {
+            if(C.MultiDisableOnRelog)
+            {
+                MultiMode.Enabled = false;
+            }
             if (MultiMode.Active && !C.MultiNoPreferredReset)
             {
                 foreach (var z in C.OfflineData)
@@ -547,6 +552,7 @@ internal unsafe static class MultiMode
 
     internal static void PerformAutoStart()
     {
+        EzSharedData.TryGet<object>("AutoRetainer.WasLoaded", out _, CreationMode.CreateAndKeep, new());
         for (int i = 0; i < 10; i++)
         {
             var seconds = 10 - i;

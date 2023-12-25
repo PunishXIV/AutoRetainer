@@ -521,6 +521,37 @@ internal static unsafe class WorkshopUI
             ImGuiEx.SetNextItemWidthScaled(150f);
             ImGuiEx.SliderInt("Index override", ref adata.IndexOverride, 0, 4, adata.IndexOverride == 0 ? "Disabled" : $"{adata.IndexOverride}");
             ImGuiComponents.HelpMarker($"If your vessel order in AutoRetainer is different than in voyage panel menu, you must use this feature to set correct index to incorrectly ordered vessels. Make sure that index is matching order in control panel.");
+            if(ImGui.CollapsingHeader("I have recently renamed this vessel"))
+            {
+                if(ImGui.BeginCombo("##selprev", "Select previous vessel name"))
+                {
+                    var datas = ((Func<Dictionary<string, AdditionalVesselData>>)delegate
+                    {
+                        if (type == VoyageType.Airship) return data.AdditionalAirshipData;
+                        if (type == VoyageType.Submersible) return data.AdditionalSubmarineData;
+                        throw new ArgumentOutOfRangeException(nameof(type));
+                    })();
+                    foreach (var x in datas)
+                    {
+                        var d = data.GetVesselData(type).Any(z => z.Name == x.Key);
+                        if (d) ImGui.BeginDisabled();
+                        if (ImGui.Selectable($"{x.Key}"))
+                        {
+                            new TickScheduler(() =>
+                            {
+                                var copyTo = vessel.Name;
+                                var newData = x.Value.JSONClone();
+                                var toDelete = x.Key;
+                                datas[copyTo] = x.Value;
+                                datas.Remove(toDelete);
+                                Notify.Success($"Moved data from {toDelete} to {copyTo}");
+                            });
+                        }
+                        if (d) ImGui.EndDisabled();
+                    }
+                    ImGui.EndCombo();
+                }
+            }
             if (C.Verbose)
             {
                 if (ImGui.Button("Fake ready")) vessel.ReturnTime = 1;

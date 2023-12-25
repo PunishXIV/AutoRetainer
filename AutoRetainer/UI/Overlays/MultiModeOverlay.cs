@@ -45,7 +45,7 @@ internal class MultiModeOverlay : Window
                     {
                         BailoutManager.IsLogOnTitleEnabled = false;
                     }
-                    ImGui.SetTooltip($"AutoRetainer detected stuck login.\nTemporarily waiting for valid character on login screen. \nLeft click - open AutoRetainer. \nRight click - abort.");
+                    ImGui.SetTooltip($"AutoRetainer was requested to temporarily wait for valid character on login screen. \nLeft click - open AutoRetainer. \nRight click - abort.");
                 }
             }
             else

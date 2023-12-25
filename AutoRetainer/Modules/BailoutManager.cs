@@ -53,7 +53,7 @@ namespace AutoRetainer.Modules
                             {
                                 if (Utils.GenericThrottle)
                                 {
-                                    DuoLog.Warning($"[Bailout] Backing out off CharaSelect");
+                                    DuoLog.Warning($"[Bailout] Backing out of CharaSelect");
                                     Callback.Fire(addon, true, 4);
                                     CharaSelectStuck = Environment.TickCount64;
                                     EzThrottler.Throttle("MultiModeAfkOnTitleLogin", 60000, true);

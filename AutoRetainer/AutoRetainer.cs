@@ -153,7 +153,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 if (!C.NightModePersistent) C.NightMode = false;
                 ContextMenuManager = new();
                 PluginLog.Information($"AutoRetainer v{P.GetType().Assembly.GetName().Version} is ready.");
-                if (!EzSharedData.TryGet<object>("AutoRetainer.WasLoaded", out _, CreationMode.CreateAndKeep, new()) && C.MultiAutoStart)
+                if (!EzSharedData.TryGet<object>("AutoRetainer.WasLoaded", out _) && C.MultiAutoStart)
                 {
                     MultiMode.PerformAutoStart();
                 }

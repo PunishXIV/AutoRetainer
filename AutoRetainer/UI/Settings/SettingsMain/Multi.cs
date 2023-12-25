@@ -23,7 +23,7 @@ namespace AutoRetainer.UI.Settings.SettingsMain
                 ImGuiComponents.HelpMarker("AutoRetainer will wait until all enabled retainers have completed their ventures. After that this setting will be disabled automatically and all characters will be processed.");
 
                 ImGui.Checkbox($"Disable Multi Mode on Manual Login", ref C.MultiDisableOnRelog);
-                ImGui.Checkbox($"Enable Multi Mode on Plugin Boot", ref C.MultiAutoStart);
+                ImGui.Checkbox($"Enable Multi Mode on Game Boot", ref C.MultiAutoStart);
                 ImGui.Checkbox($"Do not reset Preferred Character on Manual Login", ref C.MultiNoPreferredReset);
                 ImGuiGroup.EndGroupBox();
             }
