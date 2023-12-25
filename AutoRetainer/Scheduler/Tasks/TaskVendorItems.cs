@@ -16,7 +16,6 @@ namespace AutoRetainer.Scheduler.Tasks
             P.TaskManager.Enqueue(SelectEntrustItems);
             P.TaskManager.Enqueue(WaitUntilInventoryLoaded);
             P.TaskManager.Enqueue(EnqueueImmediateAllItems);
-            P.TaskManager.DelayNext(333);
         }
 
         public static void EnqueueImmediateAllItems()
@@ -31,6 +30,8 @@ namespace AutoRetainer.Scheduler.Tasks
                 {
                     P.TaskManager.EnqueueImmediate(() => InventorySpaceManager.SafeSellSlot(x), $"InventorySpaceManager.SafeSellSlot({x})");
                 }
+                P.TaskManager.EnqueueImmediate(InventorySpaceManager.SellSlotTasks.Clear);
+                P.TaskManager.DelayNextImmediate(333);
                 P.TaskManager.EnqueueImmediate(CloseInventory);
             }
         }

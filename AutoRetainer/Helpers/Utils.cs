@@ -31,6 +31,8 @@ namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
+    internal static int FCPoints => *(int*)((nint)AgentModule.Instance()->GetAgentByInternalId(AgentId.FreeCompanyCreditShop) + 256);
+
     internal static float AnimationLock => *(float*)((nint)ActionManager.Instance() + 8);
 
     internal static bool IsSureNotInFcTerritory()

@@ -75,6 +75,12 @@ internal unsafe static class SchedulerMain
                                     P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(retainer));
 
                                     var adata = Utils.GetAdditionalData(Svc.ClientState.LocalContentId, ret.Name.ToString());
+
+                                    if (C.IMEnableAutoVendor)
+                                    {
+                                        TaskVendorItems.Enqueue();
+                                    }
+
                                     VentureOverride = 0;
 
                                     IPC.FireSendRetainerToVentureEvent(retainer);

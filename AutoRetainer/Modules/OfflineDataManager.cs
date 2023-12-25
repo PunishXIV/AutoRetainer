@@ -34,7 +34,7 @@ internal unsafe static class OfflineDataManager
             {
                 WriteOfflineData(false, false);
             }
-            if(EzThrottler.Throttle("CalculateItemLevel") && Utils.TryGetCurrentRetainer(out var ret))
+            if(EzThrottler.Throttle("Periodic.CalculateItemLevel") && Utils.TryGetCurrentRetainer(out var ret))
             {
                 var adata = Utils.GetAdditionalData(Player.CID, ret);
                 var result = Helpers.ItemLevel.Calculate(out var g, out var p);
@@ -44,6 +44,13 @@ internal unsafe static class OfflineDataManager
                     adata.Gathering = g;
                     adata.Perception = p;
                 }
+            }
+        }
+        else
+        {
+            if((MultiMode.Active || Utils.IsBusy || P.configGui.IsOpen) && EzThrottler.Throttle("Periodic.WriteOfflineData", 1000))
+            {
+                WriteOfflineData(false, EzThrottler.Throttle("Periodic.SaveData", 1000 * 60 * 5));
             }
         }
     }
@@ -126,6 +133,11 @@ internal unsafe static class OfflineDataManager
                     }
                 }
             }
+        }
+        if(Utils.FCPoints != 0)
+        {
+            data.FCPoints = Utils.FCPoints;
+            data.FCPointsLastUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
         }
         data.WriteOfflineInventoryData();
         C.OfflineData.RemoveAll(x => x.World == "" && x.Name == "Unknown");

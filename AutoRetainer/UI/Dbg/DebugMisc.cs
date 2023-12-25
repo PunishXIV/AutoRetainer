@@ -5,6 +5,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PInvoke;
+using System.Security.Cryptography;
 using ItemLevel = AutoRetainer.Helpers.ItemLevel;
 
 namespace AutoRetainer.UI.Dbg;
@@ -14,6 +15,7 @@ internal static unsafe class DebugMisc
 
     internal static void Draw()
     {
+        ImGuiEx.Text($"FC points: {Utils.FCPoints}");
         if (ImGui.CollapsingHeader("Housing"))
         {
             ImGuiEx.Text($"FC aetheryte: {ExcelTerritoryHelper.GetName(Utils.GetFCHouseTerritory())} / {Utils.IsSureNotInFcTerritory()}");
