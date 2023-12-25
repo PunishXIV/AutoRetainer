@@ -13,6 +13,7 @@ internal unsafe static class MultiModeUI
     static Dictionary<string, (Vector2 start, Vector2 end)> bars = new();
     internal static void Draw()
     {
+        SharedUI.DrawExcludedNotification(true, false);
         C.OfflineData.RemoveAll(x => C.Blacklist.Any(z => z.CID == x.CID));
         var sortedData = new List<OfflineCharacterData>();
         var shouldExpand = false;

@@ -17,6 +17,7 @@ internal static unsafe class WorkshopUI
     static List<(ulong cid, ulong frame, Vector2 start, Vector2 end, float percent)> bars = new();
     internal static void Draw()
     {
+        SharedUI.DrawExcludedNotification(false, true);
         //ImGuiEx.ImGuiLineCentered("WorkshopBetaWarning", () => ImGuiEx.Text(ImGuiColors.DalamudYellow, "This feature is in beta testing."));
         var sortedData = new List<OfflineCharacterData>();
         if (C.NoCurrentCharaOnTop)

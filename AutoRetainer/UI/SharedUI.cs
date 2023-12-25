@@ -1,11 +1,36 @@
 ﻿using AutoRetainerAPI.Configuration;
 using Dalamud.Interface.Components;
+using ECommons.GameHelpers;
 using PunishLib.ImGuiMethods;
 
 namespace AutoRetainer.UI
 {
     internal static class SharedUI
     {
+        internal static void DrawExcludedNotification(bool retainer, bool workshop)
+        {
+            if (Player.CID == 0) return;
+            var col = GradientColor.Get(ImGuiColors.DalamudYellow, ImGuiColors.DalamudRed, 750);
+            if (C.Blacklist.Any(x => x.CID == Player.CID))
+            {
+                ImGuiEx.ImGuiLineCentered("ExclWarning1", () => ImGuiEx.Text(col, "Your current character is excluded from AutoRetainer!"));
+                ImGuiEx.ImGuiLineCentered("ExclWarning2", () => ImGuiEx.Text(col, "Go to settings - exclusions to change it."));
+            }
+            else
+            {
+                if (retainer && Data.ExcludeRetainer)
+                {
+                    ImGuiEx.ImGuiLineCentered("ExclWarning1", () => ImGuiEx.Text(col, "Your current character is excluded from retainer list!"));
+                    ImGuiEx.ImGuiLineCentered("ExclWarning2", () => ImGuiEx.Text(col, "Go to settings - exclusions to change it."));
+                }
+                if (workshop && Data.ExcludeWorkshop)
+                {
+                    ImGuiEx.ImGuiLineCentered("ExclWarning3", () => ImGuiEx.Text(col, "Your current character is excluded from deployable list!"));
+                    ImGuiEx.ImGuiLineCentered("ExclWarning2", () => ImGuiEx.Text(col, "Go to settings - exclusions to change it."));
+                }
+            }
+        }
+
         internal static void DrawEntranceConfig(this OfflineCharacterData data, ref HouseEntrance entrance)
         {
             if (ImGui.Button("Register Entrance"))
