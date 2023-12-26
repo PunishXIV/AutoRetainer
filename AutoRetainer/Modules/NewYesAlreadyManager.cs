@@ -46,7 +46,7 @@ internal static class NewYesAlreadyManager
 
     internal static bool? WaitForYesAlreadyDisabledTask()
     {
-        if (Svc.PluginInterface.TryGetData<HashSet<string>>("YesAlready.StopRequests", out var data))
+        if (EzSharedData.TryGet<HashSet<string>>("YesAlready.StopRequests", out var data))
         {
             return data.Contains(P.Name);
         }
