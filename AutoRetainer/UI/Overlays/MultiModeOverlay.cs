@@ -290,7 +290,7 @@ internal class MultiModeOverlay : Window
             ImGui.SameLine();
         }
         ImGui.Dummy(Vector2.One);
-        if (Data != null)
+        if (Data != null && !C.OldStatusIcons)
         {
             ImGuiEx.ImGuiLineCentered("Status", delegate
             {
