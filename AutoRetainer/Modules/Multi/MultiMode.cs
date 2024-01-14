@@ -439,10 +439,19 @@ internal unsafe static class MultiMode
 
     internal static OfflineCharacterData GetCurrentTargetCharacter()
     {
-        var data = C.OfflineData;
+        var data = C.OfflineData.ToList();
         if (C.CharEqualize)
         {
             data = [.. data.OrderBy(x => CharaCnt.GetOrDefault(x.CID))];
+        }
+        if (C.MultiPreferredLast)
+        {
+            var pref = data.FirstOrDefault(x => x.Preferred);
+            if(pref != null)
+            {
+                data.Remove(pref);
+                data.Add(pref);
+            }
         }
         if (EnabledSubmarines)
         {

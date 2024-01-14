@@ -111,6 +111,7 @@ internal unsafe class Config : IEzConfig
     public bool MultiAutoStart = false;
     public bool MultiDisableOnRelog = false;
     public bool MultiNoPreferredReset = false;
+    public bool MultiPreferredLast = false;
 
     internal bool DontReassign
     {

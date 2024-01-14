@@ -386,7 +386,7 @@ internal unsafe static class MultiModeUI
         }
     }
 
-    static void SetAsPreferred(OfflineCharacterData x)
+    internal static void SetAsPreferred(OfflineCharacterData x)
     {
         if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
         {

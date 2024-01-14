@@ -183,10 +183,23 @@ internal static unsafe class WorkshopUI
                 ImGui.SetCursorPos(initCurpos);
             }
 
+            var colpref = data.Preferred;
+            if (colpref)
+            {
+                ImGui.PushStyleColor(ImGuiCol.Text, GradientColor.Get(ImGui.GetStyle().Colors[(int)ImGuiCol.Text], ImGuiColors.ParsedGreen));
+            }
+
             if (ImGuiEx.CollapsingHeader(Censor.Character(data.Name, data.World)))
             {
+                MultiModeUI.SetAsPreferred(data);
+                if (colpref) ImGui.PopStyleColor();
                 pad = ImGui.GetStyle().FramePadding.Y;
                 DrawTable(data);
+            }
+            else
+            {
+                MultiModeUI.SetAsPreferred(data);
+                if (colpref) ImGui.PopStyleColor();
             }
 
             var rightText = $"R: {data.RepairKits} | C: {data.Ceruleum} | I: {data.InventorySpace}";
