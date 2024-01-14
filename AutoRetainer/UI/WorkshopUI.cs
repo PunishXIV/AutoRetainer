@@ -171,10 +171,10 @@ internal static unsafe class WorkshopUI
                 .Union(data.GetVesselData(VoyageType.Submersible).Where(x => data.GetEnabledVesselsData(VoyageType.Submersible).Contains(x.Name)))
                 .Where(x => x.ReturnTime != 0).OrderBy(z => z.GetRemainingSeconds());
             //if (EzThrottler.Throttle("log")) PluginLog.Information($"{lst.Select(x => x.Name).Print()}");
-            var lowestRetainer = C.MultiModeWorkshopConfiguration.MultiWaitForAll ? lst.LastOrDefault() : lst.FirstOrDefault();
-            if (lowestRetainer != default)
+            var lowestVessel = C.MultiModeWorkshopConfiguration.MultiWaitForAll ? lst.LastOrDefault() : lst.FirstOrDefault();
+            if (lowestVessel != default)
             {
-                var prog = 1f - ((float)lowestRetainer.GetRemainingSeconds() / (60f * 60f * 24f));
+                var prog = 1f - ((float)lowestVessel.GetRemainingSeconds() / (60f * 60f * 24f));
                 prog.ValidateRange(0f, 1f);
                 var pcol = prog == 1f ? GradientColor.Get(0xbb500000.ToVector4(), 0xbb005000.ToVector4()) : 0xbb500000.ToVector4();
                 ImGui.PushStyleColor(ImGuiCol.PlotHistogram, pcol);
@@ -555,7 +555,9 @@ internal static unsafe class WorkshopUI
             }
             if (C.Verbose)
             {
-                if (ImGui.Button("Fake ready")) vessel.ReturnTime = 1;
+                if (ImGui.Button("Fake ready")) vessel.ReturnTime = (uint)P.Time;
+                if (ImGui.Button("Fake ready+")) vessel.ReturnTime += 60u * (ImGui.GetIO().KeyCtrl ? 10u : 1u) * (ImGui.GetIO().KeyShift ? 10u : 1u);
+                if (ImGui.Button("Fake ready-")) vessel.ReturnTime -= 60u * (ImGui.GetIO().KeyCtrl ? 10u : 1u) * (ImGui.GetIO().KeyShift ? 10u : 1u);
                 if (ImGui.Button("Fake unready")) vessel.ReturnTime = (uint)(P.Time + 9999);
             }
             ImGui.EndPopup();

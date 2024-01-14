@@ -44,6 +44,9 @@ namespace AutoRetainer.UI.Settings.SettingsMain
                 ImGui.PushID("workshop");
                 ImGui.Checkbox("Wait For Voyage Completion", ref C.MultiModeWorkshopConfiguration.MultiWaitForAll);
                 ImGuiComponents.HelpMarker("AutoRetainer will wait for all deployables to return before cycling to the next character in multi mode operation.");
+                ImGuiEx.SetNextItemWidthScaled(120);
+                ImGui.InputInt("Maximum Wait, minutes", ref C.MultiModeWorkshopConfiguration.MaxMinutesOfWaiting.ValidateRange(0, 9999), 10, 60);
+                ImGuiComponents.HelpMarker("If waiting for other deployables to return would exceed this amount of minutes, AutoRetainer will ignore the setting.");
                 ImGuiEx.SetNextItemWidthScaled(60);
                 ImGui.DragInt("Advance Relog Threshold", ref C.MultiModeWorkshopConfiguration.AdvanceTimer.ValidateRange(0, 300), 0.1f, 0, 300);
                 ImGui.Checkbox("Wait even when already logged in", ref C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn);

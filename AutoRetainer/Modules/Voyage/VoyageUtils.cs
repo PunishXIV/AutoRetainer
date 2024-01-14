@@ -22,7 +22,7 @@ internal unsafe static class VoyageUtils
 
     internal static uint[] Workshops = [Houses.Company_Workshop_Empyreum, Houses.Company_Workshop_The_Goblet, Houses.Company_Workshop_Mist, Houses.Company_Workshop_Shirogane, Houses.Company_Workshop_The_Lavender_Beds];
 
-    internal static bool ShouldEnterWorkshop() => Data.WorkshopEnabled && Data.AreAnyEnabledVesselsReturnInNext(5 * 60, C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn) || (Utils.GetReachableRetainerBell(false) == null);
+    internal static bool ShouldEnterWorkshop() => (Data.WorkshopEnabled && Data.AreAnyEnabledVesselsReturnInNext(5 * 60, C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn)) || (Utils.GetReachableRetainerBell(false) == null);
 
 
     internal static bool IsNotEnoughSubmarinesEnabled(this OfflineCharacterData data)
@@ -555,9 +555,29 @@ internal unsafe static class VoyageUtils
 
     internal static bool AreAnyEnabledVesselsReturnInNext(this OfflineCharacterData data, int seconds, bool all = false, bool ignorePerCharaSetting = false) => data.AreAnyEnabledVesselsReturnInNext(VoyageType.Airship, seconds, all, ignorePerCharaSetting) || data.AreAnyEnabledVesselsReturnInNext(VoyageType.Submersible, seconds, all, ignorePerCharaSetting);
 
+    internal static bool CheckVesselForWaitTreshold(this OfflineCharacterData data, VoyageType type, int seconds)
+    {
+        if (C.MultiModeWorkshopConfiguration.MaxMinutesOfWaiting == 0) return true;
+        var completedVesselExists = false;
+        var upcomingVesselExists = false;
+        foreach(var x in data.GetVesselData(type))
+        {
+            if (x.GetRemainingSeconds() < seconds)
+            {
+                completedVesselExists = true;
+            }
+            else if(x.GetRemainingSeconds() < C.MultiModeWorkshopConfiguration.MaxMinutesOfWaiting * 60)
+            {
+                upcomingVesselExists = true;
+            }
+        }
+        if (completedVesselExists && !upcomingVesselExists) return false;
+        return true;
+    }
+
     internal static bool AreAnyEnabledVesselsReturnInNext(this OfflineCharacterData data, VoyageType type, int seconds, bool all = false, bool ignorePerCharaSetting = false)
     {
-        if (all || (!ignorePerCharaSetting && data.MultiWaitForAllDeployables))
+        if ((all || (!ignorePerCharaSetting && data.MultiWaitForAllDeployables)) && data.CheckVesselForWaitTreshold(type, seconds))
         {
             var v = data.GetVesselData(type).Where(x => data.GetEnabledVesselsData(type).Contains(x.Name));
             return v.Any() && v.All(x => data.IsVesselAvailable(x, type, seconds));
