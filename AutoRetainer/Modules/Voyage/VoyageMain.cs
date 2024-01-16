@@ -214,11 +214,11 @@ internal static unsafe class VoyageMain
                         {
                             if(adata.UnlockMode == UnlockMode.WhileLevelling)
                             {
-                                TaskDeployOnBestExpVoyage.Enqueue(next, type, VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan) ?? new());
+                                TaskDeployOnBestExpVoyage.Enqueue(next, type, VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan) ?? VoyageUtils.GetDefaultSubmarineUnlockPlan());
                             }
                             else if(adata.UnlockMode.EqualsAny(UnlockMode.SpamOne, UnlockMode.MultiSelect))
                             {
-                                TaskDeployOnUnlockRoute.Enqueue(next, type, VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan) ?? new(), adata.UnlockMode);
+                                TaskDeployOnUnlockRoute.Enqueue(next, type, VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan) ?? VoyageUtils.GetDefaultSubmarineUnlockPlan(), adata.UnlockMode);
                             }
                             else
                             {

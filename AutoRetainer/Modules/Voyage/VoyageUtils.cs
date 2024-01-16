@@ -24,6 +24,12 @@ internal unsafe static class VoyageUtils
 
     internal static bool ShouldEnterWorkshop() => (Data.WorkshopEnabled && Data.AreAnyEnabledVesselsReturnInNext(5 * 60, C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn)) || (Utils.GetReachableRetainerBell(false) == null);
 
+    internal static SubmarineUnlockPlan GetDefaultSubmarineUnlockPlan(bool New = true)
+    {
+        var ret = C.SubmarineUnlockPlans.FirstOrDefault(x => x.GUID == C.DefaultSubmarineUnlockPlan);
+        if (ret == null && New) return new();
+        return ret;
+    }
 
     internal static bool IsNotEnoughSubmarinesEnabled(this OfflineCharacterData data)
     {

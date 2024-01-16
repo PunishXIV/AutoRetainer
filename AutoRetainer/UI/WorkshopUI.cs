@@ -482,9 +482,10 @@ internal static unsafe class WorkshopUI
             {
                 ImGuiEx.Text($"Unlock mode:");
                 ImGuiEx.EnumCombo("##umode", ref adata.UnlockMode, Lang.UnlockModeNames);
-                var currentPlan = VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan);
-                var text = Environment.TickCount64 % 2000 > 1000 ? "Unlocking every point (default plan)" : "No or unknown plan selected";
-                if (ImGui.BeginCombo("##uplan", currentPlan?.Name ?? text))
+                var currentPlan = VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan) ?? VoyageUtils.GetDefaultSubmarineUnlockPlan(false);
+                var isDefault = VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan) == null;
+                var text = Environment.TickCount64 % 2000 > 1000 ? "Unlocking every point" : "No or unknown plan selected";
+                if (ImGui.BeginCombo("##uplan", (currentPlan?.Name ?? text) + (isDefault?" (default)":"")))
                 {
                     if (ImGui.Button("Open editor"))
                     {

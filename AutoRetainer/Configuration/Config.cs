@@ -113,6 +113,8 @@ internal unsafe class Config : IEzConfig
     public bool MultiNoPreferredReset = false;
     public bool MultiPreferredLast = false;
 
+    public string DefaultSubmarineUnlockPlan = "";
+
     internal bool DontReassign
     {
         get
