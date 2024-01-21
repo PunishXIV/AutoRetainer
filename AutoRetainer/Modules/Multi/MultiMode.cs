@@ -444,7 +444,7 @@ internal unsafe static class MultiMode
         {
             data = [.. data.OrderBy(x => CharaCnt.GetOrDefault(x.CID))];
         }
-        if (C.MultiPreferredLast)
+        if (C.MultiPreferredCharLast)
         {
             var pref = data.FirstOrDefault(x => x.Preferred);
             if(pref != null)

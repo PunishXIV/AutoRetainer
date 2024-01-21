@@ -70,7 +70,7 @@ internal unsafe static class MultiModeUI
             }
             if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
             {
-                ImGui.SetClipboardText($"/ays relog {data.Name}@{data.World}");
+                Copy($"/ays relog {data.Name}@{data.World}");
             }
             ImGuiEx.Tooltip($"Left click - relog to this character\nRight click - copy relog command into clipboard");
             ImGui.SameLine(0, 3);
