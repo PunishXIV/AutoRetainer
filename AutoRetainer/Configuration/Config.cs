@@ -112,6 +112,8 @@ internal unsafe class Config : IEzConfig
     public bool MultiDisableOnRelog = false;
     public bool MultiNoPreferredReset = false;
     public bool MultiPreferredCharLast = true;
+    public bool VoyageDisableCalcParallel = false;
+    public bool VoyageDisableCalcMultithreading = false;
 
     public string DefaultSubmarineUnlockPlan = "";
 
