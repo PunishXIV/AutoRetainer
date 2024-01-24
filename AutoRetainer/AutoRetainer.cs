@@ -205,6 +205,16 @@ public unsafe class AutoRetainer : IDalamudPlugin
             MultiMode.Enabled = !MultiMode.Enabled;
             MultiMode.OnMultiModeEnabled();
         }
+        else if (arguments.EqualsIgnoreCaseAny("o", "on"))
+        {
+            MultiMode.Enabled = true;
+            MultiMode.OnMultiModeEnabled();
+        }
+        else if (arguments.EqualsIgnoreCaseAny("f", "off"))
+        {
+            MultiMode.Enabled = false;
+            MultiMode.OnMultiModeEnabled();
+        }
         else if (arguments.EqualsIgnoreCaseAny("b", "browser"))
         {
             VentureBrowser.IsOpen = !VentureBrowser.IsOpen;
