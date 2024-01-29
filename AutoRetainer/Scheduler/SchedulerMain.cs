@@ -214,9 +214,9 @@ internal unsafe static class SchedulerMain
                                     }
                                     else if (Reason == PluginEnableReason.Artisan)
                                     {
-                                        DebugLog($"Scheduling closing  as Artisan is running");
+                                        DebugLog($"Scheduling closing as Artisan is running");
                                         P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
-                                        //P.TaskManager.Enqueue(DisablePlugin);
+                                        P.TaskManager.Enqueue(DisablePlugin);
                                     }
                                     else
                                     {
