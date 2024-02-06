@@ -1,4 +1,5 @@
-﻿using AutoRetainerAPI.Configuration;
+﻿using AutoRetainer.Internal;
+using AutoRetainerAPI.Configuration;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.Text.SeStringHandling;
 using ECommons.Automation;
@@ -30,7 +31,7 @@ internal unsafe static class OfflineDataManager
     {
         if (Svc.Condition[ConditionFlag.OccupiedSummoningBell])
         {
-            if (P.retainerManager.Ready)
+            if (GameRetainerManager.Ready)
             {
                 WriteOfflineData(false, false);
             }
@@ -100,12 +101,12 @@ internal unsafe static class OfflineDataManager
                 e.Log();
             }
         }
-        if (P.retainerManager.Ready && P.retainerManager.Count > 0 && Player.IsInHomeWorld)
+        if (GameRetainerManager.Ready && GameRetainerManager.Count > 0 && Player.IsInHomeWorld)
         {
             var cleared = false;
-            for (var i = 0; i < P.retainerManager.Count; i++)
+            for (var i = 0; i < GameRetainerManager.Count; i++)
             {
-                var ret = P.retainerManager.Retainer(i);
+                var ret = GameRetainerManager.Retainers[i];
                 if (ret.RetainerID == 0) continue;
                 if (ret.RetainerID != 0 && !cleared)
                 {
@@ -124,9 +125,9 @@ internal unsafe static class OfflineDataManager
                     RetainerID = ret.RetainerID,
                 });
 
-                for (int p = 0; p < P.retainerManager.Count; p++)
+                for (int p = 0; p < GameRetainerManager.Count; p++)
                 {
-                    if (FFXIVClientStructs.FFXIV.Client.Game.RetainerManager.Instance()->DisplayOrder[p] == i)
+                    if (RetainerManager.Instance()->DisplayOrder[p] == i)
                     {
                         data.RetainerData[i].DisplayOrder = p;
                         break;

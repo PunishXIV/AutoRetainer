@@ -1,4 +1,5 @@
-﻿using ECommons.Events;
+﻿using ECommons.Automation;
+using ECommons.Events;
 using ECommons.ExcelServices;
 using ECommons.MathHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
@@ -15,6 +16,37 @@ internal static unsafe class DebugMisc
 
     internal static void Draw()
     {
+        if (ImGui.CollapsingHeader("pfinder"))
+        {
+
+            if (ImGui.Button("Callback"))
+            {
+                if (!TryGetAddonByName<AtkUnitBase>("LookingForGroup", out var _))
+                {
+                    P.TaskManager.Enqueue(() => Chat.Instance.SendMessage("/partyfinder"));
+                    P.TaskManager.DelayNext(500);
+                }
+                P.TaskManager.Enqueue(() =>
+                {
+                    if (TryGetAddonByName<AtkUnitBase>("LookingForGroup", out var addon))
+                    {
+                        var btn = addon->UldManager.NodeList[35];
+                        var enabled = btn->GetAsAtkComponentNode()->Component->UldManager.NodeList[2]->Alpha_2 == 255;
+                        var selected = btn->GetAsAtkComponentNode()->Component->UldManager.NodeList[4]->GetAsAtkImageNode()->PartId == 0;
+                        if (enabled)
+                        {
+                            if (!selected)
+                            {
+                                PluginLog.Debug($"Selecting hunts");
+                                Callback.Fire(addon, true, 21, 11, Callback.ZeroAtkValue);
+                            }
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+            }
+        }
         ImGuiEx.Text($"FC points: {Utils.FCPoints}");
         if (ImGui.CollapsingHeader("Housing"))
         {

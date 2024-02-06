@@ -1,4 +1,5 @@
-﻿using AutoRetainer.Modules.Voyage;
+﻿using AutoRetainer.Internal;
+using AutoRetainer.Modules.Voyage;
 using AutoRetainerAPI.Configuration;
 using ClickLib.Clicks;
 using Dalamud;
@@ -752,7 +753,7 @@ internal static unsafe class Utils
             && o.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName);
     }
 
-    internal static long GetVentureSecondsRemaining(this SeRetainer ret, bool allowNegative = true)
+    internal static long GetVentureSecondsRemaining(this GameRetainerManager.Retainer ret, bool allowNegative = true)
     {
         var x = ret.VentureCompleteTimeStamp - P.Time;
         return allowNegative ? x : Math.Max(0, x);
@@ -764,16 +765,16 @@ internal static unsafe class Utils
         return allowNegative ? x : Math.Max(0, x);
     }
 
-    internal static bool TryGetRetainerByName(string name, out SeRetainer retainer)
+    internal static bool TryGetRetainerByName(string name, out GameRetainerManager.Retainer retainer)
     {
-        if (!P.retainerManager.Ready)
+        if (!GameRetainerManager.Ready)
         {
             retainer = default;
             return false;
         }
-        for (var i = 0; i < P.retainerManager.Count; i++)
+        for (var i = 0; i < GameRetainerManager.Count; i++)
         {
-            var r = P.retainerManager.Retainer(i);
+            var r = GameRetainerManager.Retainers[i];
             if (r.Name.ToString() == name)
             {
                 retainer = r;
@@ -808,13 +809,13 @@ internal static unsafe class Utils
     internal static bool TryParseRetainerName(string s, out string retainer)
     {
         retainer = default;
-        if (!P.retainerManager.Ready)
+        if (!GameRetainerManager.Ready)
         {
             return false;
         }
-        for (var i = 0; i < P.retainerManager.Count; i++)
+        for (var i = 0; i < GameRetainerManager.Count; i++)
         {
-            var r = P.retainerManager.Retainer(i);
+            var r = GameRetainerManager.Retainers[i];
             var rname = r.Name.ToString();
             if (s.Contains(rname) && (retainer == null || rname.Length > retainer.Length))
             {

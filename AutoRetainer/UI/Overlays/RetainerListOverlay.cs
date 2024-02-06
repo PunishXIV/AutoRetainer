@@ -1,3 +1,4 @@
+using AutoRetainer.Internal;
 using AutoRetainer.Scheduler.Handlers;
 using AutoRetainer.Scheduler.Tasks;
 using AutoRetainerAPI;
@@ -91,9 +92,9 @@ internal unsafe class RetainerListOverlay : Window
             ImGui.SameLine();
             if (ImGuiEx.IconButton($"{Lang.IconDuplicate}##Entrust all duplicates"))
             {
-                for (var i = 0; i < P.retainerManager.Count; i++)
+                for (var i = 0; i < GameRetainerManager.Count; i++)
                 {
-                    var ret = P.retainerManager.Retainer(i);
+                    var ret = GameRetainerManager.Retainers[i];
                     if (ret.Available)
                     {
                         P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
@@ -112,9 +113,9 @@ internal unsafe class RetainerListOverlay : Window
             ImGui.SameLine();
             if (ImGuiEx.IconButton($"{Lang.IconGil}##WithdrawGil"))
             {
-                for (var i = 0; i < P.retainerManager.Count; i++)
+                for (var i = 0; i < GameRetainerManager.Count; i++)
                 {
-                    var ret = P.retainerManager.Retainer(i);
+                    var ret = GameRetainerManager.Retainers[i];
                     if (ret.Available)
                     {
                         P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
@@ -135,9 +136,9 @@ internal unsafe class RetainerListOverlay : Window
                 ImGui.SameLine();
                 if (ImGuiEx.IconButton($"{Lang.IconFire}##vendoritems"))
                 {
-                    for (var i = 0; i < P.retainerManager.Count; i++)
+                    for (var i = 0; i < GameRetainerManager.Count; i++)
                     {
-                        var ret = P.retainerManager.Retainer(i);
+                        var ret = GameRetainerManager.Retainers[i];
                         if (ret.Available)
                         {
                             P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
@@ -158,9 +159,9 @@ internal unsafe class RetainerListOverlay : Window
             Svc.PluginInterface.GetIpcProvider<object>(ApiConsts.OnRetainerListTaskButtonsDraw).SendMessage();
             if(PluginToProcess != null)
             {
-                for (var i = 0; i < P.retainerManager.Count; i++)
+                for (var i = 0; i < GameRetainerManager.Count; i++)
                 {
-                    var ret = P.retainerManager.Retainer(i);
+                    var ret = GameRetainerManager.Retainers[i];
                     if (ret.Available)
                     {
                         P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));

@@ -6,6 +6,7 @@ using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
+using AutoRetainer.Internal;
 
 namespace AutoRetainer.UI.Dbg;
 
@@ -143,15 +144,6 @@ internal unsafe static class DebugScheduler
         }
 
         ImGuiEx.Text($"Free inventory slots: {Utils.GetInventoryFreeSlotCount()}");
-        for (var i = 0; i < P.retainerManager.Count; i++)
-        {
-            var ret = P.retainerManager.Retainer(i);
-            ImGuiEx.TextWrapped($"{ret.Name}\n           {ret.VentureID} {ret.VentureComplete} {ret.GetVentureSecondsRemaining()}/{ret.GetVentureSecondsRemaining()} | {ret.Gil} gil");
-            if (SafeMemory.ReadBytes((IntPtr)(&ret), 0x48, out var buff))
-            {
-                ImGuiEx.TextCopy(buff.Select(x => $"{x:X2}").Join(" "));
-            }
-        }
         ImGui.InputText("Retainer name", ref dbgRetName, 50);
         if(ImGui.Button("Select retainer by name"))
         {

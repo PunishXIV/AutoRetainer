@@ -1,4 +1,5 @@
-﻿using AutoRetainer.Internal.InventoryManagement;
+﻿using AutoRetainer.Internal;
+using AutoRetainer.Internal.InventoryManagement;
 using AutoRetainer.Scheduler.Handlers;
 using AutoRetainer.Scheduler.Tasks;
 using AutoRetainerAPI.Configuration;
@@ -318,11 +319,15 @@ internal unsafe static class SchedulerMain
 
     static internal string GetNextRetainerName()
     {
-        if (P.retainerManager.Ready)
+        if (GameRetainerManager.Ready)
         {
             if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var cdata))
             {
-                var retainerData = cdata.ShowRetainersInDisplayOrder ? cdata.RetainerData.OrderBy(x => x.DisplayOrder).ToList() : cdata.RetainerData;
+                var retainerData = cdata.ShowRetainersInDisplayOrder ? [.. cdata.RetainerData.OrderBy(x => x.DisplayOrder)] : cdata.RetainerData;
+                if (C.LeastMBSFirst)
+                {
+                    retainerData = [.. cdata.RetainerData.OrderBy(x => x.MBItems)];
+                }
 
                 for (var i = 0; i < retainerData.Count; i++)
                 {

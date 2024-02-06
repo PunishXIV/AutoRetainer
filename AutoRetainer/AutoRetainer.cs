@@ -40,7 +40,6 @@ public unsafe class AutoRetainer : IDalamudPlugin
     private Config config;
     internal WindowSystem ws;
     internal ConfigGui configGui;
-    internal RetainerManager retainerManager;
     internal bool IsInteractionAutomatic = false;
     internal QuickSellItems quickSellItems;
     internal TaskManager TaskManager;
@@ -85,83 +84,83 @@ public unsafe class AutoRetainer : IDalamudPlugin
             ECommonsMain.Init(pi, this, Module.DalamudReflector);
             PunishLibMain.Init(pi, Name, PunishOption.DefaultKoFi); // Default button
             P = this;
-            new TickScheduler(delegate
-            {
-                EzConfig.Migrate<Config>();
-                config = EzConfig.Init<Config>();
-                Migrator.MigrateGC();
-                retainerManager = new(Svc.SigScanner);
-                ws = new();
-                VenturePlanner = new();
-                ws.AddWindow(VenturePlanner);
-                VentureBrowser = new();
-                ws.AddWindow(VentureBrowser);
-                LogWindow = new();
-                ws.AddWindow(LogWindow);
-                configGui = new();
-                MarketCooldownOverlay = new();
-                ws.AddWindow(MarketCooldownOverlay);
-                DuplicateBlacklistSelector = new();
-                ws.AddWindow(DuplicateBlacklistSelector);
-                TaskManager = new() { AbortOnTimeout = true, TimeLimitMS = 20000 };
-                Memory = new();
-                Svc.PluginInterface.UiBuilder.Draw += ws.Draw;
-                Svc.PluginInterface.UiBuilder.OpenConfigUi += delegate { configGui.IsOpen = true; };
-                Svc.ClientState.Logout += Logout;
-                Svc.Condition.ConditionChange += ConditionChange;
-                EzCmd.Add("/autoretainer", CommandHandler, "Open plugin interface\n/autoretainer e|enable → Enable plugin\n/autoretainer d|disable - Disable plugin\n/autoretainer t|toggle - toggle plugin\n/autoretainer m|multi - toggle MultiMode\n/autoretainer relog Character Name@WorldName - relog to the targeted character if configured\n/autoretainer b|browser - open venture browser\n/autoretainer expert - toggle expert settings\n/autoretainer debug - toggle debug menu and verbose output\n/autoretainer shutdown <hours> [minutes] [seconds] - schedule a game shutdown in this amount of time");
-                EzCmd.Add("/ays", CommandHandler);
-                Svc.Toasts.ErrorToast += Toasts_ErrorToast;
-                Svc.Toasts.Toast += Toasts_Toast;
-                Svc.Framework.Update += Tick;
-                quickSellItems = new();
-                StatisticsManager.Init();
-                AutoGCHandin.Init();
-                IPC.Init();
-                Utils.FixKeys();
-                VoyageMain.Init();
-
-                ws.AddWindow(new MultiModeOverlay());
-                RetainerListOverlay = new RetainerListOverlay();
-                ws.AddWindow(RetainerListOverlay);
-                LoginOverlay = (new LoginOverlay());
-                ws.AddWindow(LoginOverlay);
-                SubmarineUnlockPlanUI = new();
-                ws.AddWindow(SubmarineUnlockPlanUI);
-                SubmarinePointPlanUI = new();
-                ws.AddWindow(SubmarinePointPlanUI);
-                MultiMode.Init();
-                NotificationMasterApi = new(pi);
-                ODMTaskManager = new()
-                {
-                    TimeLimitMS = 60 * 1000,
-                    AbortOnTimeout = true,
-                };
-
-                Safety.Check();
-
-                Style = StyleModel.Deserialize("DS1H4sIAAAAAAAACqVYS3ObOhT+L6w9HZ4CvGuS22bRdDJNOu29OxkrNjUxFGP3kcl/75F0jiSwO3MBb4Swvu+8jyRePO4tgzf+wlt5yxfvq7fM5ORfNb4uvMJb+vLFGkeBq3xc5b9JYNUTcCy8Db7eImOJc77Ch28IZggOlYgd/lvh+IyrYlzF1Kr9AKvf1hffNvg2wreRevsd1FLGtfAAohfegR46NPuIKpxw/IHjTxx/GesTx/rfZz6R4ji/qEVRg50v3qP42RlY5kd5GDAEZ3KSpAvvPznLE5axMAV5X5RbgUJib8oDX1VibThY4ueZHyMHS7M4CmLkUJMojR2OL+V+Xf+42ljVmfqlZIGZKobAT7IsjBKX4npbVuuJDNpF93VzbFyGjLAZouSDWp7HsP6qbteitcvzOAhSRqGwUy0wVh7RjoNA+UHO/MywPGw5OGCG8u9a/iwc5QMZNZYRg5Qm/Y4MoSYkcxKtqqW5rU+idcIZpkok2Rb24hklIdgaIldsWd4WXXmyJRoZFyiSyKSSYokpzxQLQ4Eyv8quErNSAxkG6kzmua6rijcHxz3jqe7E/njFWzdgVCzGr4ELeChaELvqQcZniWF538o2OD5XgnOayblygWtyxlAPEMXujre7v/ShLJdlFyCeyS4UMleXqoRa7PlmrDWGYaYpV8euq2mXgQWhkhUi3KxX6CRM4tx3C1Cjh5GJQQEAEkkCNR+nxhuyBcRUf7lW13INzEnkWp/2CEYcWkB0TnIruNsrR3WnSJJEeWRoZnSnzJDMjM+DaHjLu3qiTbb/G6IZVtGO6tLNaL5O3D6JQ/lbvG/LZnq3sBwzW4Ulmhm8x2nND9IHW6rmmBMxWT5JrnlmhKrH83n/VBdHd2MaZVyeyj4yoJrp6Zu62JX7zX0rTqWw55tYNizQBmlSfeQ0h8xeP0tNqSDZP89N98vZBqmfhWSWI/++qrsP5V4c7I4QUNOyne8SYBjcnOKne6f2A2nMdF4kA6Lb8tDVGzgMWZZe38yk82LyHqPZZY4zhfrndHST2RLk8dOtQghqJXTr6x0TTWpc8J7C4AG1a+u9xUXkRfmA+X0Z+KHcbO3dQu4NOlgmCc9wnybfBPwByduKJKsbIBCoEZBq1AiGd5gHUYmiE+4dYkyaRnppKPO05Zubtm4eebsR3ejYw0qT8h/56RYcWPWcmMCxBUSbwEsXUJuxWWGcChz6fgW1MyT7u1/SAfKmfHY8Q1cjyjfqIdL8u3rNK437f6AoeZVXargzeEvvmndNcyyKcu/BPV9fT/nkKlyNObEE9I1h7HlJA9fjT2saaNtrxqIwN+0arEkZ1Ukegzj3RvA09cK+mdpCthMKQyNLG4aeS/tFkOk90sHRJxrJKTcy6Q0dPwkzoUhVHji43cSGWxmcqSptoNn2tIFmHzVI2+IJQxXpxmw/8WJST639xhqkdTafZEi+Rp67Ar5PTcsSeyI2XtK43tkj143b1dXu0WOCBkDYF+Gf1z+6Z+sXPRQAAA==");
-
-                API = new();
-                ApiTest.Init();
-                FPSManager.UnlockChillFrames();
-                Svc.GameNetwork.NetworkMessage += GameNetwork_NetworkMessage;
-                Utils.ResetEscIgnoreByWindows();
-                Svc.PluginInterface.UiBuilder.Draw += FPSLimiter.FPSLimit;
-                AutoCutsceneSkipper.Init(MiniTA.ProcessCutsceneSkip);
-                EzSharedData.TryGet("AutoRetainer.Started", out TimeLaunched, CreationMode.CreateAndKeep, [DateTimeOffset.Now.ToUnixTimeMilliseconds()]);
-                if (!C.NightModePersistent) C.NightMode = false;
-                ContextMenuManager = new();
-                PluginLog.Information($"AutoRetainer v{P.GetType().Assembly.GetName().Version} is ready.");
-                if (!EzSharedData.TryGet<object>("AutoRetainer.WasLoaded", out _) && C.MultiAutoStart)
-                {
-                    MultiMode.PerformAutoStart();
-                }
-            });
+            new TickScheduler(Load);
         }
         //);
     }
 
+    void Load()
+    {
+        EzConfig.Migrate<Config>();
+        config = EzConfig.Init<Config>();
+        Migrator.MigrateGC();
+        ws = new();
+        VenturePlanner = new();
+        ws.AddWindow(VenturePlanner);
+        VentureBrowser = new();
+        ws.AddWindow(VentureBrowser);
+        LogWindow = new();
+        ws.AddWindow(LogWindow);
+        configGui = new();
+        MarketCooldownOverlay = new();
+        ws.AddWindow(MarketCooldownOverlay);
+        DuplicateBlacklistSelector = new();
+        ws.AddWindow(DuplicateBlacklistSelector);
+        TaskManager = new() { AbortOnTimeout = true, TimeLimitMS = 20000 };
+        Memory = new();
+        Svc.PluginInterface.UiBuilder.Draw += ws.Draw;
+        Svc.PluginInterface.UiBuilder.OpenConfigUi += delegate { configGui.IsOpen = true; };
+        Svc.ClientState.Logout += Logout;
+        Svc.Condition.ConditionChange += ConditionChange;
+        EzCmd.Add("/autoretainer", CommandHandler, "Open plugin interface\n/autoretainer e|enable → Enable plugin\n/autoretainer d|disable - Disable plugin\n/autoretainer t|toggle - toggle plugin\n/autoretainer m|multi - toggle MultiMode\n/autoretainer relog Character Name@WorldName - relog to the targeted character if configured\n/autoretainer b|browser - open venture browser\n/autoretainer expert - toggle expert settings\n/autoretainer debug - toggle debug menu and verbose output\n/autoretainer shutdown <hours> [minutes] [seconds] - schedule a game shutdown in this amount of time");
+        EzCmd.Add("/ays", CommandHandler);
+        Svc.Toasts.ErrorToast += Toasts_ErrorToast;
+        Svc.Toasts.Toast += Toasts_Toast;
+        Svc.Framework.Update += Tick;
+        quickSellItems = new();
+        StatisticsManager.Init();
+        AutoGCHandin.Init();
+        IPC.Init();
+        Utils.FixKeys();
+        VoyageMain.Init();
+
+        ws.AddWindow(new MultiModeOverlay());
+        RetainerListOverlay = new RetainerListOverlay();
+        ws.AddWindow(RetainerListOverlay);
+        LoginOverlay = (new LoginOverlay());
+        ws.AddWindow(LoginOverlay);
+        SubmarineUnlockPlanUI = new();
+        ws.AddWindow(SubmarineUnlockPlanUI);
+        SubmarinePointPlanUI = new();
+        ws.AddWindow(SubmarinePointPlanUI);
+        MultiMode.Init();
+        NotificationMasterApi = new(Svc.PluginInterface);
+        ODMTaskManager = new()
+        {
+            TimeLimitMS = 60 * 1000,
+            AbortOnTimeout = true,
+        };
+
+        Safety.Check();
+
+        Style = StyleModel.Deserialize("DS1H4sIAAAAAAAACqVYS3ObOhT+L6w9HZ4CvGuS22bRdDJNOu29OxkrNjUxFGP3kcl/75F0jiSwO3MBb4Swvu+8jyRePO4tgzf+wlt5yxfvq7fM5ORfNb4uvMJb+vLFGkeBq3xc5b9JYNUTcCy8Db7eImOJc77Ch28IZggOlYgd/lvh+IyrYlzF1Kr9AKvf1hffNvg2wreRevsd1FLGtfAAohfegR46NPuIKpxw/IHjTxx/GesTx/rfZz6R4ji/qEVRg50v3qP42RlY5kd5GDAEZ3KSpAvvPznLE5axMAV5X5RbgUJib8oDX1VibThY4ueZHyMHS7M4CmLkUJMojR2OL+V+Xf+42ljVmfqlZIGZKobAT7IsjBKX4npbVuuJDNpF93VzbFyGjLAZouSDWp7HsP6qbteitcvzOAhSRqGwUy0wVh7RjoNA+UHO/MywPGw5OGCG8u9a/iwc5QMZNZYRg5Qm/Y4MoSYkcxKtqqW5rU+idcIZpkok2Rb24hklIdgaIldsWd4WXXmyJRoZFyiSyKSSYokpzxQLQ4Eyv8quErNSAxkG6kzmua6rijcHxz3jqe7E/njFWzdgVCzGr4ELeChaELvqQcZniWF538o2OD5XgnOayblygWtyxlAPEMXujre7v/ShLJdlFyCeyS4UMleXqoRa7PlmrDWGYaYpV8euq2mXgQWhkhUi3KxX6CRM4tx3C1Cjh5GJQQEAEkkCNR+nxhuyBcRUf7lW13INzEnkWp/2CEYcWkB0TnIruNsrR3WnSJJEeWRoZnSnzJDMjM+DaHjLu3qiTbb/G6IZVtGO6tLNaL5O3D6JQ/lbvG/LZnq3sBwzW4Ulmhm8x2nND9IHW6rmmBMxWT5JrnlmhKrH83n/VBdHd2MaZVyeyj4yoJrp6Zu62JX7zX0rTqWw55tYNizQBmlSfeQ0h8xeP0tNqSDZP89N98vZBqmfhWSWI/++qrsP5V4c7I4QUNOyne8SYBjcnOKne6f2A2nMdF4kA6Lb8tDVGzgMWZZe38yk82LyHqPZZY4zhfrndHST2RLk8dOtQghqJXTr6x0TTWpc8J7C4AG1a+u9xUXkRfmA+X0Z+KHcbO3dQu4NOlgmCc9wnybfBPwByduKJKsbIBCoEZBq1AiGd5gHUYmiE+4dYkyaRnppKPO05Zubtm4eebsR3ejYw0qT8h/56RYcWPWcmMCxBUSbwEsXUJuxWWGcChz6fgW1MyT7u1/SAfKmfHY8Q1cjyjfqIdL8u3rNK437f6AoeZVXargzeEvvmndNcyyKcu/BPV9fT/nkKlyNObEE9I1h7HlJA9fjT2saaNtrxqIwN+0arEkZ1Ukegzj3RvA09cK+mdpCthMKQyNLG4aeS/tFkOk90sHRJxrJKTcy6Q0dPwkzoUhVHji43cSGWxmcqSptoNn2tIFmHzVI2+IJQxXpxmw/8WJST639xhqkdTafZEi+Rp67Ar5PTcsSeyI2XtK43tkj143b1dXu0WOCBkDYF+Gf1z+6Z+sXPRQAAA==");
+
+        API = new();
+        ApiTest.Init();
+        FPSManager.UnlockChillFrames();
+        Svc.GameNetwork.NetworkMessage += GameNetwork_NetworkMessage;
+        Utils.ResetEscIgnoreByWindows();
+        Svc.PluginInterface.UiBuilder.Draw += FPSLimiter.FPSLimit;
+        AutoCutsceneSkipper.Init(MiniTA.ProcessCutsceneSkip);
+        EzSharedData.TryGet("AutoRetainer.Started", out TimeLaunched, CreationMode.CreateAndKeep, [DateTimeOffset.Now.ToUnixTimeMilliseconds()]);
+        if (!C.NightModePersistent) C.NightMode = false;
+        ContextMenuManager = new();
+        PluginLog.Information($"AutoRetainer v{P.GetType().Assembly.GetName().Version} is ready.");
+        if (!EzSharedData.TryGet<object>("AutoRetainer.WasLoaded", out _) && C.MultiAutoStart)
+        {
+            MultiMode.PerformAutoStart();
+        }
+    }
 
     private void GameNetwork_NetworkMessage(nint dataPtr, ushort opCode, uint sourceActorId, uint targetActorId, NetworkMessageDirection direction)
     {
@@ -504,24 +503,24 @@ public unsafe class AutoRetainer : IDalamudPlugin
         {
             Safe(() => this.quickSellItems.Disable());
             Safe(() => this.quickSellItems.Dispose());
-            Svc.PluginInterface.UiBuilder.Draw -= FPSLimiter.FPSLimit;
-            Svc.PluginInterface.UiBuilder.Draw -= ws.Draw;
-            Svc.ClientState.Logout -= Logout;
-            Svc.Condition.ConditionChange -= ConditionChange;
-            Svc.Framework.Update -= Tick;
-            Svc.Toasts.ErrorToast -= Toasts_ErrorToast;
-            Svc.Toasts.Toast -= Toasts_Toast;
-            Svc.GameNetwork.NetworkMessage -= GameNetwork_NetworkMessage;
-            Safe(NewYesAlreadyManager.Unlock);
-            Safe(TextAdvanceManager.UnlockTA);
+            Safe(() => Svc.PluginInterface.UiBuilder.Draw -= FPSLimiter.FPSLimit);
+            Safe(() => Svc.PluginInterface.UiBuilder.Draw -= ws.Draw);
+            Safe(() => Svc.ClientState.Logout -= Logout);
+            Safe(() => Svc.Condition.ConditionChange -= ConditionChange);
+            Safe(() => Svc.Framework.Update -= Tick);
+            Safe(() => Svc.Toasts.ErrorToast -= Toasts_ErrorToast);
+            Safe(() => Svc.Toasts.Toast -= Toasts_Toast);
+            Safe(() => Svc.GameNetwork.NetworkMessage -= GameNetwork_NetworkMessage);
+            Safe(() => NewYesAlreadyManager.Unlock());
+            Safe(() => TextAdvanceManager.UnlockTA());
             Safe(() => StatisticsManager.Shutdown());
             Safe(() => AutoLogin.Dispose());
             Safe(() => Memory.Dispose());
-            Safe(IPC.Shutdown);
+            Safe(() => IPC.Shutdown());
             Safe(() => API.Dispose());
-            Safe(FPSManager.ForceRestore);
-            Safe(PriorityManager.RestorePriority);
-            Safe(VoyageMain.Shutdown);
+            Safe(() => FPSManager.ForceRestore());
+            Safe(() => PriorityManager.RestorePriority());
+            Safe(() => VoyageMain.Shutdown());
             Safe(() => ContextMenuManager.Dispose());
             PunishLibMain.Dispose();
             ECommonsMain.Dispose();

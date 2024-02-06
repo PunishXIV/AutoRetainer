@@ -115,6 +115,8 @@ internal unsafe class Config : IEzConfig
     public bool VoyageDisableCalcParallel = false;
     public bool VoyageDisableCalcMultithreading = false;
 
+    public bool LeastMBSFirst = false;
+
     public string DefaultSubmarineUnlockPlan = "";
 
     internal bool DontReassign

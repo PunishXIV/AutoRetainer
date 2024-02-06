@@ -171,7 +171,7 @@ internal static unsafe class WorkshopUI
                 .Union(data.GetVesselData(VoyageType.Submersible).Where(x => data.GetEnabledVesselsData(VoyageType.Submersible).Contains(x.Name)))
                 .Where(x => x.ReturnTime != 0).OrderBy(z => z.GetRemainingSeconds());
             //if (EzThrottler.Throttle("log")) PluginLog.Information($"{lst.Select(x => x.Name).Print()}");
-            var lowestVessel = C.MultiModeWorkshopConfiguration.MultiWaitForAll ? lst.LastOrDefault() : lst.FirstOrDefault();
+            var lowestVessel = C.MultiModeWorkshopConfiguration.MultiWaitForAll || data.MultiWaitForAllDeployables ? lst.LastOrDefault() : lst.FirstOrDefault();
             if (lowestVessel != default)
             {
                 var prog = 1f - ((float)lowestVessel.GetRemainingSeconds() / (60f * 60f * 24f));
