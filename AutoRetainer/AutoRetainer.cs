@@ -74,6 +74,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal NotificationMasterApi NotificationMasterApi;
     internal long[] TimeLaunched;
     internal ContextMenuManager ContextMenuManager;
+    public bool ReadOnly = false;
 
     internal static OfflineCharacterData Data => Utils.GetCurrentCharacterData();
 
@@ -84,12 +85,21 @@ public unsafe class AutoRetainer : IDalamudPlugin
             ECommonsMain.Init(pi, this, Module.DalamudReflector);
             PunishLibMain.Init(pi, Name, PunishOption.DefaultKoFi); // Default button
             P = this;
-            new TickScheduler(Load);
+            var cnt = Singleton.GetFFXIVCNT();
+            PluginLog.Information($"FFXIV instances: {cnt}");
+            if (Singleton.AcquireLock() || cnt <= 1)
+            {
+                new TickScheduler(Load);
+            }
+            else
+            {
+                new SingletonNotifyWindow();
+            }
         }
         //);
     }
 
-    void Load()
+    public void Load()
     {
         EzConfig.Migrate<Config>();
         config = EzConfig.Init<Config>();
@@ -501,6 +511,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     {
         //if (PluginLoader.IsLoaded)
         {
+            Safe(() => Singleton.ReleaseLock());
             Safe(() => this.quickSellItems.Disable());
             Safe(() => this.quickSellItems.Dispose());
             Safe(() => Svc.PluginInterface.UiBuilder.Draw -= FPSLimiter.FPSLimit);
