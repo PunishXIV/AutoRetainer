@@ -29,6 +29,7 @@ using ECommons.EzSharedDataManager;
 using AutoRetainer.UI.Experiments.Inventory;
 using ECommons.Reflection;
 using Dalamud.Interface.Internal.Notifications;
+using FFXIVClientStructs.FFXIV.Client.Game.UI;
 
 namespace AutoRetainer;
 
@@ -232,6 +233,22 @@ public unsafe class AutoRetainer : IDalamudPlugin
         {
             MultiMode.Enabled = !MultiMode.Enabled;
             MultiMode.OnMultiModeEnabled();
+        }
+        else if (arguments.StartsWithAny(StringComparison.OrdinalIgnoreCase, "m ", "multi "))
+        {
+            var arg2 = arguments.Split(" ")[1];
+            if(arg2.EqualsIgnoreCaseAny("d", "disable"))
+            {
+                if (MultiMode.Enabled) MultiMode.Enabled = false;
+            }
+            else if (arg2.EqualsIgnoreCaseAny("e", "enable"))
+            {
+                if (!MultiMode.Enabled)
+                {
+                    MultiMode.Enabled = true;
+                    MultiMode.OnMultiModeEnabled();
+                }
+            }
         }
         else if (arguments.EqualsIgnoreCaseAny("b", "browser"))
         {

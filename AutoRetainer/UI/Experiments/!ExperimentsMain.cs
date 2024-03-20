@@ -13,9 +13,8 @@ namespace AutoRetainer.UI.Experiments
         {
             ImGuiEx.EzTabBar("Experiments", [
                 ("Night mode", Night.Draw, null, true),
-                ("Gil display", GilDisplay.Draw, null, true),
-                ("FC points", FCPoints.Draw, null, true),
-                (C.IMDisplayTab?"Inventory management":null, InventoryManagement.Draw, null, true),
+                ("Inventory management", InventoryManagement.Draw, null, true),
+                //("GC Auto Delivery", GCAutoDelivery.Draw, null, true),
                 ]);
         }
     }

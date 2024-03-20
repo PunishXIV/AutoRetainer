@@ -22,7 +22,7 @@ internal unsafe static class VoyageUtils
 
     internal static uint[] Workshops = [Houses.Company_Workshop_Empyreum, Houses.Company_Workshop_The_Goblet, Houses.Company_Workshop_Mist, Houses.Company_Workshop_Shirogane, Houses.Company_Workshop_The_Lavender_Beds];
 
-    internal static bool ShouldEnterWorkshop() => (Data.WorkshopEnabled && Data.AreAnyEnabledVesselsReturnInNext(5 * 60, C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn)) || (Utils.GetReachableRetainerBell(false) == null);
+    internal static bool ShouldEnterWorkshop() => ((Data.WorkshopEnabled && Data.AreAnyEnabledVesselsReturnInNext(5 * 60, C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn)) || (Utils.GetReachableRetainerBell(false) == null)) && Player.IsInHomeWorld;
 
     internal static SubmarineUnlockPlan GetDefaultSubmarineUnlockPlan(bool New = true)
     {

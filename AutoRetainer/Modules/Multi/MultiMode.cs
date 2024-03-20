@@ -460,6 +460,17 @@ internal unsafe static class MultiMode
                 if (x.CID == Player.CID) continue;
                 if (x.WorkshopEnabled && x.GetEnabledVesselsData(VoyageType.Airship).Count + x.GetEnabledVesselsData(VoyageType.Submersible).Count > 0)
                 {
+                    if (x.AreAnyEnabledVesselsReturnInNext(0, C.MultiModeWorkshopConfiguration.MultiWaitForAll))
+                    {
+                        return x;
+                    }
+                }
+            }
+            foreach (var x in data)
+            {
+                if (x.CID == Player.CID) continue;
+                if (x.WorkshopEnabled && x.GetEnabledVesselsData(VoyageType.Airship).Count + x.GetEnabledVesselsData(VoyageType.Submersible).Count > 0)
+                {
                     if (x.AreAnyEnabledVesselsReturnInNext(C.MultiModeWorkshopConfiguration.AdvanceTimer, C.MultiModeWorkshopConfiguration.MultiWaitForAll))
                     {
                         return x;
@@ -469,6 +480,19 @@ internal unsafe static class MultiMode
         }
         if (EnabledRetainers)
         {
+            foreach (var x in data)
+            {
+                if (x.CID == Player.CID) continue;
+                if (x.Enabled && C.SelectedRetainers.TryGetValue(x.CID, out var enabledRetainers))
+                {
+                    var selectedRetainers = x.GetEnabledRetainers().Where(z => z.HasVenture);
+                    if (selectedRetainers.Any() &&
+                        C.MultiModeRetainerConfiguration.MultiWaitForAll ? selectedRetainers.All(z => z.GetVentureSecondsRemaining() <= 0) : selectedRetainers.Any(z => z.GetVentureSecondsRemaining() <= 0))
+                    {
+                        return x;
+                    }
+                }
+            }
             foreach (var x in data)
             {
                 if (x.CID == Player.CID) continue;
