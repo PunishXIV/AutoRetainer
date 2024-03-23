@@ -15,22 +15,24 @@ namespace AutoRetainer.UI.Settings.SettingsMain
         {
             if (ImGuiGroup.BeginGroupBox("Settings"))
             {
-                ImGui.SetNextItemWidth(100f);
-                ImGui.SliderInt("Time Desynchronization Compensation", ref C.UnsyncCompensation.ValidateRange(-60, 0), -10, 0);
+                ImGuiEx.SetNextItemWidthScaled(100f);
+                ImGuiEx.SliderInt("Time Desynchronization Compensation", ref C.UnsyncCompensation.ValidateRange(-60, 0), -10, 0);
                 ImGuiComponents.HelpMarker("Additional amount of seconds that will be subtracted from venture ending time to help mitigate possible issues of time desynchronization between the game and your PC. ");
                 ImGui.Checkbox($"Enable frame delay", ref C.UseFrameDelay);
-                ImGui.SetNextItemWidth(100f);
+                ImGuiEx.SetNextItemWidthScaled(100f);
                 if (!C.UseFrameDelay)
                 {
                     ImGuiEx.SliderIntAsFloat("Interaction Delay, seconds", ref C.Delay.ValidateRange(10, 1000), 20, 1000);
                 }
                 else
                 {
-                    ImGui.SliderInt("Interaction Delay, frames", ref C.FrameDelay.ValidateRange(2, 500), 2, 12);
+                    ImGuiEx.SliderInt("Interaction Delay, frames", ref C.FrameDelay.ValidateRange(2, 500), 2, 12);
                 }
                 ImGuiComponents.HelpMarker("The lower this value is the faster plugin will use actions. When dealing with low FPS or high latency you may want to increase this value. If you want the plugin to operate faster you may decrease it. ");
                 ImGui.Checkbox("Extra logging", ref C.ExtraDebug);
                 ImGuiComponents.HelpMarker("This option enables excessive logging for debugging purposes. It will spam your log and cause performance issues while enabled. This option will disable itself upon plugin reload or game restart.");
+
+
                 ImGuiGroup.EndGroupBox();
             };
             if (ImGuiGroup.BeginGroupBox("Operation"))
@@ -54,16 +56,9 @@ namespace AutoRetainer.UI.Settings.SettingsMain
                 }
                 ImGuiComponents.HelpMarker("Only reassign ventures that retainers are undertaking.");
 
-                var d = MultiMode.GetAutoAfkOpt() != 0;
-                if (d) ImGui.BeginDisabled();
                 ImGui.Checkbox("RetainerSense", ref C.RetainerSense);
                 ImGuiComponents.HelpMarker($"AutoRetainer will automatically enable itself when the player is within interaction range of a Summoning Bell. You must remain stationary or the activation will be cancelled.");
-                if (d)
-                {
-                    ImGui.EndDisabled();
-                    ImGuiComponents.HelpMarker("Using RetainerSense requires Auto-afk option to be turned off.");
-                }
-                ImGui.SetNextItemWidth(200f);
+                ImGuiEx.SetNextItemWidthScaled(200f);
                 ImGuiEx.SliderIntAsFloat("Activation Time", ref C.RetainerSenseThreshold, 1000, 100000);
                 ImGuiGroup.EndGroupBox();
             };
@@ -82,16 +77,20 @@ namespace AutoRetainer.UI.Settings.SettingsMain
                 ImGui.Separator();
                 TabLoginOverlay();
                 ImGui.Separator();
-                ImGui.SetNextItemWidth(100f);
+                ImGuiEx.SetNextItemWidthScaled(100f);
                 ImGui.InputInt($"Retainer list: remaining inventory slots warning", ref C.UIWarningRetSlotNum.ValidateRange(2, 1000));
-                ImGui.SetNextItemWidth(100f);
+                ImGuiEx.SetNextItemWidthScaled(100f);
                 ImGui.InputInt($"Retainer list: remaining ventures warning", ref C.UIWarningRetVentureNum.ValidateRange(2, 1000));
-                ImGui.SetNextItemWidth(100f);
+                ImGuiEx.SetNextItemWidthScaled(100f);
                 ImGui.InputInt($"Deployables list: remaining inventory slots warning", ref C.UIWarningDepSlotNum.ValidateRange(2, 1000));
-                ImGui.SetNextItemWidth(100f);
+                ImGuiEx.SetNextItemWidthScaled(100f);
                 ImGui.InputInt($"Deployables list: remaining fuel warning", ref C.UIWarningDepTanksNum.ValidateRange(20, 1000));
-                ImGui.SetNextItemWidth(100f);
+                ImGuiEx.SetNextItemWidthScaled(100f);
                 ImGui.InputInt($"Deployables list: remaining repair kit warning", ref C.UIWarningDepRepairNum.ValidateRange(5, 1000));
+                ImGui.Separator();
+                ImGui.Checkbox("Display only most significant icon in status bar", ref C.StatusBarMSI);
+                ImGuiEx.SetNextItemWidthScaled(100f);
+                ImGuiEx.SliderInt("Status bar icon size", ref C.StatusBarIconWidth, 32, 128);
                 ImGuiGroup.EndGroupBox();
             }
             if (ImGuiGroup.BeginGroupBox("Keybinds"))
@@ -105,10 +104,10 @@ namespace AutoRetainer.UI.Settings.SettingsMain
         static void TabLoginOverlay()
         {
             ImGui.Checkbox($"Display Login Overlay", ref C.LoginOverlay);
-            ImGui.SetNextItemWidth(150f);
-            if (ImGui.SliderFloat($"Login overlay scale multiplier", ref C.LoginOverlayScale.ValidateRange(0.1f, 5f), 0.2f, 2f)) P.LoginOverlay.bWidth = 0;
-            ImGui.SetNextItemWidth(150f);
-            if (ImGui.SliderFloat($"Login overlay button padding", ref C.LoginOverlayBPadding.ValidateRange(0.5f, 5f), 1f, 1.5f)) P.LoginOverlay.bWidth = 0;
+            ImGuiEx.SetNextItemWidthScaled(150f);
+            if (ImGuiEx.SliderFloat($"Login overlay scale multiplier", ref C.LoginOverlayScale.ValidateRange(0.1f, 5f), 0.2f, 2f)) P.LoginOverlay.bWidth = 0;
+            ImGuiEx.SetNextItemWidthScaled(150f);
+            if (ImGuiEx.SliderFloat($"Login overlay button padding", ref C.LoginOverlayBPadding.ValidateRange(0.5f, 5f), 1f, 1.5f)) P.LoginOverlay.bWidth = 0;
         }
 
         

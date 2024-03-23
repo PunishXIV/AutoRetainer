@@ -1,4 +1,5 @@
-﻿using AutoRetainer.Scheduler.Tasks;
+﻿using AutoRetainer.Internal;
+using AutoRetainer.Scheduler.Tasks;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Memory;
 using Dalamud.Utility;
@@ -58,7 +59,7 @@ internal static unsafe class VentureUtils
         }
     }
 
-    internal static void ProcessVenturePlanner(this SeRetainer ret, uint next)
+    internal static void ProcessVenturePlanner(this GameRetainerManager.Retainer ret, uint next)
     {
         if(next != 0)
         {

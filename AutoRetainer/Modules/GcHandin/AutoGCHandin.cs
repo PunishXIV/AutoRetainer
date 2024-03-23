@@ -210,7 +210,8 @@ internal unsafe static class AutoGCHandin
         try
         {
             return
-                IsAddonReady(GCSupplyListAddon)
+                GCSupplyListAddon != null
+                && IsAddonReady(GCSupplyListAddon)
                 && GCSupplyListAddon->UldManager.NodeListCount > 20
                 && GCSupplyListAddon->UldManager.NodeList[5]->IsVisible
                 && IsSelectedFilterValid(GCSupplyListAddon);

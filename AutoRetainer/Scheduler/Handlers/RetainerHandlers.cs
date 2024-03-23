@@ -14,6 +14,24 @@ namespace AutoRetainer.Scheduler.Handlers;
 
 internal unsafe static class RetainerHandlers
 {
+    internal static bool? ConfirmCantBuyback()
+    {
+        var yesno = Utils.GetSpecificYesno(Lang.WillBeUnableToProcessBuyback);
+        if (yesno != null)
+        {
+            if (Utils.GenericThrottle && EzThrottler.Throttle("WillBeUnableToProcessBuyback"))
+            {
+                ClickSelectYesNo.Using((nint)yesno).Yes();
+                return true;
+            }
+        }
+        if (TryGetAddonByName<AtkUnitBase>("RetainerList", out _))
+        {
+            return true;
+        }
+        return false;
+    }
+
     internal static bool? WaitForVentureListUpdate()
     {
         if (P.ListUpdateFrame > CSFramework.Instance()->FrameCounter - 10) return true;

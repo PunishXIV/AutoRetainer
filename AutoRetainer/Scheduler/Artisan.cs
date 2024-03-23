@@ -21,19 +21,21 @@ internal static class Artisan
         {
             if (IsCurrentlyOperating() && MultiMode.EnsureCharacterValidity(true))
             {
-                if(!SchedulerMain.PluginEnabled || SchedulerMain.Reason != PluginEnableReason.Artisan)
-                {
-                    SchedulerMain.EnablePlugin(PluginEnableReason.Artisan);
-                    DebugLog($"Enabling AutoRetainer because of Artisan integration");
-                }
                 try
                 {
-                    if (AnyRetainersAvailable())
+                    var bell = Utils.GetReachableRetainerBell(true);
+                    if (AnyRetainersAvailable() && bell != null)
                     {
                         if (!WasPaused)
                         {
                             WasPaused = true;
                             SetStopRequest(true);
+                        }
+
+                        if (!SchedulerMain.PluginEnabled || SchedulerMain.Reason != PluginEnableReason.Artisan)
+                        {
+                            SchedulerMain.EnablePlugin(PluginEnableReason.Artisan);
+                            DebugLog($"Enabling AutoRetainer because of Artisan integration");
                         }
                     }
                 }

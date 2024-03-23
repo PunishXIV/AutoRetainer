@@ -1,6 +1,9 @@
 ﻿using AutoRetainerAPI;
 using AutoRetainerAPI.Configuration;
+using ECommons.Reflection;
+using NotificationMasterAPI;
 using System.Diagnostics.Metrics;
+using System.Reflection;
 
 namespace AutoRetainer.Modules;
 
@@ -99,7 +102,16 @@ internal static class IPC
         var index = C.OfflineData.IndexOf(x => x.CID == OCD.CID);
         if (index != -1)
         {
-            C.OfflineData[index] = OCD;
+            //C.OfflineData[index] = OCD;
+            var data = C.OfflineData[index];
+            foreach (var field in OCD.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (data.GetFoP(field.Name) != null)
+                {
+                    data.SetFoP(field.Name, field.GetValue(OCD));
+                    PluginLog.Verbose($"Setting {field.Name} to {field.GetValue(data)}");
+                }
+            }
         }
         else
         {
@@ -114,7 +126,15 @@ internal static class IPC
 
     static void SetARD(ulong cid, string name, AdditionalRetainerData data)
     {
-        C.AdditionalData[Utils.GetAdditionalDataKey(cid, name)] = data;
+        var x = C.AdditionalData[Utils.GetAdditionalDataKey(cid, name)];
+        foreach (var field in data.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance))
+        {
+            if (x.GetFoP(field.Name) != null)
+            {
+                x.SetFoP(field.Name, field.GetValue(data));
+                PluginLog.Verbose($"Setting {field.Name} to {field.GetValue(data)}");
+            }
+        }
     }
 
     static void SetVenture(uint VentureID)

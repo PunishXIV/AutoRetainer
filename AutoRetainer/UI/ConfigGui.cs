@@ -6,6 +6,7 @@ using AutoRetainerAPI.Configuration;
 using AutoRetainerAPI;
 using AutoRetainer.Modules.Voyage;
 using AutoRetainer.UI.Settings.SettingsMain;
+using ECommons.Events;
 
 namespace AutoRetainer.UI;
 
@@ -29,7 +30,34 @@ unsafe internal class ConfigGui : Window
             P.StylePushed = true;
         }
         var prefix = SchedulerMain.PluginEnabled ? $" [{SchedulerMain.Reason}]" : "";
-        this.WindowName = $"{P.Name} {P.GetType().Assembly.GetName().Version}{prefix}###AutoRetainer";
+        var tokenRem = TimeSpan.FromMilliseconds(P.TimeLaunched[0] + 3*24*60*60*1000 - DateTimeOffset.Now.ToUnixTimeMilliseconds());
+        this.WindowName = $"{P.Name} {P.GetType().Assembly.GetName().Version}{prefix} | {FormatToken(tokenRem)}###AutoRetainer";
+    }
+
+    string FormatToken(TimeSpan time)
+    {
+        if (time.TotalMilliseconds > 0)
+        {
+            if (time.Days > 0)
+            {
+                return $"Session expires in {time.Days} day{(time.Days == 1 ? "" : "s")}" + (time.Hours>0?$" {time.Hours} hours":"");
+            }
+            else
+            {
+                if (time.Hours > 0)
+                {
+                    return $"Session expires in {time.Hours} hours";
+                }
+                else
+                {
+                    return $"Session expires in less than an hour";
+                }
+            }
+        }
+        else
+        {
+            return "Session expired";
+        }
     }
 
     public override void Draw()
@@ -75,10 +103,18 @@ unsafe internal class ConfigGui : Window
         {
             MultiMode.OnMultiModeEnabled();
         }
+        if (C.ShowNightMode)
+        {
+            ImGui.SameLine();
+            if (ImGui.Checkbox("Night", ref C.NightMode))
+            {
+                MultiMode.BailoutNightMode();
+            }
+        }
         if (C.DisplayMMType)
         {
             ImGui.SameLine();
-            ImGui.SetNextItemWidth(100f);
+            ImGuiEx.SetNextItemWidthScaled(100f);
             ImGuiEx.EnumCombo("##mode", ref C.MultiModeType);
         }
         if (C.CharEqualize && MultiMode.Enabled)

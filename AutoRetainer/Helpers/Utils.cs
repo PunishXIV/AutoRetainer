@@ -1,4 +1,5 @@
-﻿using AutoRetainer.Modules.Voyage;
+﻿using AutoRetainer.Internal;
+using AutoRetainer.Modules.Voyage;
 using AutoRetainerAPI.Configuration;
 using ClickLib.Clicks;
 using Dalamud;
@@ -17,6 +18,8 @@ using ECommons.MathHelpers;
 using ECommons.Reflection;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Client.Game.Housing;
+using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -29,6 +32,59 @@ namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
+    internal static int FCPoints => *(int*)((nint)AgentModule.Instance()->GetAgentByInternalId(AgentId.FreeCompanyCreditShop) + 256);
+
+    internal static float AnimationLock => *(float*)((nint)ActionManager.Instance() + 8);
+
+    internal static bool IsSureNotInFcTerritory()
+    {
+        var h = HousingManager.Instance();
+        if (h->OutdoorTerritory != null)
+        {
+            var success = false;
+            for (int i = 0; i < 30; i++)
+            {
+                if(P.Memory.OutdoorTerritory_IsEstateResident((nint)h->OutdoorTerritory, (byte)i) == 1) success = true;
+            }
+            if (!success) return false;
+        }
+        if (GetFCHouseTerritory() == GetPrivateHouseTerritory()) return false;
+        return Player.Territory != GetFCHouseTerritory();
+    }
+
+    internal static bool IsSureNotInPrivateTerritory()
+    {
+        var h = HousingManager.Instance();
+        if (h->OutdoorTerritory != null)
+        {
+            var success = false;
+            for (int i = 0; i < 30; i++)
+            {
+                if (P.Memory.OutdoorTerritory_IsEstateResident((nint)h->OutdoorTerritory, (byte)i) == 1) success = true;
+            }
+            if (!success) return false;
+        }
+        if (GetFCHouseTerritory() == GetPrivateHouseTerritory()) return false;
+        return Player.Territory != GetPrivateHouseTerritory();
+    }
+
+    internal static uint GetFCHouseTerritory()
+    {
+        foreach(var x in Svc.AetheryteList) 
+        {
+            if (HouseEnterTask.FCAetherytes.Contains(x.AetheryteId) && !x.IsAppartment && !x.IsSharedHouse) return x.TerritoryId;
+        }
+        return 0;
+    }
+
+    internal static uint GetPrivateHouseTerritory()
+    {
+        foreach (var x in Svc.AetheryteList)
+        {
+            if (HouseEnterTask.PrivateAetherytes.Contains(x.AetheryteId) && !x.IsAppartment && !x.IsSharedHouse) return x.TerritoryId;
+        }
+        return 0;
+    }
 
     internal static int LoadedItems => AtkStage.GetSingleton()->GetNumberArrayData()[36]->IntArray[401];
 
@@ -509,8 +565,8 @@ internal static unsafe class Utils
         var currentDistance = float.MaxValue;
         GameObject currentObject = null;
 
-        var fcOverride = Data.FCHouseEntrance == default ? null : GetEntranceAtLocation(Data.FCHouseEntrance);
-        var pOverride = Data.FCHouseEntrance == default ? null : GetEntranceAtLocation(Data.PHouseEntrance);
+        var fcOverride = Data.FreeCompanyHouseEntrance == null ? null : GetEntranceAtLocation(Data.FreeCompanyHouseEntrance.Entrance);
+        var pOverride = Data.PrivateHouseEntrance == null ? null : GetEntranceAtLocation(Data.PrivateHouseEntrance.Entrance);
 
         if(fcOverride != null && pOverride != null)
         {
@@ -697,7 +753,7 @@ internal static unsafe class Utils
             && o.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName);
     }
 
-    internal static long GetVentureSecondsRemaining(this SeRetainer ret, bool allowNegative = true)
+    internal static long GetVentureSecondsRemaining(this GameRetainerManager.Retainer ret, bool allowNegative = true)
     {
         var x = ret.VentureCompleteTimeStamp - P.Time;
         return allowNegative ? x : Math.Max(0, x);
@@ -709,16 +765,16 @@ internal static unsafe class Utils
         return allowNegative ? x : Math.Max(0, x);
     }
 
-    internal static bool TryGetRetainerByName(string name, out SeRetainer retainer)
+    internal static bool TryGetRetainerByName(string name, out GameRetainerManager.Retainer retainer)
     {
-        if (!P.retainerManager.Ready)
+        if (!GameRetainerManager.Ready)
         {
             retainer = default;
             return false;
         }
-        for (var i = 0; i < P.retainerManager.Count; i++)
+        for (var i = 0; i < GameRetainerManager.Count; i++)
         {
-            var r = P.retainerManager.Retainer(i);
+            var r = GameRetainerManager.Retainers[i];
             if (r.Name.ToString() == name)
             {
                 retainer = r;
@@ -753,13 +809,13 @@ internal static unsafe class Utils
     internal static bool TryParseRetainerName(string s, out string retainer)
     {
         retainer = default;
-        if (!P.retainerManager.Ready)
+        if (!GameRetainerManager.Ready)
         {
             return false;
         }
-        for (var i = 0; i < P.retainerManager.Count; i++)
+        for (var i = 0; i < GameRetainerManager.Count; i++)
         {
-            var r = P.retainerManager.Retainer(i);
+            var r = GameRetainerManager.Retainers[i];
             var rname = r.Name.ToString();
             if (s.Contains(rname) && (retainer == null || rname.Length > retainer.Length))
             {

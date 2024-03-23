@@ -22,8 +22,14 @@ internal unsafe static class VoyageUtils
 
     internal static uint[] Workshops = [Houses.Company_Workshop_Empyreum, Houses.Company_Workshop_The_Goblet, Houses.Company_Workshop_Mist, Houses.Company_Workshop_Shirogane, Houses.Company_Workshop_The_Lavender_Beds];
 
-    internal static bool ShouldEnterWorkshop() => Data.AreAnyEnabledVesselsReturnInNext(5 * 60, C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn) || (Utils.GetReachableRetainerBell(false) == null);
+    internal static bool ShouldEnterWorkshop() => ((Data.WorkshopEnabled && Data.AreAnyEnabledVesselsReturnInNext(5 * 60, C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn)) || (Utils.GetReachableRetainerBell(false) == null)) && Player.IsInHomeWorld;
 
+    internal static SubmarineUnlockPlan GetDefaultSubmarineUnlockPlan(bool New = true)
+    {
+        var ret = C.SubmarineUnlockPlans.FirstOrDefault(x => x.GUID == C.DefaultSubmarineUnlockPlan);
+        if (ret == null && New) return new();
+        return ret;
+    }
 
     internal static bool IsNotEnoughSubmarinesEnabled(this OfflineCharacterData data)
     {
@@ -102,6 +108,8 @@ internal unsafe static class VoyageUtils
     {
         var w = HousingManager.Instance()->WorkshopTerritory;
         if (w == null) return null;
+        var adata = GetAdditionalVesselData(Data, name, type);
+        if (adata.IndexOverride > 0) return adata.IndexOverride - 1;
         if (type == VoyageType.Airship)
         {
             var v = w->Airship.DataListSpan;
@@ -357,9 +365,9 @@ internal unsafe static class VoyageUtils
     internal static bool IsRetainerBlockedByVoyage()
     {
         if (C.DisableRetainerVesselReturn == 0) return false;
-        foreach(var x in C.OfflineData)
+        foreach(var x in C.OfflineData.Where(x => x.WorkshopEnabled))
         {
-            if (x.AreAnyEnabledVesselsReturnInNext(C.DisableRetainerVesselReturn * 60)) return true;
+            if (x.WorkshopEnabled && x.AreAnyEnabledVesselsReturnInNext(C.DisableRetainerVesselReturn * 60)) return true;
         }
         return false;
     }
@@ -436,7 +444,7 @@ internal unsafe static class VoyageUtils
             throw new ArgumentOutOfRangeException(nameof(type));
         }
         var index = begin + slotIndex;
-        var slot = InventoryManager.Instance()->GetInventoryContainer(itype)->GetInventorySlot(index);
+        var slot = FFXIVClientStructs.FFXIV.Client.Game.InventoryManager.Instance()->GetInventoryContainer(itype)->GetInventorySlot(index);
         return slot;
     }
 
@@ -546,16 +554,36 @@ internal unsafe static class VoyageUtils
         var v = data.GetVesselData(type).Where(x => data.IsVesselAvailable(x, type) && data.GetEnabledVesselsData(type).Contains(x.Name));
         if (v.Any())
         {
-            return v.First().Name;
+            return v.FirstOrDefault(x => x.ReturnTime != 0)?.Name ?? v.First().Name;
         }
         return null;
     }
 
-    internal static bool AreAnyEnabledVesselsReturnInNext(this OfflineCharacterData data, int seconds, bool all = false) => data.AreAnyEnabledVesselsReturnInNext(VoyageType.Airship, seconds, all) || data.AreAnyEnabledVesselsReturnInNext(VoyageType.Submersible, seconds, all);
+    internal static bool AreAnyEnabledVesselsReturnInNext(this OfflineCharacterData data, int seconds, bool all = false, bool ignorePerCharaSetting = false) => data.AreAnyEnabledVesselsReturnInNext(VoyageType.Airship, seconds, all, ignorePerCharaSetting) || data.AreAnyEnabledVesselsReturnInNext(VoyageType.Submersible, seconds, all, ignorePerCharaSetting);
 
-    internal static bool AreAnyEnabledVesselsReturnInNext(this OfflineCharacterData data, VoyageType type, int seconds, bool all = false)
+    internal static bool CheckVesselForWaitTreshold(this OfflineCharacterData data, VoyageType type, int seconds)
     {
-        if (all)
+        if (C.MultiModeWorkshopConfiguration.MaxMinutesOfWaiting == 0) return true;
+        var completedVesselExists = false;
+        var upcomingVesselExists = false;
+        foreach(var x in data.GetVesselData(type))
+        {
+            if (x.GetRemainingSeconds() < seconds)
+            {
+                completedVesselExists = true;
+            }
+            else if(x.GetRemainingSeconds() < C.MultiModeWorkshopConfiguration.MaxMinutesOfWaiting * 60)
+            {
+                upcomingVesselExists = true;
+            }
+        }
+        if (completedVesselExists && !upcomingVesselExists) return false;
+        return true;
+    }
+
+    internal static bool AreAnyEnabledVesselsReturnInNext(this OfflineCharacterData data, VoyageType type, int seconds, bool all = false, bool ignorePerCharaSetting = false)
+    {
+        if ((all || (!ignorePerCharaSetting && data.MultiWaitForAllDeployables)) && data.CheckVesselForWaitTreshold(type, seconds))
         {
             var v = data.GetVesselData(type).Where(x => data.GetEnabledVesselsData(type).Contains(x.Name));
             return v.Any() && v.All(x => data.IsVesselAvailable(x, type, seconds));

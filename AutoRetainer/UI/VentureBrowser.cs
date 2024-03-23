@@ -83,12 +83,12 @@ internal class VentureBrowser : Window
             {
                 ImGuiEx.TextV($"{Lang.CharLevel}:");
                 ImGui.SameLine();
-                ImGui.SetNextItemWidth(50f);
+                ImGuiEx.SetNextItemWidthScaled(50f);
                 ImGui.DragInt("##minL", ref minLevel, 1, 1, 90);
                 ImGui.SameLine();
                 ImGuiEx.Text($"-");
                 ImGui.SameLine();
-                ImGui.SetNextItemWidth(50f);
+                ImGuiEx.SetNextItemWidthScaled(50f);
                 ImGui.DragInt("##maxL", ref maxLevel, 1, 1, 90);
             });
             if(adata.Gathering == -1 || adata.Perception == -1 || adata.Ilvl == -1 || SelectedRetainer.Level == 0)

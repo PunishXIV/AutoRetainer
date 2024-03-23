@@ -75,19 +75,19 @@ internal unsafe class Calculator
                         }
                     }
 
-                    var allPaths = paths.AsParallel().Select(t => t.Select(f => valid.FirstOrDefault(k => k.RowId == f) ?? startPoint)).ToList();
+                    var allPaths = C.VoyageDisableCalcParallel? paths.Select(t => t.Select(f => valid.FirstOrDefault(k => k.RowId == f) ?? startPoint)).ToList():paths.AsParallel().Select(t => t.Select(f => valid.FirstOrDefault(k => k.RowId == f) ?? startPoint)).ToList();
 
                     if (!allPaths.Any())
                     {
                         return null;
                     }
 
-                    distances = allPaths.AsParallel().Select(Voyage.CalculateDistance).ToArray();
+                    distances = C.VoyageDisableCalcParallel? allPaths.Select(Voyage.CalculateDistance).ToArray():allPaths.AsParallel().Select(Voyage.CalculateDistance).ToArray();
                     mapDictionary.AddOrUpdate(highestRank, distances, (k, v) => distances);
                 }
 
                 var build = routeBuild.GetSubmarineBuild;
-                var optimalDistances = distances.AsParallel().Where(t => t.Item1 <= build.Range && t.Item2.ContainsAllItems(MustInclude)).ToArray();
+                var optimalDistances = C.VoyageDisableCalcParallel? distances.Where(t => t.Item1 <= build.Range && t.Item2.ContainsAllItems(MustInclude)).ToArray():distances.AsParallel().Where(t => t.Item1 <= build.Range && t.Item2.ContainsAllItems(MustInclude)).ToArray();
                 if (!optimalDistances.Any())
                 {
                     return null;

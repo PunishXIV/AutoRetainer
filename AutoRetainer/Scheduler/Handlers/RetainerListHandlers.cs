@@ -1,4 +1,5 @@
-﻿using AutoRetainer.Scheduler.Tasks;
+﻿using AutoRetainer.Internal.InventoryManagement;
+using AutoRetainer.Scheduler.Tasks;
 using ClickLib.Clicks;
 using ECommons.UIHelpers.Implementations;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -10,6 +11,7 @@ internal unsafe static class RetainerListHandlers
     internal static bool? SelectRetainerByName(string name)
     {
         TaskWithdrawGil.forceCheck = false;
+        InventorySpaceManager.SellSlotTasks.Clear();
         if (name.IsNullOrEmpty())
         {
             throw new Exception($"Name can not be null or empty");

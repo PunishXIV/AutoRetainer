@@ -40,18 +40,18 @@ namespace AutoRetainer.UI.Settings.SettingsMain
 
                 ImGuiEx.TextV($"Rank:");
                 ImGui.SameLine();
-                ImGui.SetNextItemWidth(60f);
+                ImGuiEx.SetNextItemWidthScaled(60f);
                 ImGui.DragInt("##rank1", ref MinLevel, 0.1f);
                 ImGui.SameLine();
                 ImGuiEx.Text($"-");
                 ImGui.SameLine();
-                ImGui.SetNextItemWidth(60f);
+                ImGuiEx.SetNextItemWidthScaled(60f);
                 ImGui.DragInt("##rank2", ref MaxLevel, 0.1f);
                 ImGuiEx.TextV($"Configurations:");
                 ImGui.SameLine();
                 ImGui.Checkbox($"NOT", ref InvertConf);
                 ImGui.SameLine();
-                ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - 100f);
+                ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - 100f.Scale());
                 ImGui.InputText($"##conf", ref Conf, 3000);
                 ImGui.SameLine();
                 if (ImGui.Button("Add"))

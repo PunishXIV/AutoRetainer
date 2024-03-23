@@ -58,6 +58,8 @@ internal unsafe class AutoLogin
 
     internal void Login(string WorldName, string characterName, uint charaWorld, int serviceAccount)
     {
+        BailoutManager.IsLogOnTitleEnabled = false;
+        RecordLastData(WorldName, characterName, charaWorld, serviceAccount);
         this.charaWorld = charaWorld;
         var world = Svc.Data.Excel.GetSheet<World>()?.FirstOrDefault(w => w.Name.ToDalamudString().TextValue.Equals(WorldName, StringComparison.InvariantCultureIgnoreCase));
 
@@ -95,8 +97,23 @@ internal unsafe class AutoLogin
         actionQueue.Enqueue(ClearTemp);
     }
 
+    internal string LastCharacter;
+    internal string LastWorld;
+    internal uint LastCharaWorld;
+    internal int LastServiceAccount;
+
+    void RecordLastData(string WorldName, string characterName, uint charaWorld, int serviceAccount)
+    {
+        LastCharacter = characterName;
+        LastWorld = WorldName;
+        LastCharaWorld = charaWorld;
+        LastServiceAccount = serviceAccount;
+    }
+
     internal void SwapCharacter(string WorldName, string characterName, uint charaWorld, int serviceAccount)
     {
+        BailoutManager.IsLogOnTitleEnabled = false;
+        RecordLastData(WorldName, characterName, charaWorld, serviceAccount);
         this.charaWorld = charaWorld;
         var world = Svc.Data.Excel.GetSheet<World>()?.FirstOrDefault(w => w.Name.ToDalamudString().TextValue.Equals(WorldName, StringComparison.InvariantCultureIgnoreCase));
 
@@ -175,8 +192,6 @@ internal unsafe class AutoLogin
             Delay -= 1;
             return;
         }
-
-
 
         if (sw.ElapsedMilliseconds > 60000)
         {
@@ -349,11 +364,11 @@ internal unsafe class AutoLogin
     }
 
 
-    private uint? tempDc = null;
-    private uint? tempWorld = null;
-    private string? tempCharacter = null;
-    private uint charaWorld = 0;
-    private int tempServiceAccount = 0;
+    internal uint? tempDc = null;
+    internal uint? tempWorld = null;
+    internal string? tempCharacter = null;
+    internal uint charaWorld = 0;
+    internal int tempServiceAccount = 0;
 
     internal void DrawUI()
     {

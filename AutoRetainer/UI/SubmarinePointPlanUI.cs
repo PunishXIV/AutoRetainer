@@ -111,14 +111,14 @@ internal unsafe class SubmarinePointPlanUI : Window
             {
                 if (ImGui.Button($"Copy plan settings"))
                 {
-                    ImGui.SetClipboardText(JsonConvert.SerializeObject(SelectedPlan));
+                    Copy(JsonConvert.SerializeObject(SelectedPlan));
                 }
                 ImGui.SameLine();
                 if (ImGui.Button($"Paste plan settings"))
                 {
                     try
                     {
-                        SelectedPlan.CopyFrom(JsonConvert.DeserializeObject<SubmarinePointPlan>(ImGui.GetClipboardText()));
+                        SelectedPlan.CopyFrom(JsonConvert.DeserializeObject<SubmarinePointPlan>(Paste()));
                     }
                     catch (Exception ex)
                     {

@@ -46,14 +46,14 @@ internal class DuplicateBlacklistSelector() : Window("Entrust duplicates blackli
             ImGuiEx.Text($"Item transfer blacklist:");
             if(ImGui.Button("Copy to clipboard"))
             {
-                ImGui.SetClipboardText(JsonConvert.SerializeObject(SelectedData.TransferItemsBlacklist));
+                Copy(JsonConvert.SerializeObject(SelectedData.TransferItemsBlacklist));
             }
             ImGui.SameLine();
             if(ImGuiEx.ButtonCtrl("Paste from clipboard"))
             {
                 try
                 {
-                    SelectedData.TransferItemsBlacklist = JsonConvert.DeserializeObject<List<uint>>(ImGui.GetClipboardText());
+                    SelectedData.TransferItemsBlacklist = JsonConvert.DeserializeObject<List<uint>>(Paste());
                 }
                 catch(Exception e)
                 {

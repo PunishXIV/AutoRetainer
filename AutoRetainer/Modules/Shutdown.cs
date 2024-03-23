@@ -24,43 +24,52 @@ namespace AutoRetainer.Modules
             {
                 if(Environment.TickCount64 > ShutdownAt && Player.Available)
                 {
-                    if(MultiMode.Enabled)
+                    if (C.ShutdownMakesNightMode)
                     {
-                        MultiMode.Enabled = false;
-                    }
-
-                    if(!VoyageScheduler.Enabled && !SchedulerMain.PluginEnabled && !P.TaskManager.IsBusy)
-                    {
+                        C.NightMode = true;
                         ShutdownAt = 0;
-                        P.TaskManager.Enqueue(() =>
+                        ForceShutdownAt = 0;
+                    }
+                    else
+                    {
+                        if (MultiMode.Enabled)
                         {
-                            if (EzThrottler.Throttle("SendChat"))
-                            {
-                                Chat.Instance.SendMessage("/shutdown");
-                                return true;
-                            }
-                            return false;
-                        });
-                        P.TaskManager.Enqueue(() =>
+                            MultiMode.Enabled = false;
+                        }
+
+                        if (!VoyageScheduler.Enabled && !SchedulerMain.PluginEnabled && !P.TaskManager.IsBusy)
                         {
-                            var yesno = Utils.GetSpecificYesno(Lang.LogOutAndExitGame);
-                            if(yesno != null)
+                            ShutdownAt = 0;
+                            P.TaskManager.Enqueue(() =>
                             {
-                                if (EzThrottler.Throttle("ClickExit"))
+                                if (EzThrottler.Throttle("SendChat"))
                                 {
-                                    ClickSelectYesNo.Using((nint)yesno).Yes();
+                                    Chat.Instance.SendMessage("/shutdown");
                                     return true;
                                 }
-                            }
-                            return false;
-                        });
-                    }
+                                return false;
+                            });
+                            P.TaskManager.Enqueue(() =>
+                            {
+                                var yesno = Utils.GetSpecificYesno(Lang.LogOutAndExitGame);
+                                if (yesno != null)
+                                {
+                                    if (EzThrottler.Throttle("ClickExit"))
+                                    {
+                                        ClickSelectYesNo.Using((nint)yesno).Yes();
+                                        return true;
+                                    }
+                                }
+                                return false;
+                            });
+                        }
 
-                    if(ForceShutdownAt  != 0)
-                    {
-                        if(Environment.TickCount64 > ForceShutdownAt)
+                        if (ForceShutdownAt != 0)
                         {
-                            Environment.Exit(0);
+                            if (Environment.TickCount64 > ForceShutdownAt)
+                            {
+                                Environment.Exit(0);
+                            }
                         }
                     }
                 }

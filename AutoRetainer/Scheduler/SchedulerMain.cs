@@ -1,4 +1,6 @@
-﻿using AutoRetainer.Scheduler.Handlers;
+﻿using AutoRetainer.Internal;
+using AutoRetainer.Internal.InventoryManagement;
+using AutoRetainer.Scheduler.Handlers;
 using AutoRetainer.Scheduler.Tasks;
 using AutoRetainerAPI.Configuration;
 using ECommons.Throttlers;
@@ -50,15 +52,13 @@ internal unsafe static class SchedulerMain
     {
         if (PluginEnabled)
         {
-            if (C.RetainerSense && MultiMode.GetAutoAfkOpt() != 0)
+            if (C.RetainerSense)
             {
-                C.RetainerSense = false;
-                DuoLog.Warning("Using RetainerSense requires Auto-afk option to be turned off. That option has been automatically disabled.");
+                MultiMode.ValidateAutoAfkSettings();
             }
-            if (C.OldRetainerSense && MultiMode.GetAutoAfkOpt() != 0)
+            if (C.OldRetainerSense)
             {
-                C.OldRetainerSense = false;
-                DuoLog.Warning("Using old RetainerSense requires Auto-afk option to be turned off. That option has been automatically disabled.");
+                MultiMode.ValidateAutoAfkSettings();
             }
             if (TryGetAddonByName<AtkUnitBase>("RetainerList", out var addon) && addon->IsVisible)
             {
@@ -76,6 +76,12 @@ internal unsafe static class SchedulerMain
                                     P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(retainer));
 
                                     var adata = Utils.GetAdditionalData(Svc.ClientState.LocalContentId, ret.Name.ToString());
+
+                                    if (C.IMEnableAutoVendor)
+                                    {
+                                        TaskVendorItems.Enqueue();
+                                    }
+
                                     VentureOverride = 0;
 
                                     IPC.FireSendRetainerToVentureEvent(retainer);
@@ -176,6 +182,11 @@ internal unsafe static class SchedulerMain
                                         }
                                     }
 
+                                    if (C.IMEnableAutoVendor)
+                                    {
+                                        TaskVendorItems.Enqueue();
+                                    }
+
                                     //fire event, let other plugins deal with retainer
                                     TaskPostprocessRetainerIPC.Enqueue(retainer);
 
@@ -184,6 +195,7 @@ internal unsafe static class SchedulerMain
                                         TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
                                     }
                                     P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
+                                    P.TaskManager.Enqueue(RetainerHandlers.ConfirmCantBuyback);
                                 }
                             }
                             else
@@ -199,12 +211,13 @@ internal unsafe static class SchedulerMain
                                         DebugLog($"Scheduling closing and disabling plugin as MultiMode is running");
                                         P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
                                         P.TaskManager.Enqueue(DisablePlugin);
+                                        if (C.IMEnableCofferAutoOpen) TaskOpenAllCoffers.Enqueue();
                                     }
                                     else if (Reason == PluginEnableReason.Artisan)
                                     {
-                                        DebugLog($"Scheduling closing  as Artisan is running");
+                                        DebugLog($"Scheduling closing as Artisan is running");
                                         P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
-                                        //P.TaskManager.Enqueue(DisablePlugin);
+                                        P.TaskManager.Enqueue(DisablePlugin);
                                     }
                                     else
                                     {
@@ -306,11 +319,15 @@ internal unsafe static class SchedulerMain
 
     static internal string GetNextRetainerName()
     {
-        if (P.retainerManager.Ready)
+        if (GameRetainerManager.Ready)
         {
             if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var cdata))
             {
-                var retainerData = cdata.ShowRetainersInDisplayOrder ? cdata.RetainerData.OrderBy(x => x.DisplayOrder).ToList() : cdata.RetainerData;
+                var retainerData = cdata.ShowRetainersInDisplayOrder ? [.. cdata.RetainerData.OrderBy(x => x.DisplayOrder)] : cdata.RetainerData;
+                if (C.LeastMBSFirst)
+                {
+                    retainerData = [.. cdata.RetainerData.OrderBy(x => x.MBItems)];
+                }
 
                 for (var i = 0; i < retainerData.Count; i++)
                 {

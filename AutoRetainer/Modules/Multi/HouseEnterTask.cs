@@ -9,23 +9,26 @@ using ECommons.GameHelpers;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using System.Diagnostics;
 
 namespace AutoRetainer.Modules.Multi;
 
 internal unsafe static class HouseEnterTask
 {
-    static readonly uint[] FCAetherytes = [56, 57, 58, 96, 164];
-    static readonly uint[] PrivateAetherytes = [59,60,61,97,165];
-    internal static void EnqueueTask(bool ignoreTeleportZoneCheck = false)
+    internal static readonly uint[] FCAetherytes = [56, 57, 58, 96, 164];
+    internal static readonly uint[] PrivateAetherytes = [59,60,61,97,165];
+    internal static void EnqueueTask(bool ignoreTeleportZoneCheck = false, bool noTeleport = false)
     {
+        PluginLog.Debug($"Enqueued HouseEnterTast(ignoreTeleportZoneCheck={ignoreTeleportZoneCheck}) from {new StackTrace().GetFrames().Select(x => x.GetMethod()?.Name).Prepend("      ").Print("\n")}");
         P.TaskManager.Enqueue(NewYesAlreadyManager.WaitForYesAlreadyDisabledTask);
-        P.TaskManager.Enqueue(() =>
+        if(!noTeleport) P.TaskManager.Enqueue(() =>
         {
-            if ((Data.TeleportToFCHouse || Data.TeleportToRetainerHouse) && (!Svc.ClientState.TerritoryType.EqualsAny([.. ResidentalAreas.List, .. Houses.List, .. VoyageUtils.Workshops.Select(x => (ushort)x)]) || ignoreTeleportZoneCheck))
+            if ((Data.TeleportToFCHouse || Data.TeleportToRetainerHouse) && (!Player.Territory.EqualsAny([Utils.GetFCHouseTerritory(), Utils.GetPrivateHouseTerritory(), .. VoyageUtils.Workshops]) || ignoreTeleportZoneCheck))
             {
                 P.TaskManager.EnqueueImmediate(() => Player.Interactable, $"WaitForPlayerInteractable");
                 var canTpToFc = (Data.TeleportToFCHouse && !MultiMode.IsCurrentCharacterCaptainDone()) || (Data.TeleportToRetainerHouse && Data.HouseTeleportTarget == HouseTeleportTarget.Free_Company_Estate_Hall);
                 var canTpToPrivate = (Data.TeleportToRetainerHouse && Data.HouseTeleportTarget == HouseTeleportTarget.Private_Estate_Hall);
+                var canTpToApartment = (Data.TeleportToRetainerHouse && Data.HouseTeleportTarget == HouseTeleportTarget.Apartment);
                 if (canTpToFc)
                 {
                     P.TaskManager.EnqueueImmediate(() => TeleportTo(FCAetherytes), $"TeleportTo(FCAetherytes)");
@@ -33,6 +36,10 @@ internal unsafe static class HouseEnterTask
                 else if (canTpToPrivate)
                 {
                     P.TaskManager.EnqueueImmediate(() => TeleportTo(PrivateAetherytes), "TeleportTo(PrivateAetherytes)");
+                }
+                else if (canTpToApartment)
+                {
+                    P.TaskManager.EnqueueImmediate(() => TeleportTo("Apartment"), "TeleportTo(Apartment)");
                 }
                 P.TaskManager.EnqueueImmediate(() => Player.Interactable && Svc.ClientState.TerritoryType.EqualsAny(ResidentalAreas.List), 1000 * 60, "WaitUntilArrival");
             }
@@ -61,6 +68,76 @@ internal unsafe static class HouseEnterTask
             return true;
         }, "Master HET");
         TaskEnterWorkshop.Enqueue();
+    }
+
+    internal static void EnqueueForcedTeleport()
+    {
+        if (Data.WorkshopEnabled && Data.AreAnyEnabledVesselsReturnInNext(60 * 60, C.MultiModeWorkshopConfiguration.MultiWaitForAll))
+        {
+            if(((Data.FreeCompanyHouseEntrance != null && !Data.FreeCompanyHouseEntrance.Descriptor.IsInThisHouse()) || Utils.IsSureNotInFcTerritory()) && Utils.GetFCHouseTerritory() != 0)
+            {
+                EnqueueForcedTeleportInternal(FCAetherytes, Data.FreeCompanyHouseEntrance.Descriptor);
+            }
+        }
+        else if (Data.Enabled)
+        {
+            if (Data.HouseTeleportTarget == HouseTeleportTarget.Private_Estate_Hall)
+            {
+                if (((Data.PrivateHouseEntrance != null && !Data.PrivateHouseEntrance.Descriptor.IsInThisHouse()) || Utils.IsSureNotInPrivateTerritory()) && Utils.GetPrivateHouseTerritory() != 0)
+                {
+                    EnqueueForcedTeleportInternal(PrivateAetherytes, Data.PrivateHouseEntrance.Descriptor);
+                }
+            }
+            else if (((Data.FreeCompanyHouseEntrance != null && !Data.FreeCompanyHouseEntrance.Descriptor.IsInThisHouse()) || Utils.IsSureNotInFcTerritory()) && Utils.GetFCHouseTerritory() != 0)
+            {
+                if (Data.FreeCompanyHouseEntrance != null && !Data.FreeCompanyHouseEntrance.Descriptor.IsInThisHouse())
+                {
+                    EnqueueForcedTeleportInternal(FCAetherytes, Data.FreeCompanyHouseEntrance.Descriptor);
+                }
+            }
+            else if (Data.HouseTeleportTarget == HouseTeleportTarget.Apartment)
+            {
+                if (Utils.GetNearestEntrance(out _)?.Name.ExtractText().EqualsAny(Lang.ApartmentEntrance) != true)
+                {
+                    EnqueueForcedTeleportInternal("Apartment");
+                }
+            }
+        }
+    }
+
+    static void EnqueueForcedTeleportInternal(uint[] Aetherytes, HouseDescriptor d)
+    {
+        P.TaskManager.Enqueue(NewYesAlreadyManager.WaitForYesAlreadyDisabledTask);
+        P.TaskManager.EnqueueImmediate(() => Player.Interactable, $"WaitForPlayerInteractable");
+        P.TaskManager.EnqueueImmediate(() => TeleportTo(Aetherytes), $"TeleportTo({Aetherytes.Print()})");
+        P.TaskManager.EnqueueImmediate(() => Player.Interactable && Svc.ClientState.TerritoryType == d.TerritoryType, 1000 * 60, "WaitUntilArrival");
+    }
+
+    static void EnqueueForcedTeleportInternal(string destination)
+    {
+        P.TaskManager.Enqueue(NewYesAlreadyManager.WaitForYesAlreadyDisabledTask);
+        P.TaskManager.EnqueueImmediate(() => Player.Interactable, $"WaitForPlayerInteractable");
+        P.TaskManager.EnqueueImmediate(() => TeleportTo(destination), $"TeleportTo({destination})");
+        P.TaskManager.EnqueueImmediate(() => Svc.Condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BetweenAreas], 1000 * 60, "WaitUntilBetweenAreas");
+        P.TaskManager.EnqueueImmediate(() => Player.Interactable, 1000 * 60, "WaitUntilArrival");
+    }
+
+    internal static bool? TeleportTo(string destination)
+    {
+        if (!Player.Available) return false;
+        if (AgentMap.Instance()->IsPlayerMoving == 0 && !IsOccupied() && !Player.Object.IsCasting && EzThrottler.Throttle("ExecTP", 1000))
+        {
+            try
+            {
+                if (Svc.Commands.ProcessCommand($"/tp Apartment")) return true;
+            }
+            catch (Exception e)
+            {
+                e.Log();
+                DuoLog.Error($"You do not have Teleporter plugin installed");
+            }
+        }
+        return false;
     }
 
     internal static bool? TeleportTo(params uint[] Destinations)

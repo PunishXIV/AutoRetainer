@@ -11,12 +11,12 @@ internal unsafe static class TaskEntrustDuplicates
 
     internal static unsafe bool CheckNoDuplicates() {
         for (var rI = InventoryType.RetainerPage1; rI <= InventoryType.RetainerPage7; rI++) {
-            var inv = InventoryManager.Instance()->GetInventoryContainer(rI);
+            var inv = FFXIVClientStructs.FFXIV.Client.Game.InventoryManager.Instance()->GetInventoryContainer(rI);
             if (inv == null || inv->Loaded == 0) continue;
             for (var slot = 0; slot < inv->Size; slot++) {
                 var slotItem = inv->GetInventorySlot(slot);
                 if (slotItem == null) continue;
-                if (InventoryManager.Instance()->GetInventoryItemCount(slotItem->ItemID, slotItem->Flags.HasFlag(InventoryItem.ItemFlags.HQ)) > 0) 
+                if (FFXIVClientStructs.FFXIV.Client.Game.InventoryManager.Instance()->GetInventoryItemCount(slotItem->ItemID, slotItem->Flags.HasFlag(InventoryItem.ItemFlags.HQ)) > 0) 
                 {
                     if (!Data.TransferItemsBlacklist.Contains(slotItem->ItemID))
                     {

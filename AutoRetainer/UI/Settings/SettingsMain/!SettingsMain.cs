@@ -1,4 +1,5 @@
-﻿using AutoRetainerAPI.Configuration;
+﻿using AutoRetainer.UI.Experiments;
+using AutoRetainerAPI.Configuration;
 using Dalamud.Interface.Components;
 using ECommons.Interop;
 using PunishLib.ImGuiMethods;
@@ -7,8 +8,6 @@ namespace AutoRetainer.UI.Settings.SettingsMain;
 
 internal static class SettingsMain
 {
-    
-
     internal static void Draw()
     {
         ImGuiEx.EzTabBar("GeneralSettings", [
@@ -18,6 +17,7 @@ internal static class SettingsMain
             ("Character Order", CharaOrder.Draw, null, true),
             ("Exclusions", Exclusions.Draw, null, true),
             ("Other", Other.Draw, null, true),
+            ("Experiments", ExperimentsMain.Draw, null, true),
             ]);
     }
 
@@ -28,7 +28,7 @@ internal static class SettingsMain
         {
             fps = (int)(1000f / frameTime);
         }
-        ImGui.SliderInt(name, ref fps, min, 60, fps == 60 ? "Unlimited" : null, ImGuiSliderFlags.AlwaysClamp);
+        ImGuiEx.SliderInt(name, ref fps, min, 60, fps == 60 ? "Unlimited" : null, ImGuiSliderFlags.AlwaysClamp);
         frameTime = fps == 60 ? 0 : (int)(1000f / fps);
     }
 
@@ -50,7 +50,7 @@ internal static class SettingsMain
         ImGuiEx.Text($"{text}:");
         ImGui.Dummy(new(20, 1));
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(200f);
+        ImGuiEx.SetNextItemWidthScaled(200f);
         if (ImGui.BeginCombo("##inputKey", $"{key}"))
         {
             if (text == KeyInputActive)
