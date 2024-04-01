@@ -21,7 +21,6 @@ using AutoRetainerAPI;
 using ECommons.GameHelpers;
 using AutoRetainer.Modules.Voyage;
 using Dalamud.Game.Network;
-using AutoRetainer.Scheduler.Handlers;
 using System.Threading;
 using ECommons.ExcelServices;
 using NotificationMasterAPI;
@@ -287,7 +286,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         }
         else if (arguments.EqualsIgnoreCaseAny("deliver"))
         {
-            GCHandlers.EnableDeliveringIfPossible();
+            GCContinuation.EnableDeliveringIfPossible();
         }
         else if (arguments.StartsWith("shutdown"))
         {

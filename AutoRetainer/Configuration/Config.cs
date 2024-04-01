@@ -18,6 +18,7 @@ internal unsafe class Config : IEzConfig
     public bool StatsUnifyHQ = false;
     public bool RecordStats = true;
     public bool EnableAutoGCHandin = false; //todo: remove
+    public bool AutoGCContinuation = false;
     public bool ShouldSerializeEnableAutoGCHandin() => false;
     public bool GCHandinNotify = false;
     internal bool BypassSanctuaryCheck = false;
@@ -181,7 +182,6 @@ internal unsafe class Config : IEzConfig
     public bool StatusBarMSI = false;
     public int StatusBarIconWidth = 96;
 
-    public bool IMDisplayTab = false;
     public bool IMEnableCofferAutoOpen = false;
     public bool IMEnableAutoVendor = false;
     public bool IMEnableContextMenu = false;

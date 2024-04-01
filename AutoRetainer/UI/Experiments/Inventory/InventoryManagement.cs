@@ -20,7 +20,6 @@ namespace AutoRetainer.UI.Experiments.Inventory
     {
         public static void Draw()
         {
-            ImGui.Checkbox($"Display tab", ref C.IMDisplayTab);
             ImGui.Checkbox($"Auto-open coffers", ref C.IMEnableCofferAutoOpen);
             ImGui.Checkbox($"Auto-vendor items", ref C.IMEnableAutoVendor);
             ImGui.Checkbox($"Enable context menu integration", ref C.IMEnableContextMenu);

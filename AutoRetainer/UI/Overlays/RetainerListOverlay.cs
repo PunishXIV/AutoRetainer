@@ -131,7 +131,6 @@ internal unsafe class RetainerListOverlay : Window
             }
             ImGuiEx.Tooltip("Quick Withdraw Gil");
 
-            if (C.IMDisplayTab)
             {
                 ImGui.SameLine();
                 if (ImGuiEx.IconButton($"{Lang.IconFire}##vendoritems"))

@@ -1,0 +1,252 @@
+﻿using AutoRetainer.UI.Experiments;
+using ClickLib.Clicks;
+using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Memory;
+using ECommons.GameFunctions;
+using ECommons.GameHelpers;
+using ECommons.Throttlers;
+using FFXIVClientStructs.FFXIV.Client.Game.Control;
+using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using FFXIVClientStructs.FFXIV.Client.UI;
+using FFXIVClientStructs.FFXIV.Component.GUI;
+using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
+
+namespace AutoRetainer.Modules.GcHandin;
+
+internal unsafe static class GCContinuation
+{
+    public static readonly GCInfo Maelstrom = new(1002387, 1002388, new(92.751045f, 40.27537f, 75.468185f));
+    public static readonly GCInfo ImmortalFlames = new(1002390, 1002391, new(-141.44354f, 4.109951f, -106.125496f));
+    public static readonly GCInfo TwinAdder = new(1002393, 1002394, new(-67.464386f, -0.5018193f, -8.161054f));
+
+    public static void EnqueueInitiation()
+    {
+        EnqueueExchangeVentures();
+        P.TaskManager.Enqueue(GCContinuation.WaitUntilNotOccupied);
+        P.TaskManager.Enqueue(GCContinuation.InteractWithExchange);
+        P.TaskManager.Enqueue(GCContinuation.SelectProvisioningMission);
+        P.TaskManager.Enqueue(GCContinuation.SelectGCExpertDelivery);
+        P.TaskManager.Enqueue(GCContinuation.EnableDeliveringIfPossible);
+    }
+
+    public static void EnqueueExchangeVentures()
+    {
+        if (AutoGCHandin.GetSeals() > 1000 && Utils.GetVenturesAmount() < 65000)
+        {
+            P.TaskManager.Enqueue(GCContinuation.WaitUntilNotOccupied);
+            P.TaskManager.Enqueue(GCContinuation.InteractWithShop);
+            P.TaskManager.Enqueue(GCContinuation.SelectGCExchangeVerticalTab);
+            P.TaskManager.Enqueue(GCContinuation.SelectGCExchangeHorizontalTab);
+            P.TaskManager.Enqueue(GCContinuation.OpenSeals);
+            P.TaskManager.Enqueue(GCContinuation.SetMaxVenturesExchange);
+            P.TaskManager.Enqueue(GCContinuation.SelectExchange);
+            P.TaskManager.Enqueue(GCContinuation.ConfirmExchange);
+            P.TaskManager.Enqueue(GCContinuation.CloseExchange);
+        }
+    }
+
+    public static void EnqueueDeliveryClose()
+    {
+        P.TaskManager.Enqueue(GCContinuation.CloseSupplyList);
+        P.TaskManager.Enqueue(GCContinuation.CloseSelectString);
+        P.TaskManager.Enqueue(GCContinuation.WaitUntilNotOccupied);
+    }
+
+    internal static bool? SetMaxVenturesExchange()
+    {
+        if (TryGetAddonByName<AtkUnitBase>("ShopExchangeCurrencyDialog", out var addon) && IsAddonReady(addon) && TryGetAddonByName<AtkUnitBase>("GrandCompanyExchange", out var gca) && IsAddonReady(gca))
+        {
+            var num = MemoryHelper.ReadSeString(&gca->UldManager.NodeList[52]->GetAsAtkTextNode()->NodeText).ExtractText().Replace(" ", "").Replace(",", "").Replace(".", "").ParseInt();
+            if (num != null && EzThrottler.Throttle("GC SetMaxVenturesExchange"))
+            {
+                var numeric = (AtkComponentNumericInput*)addon->UldManager.NodeList[8]->GetComponent();
+                var set = Math.Min(65000 - Utils.GetVenturesAmount(), (int)(num.Value / 200));
+                if (set < 1) throw new Exception($"Venture amount is too low, is {set}, expected 1 or more");
+                PluginLog.Debug($"Setting {set} ventures");
+                numeric->SetValue((int)set);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    internal static bool? SelectExchange()
+    {
+        if (TryGetAddonByName<AtkUnitBase>("ShopExchangeCurrencyDialog", out var addon) && IsAddonReady(addon) && EzThrottler.Throttle("GC SelectExchange"))
+        {
+            var button = addon->GetButtonNodeById(17);
+            if (button->IsEnabled)
+            {
+                (*button).ClickAddonButton(addon);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    internal static bool? ConfirmExchange()
+    {
+        var x = Utils.GetSpecificYesno(x => x.Contains("Exchange") && x.Contains("seals for"));
+        if (x != null && EzThrottler.Throttle("GC ConfirmExchange"))
+        {
+            ClickSelectYesNo.Using((nint)x).Yes();
+            return true;
+        }
+        return false;
+    }
+
+    internal static bool? SelectGCExchangeVerticalTab()
+    {
+        if (TryGetAddonByName<AtkUnitBase>("GrandCompanyExchange", out var addon) && IsAddonReady(addon) && EzThrottler.Throttle("GC SelectGCExchangeVerticalTab"))
+        {
+            Callback.Fire(addon, true, 1, 0, Callback.ZeroAtkValue, Callback.ZeroAtkValue, Callback.ZeroAtkValue, Callback.ZeroAtkValue, Callback.ZeroAtkValue, Callback.ZeroAtkValue, Callback.ZeroAtkValue);
+            return true;
+        }
+        return false;
+    }
+
+    internal static bool? SelectGCExchangeHorizontalTab()
+    {
+        if (TryGetAddonByName<AtkUnitBase>("GrandCompanyExchange", out var addon) && IsAddonReady(addon) && EzThrottler.Throttle("GC SelectGCExchangeHorizontalTab"))
+        {
+            Callback.Fire(addon, true, 2, 1, Callback.ZeroAtkValue, Callback.ZeroAtkValue, Callback.ZeroAtkValue, Callback.ZeroAtkValue, Callback.ZeroAtkValue, Callback.ZeroAtkValue, Callback.ZeroAtkValue);
+            return true;
+        }
+        return false;
+    }
+
+    internal static GCInfo? GetGCInfo()
+    {
+        if (PlayerState.Instance()->GrandCompany == 1) return Maelstrom;
+        if (PlayerState.Instance()->GrandCompany == 2) return TwinAdder;
+        if (PlayerState.Instance()->GrandCompany == 3) return ImmortalFlames;
+        return null;
+    }
+
+    internal static bool? InteractWithExchange() => InteractWithDataID(GetGCInfo().Value.ExchangeDataID);
+
+    internal static bool? InteractWithShop() => InteractWithDataID(GetGCInfo().Value.ShopDataID);
+
+    static bool? InteractWithDataID(uint dataID)
+    {
+        if (Svc.Targets.Target != null)
+        {
+            var t = Svc.Targets.Target;
+            if (t.IsTargetable && t.DataId == dataID && Vector3.Distance(Player.Object.Position, t.Position) < 10f && !IsOccupied() && EzThrottler.Throttle("GCInteract"))
+            {
+                TargetSystem.Instance()->InteractWithObject(Svc.Targets.Target.Struct(), false);
+                return true;
+            }
+        }
+        else
+        {
+            foreach (var t in Svc.Objects)
+            {
+                if (t.IsTargetable && t.DataId == dataID && Vector3.Distance(Player.Object.Position, t.Position) < 10f && !IsOccupied() && EzThrottler.Throttle("GCSetTarget"))
+                {
+                    Svc.Targets.Target = t;
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
+
+    internal static bool? WaitUntilNotOccupied() => !IsOccupied();
+
+    internal static bool? SelectProvisioningMission()
+    {
+        if (TryGetAddonByName<AddonSelectString>("SelectString", out var addon) && IsAddonReady(&addon->AtkUnitBase))
+        {
+            if (EzThrottler.Throttle("SelectProvisioningMission") && Utils.TrySelectSpecificEntry("Undertake supply and provisioning missions."))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    internal static bool? SelectGCExpertDelivery()
+    {
+        if (TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon) && IsAddonReady(addon) && EzThrottler.Throttle("GC SelectGCExpertDelivery"))
+        {
+            var val = stackalloc AtkValue[]
+            {
+                new AtkValue() { Type = ValueType.Int, Int = 0 },
+                new AtkValue() { Type = ValueType.Int, Int = 2 },
+                new AtkValue() { Type = 0, Int = 0 },
+            };
+            Callback.FireRaw(addon, 3, val, 1);
+            return true;
+        }
+        return false;
+    }
+
+    internal static bool? EnableDeliveringIfPossible()
+    {
+        if (TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon) && IsAddonReady(addon) && EzThrottler.Throttle("GC EnableDeliveringIfPossible"))
+        {
+            if (AutoGCHandin.Overlay.DrawConditions() && AutoGCHandin.Overlay.Allowed)
+            {
+                AutoGCHandin.Operation = true;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    internal static bool? CloseSupplyList()
+    {
+        if (TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon) && IsAddonReady(addon) && EzThrottler.Throttle("GC CloseSupplyList"))
+        {
+            Callback.Fire(addon, true, -1);
+            return true;
+        }
+        return false;
+    }
+
+    internal static bool? CloseSelectString()
+    {
+        if (TryGetAddonByName<AtkUnitBase>("SelectString", out var addon) && IsAddonReady(addon) && EzThrottler.Throttle("GC CloseSelectString"))
+        {
+            Callback.Fire(addon, true, -1);
+            return true;
+        }
+        return false;
+    }
+
+    internal static bool? CloseExchange()
+    {
+        if (TryGetAddonByName<AtkUnitBase>("GrandCompanyExchange", out var addon) && IsAddonReady(addon) && EzThrottler.Throttle("GC GrandCompanyExchange"))
+        {
+            Callback.Fire(addon, true, -1);
+            return true;
+        }
+        return false;
+    }
+
+    internal static bool? OpenSeals()
+    {
+        if (TryGetAddonByName<AtkUnitBase>("GrandCompanyExchange", out var addon) && IsAddonReady(addon) && AutoGCHandin.IsValidGCTerritory())
+        {
+            var reader = new ReaderGrandCompanyExchange(addon);
+            for (int i = 0; i < reader.Items.Count; i++)
+            {
+                var itemInfo = reader.Items[i];
+                if (itemInfo.ItemID == 21072) {
+                    var currentRank = AutoGCHandin.GetRank();
+                    if (currentRank >= itemInfo.RankReq && AutoGCHandin.GetSeals() >= itemInfo.Seals)
+                    {
+                        if (FrameThrottler.Throttle("GCCont.OpenItem", 20))
+                        {
+                            Callback.Fire(addon, true, 0, i, 1, Callback.ZeroAtkValue, currentRank >= itemInfo.RankReq, itemInfo.OpenCurrencyExchange, itemInfo.ItemID, itemInfo.IconID, itemInfo.Seals);
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+}

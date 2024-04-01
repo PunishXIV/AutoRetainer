@@ -1,0 +1,1 @@
+﻿global using GCInfo = (uint ShopDataID, uint ExchangeDataID, System.Numerics.Vector3 Position);

@@ -145,11 +145,10 @@ internal static unsafe class DebugMisc
         }
 
         ImGui.Separator();
-        ImGuiEx.Text($"GC Addon Life: {AutoGCHandin.GetAddonLife()}");
         {
             if (ImGui.Button("Fire") && TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon) && IsAddonReady(addon) && addon->UldManager.NodeList[5]->IsVisible)
             {
-                AutoGCHandin.InvokeHandin(addon);
+                AutoGCHandin.InvokeHandin(addon, 0);
             }
         }
 
