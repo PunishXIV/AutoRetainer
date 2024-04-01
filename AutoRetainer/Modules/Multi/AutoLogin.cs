@@ -6,6 +6,7 @@ using ClickLib.Clicks;
 using Dalamud.Memory;
 using Dalamud.Utility;
 using ECommons.Automation;
+using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -86,9 +87,17 @@ internal unsafe class AutoLogin
         tempCharacter = characterName;
         tempServiceAccount = serviceAccount;
         actionQueue.Clear();
-        actionQueue.Enqueue(OpenDataCenterMenu);
-        actionQueue.Enqueue(SelectDataCentre);
-        actionQueue.Enqueue(SelectServiceAccount);
+        if (!Utils.IsCN)
+        {
+            actionQueue.Enqueue(OpenDataCenterMenu);
+            actionQueue.Enqueue(SelectDataCentre);
+            actionQueue.Enqueue(SelectServiceAccount);
+        }
+        else
+        {
+            actionQueue.Enqueue(Utils.IsTitleScreenReady);
+            actionQueue.Enqueue(TitleScreenClickStart);
+        }
         actionQueue.Enqueue(SelectWorld);
         actionQueue.Enqueue(VariableDelay(10));
         actionQueue.Enqueue(SelectCharacter);
@@ -144,9 +153,17 @@ internal unsafe class AutoLogin
         actionQueue.Enqueue(Logout);
         actionQueue.Enqueue(SelectYesLogout);
         actionQueue.Enqueue(VariableDelay(5));
-        actionQueue.Enqueue(OpenDataCenterMenu);
-        actionQueue.Enqueue(SelectDataCentre);
-        actionQueue.Enqueue(SelectServiceAccount);
+        if (!Utils.IsCN)
+        {
+            actionQueue.Enqueue(OpenDataCenterMenu);
+            actionQueue.Enqueue(SelectDataCentre);
+            actionQueue.Enqueue(SelectServiceAccount);
+        }
+        else
+        {
+            actionQueue.Enqueue(Utils.IsTitleScreenReady);
+            actionQueue.Enqueue(TitleScreenClickStart);
+        }
         actionQueue.Enqueue(SelectWorld);
         actionQueue.Enqueue(VariableDelay(10));
         actionQueue.Enqueue(SelectCharacter);
@@ -224,7 +241,7 @@ internal unsafe class AutoLogin
     {
         var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("_TitleMenu", 1);
         if (addon == null || addon->IsVisible == false) return false;
-        Callback.Fire(addon,false, 13);
+        Callback.Fire(addon, false, 13);
         var nextAddon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("TitleDCWorldMap", 1);
         if (nextAddon == null) return false;
         return true;
@@ -254,6 +271,27 @@ internal unsafe class AutoLogin
                 PluginLog.Information($"Found different SelectString: {text}");
                 return false;
             }
+        }
+        return false;
+    }
+
+    bool TitleScreenClickStart()
+    {
+        if (!Utils.IsTitleScreenReady())
+        {
+            FrameThrottler.Throttle($"TitleScreenClickStart", 15, true);
+            return true;
+        }
+        if (Utils.IsTitleScreenReady() && TryGetAddonByName<AtkUnitBase>("_TitleMenu", out var title) && IsAddonReady(title) && FrameThrottler.Throttle("TitleScreenClickStart"))
+        {
+            PluginLog.Debug($"[DCChange] Clicking start");
+            Callback.Fire(title, true, (int)1);
+            FrameThrottler.Throttle($"TitleScreenClickStart", 15, true);
+            return false;
+        }
+        else
+        {
+            FrameThrottler.Throttle($"TitleScreenClickStart", 15, true);
         }
         return false;
     }

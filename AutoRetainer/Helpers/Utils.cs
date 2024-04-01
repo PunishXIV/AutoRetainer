@@ -32,6 +32,7 @@ namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
+    internal static bool IsCN => Svc.ClientState.ClientLanguage == (ClientLanguage)4;
     internal static int FCPoints => *(int*)((nint)AgentModule.Instance()->GetAgentByInternalId(AgentId.FreeCompanyCreditShop) + 256);
 
     internal static float AnimationLock => *(float*)((nint)ActionManager.Instance() + 8);
@@ -44,7 +45,7 @@ internal static unsafe class Utils
             var success = false;
             for (int i = 0; i < 30; i++)
             {
-                if(P.Memory.OutdoorTerritory_IsEstateResident((nint)h->OutdoorTerritory, (byte)i) == 1) success = true;
+                if (P.Memory.OutdoorTerritory_IsEstateResident((nint)h->OutdoorTerritory, (byte)i) == 1) success = true;
             }
             if (!success) return false;
         }
@@ -70,7 +71,7 @@ internal static unsafe class Utils
 
     internal static uint GetFCHouseTerritory()
     {
-        foreach(var x in Svc.AetheryteList) 
+        foreach (var x in Svc.AetheryteList)
         {
             if (HouseEnterTask.FCAetherytes.Contains(x.AetheryteId) && !x.IsAppartment && !x.IsSharedHouse) return x.TerritoryId;
         }
@@ -216,7 +217,12 @@ internal static unsafe class Utils
             && !Svc.Condition.Any()
             && !P.TaskManager.IsBusy
             && !AutoLogin.Instance.IsRunning
-            && TryGetAddonByName<AtkUnitBase>("_TitleMenu", out var title)
+            && IsTitleScreenReady();
+    }
+
+    internal static bool IsTitleScreenReady()
+    {
+        return TryGetAddonByName<AtkUnitBase>("_TitleMenu", out var title)
             && IsAddonReady(title)
             && title->UldManager.NodeListCount > 3
             && title->UldManager.NodeList[3]->Color.A == 0xFF
@@ -568,11 +574,11 @@ internal static unsafe class Utils
         var fcOverride = Data.FreeCompanyHouseEntrance == null ? null : GetEntranceAtLocation(Data.FreeCompanyHouseEntrance.Entrance);
         var pOverride = Data.PrivateHouseEntrance == null ? null : GetEntranceAtLocation(Data.PrivateHouseEntrance.Entrance);
 
-        if(fcOverride != null && pOverride != null)
+        if (fcOverride != null && pOverride != null)
         {
             var fcd = Vector3.Distance(Player.Object.Position, fcOverride.Position);
             var pd = Vector3.Distance(Player.Object.Position, pOverride.Position);
-            if(fcd > pd)
+            if (fcd > pd)
             {
                 Distance = pd;
                 return pOverride;
