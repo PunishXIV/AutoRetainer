@@ -8,7 +8,7 @@ namespace AutoRetainer.Helpers;
 public unsafe class ClickHelper
 {
     public delegate nint InvokeListener(nint a1, AtkEventType a2, uint a3, AtkEvent* a4);
-    public InvokeListener Listener = EzDelegate.Get<InvokeListener>("48 89 5C 24 ?? 48 89 74 24 ?? 57 48 83 EC 30 0F B7 FA");
+    public static InvokeListener Listener = EzDelegate.Get<InvokeListener>("48 89 5C 24 ?? 48 89 74 24 ?? 57 48 83 EC 30 0F B7 FA");
 
     public unsafe delegate IntPtr ReceiveEventDelegate(AtkEventListener* eventListener, EventType evt, uint which, void* eventData, void* inputData);
 
@@ -35,8 +35,6 @@ public unsafe class ClickHelper
 
 public static unsafe class ClickHelperExtensions
 {
-    public static ClickHelper Helper = new();
-
     public static void ClickAddonButton(this AtkComponentButton target, AtkComponentBase* addon, uint which, EventType type = EventType.CHANGE, EventData? eventData = null)
         => ClickHelper.ClickAddonComponent(addon, target.AtkComponentBase.OwnerNode, which, type, eventData);
 
@@ -45,12 +43,12 @@ public static unsafe class ClickHelperExtensions
 
     public static void ClickAddonButton(this AtkComponentButton target, AtkUnitBase* addon, AtkEvent* eventData)
     {
-        Helper.Listener.Invoke((nint)addon, eventData->Type, eventData->Param, eventData);
+        ClickHelper.Listener.Invoke((nint)addon, eventData->Type, eventData->Param, eventData);
     }
 
     public static void ClickAddonButton(this AtkCollisionNode target, AtkUnitBase* addon, AtkEvent* eventData)
     {
-        Helper.Listener.Invoke((nint)addon, eventData->Type, eventData->Param, eventData);
+        ClickHelper.Listener.Invoke((nint)addon, eventData->Type, eventData->Param, eventData);
     }
 
     public static void ClickAddonButton(this AtkComponentButton target, AtkUnitBase* addon)
@@ -70,7 +68,6 @@ public static unsafe class ClickHelperExtensions
             evt = evt->NextEvent;
 
         addon->ReceiveEvent(evt->Type, (int)evt->Param, btnRes.AtkEventManager.Event);
-
     }
 
 

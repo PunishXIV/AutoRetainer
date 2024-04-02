@@ -57,12 +57,12 @@ internal static unsafe class DebugGCAuto
         if (ImGui.Button(nameof(GCContinuation.SetMaxVenturesExchange))) DuoLog.Information($"{GCContinuation.SetMaxVenturesExchange()}");
         if (ImGui.Button(nameof(GCContinuation.SelectExchange))) DuoLog.Information($"{GCContinuation.SelectExchange()}");
         if (ImGui.Button(nameof(GCContinuation.ConfirmExchange))) DuoLog.Information($"{GCContinuation.ConfirmExchange()}");
-        if (ImGui.Button(nameof(GCContinuation.SelectGCExchangeVerticalTab))) DuoLog.Information($"{GCContinuation.SelectGCExchangeVerticalTab()}");
-        if (ImGui.Button(nameof(GCContinuation.SelectGCExchangeHorizontalTab))) DuoLog.Information($"{GCContinuation.SelectGCExchangeHorizontalTab()}");
+        if (ImGui.Button(nameof(GCContinuation.SelectGCExchangeVerticalTab))) DuoLog.Information($"{GCContinuation.SelectGCExchangeVerticalTab(0)}");
+        if (ImGui.Button(nameof(GCContinuation.SelectGCExchangeHorizontalTab))) DuoLog.Information($"{GCContinuation.SelectGCExchangeHorizontalTab(2)}");
         if (ImGui.Button(nameof(GCContinuation.InteractWithShop))) DuoLog.Information($"{GCContinuation.InteractWithShop()}");
         if (ImGui.Button(nameof(GCContinuation.InteractWithExchange))) DuoLog.Information($"{GCContinuation.InteractWithExchange()}");
         if (ImGui.Button(nameof(GCContinuation.SelectProvisioningMission))) DuoLog.Information($"{GCContinuation.SelectProvisioningMission()}");
-        if (ImGui.Button(nameof(GCContinuation.SelectGCExpertDelivery))) DuoLog.Information($"{GCContinuation.SelectGCExpertDelivery()}");
+        if (ImGui.Button(nameof(GCContinuation.SelectSupplyListTab))) DuoLog.Information($"{GCContinuation.SelectSupplyListTab(2)}");
         if (ImGui.Button(nameof(GCContinuation.EnableDeliveringIfPossible))) DuoLog.Information($"{GCContinuation.EnableDeliveringIfPossible()}");
         if (ImGui.Button(nameof(GCContinuation.CloseSupplyList))) DuoLog.Information($"{GCContinuation.CloseSupplyList()}");
         if (ImGui.Button(nameof(GCContinuation.CloseSelectString))) DuoLog.Information($"{GCContinuation.CloseSelectString()}");

@@ -1,16 +1,14 @@
-﻿using AutoRetainer.UI.Experiments;
-using ClickLib.Clicks;
-using Dalamud.Game.ClientState.Objects.Enums;
-using Dalamud.Game.ClientState.Objects.Types;
+﻿using ClickLib.Clicks;
 using Dalamud.Memory;
+using ECommons.EzIpcManager;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;
+using ECommons.MathHelpers;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
 
 namespace AutoRetainer.Modules.GcHandin;
 
@@ -20,13 +18,16 @@ internal unsafe static class GCContinuation
     public static readonly GCInfo ImmortalFlames = new(1002390, 1002391, new(-141.44354f, 4.109951f, -106.125496f));
     public static readonly GCInfo TwinAdder = new(1002393, 1002394, new(-67.464386f, -0.5018193f, -8.161054f));
 
+    public static void InitIPC() => EzIPC.Init(typeof(GCContinuation), $"{Svc.PluginInterface.InternalName}.GC");
+
+    [EzIPC]
     public static void EnqueueInitiation()
     {
         EnqueueExchangeVentures();
         P.TaskManager.Enqueue(GCContinuation.WaitUntilNotOccupied);
         P.TaskManager.Enqueue(GCContinuation.InteractWithExchange);
         P.TaskManager.Enqueue(GCContinuation.SelectProvisioningMission);
-        P.TaskManager.Enqueue(GCContinuation.SelectGCExpertDelivery);
+        P.TaskManager.Enqueue(() => GCContinuation.SelectSupplyListTab(2), "SelectSupplyListTab(2)");
         P.TaskManager.Enqueue(GCContinuation.EnableDeliveringIfPossible);
     }
 
@@ -36,8 +37,8 @@ internal unsafe static class GCContinuation
         {
             P.TaskManager.Enqueue(GCContinuation.WaitUntilNotOccupied);
             P.TaskManager.Enqueue(GCContinuation.InteractWithShop);
-            P.TaskManager.Enqueue(GCContinuation.SelectGCExchangeVerticalTab);
-            P.TaskManager.Enqueue(GCContinuation.SelectGCExchangeHorizontalTab);
+            P.TaskManager.Enqueue(() => GCContinuation.SelectGCExchangeVerticalTab(0), "SelectGCExchangeVerticalTab(0)");
+            P.TaskManager.Enqueue(() => GCContinuation.SelectGCExchangeHorizontalTab(3), "SelectGCExchangeHorizontalTab(2)");
             P.TaskManager.Enqueue(GCContinuation.OpenSeals);
             P.TaskManager.Enqueue(GCContinuation.SetMaxVenturesExchange);
             P.TaskManager.Enqueue(GCContinuation.SelectExchange);
@@ -96,26 +97,31 @@ internal unsafe static class GCContinuation
         return false;
     }
 
-    internal static bool? SelectGCExchangeVerticalTab()
+    internal static bool? SelectGCExchangeVerticalTab(int which)
     {
+        if(!which.InRange(0, 3)) throw new ArgumentOutOfRangeException(nameof(which));
         if (TryGetAddonByName<AtkUnitBase>("GrandCompanyExchange", out var addon) && IsAddonReady(addon) && EzThrottler.Throttle("GC SelectGCExchangeVerticalTab"))
         {
-            Callback.Fire(addon, true, 1, 0, Callback.ZeroAtkValue, Callback.ZeroAtkValue, Callback.ZeroAtkValue, Callback.ZeroAtkValue, Callback.ZeroAtkValue, Callback.ZeroAtkValue, Callback.ZeroAtkValue);
+            var button = addon->GetNodeById((uint)(37 + which))->GetAsAtkComponentRadioButton();
+            (*button).ClickRadioButton(addon);
             return true;
         }
         return false;
     }
 
-    internal static bool? SelectGCExchangeHorizontalTab()
+    internal static bool? SelectGCExchangeHorizontalTab(int which)
     {
+        if (!which.InRange(0, 4)) throw new ArgumentOutOfRangeException(nameof(which));
         if (TryGetAddonByName<AtkUnitBase>("GrandCompanyExchange", out var addon) && IsAddonReady(addon) && EzThrottler.Throttle("GC SelectGCExchangeHorizontalTab"))
         {
-            Callback.Fire(addon, true, 2, 1, Callback.ZeroAtkValue, Callback.ZeroAtkValue, Callback.ZeroAtkValue, Callback.ZeroAtkValue, Callback.ZeroAtkValue, Callback.ZeroAtkValue, Callback.ZeroAtkValue);
+            var button = addon->GetNodeById((uint)(44 + which))->GetAsAtkComponentRadioButton();
+            (*button).ClickRadioButton(addon);
             return true;
         }
         return false;
     }
 
+    [EzIPC]
     internal static GCInfo? GetGCInfo()
     {
         if (PlayerState.Instance()->GrandCompany == 1) return Maelstrom;
@@ -167,17 +173,13 @@ internal unsafe static class GCContinuation
         return false;
     }
 
-    internal static bool? SelectGCExpertDelivery()
+    internal static bool? SelectSupplyListTab(int which)
     {
+        if (!which.InRange(0, 3)) throw new ArgumentOutOfRangeException(nameof(which));
         if (TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon) && IsAddonReady(addon) && EzThrottler.Throttle("GC SelectGCExpertDelivery"))
         {
-            var val = stackalloc AtkValue[]
-            {
-                new AtkValue() { Type = ValueType.Int, Int = 0 },
-                new AtkValue() { Type = ValueType.Int, Int = 2 },
-                new AtkValue() { Type = 0, Int = 0 },
-            };
-            Callback.FireRaw(addon, 3, val, 1);
+            var button = addon->GetNodeById((uint)(11 + which))->GetAsAtkComponentRadioButton();
+            button->ClickRadioButton(addon);
             return true;
         }
         return false;
@@ -242,6 +244,34 @@ internal unsafe static class GCContinuation
                         {
                             Callback.Fire(addon, true, 0, i, 1, Callback.ZeroAtkValue, currentRank >= itemInfo.RankReq, itemInfo.OpenCurrencyExchange, itemInfo.ItemID, itemInfo.IconID, itemInfo.Seals);
                             return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    internal static bool? SelectGCPurchaseItem(int which)
+    {
+        if (TryGetAddonByName<AtkUnitBase>("GrandCompanyExchange", out var addon) && IsAddonReady(addon) && AutoGCHandin.IsValidGCTerritory())
+        {
+            var reader = new ReaderGrandCompanyExchange(addon);
+            if (which < reader.ItemCount)
+            {
+                for (int i = 0; i < reader.Items.Count; i++)
+                {
+                    var itemInfo = reader.Items[i];
+                    if (itemInfo.ItemID == 21072)
+                    {
+                        var currentRank = AutoGCHandin.GetRank();
+                        if (currentRank >= itemInfo.RankReq && AutoGCHandin.GetSeals() >= itemInfo.Seals)
+                        {
+                            if (FrameThrottler.Throttle("GCCont.SelectGCPurchaseItem", 20))
+                            {
+                                
+                                return true;
+                            }
                         }
                     }
                 }
