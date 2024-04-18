@@ -1,5 +1,7 @@
 ﻿using AutoRetainer.UI.Dbg;
 using AutoRetainer.UI.Settings;
+using Dalamud.Game.ClientState.Conditions;
+using ECommons.GameHelpers;
 
 namespace AutoRetainer.UI;
 
@@ -10,7 +12,8 @@ internal unsafe static class Debug
         ImGuiEx.TextWrapped(ImGuiColors.ParsedOrange, "Anything can happen here.");
         Safe(delegate
         {
-            ImGuiEx.EzTabBar("DebugBar", [
+            
+                ImGuiEx.EzTabBar("DebugBar", [
                 ("Beta", Beta.Draw, null, true),
                 ("Venture", DebugVenture.Draw, null, true),
                 ("Scheduler", DebugScheduler.Draw, null, true),

@@ -1,6 +1,6 @@
 ﻿using ClickLib.Clicks;
 using Dalamud.Memory;
-using ECommons.EzIpcManager;
+using ECommons.Configuration;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;
 using ECommons.MathHelpers;
@@ -9,6 +9,10 @@ using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using Lumina.Excel.GeneratedSheets;
+using System.IO;
+using System.Net;
+using System.Net.Http;
 
 namespace AutoRetainer.Modules.GcHandin;
 
@@ -17,10 +21,7 @@ internal unsafe static class GCContinuation
     public static readonly GCInfo Maelstrom = new(1002387, 1002388, new(92.751045f, 40.27537f, 75.468185f));
     public static readonly GCInfo ImmortalFlames = new(1002390, 1002391, new(-141.44354f, 4.109951f, -106.125496f));
     public static readonly GCInfo TwinAdder = new(1002393, 1002394, new(-67.464386f, -0.5018193f, -8.161054f));
-
-    public static void InitIPC() => EzIPC.Init(typeof(GCContinuation), $"{Svc.PluginInterface.InternalName}.GC");
-
-    [EzIPC]
+    
     public static void EnqueueInitiation()
     {
         EnqueueExchangeVentures();
@@ -31,14 +32,14 @@ internal unsafe static class GCContinuation
         P.TaskManager.Enqueue(GCContinuation.EnableDeliveringIfPossible);
     }
 
-    public static void EnqueueExchangeVentures()
+    public static async void EnqueueExchangeVentures()
     {
         if (AutoGCHandin.GetSeals() > 1000 && Utils.GetVenturesAmount() < 65000)
         {
             P.TaskManager.Enqueue(GCContinuation.WaitUntilNotOccupied);
             P.TaskManager.Enqueue(GCContinuation.InteractWithShop);
             P.TaskManager.Enqueue(() => GCContinuation.SelectGCExchangeVerticalTab(0), "SelectGCExchangeVerticalTab(0)");
-            P.TaskManager.Enqueue(() => GCContinuation.SelectGCExchangeHorizontalTab(3), "SelectGCExchangeHorizontalTab(2)");
+            P.TaskManager.Enqueue(() => GCContinuation.SelectGCExchangeHorizontalTab(2), "SelectGCExchangeHorizontalTab(2)");
             P.TaskManager.Enqueue(GCContinuation.OpenSeals);
             P.TaskManager.Enqueue(GCContinuation.SetMaxVenturesExchange);
             P.TaskManager.Enqueue(GCContinuation.SelectExchange);
@@ -121,7 +122,6 @@ internal unsafe static class GCContinuation
         return false;
     }
 
-    [EzIPC]
     internal static GCInfo? GetGCInfo()
     {
         if (PlayerState.Instance()->GrandCompany == 1) return Maelstrom;

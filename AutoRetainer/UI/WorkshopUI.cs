@@ -5,10 +5,17 @@ using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using AutoRetainer.Scheduler.Tasks;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Interface.Components;
+using Dalamud.Interface.Internal.Windows.Settings.Widgets;
 using Dalamud.Memory;
+using ECommons.ExcelServices;
+using ECommons.GameHelpers;
+using ECommons.Reflection;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using Lumina.Excel.GeneratedSheets;
 using PunishLib.ImGuiMethods;
+using System.Collections;
+using Action = Lumina.Excel.GeneratedSheets.Action;
 
 namespace AutoRetainer.UI;
 
@@ -164,14 +171,12 @@ internal static unsafe class WorkshopUI
                 }
             }
 
-
-
             var initCurpos = ImGui.GetCursorPos();
             var lst = data.GetVesselData(VoyageType.Airship).Where(s => data.GetEnabledVesselsData(VoyageType.Airship).Contains(s.Name))
                 .Union(data.GetVesselData(VoyageType.Submersible).Where(x => data.GetEnabledVesselsData(VoyageType.Submersible).Contains(x.Name)))
                 .Where(x => x.ReturnTime != 0).OrderBy(z => z.GetRemainingSeconds());
             //if (EzThrottler.Throttle("log")) PluginLog.Information($"{lst.Select(x => x.Name).Print()}");
-            var lowestVessel = C.MultiModeWorkshopConfiguration.MultiWaitForAll || data.MultiWaitForAllDeployables ? lst.LastOrDefault() : lst.FirstOrDefault();
+            var lowestVessel = (C.MultiModeWorkshopConfiguration.MultiWaitForAll || data.MultiWaitForAllDeployables) && !data.AreAnyEnabledVesselsReturnInNext(C.MultiModeWorkshopConfiguration.MaxMinutesOfWaiting * 60) ? lst.LastOrDefault() : lst.FirstOrDefault();
             if (lowestVessel != default)
             {
                 var prog = 1f - ((float)lowestVessel.GetRemainingSeconds() / (60f * 60f * 24f));

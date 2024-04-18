@@ -29,6 +29,7 @@ using AutoRetainer.UI.Experiments.Inventory;
 using ECommons.Reflection;
 using Dalamud.Interface.Internal.Notifications;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using AutoRetainer.Modules.EzIPCManagers;
 
 namespace AutoRetainer;
 
@@ -75,6 +76,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal long[] TimeLaunched;
     internal ContextMenuManager ContextMenuManager;
     public bool ReadOnly = false;
+    public EzIPCManager EzIPCManager;
 
     internal static OfflineCharacterData Data => Utils.GetCurrentCharacterData();
 
@@ -170,6 +172,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         {
             MultiMode.PerformAutoStart();
         }
+        EzIPCManager = new();
     }
 
     private void GameNetwork_NetworkMessage(nint dataPtr, ushort opCode, uint sourceActorId, uint targetActorId, NetworkMessageDirection direction)

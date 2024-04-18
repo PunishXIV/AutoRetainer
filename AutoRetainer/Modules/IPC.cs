@@ -1,5 +1,7 @@
-﻿using AutoRetainerAPI;
+﻿using AutoRetainer.Modules.Voyage;
+using AutoRetainerAPI;
 using AutoRetainerAPI.Configuration;
+using ECommons.EzIpcManager;
 using ECommons.Reflection;
 using NotificationMasterAPI;
 using System.Diagnostics.Metrics;
@@ -29,6 +31,7 @@ internal static class IPC
         Svc.PluginInterface.GetIpcProvider<string, object>(ApiConsts.RequestCharacterPostProcess).RegisterAction(RequestCharacterPostprocess);
         Svc.PluginInterface.GetIpcProvider<object>(ApiConsts.FinishCharacterPostprocessRequest).RegisterAction(FinishCharacterPostprocessRequest);
         Svc.PluginInterface.GetIpcProvider<string, object>(ApiConsts.OnRetainerListCustomTask).RegisterAction(OnRetainerListCustomTask);
+        EzIPC.Init(typeof(IPC));
     }
 
     private static void OnRetainerListCustomTask(string s)
