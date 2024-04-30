@@ -1,12 +1,14 @@
-﻿using Dalamud.Game.ClientState.Conditions;
+﻿using AutoRetainer.Internal.InventoryManagement;
+using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using ECommons.Events;
+using FFXIVClientStructs.FFXIV.Client.Game;
 
 namespace AutoRetainer.Modules.Statistics;
 
-internal static class StatisticsManager
+internal unsafe static class StatisticsManager
 {
     internal static List<StatisticsFileWrapper> Files = new();
     internal static void Init()
@@ -15,7 +17,7 @@ internal static class StatisticsManager
         Svc.ClientState.TerritoryChanged += ClientState_TerritoryChanged;
     }
 
-    internal static void Dispose()
+    internal static void Shutdown()
     {
         Svc.Chat.ChatMessage -= Chat_ChatMessage;
         Svc.ClientState.TerritoryChanged -= ClientState_TerritoryChanged;
@@ -25,11 +27,12 @@ internal static class StatisticsManager
     private static void ClientState_TerritoryChanged(ushort e)
     {
         Files.Clear();
+        OfflineDataManager.EnqueueWriteWhenPlayerAvailable();
     }
 
     private static void Chat_ChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
     {
-        if (C.RecordStats && Svc.Condition[ConditionFlag.OccupiedSummoningBell] && ProperOnLogin.PlayerPresent && (ushort)type == 2110 && Svc.Targets.Target.IsRetainerBell() && Utils.TryGetCurrentRetainer(out var retName))
+        if (Svc.Condition[ConditionFlag.OccupiedSummoningBell] && ProperOnLogin.PlayerPresent && (ushort)type == 2110 && Svc.Targets.Target.IsRetainerBell() && Utils.TryGetCurrentRetainer(out var retName))
         {
             var textProcessed = false;
             uint amount = 1;
@@ -53,14 +56,21 @@ internal static class StatisticsManager
                 {
                     if (x is ItemPayload p)
                     {
-                        GetWrapper(Svc.ClientState.LocalContentId, retName).Add(new()
+                        if (C.RecordStats)
                         {
-                            ItemId = p.ItemId,
-                            IsHQ = p.IsHQ,
-                            Timestamp = P.Time,
-                            Amount = amount,
-                            VentureID = P.LastVentureID
-                        }) ;
+                            GetWrapper(Svc.ClientState.LocalContentId, retName).Add(new()
+                            {
+                                ItemId = p.ItemId,
+                                IsHQ = p.IsHQ,
+                                Timestamp = P.Time,
+                                Amount = amount,
+                                VentureID = P.LastVentureID
+                            });
+                        }
+                        if(C.IMEnableAutoVendor && P.LastVentureID == 395)
+                        {
+                            InventorySpaceManager.EnqueueSoftItemIfAllowed(p.ItemId, amount);
+                        }
                         break;
                     }
                 }

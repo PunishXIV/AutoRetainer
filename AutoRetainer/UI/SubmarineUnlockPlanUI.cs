@@ -139,6 +139,16 @@ internal unsafe class SubmarineUnlockPlanUI : Window
                     }
                 }
             }
+            if (C.DefaultSubmarineUnlockPlan == SelectedPlanGuid)
+            {
+                ImGuiEx.Text($"This plan is set as default.");
+                ImGui.SameLine();
+                if (ImGui.SmallButton("Reset")) C.DefaultSubmarineUnlockPlan = "";
+            }
+            else
+            {
+                if (ImGui.SmallButton("Set this plan as default")) C.DefaultSubmarineUnlockPlan = SelectedPlanGuid;
+            }
             ImGuiEx.TextV("Name: ");
             ImGui.SameLine();
             ImGuiEx.SetNextItemFullWidth();
@@ -166,14 +176,14 @@ internal unsafe class SubmarineUnlockPlanUI : Window
             {
                 if(ImGui.Button($"Copy plan settings"))
                 {
-                    ImGui.SetClipboardText(JsonConvert.SerializeObject(SelectedPlan));
+                    Copy(JsonConvert.SerializeObject(SelectedPlan));
                 }
                 ImGui.SameLine();
                 if (ImGui.Button($"Paste plan settings"))
                 {
                     try
                     {
-                        SelectedPlan.CopyFrom(JsonConvert.DeserializeObject<SubmarineUnlockPlan>(ImGui.GetClipboardText()));
+                        SelectedPlan.CopyFrom(JsonConvert.DeserializeObject<SubmarineUnlockPlan>(Paste()));
                     }
                     catch(Exception ex)
                     {

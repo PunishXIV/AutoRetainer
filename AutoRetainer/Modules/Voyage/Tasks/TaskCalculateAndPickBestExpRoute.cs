@@ -27,7 +27,7 @@ internal static unsafe class TaskCalculateAndPickBestExpRoute
         var curSubMaps = CurrentSubmarine.GetMaps();
         var curSubRank = CurrentSubmarine.Get()->RankId;
         var prioList = unlock?.GetPrioritizedPointList();
-        Task.Run(() =>
+        void Run()
         {
             VoyageMain.WaitOverlay.IsProcessing = true;
             try
@@ -108,7 +108,15 @@ internal static unsafe class TaskCalculateAndPickBestExpRoute
                 e.Log();
             }
             VoyageMain.WaitOverlay.IsProcessing = false;
-        });
+        }
+        if (C.VoyageDisableCalcMultithreading)
+        {
+            Run();
+        }
+        else
+        {
+            Task.Run(Run);
+        }
     }
 
     internal static bool? WaitUntilCalculationStopped() => !Calculating;

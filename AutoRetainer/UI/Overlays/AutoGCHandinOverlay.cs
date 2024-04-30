@@ -1,4 +1,5 @@
 using AutoRetainerAPI.Configuration;
+using ECommons.GameHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
@@ -19,11 +20,13 @@ internal unsafe class AutoGCHandinOverlay : Window
         if (Allowed)
         {
             ImGui.Checkbox("Enable Automatic Expert Delivery", ref AutoGCHandin.Operation);
+            ImGui.SameLine();
+            ImGui.Checkbox("Continuation", ref C.AutoGCContinuation);
         }
         if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var d) && !AutoGCHandin.Operation) 
         {
             ImGui.SameLine();
-            ImGui.SetNextItemWidth(200);
+            ImGuiEx.SetNextItemWidthScaled(200);
             ImGuiEx.EnumCombo("##mode", ref d.GCDeliveryType);
             if (d.GCDeliveryType == GCDeliveryType.Hide_Gear_Set_Items)
             {
@@ -45,6 +48,11 @@ internal unsafe class AutoGCHandinOverlay : Window
         {
             ImGui.SameLine();
             ImGuiEx.Text(GradientColor.Get(ImGuiColors.DalamudRed, ImGuiColors.DalamudYellow), $"You can use Priority Seal Allowance");
+        }
+        if (!Player.IsInHomeWorld)
+        {
+            ImGui.SameLine();
+            ImGuiEx.Text(GradientColor.Get(ImGuiColors.DalamudRed, ImGuiColors.DalamudYellow), $"Foreign world. No FC points will be granted.");
         }
         height = ImGui.GetWindowSize().Y;
     }

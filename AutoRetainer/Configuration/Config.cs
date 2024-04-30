@@ -18,6 +18,7 @@ internal unsafe class Config : IEzConfig
     public bool StatsUnifyHQ = false;
     public bool RecordStats = true;
     public bool EnableAutoGCHandin = false; //todo: remove
+    public bool AutoGCContinuation = false;
     public bool ShouldSerializeEnableAutoGCHandin() => false;
     public bool GCHandinNotify = false;
     internal bool BypassSanctuaryCheck = false;
@@ -88,10 +89,36 @@ internal unsafe class Config : IEzConfig
     public bool NoFPSLockWhenActive = true;
     public bool ExtraFPSLockRange = false;
     public bool FpsLockOnlyShutdownTimer = false;
+    public bool ShutdownMakesNightMode = false;
 
     public bool ShowDeployables = false;
+    public int BailoutTimeout = 5;
+    public bool EnableBailout = true;
+    public bool EnableCharaSelectBailout = true;
+
+    public bool NightMode = false;
+    public bool NightModePersistent = false;
+    public bool ShowNightMode = false;
+    public bool NightModeRetainers = false;
+    public bool NightModeDeployables = true;
+    internal bool NightModeFPSLimit = true;
 
     internal bool ExtraDebug = false;
+
+    public bool OldStatusIcons = false;
+    public int MinGilDisplay = 10000;
+    public bool GilOnlyChars = false;
+
+    public bool MultiAutoStart = false;
+    public bool MultiDisableOnRelog = false;
+    public bool MultiNoPreferredReset = false;
+    public bool MultiPreferredCharLast = true;
+    public bool VoyageDisableCalcParallel = false;
+    public bool VoyageDisableCalcMultithreading = false;
+
+    public bool LeastMBSFirst = false;
+
+    public string DefaultSubmarineUnlockPlan = "";
 
     internal bool DontReassign
     {
@@ -151,4 +178,17 @@ internal unsafe class Config : IEzConfig
         MultiWaitForAll = false,
         AdvanceTimer = 120,
     };
+
+    public bool StatusBarMSI = false;
+    public int StatusBarIconWidth = 96;
+
+    public bool IMEnableCofferAutoOpen = false;
+    public bool IMEnableAutoVendor = false;
+    public bool IMEnableContextMenu = false;
+    public List<uint> IMAutoVendorHard = [];
+    public List<uint> IMAutoVendorSoft = [];
+    public List<uint> IMProtectList = [];
+    public int IMAutoVendorHardStackLimit = 20;
+    public bool IMDry = false;
+    public bool TreatSoftAsHard = false;
 }

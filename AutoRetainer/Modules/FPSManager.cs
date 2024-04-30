@@ -1,4 +1,6 @@
-﻿namespace AutoRetainer.Modules;
+﻿using ECommons.EzSharedDataManager;
+
+namespace AutoRetainer.Modules;
 
 internal static class FPSManager
 {
@@ -46,7 +48,7 @@ internal static class FPSManager
 
     internal static void LockChillFrames()
     {
-        if (Svc.PluginInterface.TryGetData<HashSet<string>>("ChillFrames.StopRequests", out var data))
+        if (EzSharedData.TryGet<HashSet<string>>("ChillFrames.StopRequests", out var data))
         {
             data.Add(P.Name);
         }
@@ -54,7 +56,7 @@ internal static class FPSManager
 
     internal static void UnlockChillFrames()
     {
-        if (Svc.PluginInterface.TryGetData<HashSet<string>>("ChillFrames.StopRequests", out var data))
+        if (EzSharedData.TryGet<HashSet<string>>("ChillFrames.StopRequests", out var data))
         {
             data.Remove(P.Name);
         }

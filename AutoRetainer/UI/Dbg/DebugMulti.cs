@@ -14,6 +14,10 @@ internal unsafe static class DebugMulti
 {
     internal static void Draw()
     {
+        if(ImGui.Button($"Simulate autostart"))
+        {
+            MultiMode.PerformAutoStart();
+        }
         ImGuiEx.Text($"Moving: {AgentMap.Instance()->IsPlayerMoving}");
         ImGuiEx.Text($"Occupied: {IsOccupied()}");
         ImGuiEx.Text($"Casting: {Player.Object?.IsCasting}");

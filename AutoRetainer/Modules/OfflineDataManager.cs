@@ -1,6 +1,8 @@
-﻿using AutoRetainerAPI.Configuration;
+﻿using AutoRetainer.Internal;
+using AutoRetainerAPI.Configuration;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.Text.SeStringHandling;
+using ECommons.Automation;
 using ECommons.Configuration;
 using ECommons.Events;
 using ECommons.ExcelServices;
@@ -14,15 +16,26 @@ namespace AutoRetainer.Modules;
 
 internal unsafe static class OfflineDataManager
 {
+    internal static void EnqueueWriteWhenPlayerAvailable()
+    {
+        P.ODMTaskManager.Abort();
+        P.ODMTaskManager.Enqueue(() =>
+        {
+            if (!Player.Available) return false;
+            WriteOfflineData(false, false);
+            return true;
+        });
+    }
+
     internal static void Tick()
     {
         if (Svc.Condition[ConditionFlag.OccupiedSummoningBell])
         {
-            if (P.retainerManager.Ready)
+            if (GameRetainerManager.Ready)
             {
                 WriteOfflineData(false, false);
             }
-            if(EzThrottler.Throttle("CalculateItemLevel") && Utils.TryGetCurrentRetainer(out var ret))
+            if(EzThrottler.Throttle("Periodic.CalculateItemLevel") && Utils.TryGetCurrentRetainer(out var ret))
             {
                 var adata = Utils.GetAdditionalData(Player.CID, ret);
                 var result = Helpers.ItemLevel.Calculate(out var g, out var p);
@@ -32,6 +45,13 @@ internal unsafe static class OfflineDataManager
                     adata.Gathering = g;
                     adata.Perception = p;
                 }
+            }
+        }
+        else
+        {
+            if((MultiMode.Active || AutoGCHandin.IsEnabled() || Utils.IsBusy || P.configGui.IsOpen || Svc.Condition[ConditionFlag.LoggingOut]) && EzThrottler.Throttle("Periodic.WriteOfflineData", 1000))
+            {
+                WriteOfflineData(false, EzThrottler.Throttle("Periodic.SaveData", 1000 * 60 * 5));
             }
         }
     }
@@ -81,12 +101,18 @@ internal unsafe static class OfflineDataManager
                 e.Log();
             }
         }
-        if (P.retainerManager.Ready && P.retainerManager.Count > 0)
+        if (GameRetainerManager.Ready && GameRetainerManager.Count > 0 && Player.IsInHomeWorld)
         {
-            data.RetainerData.Clear();
-            for (var i = 0; i < P.retainerManager.Count; i++)
+            var cleared = false;
+            for (var i = 0; i < GameRetainerManager.Count; i++)
             {
-                var ret = P.retainerManager.Retainer(i);
+                var ret = GameRetainerManager.Retainers[i];
+                if (ret.RetainerID == 0) continue;
+                if (ret.RetainerID != 0 && !cleared)
+                {
+                    data.RetainerData.Clear();
+                    cleared = true;
+                }
                 data.RetainerData.Add(new()
                 {
                     Name = ret.Name.ToString(),
@@ -96,17 +122,24 @@ internal unsafe static class OfflineDataManager
                     Job = ret.ClassJob,
                     VentureID = ret.VentureID, 
                     Gil = ret.Gil,
+                    RetainerID = ret.RetainerID,
+                    MBItems = ret.MarkerItemCount,
                 });
 
-                for (int p = 0; p < P.retainerManager.Count; p++)
+                for (int p = 0; p < GameRetainerManager.Count; p++)
                 {
-                    if (FFXIVClientStructs.FFXIV.Client.Game.RetainerManager.Instance()->DisplayOrder[p] == i)
+                    if (RetainerManager.Instance()->DisplayOrder[p] == i)
                     {
                         data.RetainerData[i].DisplayOrder = p;
                         break;
                     }
                 }
             }
+        }
+        if(Utils.FCPoints != 0)
+        {
+            data.FCPoints = Utils.FCPoints;
+            data.FCPointsLastUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
         }
         data.WriteOfflineInventoryData();
         C.OfflineData.RemoveAll(x => x.World == "" && x.Name == "Unknown");

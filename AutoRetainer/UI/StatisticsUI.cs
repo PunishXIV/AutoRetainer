@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.Modules.Statistics;
+using AutoRetainer.UI.Experiments;
 using ECommons.Configuration;
 using Lumina.Excel.GeneratedSheets;
 using System.IO;
@@ -14,6 +15,15 @@ internal static class StatisticsUI
     static string Filter = "";
 
     internal static void Draw()
+    {
+        ImGuiEx.EzTabBar("statstab", [
+                ("Ventures", DrawVentures, null, true),
+                ("Owned gil", GilDisplay.Draw, null, true),
+                ("Owned FC points", FCPoints.Draw, null, true),
+            ]);
+    }
+
+    internal static void DrawVentures()
     {
         if (Data.Count == 0)
         {

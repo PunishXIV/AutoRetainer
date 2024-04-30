@@ -4,12 +4,14 @@ using ClickLib.Clicks;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Memory;
 using Dalamud.Utility;
+using ECommons.ExcelServices;
+using ECommons.ExcelServices.TerritoryEnumeration;
+using ECommons.EzIpcManager;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using Lumina.Excel.GeneratedSheets;
-using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
 
 namespace AutoRetainer.Modules.GcHandin;
 
@@ -17,7 +19,6 @@ internal unsafe static class AutoGCHandin
 {
     internal static AutoGCHandinOverlay Overlay;
     internal static bool Operation = false;
-    internal static long AddonOpenedAt = 0;
 
     internal static bool IsEnabled()
     {
@@ -54,154 +55,175 @@ internal unsafe static class AutoGCHandin
 
     internal static void Tick()
     {
+        if (Svc.Condition[ConditionFlag.OccupiedInQuestEvent] && TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon))
         {
-            if (Svc.Condition[ConditionFlag.OccupiedInQuestEvent] && TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon))
+            if (addon->X != 0 || addon->Y != 0)
             {
-                if (addon->X != 0 || addon->Y != 0)
-                {
-                    Overlay.Position = new(addon->X, addon->Y - Overlay.height);
-                }
+                Overlay.Position = new(addon->X, addon->Y - Overlay.height);
             }
         }
         if (Svc.Condition[ConditionFlag.OccupiedInQuestEvent] && IsEnabled())
         {
             Safety.Check();
+            if (Operation && HandleConfirmation())
             {
-                
+                //
             }
-            if (TryGetAddonByName<AddonGrandCompanySupplyReward>("GrandCompanySupplyReward", out var addonGCSR) && IsAddonReady(&addonGCSR->AtkUnitBase) && Operation)
+            else if (Operation && HandleYesno())
             {
-                if (TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon) && IsAddonReady(addon) && FrameThrottler.Throttle("CloseSupplyList", 8))
-                {
-                    UiHelper.Close(addon);
-                    DebugLog($"Closing Supply List");
-                }
-                if (FrameThrottler.Throttle("Handin", 8) && addonGCSR->DeliverButton->IsEnabled)
-                {
-                    ClickGrandCompanySupplyReward.Using((IntPtr)addonGCSR).Deliver();
-                    DebugLog($"Delivering Item");
-                }
-            }
-            else if (TryGetAddonByName<AddonSelectYesno>("SelectYesno", out var addonSS) && IsAddonReady(&addonSS->AtkUnitBase) && Operation)
-            {
-                if (FrameThrottler.Throttle("Yesno", 8) && addonSS->YesButton->IsEnabled)
-                {
-                    var str = MemoryHelper.ReadSeString(&addonSS->PromptText->NodeText).ExtractText().Replace(" ", "");
-                    DebugLog($"SelectYesno encountered: {str}");
-                    //102434	Do you really want to trade a high-quality item?
-                    if (str.Equals(Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(102434).Text.ExtractText().Replace(" ", "")))
-                    {
-                        ClickSelectYesNo.Using((IntPtr)addonSS).Yes();
-                        DebugLog($"Selecting yes");
-                    }
-                }
-            }
-            else if (TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon) && IsReadyToOperate(addon))
-            {
-                if (AddonOpenedAt == 0)
-                {
-                    AddonOpenedAt = Environment.TickCount64;
-                }
-                if (Operation)
-                {
-                    if (IsDone(addon))
-                    {
-                        var s = $"Automatic handin has been completed";
-                        DuoLog.Information(s);
-                        if (C.GCHandinNotify)
-                        {
-                            Utils.TryNotify(s);
-                        }
-                        Operation = false;
-                    }
-                    else
-                    {
-                        Overlay.Allowed = true;
-                        if (FrameThrottler.Check("AutoGCHandin"))
-                        {
-                            try
-                            {
-                                var sealsCnt = MemoryHelper.ReadSeString(&addon->UldManager.NodeList[23]->GetAsAtkTextNode()->NodeText).ExtractText().ReplaceByChar(",. ", "", true).Split("/");
-                                if (sealsCnt.Length != 2)
-                                {
-                                    throw new FormatException();
-                                }
-                                var seals = sealsCnt[0].ParseInt();
-                                var maxSeals = sealsCnt[1].ParseInt();
-
-                                var step1 = addon->UldManager.NodeList[5];
-                                var step2 = step1->GetAsAtkComponentNode()->Component->UldManager.NodeList[2];
-                                var sealsForItem = MemoryHelper.ReadSeString(&step2->GetAsAtkComponentNode()->Component->UldManager.NodeList[4]->GetAsAtkTextNode()->NodeText).ExtractText().ParseInt();
-                                if (seals == null || maxSeals == null || sealsForItem == null)
-                                {
-                                    throw new FormatException();
-                                }
-                                else
-                                {
-                                    sealsForItem = (int)((float)sealsForItem.Value * Utils.GetGCSealMultiplier());
-                                }
-                                var step3 = step2->GetAsAtkComponentNode()->Component->UldManager.NodeList[5];
-                                var text = MemoryHelper.ReadSeString(&step3->GetAsAtkTextNode()->NodeText).ExtractText();
-                                var has = !text.IsNullOrWhitespace() && HasInInventory(text);
-                                DebugLog($"Seals: {seals}/{maxSeals}, for item {sealsForItem} | {text}: {has}");
-                                FrameThrottler.Throttle("AutoGCHandin", 10, true);
-                                if (!has)
-                                {
-                                    throw new GCHandinInterruptedException($"Item {text} was not found in inventory");
-                                }
-                                if (seals + sealsForItem > maxSeals)
-                                {
-                                    throw new GCHandinInterruptedException($"Too many seals, please spend them");
-                                }
-                                DebugLog($"Handing in item {text} for {sealsForItem} seals");
-                                InvokeHandin(addon);
-                            }
-                            catch (FormatException e)
-                            {
-                                PluginLog.Verbose($"{e.Message}");
-                            }
-                            catch (GCHandinInterruptedException e)
-                            {
-                                Operation = false;
-                                DuoLog.Information($"{e.Message}");
-                                if (C.GCHandinNotify)
-                                {
-                                    Utils.TryNotify(e.Message);
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                Operation = false;
-                                e.Log();
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    Overlay.Allowed = IsReadyToOperate(addon);
-                }
+                //
             }
             else
             {
-                Overlay.Allowed = Operation || IsReadyToOperate(addon);
-                AddonOpenedAt = 0;
+                HandleGCList();
             }
         }
         else
         {
-            if (Overlay.Allowed)
+            if (Overlay.Allowed) Overlay.Allowed = false;
+            if (Operation) Operation = false;
+        }
+    }
+
+    static bool HandleConfirmation()
+    {
+        const string Throttler = "Handin.HandleConfirmation";
+        if (TryGetAddonByName<AddonGrandCompanySupplyReward>("GrandCompanySupplyReward", out var addon) && IsAddonReady(&addon->AtkUnitBase))
+        {
+            if (addon->DeliverButton->IsEnabled && FrameThrottler.Throttle(Throttler, 10))
             {
-                Overlay.Allowed = false;
+                ClickGrandCompanySupplyReward.Using((IntPtr)addon).Deliver();
+                DebugLog($"Delivering Item");
+                return true;
             }
+        }
+        else
+        {
+            //FrameThrottler.Throttle(Throttler, 4, true);
+        }
+        return false;
+    }
+
+    static bool HandleYesno()
+    {
+        const string Throttler = "Handin.Yesno";
+        if (TryGetAddonByName<AddonSelectYesno>("SelectYesno", out var addon) && IsAddonReady(&addon->AtkUnitBase) && Operation)
+        {
+            if (addon->YesButton->IsEnabled)
+            {
+                var str = MemoryHelper.ReadSeString(&addon->PromptText->NodeText).ExtractText().Replace(" ", "");
+                DebugLog($"SelectYesno encountered: {str}");
+                //102434	Do you really want to trade a high-quality item?
+                if (str.Equals(Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(102434).Text.ExtractText().Replace(" ", "")))
+                {
+                    if (FrameThrottler.Throttle(Throttler, 10))
+                    {
+                        ClickSelectYesNo.Using((IntPtr)addon).Yes();
+                        DebugLog($"Selecting yes");
+                    }
+                }
+            }
+            else
+            {
+                //FrameThrottler.Throttle(Throttler, 4, true);
+            }
+        }
+        else
+        {
+            //FrameThrottler.Throttle(Throttler, 4, true);
+        }
+        return false;
+    }
+
+    static void HandleGCList()
+    {
+        if (TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon) && IsReadyToOperate(addon))
+        {
             if (Operation)
             {
-                Operation = false;
+                if (IsDone(addon))
+                {
+                    var s = $"Automatic handin has been completed";
+                    DuoLog.Information(s);
+                    if (C.GCHandinNotify)
+                    {
+                        Utils.TryNotify(s);
+                    }
+                    Operation = false;
+                    GCContinuation.EnqueueDeliveryClose();
+                }
+                else
+                {
+                    Overlay.Allowed = true;
+                    if (FrameThrottler.Check("Handin.HandleConfirmation"))
+                    {
+                        try
+                        {
+                            var reader = new ReaderGrandCompanySupplyList(addon);
+
+                            var nextItem = FindNextHandinItem();
+                            if (reader.NumItems == GetHandinItems().Count)
+                            {
+                                if (nextItem != null)
+                                {
+                                    var has = AutoGCHandin.HasInInventory(nextItem.Value.ItemID);
+                                    var itemName = ExcelItemHelper.GetName(nextItem.Value.ItemID);
+                                    DebugLog($"Seals: {GetSeals()}/{GetMaxSeals()}, for item {nextItem.Value.Seals} | {ExcelItemHelper.GetName(nextItem.Value.ItemID)}: {has}");
+                                    if (!has)
+                                    {
+                                        throw new GCHandinInterruptedException($"Item {itemName} was not found in inventory");
+                                    }
+                                    DebugLog($"Handing in item {itemName} for {nextItem.Value.Seals} seals (index={nextItem.Value.Index})");
+                                    InvokeHandin(addon, nextItem.Value.Index);
+                                }
+                                else
+                                {
+                                    if(FindNextHandinItem(false) == null)
+                                    {
+                                        GCContinuation.EnqueueDeliveryClose();
+                                        throw new GCHandinInterruptedException("Auto GC handin completed");
+                                    }
+                                    else
+                                    {
+                                        GCContinuation.EnqueueDeliveryClose();
+                                        if (C.AutoGCContinuation)
+                                        {
+                                            GCContinuation.EnqueueInitiation();
+                                        }
+                                        throw new GCHandinInterruptedException("Too many seals, please spend them");
+                                    }
+                                }
+                            }
+                        }
+                        catch (FormatException e)
+                        {
+                            PluginLog.Verbose($"{e.Message}");
+                        }
+                        catch (GCHandinInterruptedException e)
+                        {
+                            Operation = false;
+                            DuoLog.Information($"{e.Message}");
+                            if (C.GCHandinNotify)
+                            {
+                                Utils.TryNotify(e.Message);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Operation = false;
+                            e.Log();
+                        }
+                    }
+                }
             }
-            if (AddonOpenedAt != 0)
+            else
             {
-                AddonOpenedAt = 0;
+                Overlay.Allowed = IsReadyToOperate(addon);
             }
+        }
+        else
+        {
+            Overlay.Allowed = Operation || IsReadyToOperate(addon);
         }
     }
 
@@ -210,7 +232,8 @@ internal unsafe static class AutoGCHandin
         try
         {
             return
-                IsAddonReady(GCSupplyListAddon)
+                GCSupplyListAddon != null
+                && IsAddonReady(GCSupplyListAddon)
                 && GCSupplyListAddon->UldManager.NodeListCount > 20
                 && GCSupplyListAddon->UldManager.NodeList[5]->IsVisible
                 && IsSelectedFilterValid(GCSupplyListAddon);
@@ -257,28 +280,77 @@ internal unsafe static class AutoGCHandin
         return false;
     }
 
-    internal static void InvokeHandin(AtkUnitBase* addon)
+    internal static void InvokeHandin(AtkUnitBase* addon, int which)
     {
-        FrameThrottler.Throttle("AutoGCHandin", 10, true);
-        var values = stackalloc AtkValue[]
+        if(FrameThrottler.Throttle("AutoGCHandinCallback", 10)) Callback.Fire(addon, true, 1, which, Callback.ZeroAtkValue);
+    }
+
+    internal static bool HasInInventory(uint itemID)
+    {
+        return InventoryManager.Instance()->GetInventoryItemCount(itemID) + InventoryManager.Instance()->GetInventoryItemCount(itemID, true) > 0;
+    }
+
+    public static bool IsListReady()
+    {
+        if (TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon) && IsAddonReady(addon))
         {
-            new() { Type = ValueType.Int, Int = 1 },
-            new() { Type = ValueType.Int, Int = 0 },
-            new() { Type = 0, Int = 0 }
-        };
-        addon->FireCallback(3, values);
+            return !addon->GetComponentListById(23)->IsUpdatePending;
+        }
+        return false;
     }
 
-    internal static long GetAddonLife()
+    public static (uint ItemID, uint Seals, int Index)? FindNextHandinItem(bool checkSealCap = true)
     {
-        return AddonOpenedAt == 0 ? 0 : Environment.TickCount64 - AddonOpenedAt;
+        var sealsRemaining = GetMaxSeals() - GetSeals();
+        var items = GetHandinItems();
+        for (int i = 0; i < items.Count; i++)
+        {
+            var item = items[i];
+            if (C.IMProtectList.Contains(item.ItemID)) continue;
+            var seals = (uint)(item.Seals * Utils.GetGCSealMultiplier());
+            if(!checkSealCap || sealsRemaining > seals) return(item.ItemID, seals, i);
+        }
+        return null;
+    } 
+
+    public static List<(uint ItemID, uint Seals)> GetHandinItems()
+    {
+        var ret = new List<(uint ItemID, uint Seals)>();
+        if (TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon) && IsAddonReady(addon))
+        {
+            var reader = new ReaderGrandCompanySupplyList(addon);
+            if (IsListReady())
+            {
+                GCExpectEntry* ptr = (GCExpectEntry*)*(nint*)((nint)(addon) + 624);
+                for (int i = 0; i < reader.NumItems; i++)
+                {
+                    var entry = ptr[i];
+                    ret.Add((entry.ItemID, entry.Seals));
+                }
+            }
+        }
+        return ret;
     }
 
-    internal static bool HasInInventory(string item)
+    public static uint GetSeals() => GetGC() == 0?0:InventoryManager.Instance()->GetCompanySeals(GetGC());
+
+    public static uint GetMaxSeals() => GetGC() == 0 ? 0 : InventoryManager.Instance()->GetMaxCompanySeals(GetGC());
+
+    public static byte GetGC() => PlayerState.Instance()->GrandCompany;
+
+    public static byte GetRank()
     {
-        if (item.EndsWith("...")) return true;
-        var id = Svc.Data.GetExcelSheet<Item>().FirstOrDefault(x => x.Name.ExtractText() == item);
-        InternalLog.Information($"{item}, {id}");
-        return id != null && InventoryManager.Instance()->GetInventoryItemCount(id.RowId) + InventoryManager.Instance()->GetInventoryItemCount(id.RowId, true) > 0;
+        if (GetGC() == 1) return PlayerState.Instance()->GCRankMaelstrom;
+        if (GetGC() == 2) return PlayerState.Instance()->GCRankTwinAdders;
+        if (GetGC() == 3) return PlayerState.Instance()->GCRankImmortalFlames;
+        return 0;
+    }
+
+    public static bool IsValidGCTerritory()
+    {
+        if (GetGC() == 1) return Svc.ClientState.TerritoryType == MainCities.Limsa_Lominsa_Upper_Decks;
+        if (GetGC() == 2) return Svc.ClientState.TerritoryType == MainCities.New_Gridania;
+        if (GetGC() == 3) return Svc.ClientState.TerritoryType == MainCities.Uldah_Steps_of_Nald;
+        return false;
     }
 }

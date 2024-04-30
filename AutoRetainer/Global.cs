@@ -20,7 +20,6 @@ global using static AutoRetainer.AutoRetainer;
 global using AutoRetainer.Configuration;
 global using CSFramework = FFXIVClientStructs.FFXIV.Client.System.Framework.Framework;
 global using AutoRetainer.Helpers;
-global using AutoRetainer.Internal.SERetainer;
 global using AutoRetainer.Scheduler;
 global using AutoRetainer.Modules;
 global using AutoRetainer.Modules.GcHandin;

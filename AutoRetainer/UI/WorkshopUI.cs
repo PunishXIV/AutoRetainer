@@ -5,9 +5,17 @@ using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using AutoRetainer.Scheduler.Tasks;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Interface.Components;
+using Dalamud.Interface.Internal.Windows.Settings.Widgets;
 using Dalamud.Memory;
+using ECommons.ExcelServices;
+using ECommons.GameHelpers;
+using ECommons.Reflection;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using Lumina.Excel.GeneratedSheets;
+using PunishLib.ImGuiMethods;
+using System.Collections;
+using Action = Lumina.Excel.GeneratedSheets.Action;
 
 namespace AutoRetainer.UI;
 
@@ -16,6 +24,7 @@ internal static unsafe class WorkshopUI
     static List<(ulong cid, ulong frame, Vector2 start, Vector2 end, float percent)> bars = new();
     internal static void Draw()
     {
+        SharedUI.DrawExcludedNotification(false, true);
         //ImGuiEx.ImGuiLineCentered("WorkshopBetaWarning", () => ImGuiEx.Text(ImGuiColors.DalamudYellow, "This feature is in beta testing."));
         var sortedData = new List<OfflineCharacterData>();
         if (C.NoCurrentCharaOnTop)
@@ -48,15 +57,7 @@ internal static unsafe class WorkshopUI
             ImGui.SameLine(0,3);
             if (ImGuiEx.IconButton(FontAwesomeIcon.DoorOpen))
             {
-                if (MultiMode.Active)
-                {
-                    foreach (var z in C.OfflineData)
-                    {
-                        z.Preferred = false;
-                    }
-                    Notify.Warning("Preferred character has been reset");
-                }
-                if (MultiMode.Relog(data, out var error))
+                if (MultiMode.Relog(data, out var error, RelogReason.ConfigGUI))
                 {
                     Notify.Success("Relogging...");
                 }
@@ -75,36 +76,34 @@ internal static unsafe class WorkshopUI
 
             if (ImGui.BeginPopup($"popup{data.CID}"))
             {
-                SharedUI.DrawMultiModeHeader(data);
-                SharedUI.DrawServiceAccSelector(data);
-                SharedUI.DrawPreferredCharacterUI(data);
+                SharedUI.DrawMultiModeHeader(data, "Deployable Configuration");
+                if (ImGuiGroup.BeginGroupBox("General Character Specific Settings"))
+                {
+                    SharedUI.DrawServiceAccSelector(data);
+                    SharedUI.DrawPreferredCharacterUI(data);
+                    ImGui.Checkbox($"Wait For All Pending Deployables", ref data.MultiWaitForAllDeployables);
+                    ImGuiComponents.HelpMarker("Prevent processing this character until all enabled deployables have returned from their voyages.");
+                    ImGuiGroup.EndGroupBox();
+                }
 
+                if (ImGuiGroup.BeginGroupBox("Deployable Task Estate Teleportation Settings"))
+                {
+                    var inst = Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "TeleporterPlugin" && x.IsLoaded);
+                    if (!inst) ImGui.BeginDisabled();
+                    ImGui.Checkbox($"Enable Estate Hall Teleport", ref data.TeleportToFCHouse);
+                    SharedUI.DrawEntranceConfig(data, ref data.FreeCompanyHouseEntrance);
 
-                var inst = Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "TeleporterPlugin" && x.IsLoaded);
-                if (!inst) ImGui.BeginDisabled();
-                ImGui.Checkbox($"Enable Free Company Estate Hall Teleport", ref data.TeleportToFCHouse);
-                SharedUI.DrawEntranceConfig(ref data.FCHouseEntrance, "Free Company Estate Entrance Override");
+                    if (!inst)
+                    {
+                        ImGui.EndDisabled();
+                        ImGuiComponents.HelpMarker("You must have Teleporter plugin installed and enabled to use this function.");
+                    }
+                        ImGuiGroup.EndGroupBox();
+                }
 
-                if (!inst) ImGui.EndDisabled();
-                ImGuiComponents.HelpMarker("You must have Teleporter plugin installed and enabled to use this function.");
+                SharedUI.DrawExcludeReset(data);
+
                 ImGui.EndPopup();
-            }
-
-            var initCurpos = ImGui.GetCursorPos();
-            var lst = data.GetVesselData(VoyageType.Airship).Where(s => data.GetEnabledVesselsData(VoyageType.Airship).Contains(s.Name))
-                .Union(data.GetVesselData(VoyageType.Submersible).Where(x => data.GetEnabledVesselsData(VoyageType.Submersible).Contains(x.Name)))
-                .Where(x => x.ReturnTime != 0).OrderBy(z => z.GetRemainingSeconds());
-            //if (EzThrottler.Throttle("log")) PluginLog.Information($"{lst.Select(x => x.Name).Print()}");
-            var lowestRetainer = C.MultiModeWorkshopConfiguration.MultiWaitForAll?lst.LastOrDefault():lst.FirstOrDefault();
-            if (lowestRetainer != default)
-            {
-                var prog = 1f - ((float)lowestRetainer.GetRemainingSeconds() / (60f * 60f * 24f));
-                prog.ValidateRange(0f, 1f);
-                var pcol = prog == 1f ? GradientColor.Get(0xbb500000.ToVector4(), 0xbb005000.ToVector4()) : 0xbb500000.ToVector4();
-                ImGui.PushStyleColor(ImGuiCol.PlotHistogram, pcol);
-                ImGui.ProgressBar(prog, new(ImGui.GetContentRegionAvail().X, ImGui.CalcTextSize("A").Y + ImGui.GetStyle().FramePadding.Y * 2), "");
-                ImGui.PopStyleColor();
-                ImGui.SetCursorPos(initCurpos);
             }
 
             if (data.NumSubSlots > data.GetVesselData(VoyageType.Submersible).Count)
@@ -143,10 +142,69 @@ internal static unsafe class WorkshopUI
                 ImGui.SameLine(0, 3);
             }
 
+            if (C.OldStatusIcons)
+            {
+                if (C.MultiModeWorkshopConfiguration.MultiWaitForAll)
+                {
+                    ImGui.PushFont(UiBuilder.IconFont);
+                    ImGuiEx.TextV("\uf252");
+                    ImGui.PopFont();
+                    ImGuiEx.Tooltip($"Wait for all deployables is globally enabled.");
+                    ImGui.SameLine(0, 3);
+                }
+                else if (data.MultiWaitForAllDeployables)
+                {
+                    ImGui.PushFont(UiBuilder.IconFont);
+                    ImGuiEx.TextV("\uf252");
+                    ImGui.PopFont();
+                    ImGuiEx.Tooltip($"Wait for all deployables is enabled for this character.");
+                    ImGui.SameLine(0, 3);
+                }
+
+                if (data.TeleportToFCHouse)
+                {
+                    ImGui.PushFont(UiBuilder.IconFont);
+                    ImGuiEx.TextV("\uf1ad");
+                    ImGui.PopFont();
+                    ImGuiEx.Tooltip($"This character is allowed to teleport to FC house upon readiness");
+                    ImGui.SameLine(0, 3);
+                }
+            }
+
+            var initCurpos = ImGui.GetCursorPos();
+            var lst = data.GetVesselData(VoyageType.Airship).Where(s => data.GetEnabledVesselsData(VoyageType.Airship).Contains(s.Name))
+                .Union(data.GetVesselData(VoyageType.Submersible).Where(x => data.GetEnabledVesselsData(VoyageType.Submersible).Contains(x.Name)))
+                .Where(x => x.ReturnTime != 0).OrderBy(z => z.GetRemainingSeconds());
+            //if (EzThrottler.Throttle("log")) PluginLog.Information($"{lst.Select(x => x.Name).Print()}");
+            var lowestVessel = (C.MultiModeWorkshopConfiguration.MultiWaitForAll || data.MultiWaitForAllDeployables) && !data.AreAnyEnabledVesselsReturnInNext(C.MultiModeWorkshopConfiguration.MaxMinutesOfWaiting * 60) ? lst.LastOrDefault() : lst.FirstOrDefault();
+            if (lowestVessel != default)
+            {
+                var prog = 1f - ((float)lowestVessel.GetRemainingSeconds() / (60f * 60f * 24f));
+                prog.ValidateRange(0f, 1f);
+                var pcol = prog == 1f ? GradientColor.Get(0xbb500000.ToVector4(), 0xbb005000.ToVector4()) : 0xbb500000.ToVector4();
+                ImGui.PushStyleColor(ImGuiCol.PlotHistogram, pcol);
+                ImGui.ProgressBar(prog, new(ImGui.GetContentRegionAvail().X, ImGui.CalcTextSize("A").Y + ImGui.GetStyle().FramePadding.Y * 2), "");
+                ImGui.PopStyleColor();
+                ImGui.SetCursorPos(initCurpos);
+            }
+
+            var colpref = data.Preferred;
+            if (colpref)
+            {
+                ImGui.PushStyleColor(ImGuiCol.Text, GradientColor.Get(ImGui.GetStyle().Colors[(int)ImGuiCol.Text], ImGuiColors.ParsedGreen));
+            }
+
             if (ImGuiEx.CollapsingHeader(Censor.Character(data.Name, data.World)))
             {
+                MultiModeUI.SetAsPreferred(data);
+                if (colpref) ImGui.PopStyleColor();
                 pad = ImGui.GetStyle().FramePadding.Y;
                 DrawTable(data);
+            }
+            else
+            {
+                MultiModeUI.SetAsPreferred(data);
+                if (colpref) ImGui.PopStyleColor();
             }
 
             var rightText = $"R: {data.RepairKits} | C: {data.Ceruleum} | I: {data.InventorySpace}";
@@ -361,6 +419,11 @@ internal static unsafe class WorkshopUI
             ImGuiEx.Text(Lang.IconWarning);
         }
         ImGui.PopFont();
+        if(adata.IndexOverride > 0)
+        {
+            ImGui.SameLine();
+            ImGuiEx.Text(ImGuiColors.DalamudGrey3, $"Index override: {adata.IndexOverride}");
+        }
         var end = ImGui.GetCursorPos();
         var p = (float)vessel.GetRemainingSeconds() / (60f * 60f * 24f);
         if(vessel.ReturnTime != 0) bars.Add((data.CID, Svc.PluginInterface.UiBuilder.FrameCount, start, end, vessel.ReturnTime==0?0:p.ValidateRange(0f, 1f)));
@@ -424,9 +487,10 @@ internal static unsafe class WorkshopUI
             {
                 ImGuiEx.Text($"Unlock mode:");
                 ImGuiEx.EnumCombo("##umode", ref adata.UnlockMode, Lang.UnlockModeNames);
-                var currentPlan = VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan);
-                var text = Environment.TickCount64 % 2000 > 1000 ? "Unlocking every point (default plan)" : "No or unknown plan selected";
-                if (ImGui.BeginCombo("##uplan", currentPlan?.Name ?? text))
+                var currentPlan = VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan) ?? VoyageUtils.GetDefaultSubmarineUnlockPlan(false);
+                var isDefault = VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan) == null;
+                var text = Environment.TickCount64 % 2000 > 1000 ? "Unlocking every point" : "No or unknown plan selected";
+                if (ImGui.BeginCombo("##uplan", (currentPlan?.Name ?? text) + (isDefault?" (default)":"")))
                 {
                     if (ImGui.Button("Open editor"))
                     {
@@ -473,9 +537,47 @@ internal static unsafe class WorkshopUI
                     ImGui.EndCombo();
                 }
             }
+            ImGui.Separator();
+            ImGuiEx.SetNextItemWidthScaled(150f);
+            ImGuiEx.SliderInt("Index override", ref adata.IndexOverride, 0, 4, adata.IndexOverride == 0 ? "Disabled" : $"{adata.IndexOverride}");
+            ImGuiComponents.HelpMarker($"If your vessel order in AutoRetainer is different than in voyage panel menu, you must use this feature to set correct index to incorrectly ordered vessels. Make sure that index is matching order in control panel.");
+            if(ImGui.CollapsingHeader("I have recently renamed this vessel"))
+            {
+                if(ImGui.BeginCombo("##selprev", "Select previous vessel name"))
+                {
+                    var datas = ((Func<Dictionary<string, AdditionalVesselData>>)delegate
+                    {
+                        if (type == VoyageType.Airship) return data.AdditionalAirshipData;
+                        if (type == VoyageType.Submersible) return data.AdditionalSubmarineData;
+                        throw new ArgumentOutOfRangeException(nameof(type));
+                    })();
+                    foreach (var x in datas)
+                    {
+                        var d = data.GetVesselData(type).Any(z => z.Name == x.Key);
+                        if (d) ImGui.BeginDisabled();
+                        if (ImGui.Selectable($"{x.Key}"))
+                        {
+                            new TickScheduler(() =>
+                            {
+                                var copyTo = vessel.Name;
+                                var newData = x.Value.JSONClone();
+                                var toDelete = x.Key;
+                                datas[copyTo] = x.Value;
+                                datas.Remove(toDelete);
+                                Notify.Success($"Moved data from {toDelete} to {copyTo}");
+                            });
+                        }
+                        if (d) ImGui.EndDisabled();
+                    }
+                    ImGui.EndCombo();
+                }
+            }
             if (C.Verbose)
             {
-                if(ImGui.Button("Fake ready")) vessel.ReturnTime = 1;
+                if (ImGui.Button("Fake ready")) vessel.ReturnTime = (uint)P.Time;
+                if (ImGui.Button("Fake ready+")) vessel.ReturnTime += 60u * (ImGui.GetIO().KeyCtrl ? 10u : 1u) * (ImGui.GetIO().KeyShift ? 10u : 1u);
+                if (ImGui.Button("Fake ready-")) vessel.ReturnTime -= 60u * (ImGui.GetIO().KeyCtrl ? 10u : 1u) * (ImGui.GetIO().KeyShift ? 10u : 1u);
+                if (ImGui.Button("Fake unready")) vessel.ReturnTime = (uint)(P.Time + 9999);
             }
             ImGui.EndPopup();
         }

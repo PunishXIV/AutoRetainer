@@ -1,7 +1,12 @@
-﻿using ECommons.MathHelpers;
+﻿using ECommons.Automation;
+using ECommons.Events;
+using ECommons.ExcelServices;
+using ECommons.MathHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
+using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PInvoke;
+using System.Security.Cryptography;
 using ItemLevel = AutoRetainer.Helpers.ItemLevel;
 
 namespace AutoRetainer.UI.Dbg;
@@ -11,6 +16,60 @@ internal static unsafe class DebugMisc
 
     internal static void Draw()
     {
+        if (ImGui.CollapsingHeader("pfinder"))
+        {
+
+            if (ImGui.Button("Callback"))
+            {
+                if (!TryGetAddonByName<AtkUnitBase>("LookingForGroup", out var _))
+                {
+                    P.TaskManager.Enqueue(() => Chat.Instance.SendMessage("/partyfinder"));
+                    P.TaskManager.DelayNext(500);
+                }
+                P.TaskManager.Enqueue(() =>
+                {
+                    if (TryGetAddonByName<AtkUnitBase>("LookingForGroup", out var addon))
+                    {
+                        var btn = addon->UldManager.NodeList[35];
+                        var enabled = btn->GetAsAtkComponentNode()->Component->UldManager.NodeList[2]->Alpha_2 == 255;
+                        var selected = btn->GetAsAtkComponentNode()->Component->UldManager.NodeList[4]->GetAsAtkImageNode()->PartId == 0;
+                        if (enabled)
+                        {
+                            if (!selected)
+                            {
+                                PluginLog.Debug($"Selecting hunts");
+                                Callback.Fire(addon, true, 21, 11, Callback.ZeroAtkValue);
+                            }
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+            }
+        }
+        ImGuiEx.Text($"FC points: {Utils.FCPoints}");
+        if (ImGui.CollapsingHeader("Housing"))
+        {
+            ImGuiEx.Text($"FC aetheryte: {ExcelTerritoryHelper.GetName(Utils.GetFCHouseTerritory())} / {Utils.IsSureNotInFcTerritory()}");
+            ImGuiEx.Text($"Private aetheryte: {ExcelTerritoryHelper.GetName(Utils.GetPrivateHouseTerritory())} / {Utils.IsSureNotInPrivateTerritory()}");
+            var h = HousingManager.Instance();
+            ImGuiEx.Text($"GetCurrentDivision {h->GetCurrentDivision()}");
+            ImGuiEx.Text($"GetCurrentHouseId {h->GetCurrentHouseId()}");
+            ImGuiEx.Text($"GetCurrentPlot {h->GetCurrentPlot()}");
+            ImGuiEx.Text($"GetCurrentRoom {h->GetCurrentRoom()}");
+            ImGuiEx.Text($"GetCurrentWard {h->GetCurrentWard()}");
+            if(ImGui.Button("Simulate login"))
+            {
+                ProperOnLogin.FireArtificially();
+            }
+            if(h->OutdoorTerritory != null)
+            {
+                for(int i = 0; i < 30; i++)
+                {
+                    ImGuiEx.Text($"IsEstateResident {i}: {P.Memory.OutdoorTerritory_IsEstateResident((nint)h->OutdoorTerritory, (byte)i)}");
+                }
+            }
+        }
         if (ImGui.Button("Install callback hook")) Callback.InstallHook();
         if (ImGui.Button("Disable callback hook")) Callback.UninstallHook();
         ImGuiEx.TextCopy($"{(nint)(&TargetSystem.Instance()->Target):X16}");
@@ -86,11 +145,10 @@ internal static unsafe class DebugMisc
         }
 
         ImGui.Separator();
-        ImGuiEx.Text($"GC Addon Life: {AutoGCHandin.GetAddonLife()}");
         {
             if (ImGui.Button("Fire") && TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon) && IsAddonReady(addon) && addon->UldManager.NodeList[5]->IsVisible)
             {
-                AutoGCHandin.InvokeHandin(addon);
+                AutoGCHandin.InvokeHandin(addon, 0);
             }
         }
 

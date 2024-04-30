@@ -111,7 +111,7 @@ internal class VenturePlanner : Window
                             if (d) ImGui.EndDisabled();
                         }
                         ImGui.SameLine();
-                        ImGui.SetNextItemWidth(100f);
+                        ImGuiEx.SetNextItemWidthScaled(100f);
                         ImGui.InputInt("##cnt", ref v.Num.ValidateRange(1, 9999), 1, 1);
                         ImGui.SameLine();
                         if (ImGuiEx.IconButton(FontAwesomeIcon.Trash))
@@ -218,12 +218,12 @@ internal class VenturePlanner : Window
                     ImGui.InputTextWithHint("##search", "Filter...", ref search, 100);
                     ImGuiEx.TextV($"Level range:");
                     ImGui.SameLine();
-                    ImGui.SetNextItemWidth(50f);
+                    ImGuiEx.SetNextItemWidthScaled(50f);
                     ImGui.DragInt("##minL", ref minLevel, 1, 1, 90);
                     ImGui.SameLine();
                     ImGuiEx.Text($"-");
                     ImGui.SameLine();
-                    ImGui.SetNextItemWidth(50f);
+                    ImGuiEx.SetNextItemWidthScaled(50f);
                     ImGui.DragInt("##maxL", ref maxLevel, 1, 1, 90);
                     ImGuiEx.TextV($"Unavailable ventures:");
                     ImGui.SameLine();
