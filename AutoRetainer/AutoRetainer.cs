@@ -30,6 +30,7 @@ using ECommons.Reflection;
 using Dalamud.Interface.Internal.Notifications;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using AutoRetainer.Modules.EzIPCManagers;
+using AutoRetainer.UI.NeoUI;
 
 namespace AutoRetainer;
 
@@ -77,8 +78,9 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal ContextMenuManager ContextMenuManager;
     public bool ReadOnly = false;
     public EzIPCManager EzIPCManager;
+    public NeoWindow NeoWindow;
 
-    internal static OfflineCharacterData Data => Utils.GetCurrentCharacterData();
+		internal static OfflineCharacterData Data => Utils.GetCurrentCharacterData();
 
     public AutoRetainer(DalamudPluginInterface pi)
     {
@@ -173,7 +175,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
             MultiMode.PerformAutoStart();
         }
         EzIPCManager = new();
-    }
+        NeoWindow = new();
+		}
 
     private void GameNetwork_NetworkMessage(nint dataPtr, ushort opCode, uint sourceActorId, uint targetActorId, NetworkMessageDirection direction)
     {
