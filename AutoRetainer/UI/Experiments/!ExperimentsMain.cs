@@ -15,7 +15,6 @@ namespace AutoRetainer.UI.Experiments
             ImGuiEx.EzTabBar("Experiments", [
                 ("Night mode", Night.Draw, null, true),
                 ("Inventory management", InventoryManagement.Draw, null, true),
-                ("Neo UI", P.NeoWindow.Draw, null, true),
                 //("GC Auto Delivery", GCAutoDelivery.Draw, null, true),
                 ]);
         }

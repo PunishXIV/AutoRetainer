@@ -93,6 +93,7 @@ namespace AutoRetainer.UI.Settings.SettingsMain
             [WorkshopFailAction.ExcludeVessel] = "Exclude deployable from operation",
             [WorkshopFailAction.ExcludeChar] = "Exclude captain from multi mode rotation",
         };
+
         static void TabCont()
         {
             ImGuiEx.TextWrapped("Here you can apply various fallback actions to perform in the case of some common failure states or potential operation errors.");

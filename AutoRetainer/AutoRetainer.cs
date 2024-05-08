@@ -31,6 +31,8 @@ using Dalamud.Interface.Internal.Notifications;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using AutoRetainer.Modules.EzIPCManagers;
 using AutoRetainer.UI.NeoUI;
+using LoginOverlay = AutoRetainer.UI.Overlays.LoginOverlay;
+using ECommons.Automation.LegacyTaskManager;
 
 namespace AutoRetainer;
 
@@ -216,11 +218,13 @@ public unsafe class AutoRetainer : IDalamudPlugin
         {
             config.Verbose = !config.Verbose;
             DuoLog.Information($"Debug mode {(config.Verbose ? "enabled" : "disabled")}");
+            NeoWindow.Reload();
         }
         else if (arguments.EqualsIgnoreCase("expert"))
         {
             config.Expert = !config.Expert;
             DuoLog.Information($"Expert mode {(config.Expert ? "enabled" : "disabled")}");
+            NeoWindow.Reload();
         }
         else if(arguments.EqualsIgnoreCaseAny("e", "enable"))
         {

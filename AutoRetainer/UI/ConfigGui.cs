@@ -147,15 +147,15 @@ unsafe internal class ConfigGui : Window
             }
         }
 
-
         ImGuiEx.EzTabBar("tabbar",
                 ("Retainers", MultiModeUI.Draw, null, true),
                 ("Deployables", WorkshopUI.Draw, null, true),
-                (C.RecordStats ? "Statistics" : null, StatisticsUI.Draw, null, true),
+                ("Settings", P.NeoWindow.Draw, null, true),
+								("About", delegate { AboutTab.Draw(P.Name); }, null, true)
+								/*(C.RecordStats ? "Statistics" : null, StatisticsUI.Draw, null, true),
                 ("Settings", SettingsMain.Draw, null, true),
                 (C.Expert?"Expert":null, Expert.Draw, null, true),
                 //("Beta", Beta.Draw, null, true),
-                ("About", delegate { AboutTab.Draw(P.Name); }, null, true),
                 (C.Verbose ? "Dev" : null, delegate
                 {
                     ImGuiEx.EzTabBar("DebugBar",
@@ -164,8 +164,8 @@ unsafe internal class ConfigGui : Window
                         ("Debug", Debug.Draw, null, true),
                         ("WIP", SuperSecret.Draw, null, true)
                     );
-                }, null, true)
-                ); 
+                }, null, true)*/
+								); 
 
     }
 

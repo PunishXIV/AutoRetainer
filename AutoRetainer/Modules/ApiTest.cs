@@ -1,4 +1,5 @@
 ﻿using ECommons.Automation;
+using ECommons.Automation.LegacyTaskManager;
 
 namespace AutoRetainer.Modules;
 
