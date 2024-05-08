@@ -22,6 +22,7 @@ public class MiscTab : NeoUIEntry
 				.Checkbox($"Record Venture Statistics", () => ref C.RecordStats)
 
 				.Section("Automatic Grand Company Expert Delivery")
+				.Checkbox("Tray notification upon handin completion (requires NotificationMaster)", () => ref C.GCHandinNotify)
 
 				.Section("Performance")
 

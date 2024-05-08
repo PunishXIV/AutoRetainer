@@ -2,10 +2,12 @@
 using ECommons.Events;
 using ECommons.ExcelServices;
 using ECommons.MathHelpers;
+using ECommons.SingletonManager;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PInvoke;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using ItemLevel = AutoRetainer.Helpers.ItemLevel;
 
@@ -15,10 +17,9 @@ internal static unsafe class DebugMisc
 {
 
     internal static void Draw()
-    {
-        if (ImGui.CollapsingHeader("pfinder"))
+		{
+				if (ImGui.CollapsingHeader("pfinder"))
         {
-
             if (ImGui.Button("Callback"))
             {
                 if (!TryGetAddonByName<AtkUnitBase>("LookingForGroup", out var _))

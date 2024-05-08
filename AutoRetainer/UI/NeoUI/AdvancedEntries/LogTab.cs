@@ -11,6 +11,6 @@ public class LogTab : NeoUIEntry
 
 		public override void Draw()
 		{
-				InternalLog.ImGuiTab();
+				InternalLog.PrintImgui();
 		}
 }

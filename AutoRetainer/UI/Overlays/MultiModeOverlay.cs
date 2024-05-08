@@ -8,8 +8,9 @@ namespace AutoRetainer.UI.Overlays;
 internal class MultiModeOverlay : Window
 {
     public MultiModeOverlay() : base("AutoRetainer Alert", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoBackground, true)
-    {
-        IsOpen = true;
+		{
+				P.WindowSystem.AddWindow(this);
+				IsOpen = true;
         ShowCloseButton = false;
         RespectCloseHotkey = false;
     }

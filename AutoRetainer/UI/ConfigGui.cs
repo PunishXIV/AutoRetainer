@@ -7,11 +7,13 @@ using AutoRetainerAPI;
 using AutoRetainer.Modules.Voyage;
 using AutoRetainer.UI.Settings.SettingsMain;
 using ECommons.Events;
+using ECommons.SingletonManager;
 
 namespace AutoRetainer.UI;
 
 unsafe internal class ConfigGui : Window
 {
+		public static ConfigGui Instance { get; private set; }
     public ConfigGui() : base($"")
     {
         this.SizeConstraints = new()
@@ -19,16 +21,15 @@ unsafe internal class ConfigGui : Window
             MinimumSize = new(250, 100),
             MaximumSize = new(9999,9999)
         };
-        P.ws.AddWindow(this);
-    }
+        P.WindowSystem.AddWindow(this);
+        Instance = this;
+        Singleton<ConfigGui>.Instance = this;
+		}
+
+    public int GetRandomNumber() => Random.Shared.Next((int)this.SizeConstraints.Value.MinimumSize.X);
 
     public override void PreDraw()
     {
-        if (!C.NoTheme)
-        {
-            P.Style.Push();
-            P.StylePushed = true;
-        }
         var prefix = SchedulerMain.PluginEnabled ? $" [{SchedulerMain.Reason}]" : "";
         var tokenRem = TimeSpan.FromMilliseconds(P.TimeLaunched[0] + 3*24*60*60*1000 - DateTimeOffset.Now.ToUnixTimeMilliseconds());
         this.WindowName = $"{P.Name} {P.GetType().Assembly.GetName().Version}{prefix} | {FormatToken(tokenRem)}###AutoRetainer";
@@ -59,9 +60,13 @@ unsafe internal class ConfigGui : Window
             return "Session expired";
         }
     }
-
     public override void Draw()
     {
+        ImGuiEx.RightFloat(() =>
+        {
+            if(ImGuiEx.IconButton(FontAwesomeIcon.Cog)) P.NeoWindow.IsOpen = true;
+        });
+
         var e = SchedulerMain.PluginEnabledInternal;
         var disabled = MultiMode.Active && !ImGui.GetIO().KeyCtrl;
 
@@ -72,7 +77,7 @@ unsafe internal class ConfigGui : Window
         if (ImGui.Checkbox($"Enable {P.Name}", ref e))
         {
             P.WasEnabled = false;
-            if(e)
+            if (e)
             {
                 SchedulerMain.EnablePlugin(PluginEnableReason.Auto);
             }
@@ -120,7 +125,7 @@ unsafe internal class ConfigGui : Window
         if (C.CharEqualize && MultiMode.Enabled)
         {
             ImGui.SameLine();
-            if(ImGui.Button("Reset counters"))
+            if (ImGui.Button("Reset counters"))
             {
                 MultiMode.CharaCnt.Clear();
             }
@@ -147,36 +152,12 @@ unsafe internal class ConfigGui : Window
             }
         }
 
-        ImGuiEx.EzTabBar("tabbar",
-                ("Retainers", MultiModeUI.Draw, null, true),
-                ("Deployables", WorkshopUI.Draw, null, true),
-                ("Settings", P.NeoWindow.Draw, null, true),
+				ImGuiEx.EzTabBar("tabbar",
+								("Retainers", MultiModeUI.Draw, null, true),
+								("Deployables", WorkshopUI.Draw, null, true),
 								("About", delegate { AboutTab.Draw(P.Name); }, null, true)
-								/*(C.RecordStats ? "Statistics" : null, StatisticsUI.Draw, null, true),
-                ("Settings", SettingsMain.Draw, null, true),
-                (C.Expert?"Expert":null, Expert.Draw, null, true),
-                //("Beta", Beta.Draw, null, true),
-                (C.Verbose ? "Dev" : null, delegate
-                {
-                    ImGuiEx.EzTabBar("DebugBar",
-                        ("Log", InternalLog.PrintImgui, null, false),
-                        ("Retainers (old)", Retainers.Draw, null, true),
-                        ("Debug", Debug.Draw, null, true),
-                        ("WIP", SuperSecret.Draw, null, true)
-                    );
-                }, null, true)*/
-								); 
-
-    }
-
-    public override void PostDraw()
-    {
-        if (P.StylePushed)
-        {
-            P.Style.Pop();
-            P.StylePushed = false; 
-        }
-    }
+								);
+		}
 
     public override void OnClose()
     {

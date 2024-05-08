@@ -55,7 +55,7 @@ public class MainSettings : NeoUIEntry
 						.Section("User Interface")
 						.Checkbox("Anonymise Retainers", () => ref C.NoNames, "Retainer names will be redacted from general UI elements. They will not be hidden in debug menus and plugin logs however. While this option is on, character and retainer numbers are not guaranteed to be equal in different sections of a plugin (for example, retainer 1 in retainers view is not guaranteed to be the same retainer as in statistics view).")
 						.Checkbox("Display Quick Menu in Retainer UI", () => ref C.UIBar)
-						.Checkbox("Opt out of custom Dalamud theme", () => ref C.NoTheme)
+						//.Checkbox("Opt out of custom Dalamud theme", () => ref C.NoTheme)
 						.Checkbox("Display Extended Retainer Info", () => ref C.ShowAdditionalInfo, "Displays retainer item level/gathering/perception and the name of their current venture in the main UI.")
 						.Widget("Do not close AutoRetainer windows on ESC key press", (x) =>
 						{

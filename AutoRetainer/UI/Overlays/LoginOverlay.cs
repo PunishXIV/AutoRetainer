@@ -8,8 +8,9 @@ internal unsafe class LoginOverlay : Window
 {
     internal float bWidth = 0f;
     public LoginOverlay() : base("AutoRetainer login overlay", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoTitleBar, true)
-    {
-        this.RespectCloseHotkey = false;
+		{
+				P.WindowSystem.AddWindow(this);
+				this.RespectCloseHotkey = false;
         this.IsOpen = true;
     }
 

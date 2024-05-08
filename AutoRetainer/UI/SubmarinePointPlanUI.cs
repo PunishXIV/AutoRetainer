@@ -13,9 +13,9 @@ internal unsafe class SubmarinePointPlanUI : Window
     internal SubmarinePointPlan SelectedPlan => VoyageUtils.GetSubmarinePointPlanByGuid(SelectedPlanGuid);
 
     public SubmarinePointPlanUI() : base("Submersible Voyage Route Planner")
-    {
-    }
-
+		{
+				P.WindowSystem.AddWindow(this);
+		}
 
     internal int GetAmountOfOtherPlanUsers(string guid)
     {

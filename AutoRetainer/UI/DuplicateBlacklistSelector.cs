@@ -5,12 +5,18 @@ using Newtonsoft.Json;
 
 namespace AutoRetainer.UI;
 
-internal class DuplicateBlacklistSelector() : Window("Entrust duplicates blacklist")
+internal class DuplicateBlacklistSelector : Window
 {
     internal OfflineCharacterData SelectedData;
     internal Dictionary<uint, string> Items = Svc.Data.GetExcelSheet<Item>().Where(x => x.StackSize > 1 && x.RowId > 99).ToDictionary(x => x.RowId, x => x.Name.ToDalamudString().ExtractText());
     string Filter = "";
-    public override void Draw()
+
+		public DuplicateBlacklistSelector() : base("Entrust duplicates blacklist")
+		{
+				P.WindowSystem.AddWindow(this);
+		}
+
+		public override void Draw()
     {
         if(ImGui.BeginCombo("##ocdsel", SelectedData == null?"Select...":$"{Censor.Character(SelectedData.Name, SelectedData.World)}"))
         {

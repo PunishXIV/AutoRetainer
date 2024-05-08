@@ -50,7 +50,7 @@ internal unsafe static class AutoGCHandin
     internal static void Init()
     {
         Overlay = new();
-        P.ws.AddWindow(Overlay);
+        P.WindowSystem.AddWindow(Overlay);
     }
 
     internal static void Tick()

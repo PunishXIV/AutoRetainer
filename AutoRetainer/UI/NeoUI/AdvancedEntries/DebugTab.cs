@@ -17,4 +17,9 @@ public class DebugTab : NeoUIEntry
 												("Debug", Debug.Draw, null, true),
 												("WIP", SuperSecret.Draw, null, true));
 		}
+
+		public override bool ShouldDisplay()
+		{
+				return C.Verbose;
+		}
 }

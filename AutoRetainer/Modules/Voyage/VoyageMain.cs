@@ -19,7 +19,7 @@ internal static unsafe class VoyageMain
         Svc.Toasts.ErrorToast += Toasts_ErrorToast;
         VoyageMemory.Init();
         WaitOverlay = new();
-        P.ws.AddWindow(WaitOverlay);
+        P.WindowSystem.AddWindow(WaitOverlay);
     }
 
     private static void Toasts_ErrorToast(ref SeString message, ref bool isHandled)

@@ -19,8 +19,9 @@ internal class VentureBrowser : Window
     int maxLevel = 90;
     bool GatherBuddyPresent = false;
     public VentureBrowser() : base("Venture Browser")
-    {
-        this.SizeConstraints = new()
+		{
+				P.WindowSystem.AddWindow(this);
+				this.SizeConstraints = new()
         {
             MinimumSize = new(100, 100),
             MaximumSize = new(float.MaxValue, float.MaxValue)

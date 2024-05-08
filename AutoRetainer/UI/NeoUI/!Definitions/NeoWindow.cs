@@ -41,13 +41,16 @@ public class NeoWindow : Window
 
 		public NeoWindow() : base("AutoRetainer Configuration")
 		{
+				P.WindowSystem.AddWindow(this);
 				this.SetMinSize();
-				FileSystem = new([.. Tabs.Where(x => x.ShouldDisplay())]);
-				FileSystem.DrawButton = (x) =>
+				FileSystem = new(() => [.. Tabs.Where(x => x.ShouldDisplay())])
 				{
-						if (ImGui.Button("by Puni.sh", x))
+						DrawButton = (x) =>
 						{
-								ShellStart("https://puni.sh/");
+								if (ImGui.Button("by Puni.sh", x))
+								{
+										ShellStart("https://puni.sh/");
+								}
 						}
 				};
 		}

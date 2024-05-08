@@ -15,8 +15,9 @@ internal unsafe class SubmarineUnlockPlanUI : Window
     internal SubmarineUnlockPlan SelectedPlan => VoyageUtils.GetSubmarineUnlockPlanByGuid(SelectedPlanGuid);
 
     public SubmarineUnlockPlanUI() : base("Submersible Voyage Unlockable Planner")
-    {
-    }
+		{
+				P.WindowSystem.AddWindow(this);
+		}
 
     internal Dictionary<uint, bool> RouteUnlockedCache = new();
     internal Dictionary<uint, bool> RouteExploredCache = new();

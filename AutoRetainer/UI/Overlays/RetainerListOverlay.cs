@@ -14,8 +14,9 @@ internal unsafe class RetainerListOverlay : Window
     internal volatile string PluginToProcess = null;
 
     public RetainerListOverlay() : base("AutoRetainer retainerlist overlay", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize, true)
-    {
-        RespectCloseHotkey = false;
+		{
+				P.WindowSystem.AddWindow(this);
+				RespectCloseHotkey = false;
         IsOpen = true;
     }
 

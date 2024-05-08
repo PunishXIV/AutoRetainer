@@ -5,8 +5,9 @@ internal class MarketCooldownOverlay : Window
     public long UnlockAt = 0;
 
     public MarketCooldownOverlay() : base("AutoRetainer MarketCooldownOverlay", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.AlwaysAutoResize)
-    {
-        this.IsOpen = true;
+		{
+				P.WindowSystem.AddWindow(this);
+				this.IsOpen = true;
         this.RespectCloseHotkey = false;
     }
 

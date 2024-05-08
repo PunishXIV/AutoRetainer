@@ -42,8 +42,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal static AutoRetainer P;
     internal static Config C => P.config;
     private Config config;
-    internal WindowSystem ws;
-    internal ConfigGui configGui;
+    internal WindowSystem WindowSystem;
+    internal ConfigGui ConfigGui;
     internal bool IsInteractionAutomatic = false;
     internal QuickSellItems quickSellItems;
     internal TaskManager TaskManager;
@@ -67,8 +67,6 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
     internal long Time => C.UseServerTime ? CSFramework.GetServerTime() : DateTimeOffset.Now.ToUnixTimeSeconds();
 
-    internal StyleModel Style;
-    internal bool StylePushed = false;
     internal RetainerListOverlay RetainerListOverlay;
     internal uint LastVentureID = 0;
     internal uint ListUpdateFrame = 0;
@@ -110,22 +108,33 @@ public unsafe class AutoRetainer : IDalamudPlugin
         EzConfig.Migrate<Config>();
         config = EzConfig.Init<Config>();
         Migrator.MigrateGC();
-        ws = new();
+
+        //windows
+        WindowSystem = new();
         VenturePlanner = new();
-        ws.AddWindow(VenturePlanner);
         VentureBrowser = new();
-        ws.AddWindow(VentureBrowser);
         LogWindow = new();
-        ws.AddWindow(LogWindow);
-        configGui = new();
+        ConfigGui = new();
         MarketCooldownOverlay = new();
-        ws.AddWindow(MarketCooldownOverlay);
         DuplicateBlacklistSelector = new();
-        ws.AddWindow(DuplicateBlacklistSelector);
-        TaskManager = new() { AbortOnTimeout = true, TimeLimitMS = 20000 };
+				new MultiModeOverlay();
+				RetainerListOverlay = new();
+				LoginOverlay = new LoginOverlay();
+				SubmarineUnlockPlanUI = new();
+				SubmarinePointPlanUI = new();
+				NeoWindow = new();
+
+				TaskManager = new() { AbortOnTimeout = true, TimeLimitMS = 20000 };
         Memory = new();
-        Svc.PluginInterface.UiBuilder.Draw += ws.Draw;
-        Svc.PluginInterface.UiBuilder.OpenConfigUi += delegate { configGui.IsOpen = true; };
+        Svc.PluginInterface.UiBuilder.Draw += WindowSystem.Draw;
+        Svc.PluginInterface.UiBuilder.OpenConfigUi += () =>
+        {
+            ConfigGui.IsOpen = true;
+        };
+        Svc.PluginInterface.UiBuilder.OpenMainUi += () =>
+        {
+            NeoWindow.IsOpen = true;
+        };
         Svc.ClientState.Logout += Logout;
         Svc.Condition.ConditionChange += ConditionChange;
         EzCmd.Add("/autoretainer", CommandHandler, "Open plugin interface\n/autoretainer e|enable → Enable plugin\n/autoretainer d|disable - Disable plugin\n/autoretainer t|toggle - toggle plugin\n/autoretainer m|multi - toggle MultiMode\n/autoretainer relog Character Name@WorldName - relog to the targeted character if configured\n/autoretainer b|browser - open venture browser\n/autoretainer expert - toggle expert settings\n/autoretainer debug - toggle debug menu and verbose output\n/autoretainer shutdown <hours> [minutes] [seconds] - schedule a game shutdown in this amount of time");
@@ -140,15 +149,6 @@ public unsafe class AutoRetainer : IDalamudPlugin
         Utils.FixKeys();
         VoyageMain.Init();
 
-        ws.AddWindow(new MultiModeOverlay());
-        RetainerListOverlay = new RetainerListOverlay();
-        ws.AddWindow(RetainerListOverlay);
-        LoginOverlay = (new LoginOverlay());
-        ws.AddWindow(LoginOverlay);
-        SubmarineUnlockPlanUI = new();
-        ws.AddWindow(SubmarineUnlockPlanUI);
-        SubmarinePointPlanUI = new();
-        ws.AddWindow(SubmarinePointPlanUI);
         MultiMode.Init();
         NotificationMasterApi = new(Svc.PluginInterface);
         ODMTaskManager = new()
@@ -158,8 +158,6 @@ public unsafe class AutoRetainer : IDalamudPlugin
         };
 
         Safety.Check();
-
-        Style = StyleModel.Deserialize("DS1H4sIAAAAAAAACqVYS3ObOhT+L6w9HZ4CvGuS22bRdDJNOu29OxkrNjUxFGP3kcl/75F0jiSwO3MBb4Swvu+8jyRePO4tgzf+wlt5yxfvq7fM5ORfNb4uvMJb+vLFGkeBq3xc5b9JYNUTcCy8Db7eImOJc77Ch28IZggOlYgd/lvh+IyrYlzF1Kr9AKvf1hffNvg2wreRevsd1FLGtfAAohfegR46NPuIKpxw/IHjTxx/GesTx/rfZz6R4ji/qEVRg50v3qP42RlY5kd5GDAEZ3KSpAvvPznLE5axMAV5X5RbgUJib8oDX1VibThY4ueZHyMHS7M4CmLkUJMojR2OL+V+Xf+42ljVmfqlZIGZKobAT7IsjBKX4npbVuuJDNpF93VzbFyGjLAZouSDWp7HsP6qbteitcvzOAhSRqGwUy0wVh7RjoNA+UHO/MywPGw5OGCG8u9a/iwc5QMZNZYRg5Qm/Y4MoSYkcxKtqqW5rU+idcIZpkok2Rb24hklIdgaIldsWd4WXXmyJRoZFyiSyKSSYokpzxQLQ4Eyv8quErNSAxkG6kzmua6rijcHxz3jqe7E/njFWzdgVCzGr4ELeChaELvqQcZniWF538o2OD5XgnOayblygWtyxlAPEMXujre7v/ShLJdlFyCeyS4UMleXqoRa7PlmrDWGYaYpV8euq2mXgQWhkhUi3KxX6CRM4tx3C1Cjh5GJQQEAEkkCNR+nxhuyBcRUf7lW13INzEnkWp/2CEYcWkB0TnIruNsrR3WnSJJEeWRoZnSnzJDMjM+DaHjLu3qiTbb/G6IZVtGO6tLNaL5O3D6JQ/lbvG/LZnq3sBwzW4Ulmhm8x2nND9IHW6rmmBMxWT5JrnlmhKrH83n/VBdHd2MaZVyeyj4yoJrp6Zu62JX7zX0rTqWw55tYNizQBmlSfeQ0h8xeP0tNqSDZP89N98vZBqmfhWSWI/++qrsP5V4c7I4QUNOyne8SYBjcnOKne6f2A2nMdF4kA6Lb8tDVGzgMWZZe38yk82LyHqPZZY4zhfrndHST2RLk8dOtQghqJXTr6x0TTWpc8J7C4AG1a+u9xUXkRfmA+X0Z+KHcbO3dQu4NOlgmCc9wnybfBPwByduKJKsbIBCoEZBq1AiGd5gHUYmiE+4dYkyaRnppKPO05Zubtm4eebsR3ejYw0qT8h/56RYcWPWcmMCxBUSbwEsXUJuxWWGcChz6fgW1MyT7u1/SAfKmfHY8Q1cjyjfqIdL8u3rNK437f6AoeZVXargzeEvvmndNcyyKcu/BPV9fT/nkKlyNObEE9I1h7HlJA9fjT2saaNtrxqIwN+0arEkZ1Ukegzj3RvA09cK+mdpCthMKQyNLG4aeS/tFkOk90sHRJxrJKTcy6Q0dPwkzoUhVHji43cSGWxmcqSptoNn2tIFmHzVI2+IJQxXpxmw/8WJST639xhqkdTafZEi+Rp67Ar5PTcsSeyI2XtK43tkj143b1dXu0WOCBkDYF+Gf1z+6Z+sXPRQAAA==");
 
         API = new();
         ApiTest.Init();
@@ -177,7 +175,6 @@ public unsafe class AutoRetainer : IDalamudPlugin
             MultiMode.PerformAutoStart();
         }
         EzIPCManager = new();
-        NeoWindow = new();
 		}
 
     private void GameNetwork_NetworkMessage(nint dataPtr, ushort opCode, uint sourceActorId, uint targetActorId, NetworkMessageDirection direction)
@@ -416,7 +413,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         }
         else
         {
-            configGui.IsOpen = !configGui.IsOpen;
+            ConfigGui.IsOpen = !ConfigGui.IsOpen;
         }
     }
 
@@ -541,7 +538,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             Safe(() => this.quickSellItems.Disable());
             Safe(() => this.quickSellItems.Dispose());
             Safe(() => Svc.PluginInterface.UiBuilder.Draw -= FPSLimiter.FPSLimit);
-            Safe(() => Svc.PluginInterface.UiBuilder.Draw -= ws.Draw);
+            Safe(() => Svc.PluginInterface.UiBuilder.Draw -= WindowSystem.Draw);
             Safe(() => Svc.ClientState.Logout -= Logout);
             Safe(() => Svc.Condition.ConditionChange -= ConditionChange);
             Safe(() => Svc.Framework.Update -= Tick);

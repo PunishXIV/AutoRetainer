@@ -4,7 +4,7 @@ using ECommons.GameHelpers;
 
 namespace AutoRetainer.UI;
 
-internal class VenturePlanner : Window
+public class VenturePlanner : Window
 {
     OfflineRetainerData SelectedRetainer = null;
     OfflineCharacterData SelectedCharacter = null;
@@ -15,6 +15,7 @@ internal class VenturePlanner : Window
 
     public VenturePlanner() : base("Venture Planner")
     {
+        P.WindowSystem.AddWindow(this);
     }
 
     internal void Open(OfflineCharacterData characterData, OfflineRetainerData selectedRetainer)

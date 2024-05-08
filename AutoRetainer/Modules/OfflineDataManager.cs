@@ -49,7 +49,7 @@ internal unsafe static class OfflineDataManager
         }
         else
         {
-            if((MultiMode.Active || AutoGCHandin.IsEnabled() || Utils.IsBusy || P.configGui.IsOpen || Svc.Condition[ConditionFlag.LoggingOut]) && EzThrottler.Throttle("Periodic.WriteOfflineData", 1000))
+            if((MultiMode.Active || AutoGCHandin.IsEnabled() || Utils.IsBusy || P.ConfigGui.IsOpen || Svc.Condition[ConditionFlag.LoggingOut]) && EzThrottler.Throttle("Periodic.WriteOfflineData", 1000))
             {
                 WriteOfflineData(false, EzThrottler.Throttle("Periodic.SaveData", 1000 * 60 * 5));
             }
