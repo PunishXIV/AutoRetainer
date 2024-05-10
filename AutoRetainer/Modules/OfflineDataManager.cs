@@ -2,6 +2,7 @@
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.Text.SeStringHandling;
+using Dalamud.Memory;
 using ECommons.Automation;
 using ECommons.Configuration;
 using ECommons.Events;
@@ -10,6 +11,8 @@ using ECommons.GameHelpers;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using FFXIVClientStructs.FFXIV.Client.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Info;
 using Lumina.Excel.GeneratedSheets;
 
 namespace AutoRetainer.Modules;
@@ -49,7 +52,7 @@ internal unsafe static class OfflineDataManager
         }
         else
         {
-            if((MultiMode.Active || AutoGCHandin.IsEnabled() || Utils.IsBusy || P.ConfigGui.IsOpen || Svc.Condition[ConditionFlag.LoggingOut]) && EzThrottler.Throttle("Periodic.WriteOfflineData", 1000))
+            if((MultiMode.Active || AutoGCHandin.Operation || Utils.IsBusy || P.ConfigGui.IsOpen || Svc.Condition[ConditionFlag.LoggingOut]) && EzThrottler.Throttle("Periodic.WriteOfflineData", 1000))
             {
                 WriteOfflineData(false, EzThrottler.Throttle("Periodic.SaveData", 1000 * 60 * 5));
             }
@@ -68,7 +71,7 @@ internal unsafe static class OfflineDataManager
             };
             C.OfflineData.Add(data);
         }
-        data.World = ExcelWorldHelper.GetWorldNameById(Svc.ClientState.LocalPlayer.HomeWorld.Id);
+        data.World = ExcelWorldHelper.GetName(Svc.ClientState.LocalPlayer.HomeWorld.Id);
         data.Name = Svc.ClientState.LocalPlayer.Name.ToString();
         if(Player.Object.CurrentWorld.GameData.DataCenter.Row != Player.Object.HomeWorld.GameData.DataCenter.Row)
         {
@@ -136,11 +139,28 @@ internal unsafe static class OfflineDataManager
                 }
             }
         }
-        if(Utils.FCPoints != 0)
+        if (Player.IsInHomeWorld)
         {
-            data.FCPoints = Utils.FCPoints;
-            data.FCPointsLastUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-        }
+            var fc = InfoModule.Instance()->GetInfoProxyFreeCompany();
+            data.FCID = fc->ID;
+            if (!C.FCData.ContainsKey(fc->ID)) C.FCData[fc->ID] = new();
+						C.FCData[fc->ID].Name = MemoryHelper.ReadStringNullTerminated((nint)fc->Name);
+            var numArray = UIModule.Instance()->GetRaptureAtkModule()->AtkModule.GetNumberArrayData(57);
+            if(numArray != null)
+            {
+                var gil = numArray->IntArray[304];
+                if(gil != 0)
+                {
+										C.FCData[fc->ID].Gil = gil;
+                    C.FCData[fc->ID].LastGilUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+								}
+						}
+						if (Utils.FCPoints != 0)
+						{
+								C.FCData[fc->ID].FCPoints = Utils.FCPoints;
+								C.FCData[fc->ID].FCPointsLastUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+						}
+				}
         data.WriteOfflineInventoryData();
         C.OfflineData.RemoveAll(x => x.World == "" && x.Name == "Unknown");
         if (saveConfig) EzConfig.Save();

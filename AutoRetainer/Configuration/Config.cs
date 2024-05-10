@@ -115,6 +115,7 @@ internal unsafe class Config : IEzConfig
     public bool MultiPreferredCharLast = true;
     public bool VoyageDisableCalcParallel = false;
     public bool VoyageDisableCalcMultithreading = false;
+    public Dictionary<ulong, FCData> FCData = [];
 
     public bool LeastMBSFirst = false;
 

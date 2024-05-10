@@ -33,6 +33,7 @@ using AutoRetainer.Modules.EzIPCManagers;
 using AutoRetainer.UI.NeoUI;
 using LoginOverlay = AutoRetainer.UI.Overlays.LoginOverlay;
 using ECommons.Automation.LegacyTaskManager;
+using ECommons.Singletons;
 
 namespace AutoRetainer;
 
@@ -86,12 +87,12 @@ public unsafe class AutoRetainer : IDalamudPlugin
     {
         //PluginLoader.CheckAndLoad(pi, "https://love.puni.sh/plugins/AutoRetainer/blacklist.txt", delegate
         {
+            P = this;
             ECommonsMain.Init(pi, this, Module.DalamudReflector);
             PunishLibMain.Init(pi, Name, PunishOption.DefaultKoFi); // Default button
-            P = this;
-            var cnt = Singleton.GetFFXIVCNT();
+            var cnt = FFXIVInstanceMonitor.GetFFXIVCNT();
             PluginLog.Information($"FFXIV instances: {cnt}");
-            if (Singleton.AcquireLock() || cnt <= 1)
+            if (FFXIVInstanceMonitor.AcquireLock() || cnt <= 1)
             {
                 new TickScheduler(Load);
             }
@@ -175,6 +176,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             MultiMode.PerformAutoStart();
         }
         EzIPCManager = new();
+        SingletonManager.Initialize();
 		}
 
     private void GameNetwork_NetworkMessage(nint dataPtr, ushort opCode, uint sourceActorId, uint targetActorId, NetworkMessageDirection direction)
@@ -534,7 +536,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     {
         //if (PluginLoader.IsLoaded)
         {
-            Safe(() => Singleton.ReleaseLock());
+            Safe(() => FFXIVInstanceMonitor.ReleaseLock());
             Safe(() => this.quickSellItems.Disable());
             Safe(() => this.quickSellItems.Dispose());
             Safe(() => Svc.PluginInterface.UiBuilder.Draw -= FPSLimiter.FPSLimit);

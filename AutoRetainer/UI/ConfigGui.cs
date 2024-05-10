@@ -7,13 +7,12 @@ using AutoRetainerAPI;
 using AutoRetainer.Modules.Voyage;
 using AutoRetainer.UI.Settings.SettingsMain;
 using ECommons.Events;
-using ECommons.SingletonManager;
+using ECommons.Singletons;
 
 namespace AutoRetainer.UI;
 
-unsafe internal class ConfigGui : Window
+internal unsafe class ConfigGui : Window
 {
-		public static ConfigGui Instance { get; private set; }
     public ConfigGui() : base($"")
     {
         this.SizeConstraints = new()
@@ -22,11 +21,7 @@ unsafe internal class ConfigGui : Window
             MaximumSize = new(9999,9999)
         };
         P.WindowSystem.AddWindow(this);
-        Instance = this;
-        Singleton<ConfigGui>.Instance = this;
 		}
-
-    public int GetRandomNumber() => Random.Shared.Next((int)this.SizeConstraints.Value.MinimumSize.X);
 
     public override void PreDraw()
     {

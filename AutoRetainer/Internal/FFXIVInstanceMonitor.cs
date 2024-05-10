@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace AutoRetainer.Internal;
-public class Singleton
+public class FFXIVInstanceMonitor
 {
     public static string LockFileName => Path.Combine(Svc.PluginInterface.ConfigDirectory.FullName, "session.lock");
     static FileStream Stream;

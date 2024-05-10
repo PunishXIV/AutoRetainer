@@ -1,10 +1,11 @@
 ﻿using AutoRetainerAPI.Configuration;
 using ECommons.ExcelServices;
 using ECommons.GameHelpers;
+using ECommons.Singletons;
 
 namespace AutoRetainer.UI;
 
-internal class VentureBrowser : Window
+internal class VentureBrowser : Window, ISingleton
 {
     OfflineRetainerData SelectedRetainer = null;
     OfflineCharacterData SelectedCharacter = null;

@@ -1,13 +1,9 @@
 ﻿using AutoRetainer.UI.NeoUI.AdvancedEntries;
+using AutoRetainer.UI.NeoUI.InventoryManagementEntries;
 using AutoRetainer.UI.NeoUI.MultiModeEntries;
 using AutoRetainer.UI.NeoUI.StatisticsEntries;
 using NightmareUI.OtterGuiWrapper.FileSystems.Configuration;
 using NightmareUI.PrimaryUI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AutoRetainer.UI.NeoUI;
 public class NeoWindow : Window
@@ -26,6 +22,7 @@ public class NeoWindow : Window
 				new VentureStats(),
 				new GilStats(),
 				new FCPointsStats(),
+				new InventoryManagementTab(),
 
 				new LoginOverlay(),
 				new MiscTab(),
@@ -63,6 +60,6 @@ public class NeoWindow : Window
 		public override void Draw()
 		{
 				NuiBuilder.Filter = FileSystem.Selector?.Filter ?? "";
-				FileSystem.Draw(150f);
+				FileSystem.Draw(null);
 		}
 }

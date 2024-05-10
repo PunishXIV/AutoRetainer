@@ -2,7 +2,7 @@
 using ECommons.Events;
 using ECommons.ExcelServices;
 using ECommons.MathHelpers;
-using ECommons.SingletonManager;
+using ECommons.Singletons;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using FFXIVClientStructs.FFXIV.Component.GUI;

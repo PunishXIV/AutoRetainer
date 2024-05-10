@@ -1,10 +1,11 @@
 ﻿using AutoRetainerAPI.Configuration;
 using ECommons.ExcelServices;
 using ECommons.GameHelpers;
+using ECommons.Singletons;
 
 namespace AutoRetainer.UI;
 
-public class VenturePlanner : Window
+public class VenturePlanner : Window, ISingleton
 {
     OfflineRetainerData SelectedRetainer = null;
     OfflineCharacterData SelectedCharacter = null;
