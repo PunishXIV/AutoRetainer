@@ -1,14 +1,9 @@
 ﻿using ECommons.ExcelServices;
 using FFXIVClientStructs.FFXIV.Client.Game;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace AutoRetainer.Internal.InventoryManagement
-{
-    public class SellSlotTask
+namespace AutoRetainer.Internal.InventoryManagement;
+
+public class SellSlotTask
     {
         public InventoryType InventoryType;
         public uint Slot;
@@ -28,4 +23,3 @@ namespace AutoRetainer.Internal.InventoryManagement
             return $"[InventoryType={InventoryType},Slot={Slot},Item={ExcelItemHelper.GetName(ItemID, true)} x{Quantity}]";
         }
     }
-}

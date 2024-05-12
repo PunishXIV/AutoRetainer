@@ -3,7 +3,6 @@ using ECommons.Automation.NeoTaskManager;
 using ECommons.Events;
 using ECommons.EzEventManager;
 using ECommons.GameHelpers;
-using ECommons.Singletons;
 using ECommons.UIHelpers;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 

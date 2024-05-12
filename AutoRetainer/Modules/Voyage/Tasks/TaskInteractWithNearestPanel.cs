@@ -1,5 +1,4 @@
-﻿using AutoRetainerAPI.Configuration;
-using ECommons.ExcelServices.TerritoryEnumeration;
+﻿using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
 
 namespace AutoRetainer.Modules.Voyage.Tasks;

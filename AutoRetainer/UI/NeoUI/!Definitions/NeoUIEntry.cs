@@ -1,14 +1,6 @@
-﻿using ECommons.Singletons;
-using NightmareUI.OtterGuiWrapper.FileSystems.Configuration;
-using NightmareUI.PrimaryUI;
-using OtterGui.Filesystem;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using NightmareUI.OtterGuiWrapper.FileSystems.Configuration;
 
 namespace AutoRetainer.UI.NeoUI;
-public class NeoUIEntry : ConfigFileSystemEntry
+public abstract class NeoUIEntry : ConfigFileSystemEntry
 {
 }

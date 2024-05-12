@@ -1,11 +1,4 @@
-﻿using Dalamud.Interface.Components;
-using NightmareUI.OtterGuiWrapper.FileSystems.Configuration;
-using NightmareUI.PrimaryUI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using NightmareUI.PrimaryUI;
 
 namespace AutoRetainer.UI.NeoUI.MultiModeEntries;
 public class MultiModeCommon: NeoUIEntry

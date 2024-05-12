@@ -2,7 +2,6 @@
 using AutoRetainerAPI.Configuration;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using System.Xml.Linq;
 
 namespace AutoRetainer.Modules.Voyage.Tasks;
 

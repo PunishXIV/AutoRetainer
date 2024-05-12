@@ -2,7 +2,7 @@
 using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainer.Scheduler.Tasks;
-using AutoRetainer.UI;
+using AutoRetainer.UI.MainWindow;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game.Config;
 using Dalamud.Interface.Internal.Notifications;
@@ -15,8 +15,6 @@ using ECommons.GameHelpers;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using Lumina.Data.Files.Excel;
-using System.Xml.Linq;
 using static AutoRetainer.Modules.OfflineDataManager;
 
 namespace AutoRetainer.Modules.Multi;

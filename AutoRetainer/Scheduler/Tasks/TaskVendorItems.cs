@@ -1,14 +1,9 @@
 ﻿using AutoRetainer.Internal.InventoryManagement;
 using AutoRetainer.Scheduler.Handlers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace AutoRetainer.Scheduler.Tasks
-{
-    public static class TaskVendorItems
+namespace AutoRetainer.Scheduler.Tasks;
+
+public static class TaskVendorItems
     {
         public static void Enqueue()
         {
@@ -75,4 +70,3 @@ namespace AutoRetainer.Scheduler.Tasks
             }
         }
     }
-}

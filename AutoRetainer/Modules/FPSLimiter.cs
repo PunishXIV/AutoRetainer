@@ -1,15 +1,9 @@
-﻿using FFXIVClientStructs.FFXIV.Client.Game;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
+﻿using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
 
-namespace AutoRetainer.Modules
-{
-    internal unsafe static class FPSLimiter
+namespace AutoRetainer.Modules;
+
+internal unsafe static class FPSLimiter
     {
         readonly static Stopwatch Stopwatch = new();
         internal static void FPSLimit()
@@ -53,4 +47,3 @@ namespace AutoRetainer.Modules
             }
         }
     }
-}

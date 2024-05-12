@@ -1,17 +1,10 @@
 ﻿using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using FFXIVClientStructs.FFXIV.Client.UI.Misc;
-using FFXIVClientStructs.FFXIV.Component.GUI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace AutoRetainer.Scheduler.Tasks
-{
-    public unsafe static class TaskOpenAllCoffers
+namespace AutoRetainer.Scheduler.Tasks;
+
+public unsafe static class TaskOpenAllCoffers
     {
         public static void Enqueue()
         {
@@ -50,4 +43,3 @@ namespace AutoRetainer.Scheduler.Tasks
         }
 
     }
-}

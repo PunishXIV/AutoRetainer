@@ -2,15 +2,10 @@
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace AutoRetainer.Modules
-{
-    internal unsafe static class BailoutManager
+namespace AutoRetainer.Modules;
+
+internal unsafe static class BailoutManager
     {
         internal static bool SimulateStuckOnQuit = false;
         internal static bool SimulateStuckOnVoyagePanel = false;
@@ -75,4 +70,3 @@ namespace AutoRetainer.Modules
             }
         }
     }
-}

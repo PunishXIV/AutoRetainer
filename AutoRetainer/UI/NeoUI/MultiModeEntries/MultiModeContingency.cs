@@ -1,13 +1,6 @@
-﻿using AutoRetainer.UI.Settings.SettingsMain;
-using AutoRetainerAPI.Configuration;
-using NightmareUI.OtterGuiWrapper.FileSystems.Configuration;
+﻿using AutoRetainerAPI.Configuration;
 using NightmareUI.PrimaryUI;
-using System;
 using System.Collections.Frozen;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AutoRetainer.UI.NeoUI.MultiModeEntries;
 public class MultiModeContingency : NeoUIEntry

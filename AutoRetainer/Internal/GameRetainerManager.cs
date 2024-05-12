@@ -1,11 +1,5 @@
-﻿using Dalamud.Game.Text;
-using Dalamud.Memory;
+﻿using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Client.Game;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AutoRetainer.Internal;
 public unsafe static class GameRetainerManager

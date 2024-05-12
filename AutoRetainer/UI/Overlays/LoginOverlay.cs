@@ -1,6 +1,5 @@
 ﻿using AutoRetainer.Internal;
 using Dalamud.Interface.GameFonts;
-using ECommons.ExcelServices;
 
 namespace AutoRetainer.UI.Overlays;
 

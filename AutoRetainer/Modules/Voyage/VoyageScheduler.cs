@@ -9,7 +9,6 @@ using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using System.Windows.Forms;
 
 namespace AutoRetainer.Modules.Voyage;
 

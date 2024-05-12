@@ -1,6 +1,4 @@
 ﻿using ECommons.Automation;
-using ECommons.ExcelServices.TerritoryEnumeration;
-using ECommons.GameHelpers;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 

@@ -1,10 +1,4 @@
-﻿using NightmareUI.PrimaryUI;
-using PunishLib.ImGuiMethods;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using PunishLib.ImGuiMethods;
 
 namespace AutoRetainer.UI.NeoUI.MultiModeEntries;
 public class Exclusions : NeoUIEntry

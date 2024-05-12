@@ -4,16 +4,11 @@ using ECommons.ChatMethods;
 using ECommons.ExcelServices;
 using ECommons.Interop;
 using Lumina.Excel.GeneratedSheets;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UIColor = ECommons.ChatMethods.UIColor;
 
-namespace AutoRetainer.Internal
-{
-    internal class ContextMenuManager
+namespace AutoRetainer.Internal;
+
+internal class ContextMenuManager
     {
         DalamudContextMenu ContextMenu;
         SeString Prefix = new SeStringBuilder().AddUiForeground(" ", 539).Build();
@@ -101,4 +96,3 @@ namespace AutoRetainer.Internal
             }
         }
     }
-}

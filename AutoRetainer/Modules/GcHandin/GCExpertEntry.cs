@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AutoRetainer.Modules.GcHandin;
+﻿namespace AutoRetainer.Modules.GcHandin;
 [StructLayout(LayoutKind.Explicit, Size = 152)]
 public unsafe struct GCExpectEntry
 {

@@ -1,14 +1,9 @@
 ﻿using AutoRetainerAPI.Configuration;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace AutoRetainer.Helpers
-{
-    public static unsafe class HousingUtils
+namespace AutoRetainer.Helpers;
+
+public static unsafe class HousingUtils
     {
         public static bool TryGetCurrentDescriptor(out HouseDescriptor Descriptor)
         {
@@ -38,4 +33,3 @@ namespace AutoRetainer.Helpers
             return false;
         }
     }
-}

@@ -3,15 +3,10 @@ using ClickLib.Clicks;
 using Dalamud.Game.ClientState.Conditions;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.UI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace AutoRetainer.Modules
-{
-    internal unsafe static class MiniTA
+namespace AutoRetainer.Modules;
+
+internal unsafe static class MiniTA
     {
         internal static void Tick()
         {
@@ -65,4 +60,3 @@ namespace AutoRetainer.Modules
             return VoyageScheduler.Enabled;
         }
     }
-}

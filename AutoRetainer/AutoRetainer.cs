@@ -1,15 +1,11 @@
-﻿using AutoRetainer.UI;
-using Dalamud.Game.ClientState.Conditions;
+﻿using Dalamud.Game.ClientState.Conditions;
 using Lumina.Excel.GeneratedSheets;
 using ECommons.Events;
 using PunishLib;
 using ECommons.Automation;
 using ECommons.Configuration;
-using Dalamud.Interface.Style;
 using Dalamud.Utility;
 using AutoRetainer.Scheduler.Tasks;
-using ClickLib.Clicks;
-using FFXIVClientStructs.FFXIV.Client.UI;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using System.Diagnostics;
 using AutoRetainer.Modules.Statistics;
@@ -21,19 +17,16 @@ using AutoRetainerAPI;
 using ECommons.GameHelpers;
 using AutoRetainer.Modules.Voyage;
 using Dalamud.Game.Network;
-using System.Threading;
 using ECommons.ExcelServices;
 using NotificationMasterAPI;
 using ECommons.EzSharedDataManager;
-using AutoRetainer.UI.Experiments.Inventory;
 using ECommons.Reflection;
-using Dalamud.Interface.Internal.Notifications;
-using FFXIVClientStructs.FFXIV.Client.Game.UI;
-using AutoRetainer.Modules.EzIPCManagers;
-using AutoRetainer.UI.NeoUI;
 using LoginOverlay = AutoRetainer.UI.Overlays.LoginOverlay;
 using ECommons.Automation.LegacyTaskManager;
 using ECommons.Singletons;
+using AutoRetainer.UI.Windows;
+using AutoRetainer.UI.MainWindow;
+using AutoRetainer.Services;
 
 namespace AutoRetainer;
 
@@ -44,7 +37,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal static Config C => P.config;
     private Config config;
     internal WindowSystem WindowSystem;
-    internal ConfigGui ConfigGui;
+    internal AutoRetainerWindow ConfigGui;
     internal bool IsInteractionAutomatic = false;
     internal QuickSellItems quickSellItems;
     internal TaskManager TaskManager;

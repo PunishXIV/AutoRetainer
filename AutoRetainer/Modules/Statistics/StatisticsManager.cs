@@ -4,7 +4,6 @@ using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using ECommons.Events;
-using FFXIVClientStructs.FFXIV.Client.Game;
 
 namespace AutoRetainer.Modules.Statistics;
 

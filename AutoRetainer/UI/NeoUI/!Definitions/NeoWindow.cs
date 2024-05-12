@@ -1,15 +1,14 @@
 ﻿using AutoRetainer.UI.NeoUI.AdvancedEntries;
+using AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;
 using AutoRetainer.UI.NeoUI.InventoryManagementEntries;
 using AutoRetainer.UI.NeoUI.MultiModeEntries;
-using AutoRetainer.UI.NeoUI.StatisticsEntries;
-using ECommons.Singletons;
 using NightmareUI.OtterGuiWrapper.FileSystems.Configuration;
-using NightmareUI.PrimaryUI;
 
 namespace AutoRetainer.UI.NeoUI;
 public sealed class NeoWindow : Window
 {
-		private readonly NeoUIEntry[] Tabs = [
+		private readonly NeoUIEntry[] Tabs =
+		[
 				new MainSettings(),
 				new DeployablesTab(),
 
@@ -20,9 +19,6 @@ public sealed class NeoWindow : Window
 				new CharaOrder(),
 				new Exclusions(),
 
-				new VentureStats(),
-				new GilStats(),
-				new FCPointsStats(),
 				new InventoryManagementTab(),
 
 				new LoginOverlay(),
@@ -30,8 +26,9 @@ public sealed class NeoWindow : Window
 
 				new LogTab(),
 				new ExpertTab(),
-				new DebugTab(),
-				];
+
+				..ConfigFileSystemHelpers.CreateInstancesOf<DebugUIEntry>(),
+		];
 
 		internal ConfigFileSystem<ConfigFileSystemEntry> FileSystem;
 
@@ -39,7 +36,7 @@ public sealed class NeoWindow : Window
 		{
 				P.WindowSystem.AddWindow(this);
 				this.SetMinSize();
-				FileSystem = new(() => [.. Tabs.Where(x => x.ShouldDisplay())]);
+				FileSystem = new(() => Tabs);
 		}
 
 		public void Reload()

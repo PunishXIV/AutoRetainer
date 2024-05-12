@@ -1,10 +1,4 @@
-﻿using AutoRetainer.UI.Settings.SettingsMain;
-using NightmareUI.PrimaryUI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using NightmareUI.PrimaryUI;
 
 namespace AutoRetainer.UI.NeoUI;
 public class MiscTab : NeoUIEntry
@@ -13,10 +7,10 @@ public class MiscTab : NeoUIEntry
 
 		public override NuiBuilder Builder { get; init; } = new NuiBuilder()
 				.Section("Quick Retainer Action")
-				.Widget("Sell Item", (x) => SettingsMain.QRA(x, ref C.SellKey))
-				.Widget("Entrust Item", (x) => SettingsMain.QRA(x, ref C.EntrustKey))
-				.Widget("Retrieve Item", (x) => SettingsMain.QRA(x, ref C.RetrieveKey))
-				.Widget("Put up For Sale", (x) => SettingsMain.QRA(x, ref C.SellMarketKey))
+				.Widget("Sell Item", (x) => UIUtils.QRA(x, ref C.SellKey))
+				.Widget("Entrust Item", (x) => UIUtils.QRA(x, ref C.EntrustKey))
+				.Widget("Retrieve Item", (x) => UIUtils.QRA(x, ref C.RetrieveKey))
+				.Widget("Put up For Sale", (x) => UIUtils.QRA(x, ref C.SellMarketKey))
 
 				.Section("Statistics")
 				.Checkbox($"Record Venture Statistics", () => ref C.RecordStats)

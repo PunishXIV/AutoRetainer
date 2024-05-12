@@ -1,6 +1,5 @@
 ﻿using ClickLib.Clicks;
 using Dalamud.Memory;
-using ECommons.Configuration;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;
 using ECommons.MathHelpers;
@@ -9,10 +8,6 @@ using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using Lumina.Excel.GeneratedSheets;
-using System.IO;
-using System.Net;
-using System.Net.Http;
 
 namespace AutoRetainer.Modules.GcHandin;
 

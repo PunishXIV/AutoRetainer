@@ -3,16 +3,10 @@ using ClickLib.Clicks;
 using ECommons.Automation;
 using ECommons.GameHelpers;
 using ECommons.Throttlers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
-namespace AutoRetainer.Modules
-{
-    internal unsafe static class Shutdown
+namespace AutoRetainer.Modules;
+
+internal unsafe static class Shutdown
     {
         internal static bool Active => ShutdownAt > 0 || ForceShutdownAt > 0;
         internal static long ShutdownAt = 0;
@@ -76,4 +70,3 @@ namespace AutoRetainer.Modules
             }
         }
     }
-}

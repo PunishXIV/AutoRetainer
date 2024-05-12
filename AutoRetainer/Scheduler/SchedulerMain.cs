@@ -1,5 +1,4 @@
 ﻿using AutoRetainer.Internal;
-using AutoRetainer.Internal.InventoryManagement;
 using AutoRetainer.Scheduler.Handlers;
 using AutoRetainer.Scheduler.Tasks;
 using AutoRetainerAPI.Configuration;

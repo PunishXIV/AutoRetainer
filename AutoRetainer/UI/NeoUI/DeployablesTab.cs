@@ -1,9 +1,4 @@
 ﻿using NightmareUI.PrimaryUI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AutoRetainer.UI.NeoUI;
 public class DeployablesTab : NeoUIEntry
