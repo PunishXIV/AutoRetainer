@@ -78,8 +78,6 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal long[] TimeLaunched;
     internal ContextMenuManager ContextMenuManager;
     public bool ReadOnly = false;
-    public EzIPCManager EzIPCManager;
-    public NeoWindow NeoWindow;
 
 		internal static OfflineCharacterData Data => Utils.GetCurrentCharacterData();
 
@@ -123,7 +121,6 @@ public unsafe class AutoRetainer : IDalamudPlugin
 				LoginOverlay = new LoginOverlay();
 				SubmarineUnlockPlanUI = new();
 				SubmarinePointPlanUI = new();
-				NeoWindow = new();
 
 				TaskManager = new() { AbortOnTimeout = true, TimeLimitMS = 20000 };
         Memory = new();
@@ -134,7 +131,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         };
         Svc.PluginInterface.UiBuilder.OpenMainUi += () =>
         {
-            NeoWindow.IsOpen = true;
+            S.NeoWindow.IsOpen = true;
         };
         Svc.ClientState.Logout += Logout;
         Svc.Condition.ConditionChange += ConditionChange;
@@ -175,8 +172,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         {
             MultiMode.PerformAutoStart();
         }
-        EzIPCManager = new();
-        SingletonManager.Initialize();
+        SingletonServiceManager.Initialize(typeof(AutoRetainerServiceManager));
 		}
 
     private void GameNetwork_NetworkMessage(nint dataPtr, ushort opCode, uint sourceActorId, uint targetActorId, NetworkMessageDirection direction)
@@ -217,13 +213,13 @@ public unsafe class AutoRetainer : IDalamudPlugin
         {
             config.Verbose = !config.Verbose;
             DuoLog.Information($"Debug mode {(config.Verbose ? "enabled" : "disabled")}");
-            NeoWindow.Reload();
+            S.NeoWindow.Reload();
         }
         else if (arguments.EqualsIgnoreCase("expert"))
         {
             config.Expert = !config.Expert;
             DuoLog.Information($"Expert mode {(config.Expert ? "enabled" : "disabled")}");
-            NeoWindow.Reload();
+						S.NeoWindow.Reload();
         }
         else if(arguments.EqualsIgnoreCaseAny("e", "enable"))
         {
@@ -272,17 +268,6 @@ public unsafe class AutoRetainer : IDalamudPlugin
             if (target != null)
             {
                 MultiMode.Relog(target, out _, RelogReason.Command);
-                /*if (!AutoLogin.Instance.IsRunning)
-                {
-                    if (Svc.ClientState.IsLoggedIn)
-                    {
-                        AutoLogin.Instance.SwapCharacter(target.CurrentWorld, target.Name, ExcelWorldHelper.GetWorldByName(target.World).RowId, target.ServiceAccount);
-                    }
-                    else
-                    {
-                        AutoLogin.Instance.Login(target.CurrentWorld, target.Name, ExcelWorldHelper.GetWorldByName(target.World).RowId, target.ServiceAccount);
-                    }
-                }*/
             }
             else
             {

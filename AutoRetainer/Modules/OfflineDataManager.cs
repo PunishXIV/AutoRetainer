@@ -8,6 +8,7 @@ using ECommons.Configuration;
 using ECommons.Events;
 using ECommons.ExcelServices;
 using ECommons.GameHelpers;
+using ECommons.Singletons;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
@@ -50,14 +51,11 @@ internal unsafe static class OfflineDataManager
                 }
             }
         }
-        else
-        {
-            if((MultiMode.Active || AutoGCHandin.Operation || Utils.IsBusy || P.ConfigGui.IsOpen || Svc.Condition[ConditionFlag.LoggingOut]) && EzThrottler.Throttle("Periodic.WriteOfflineData", 1000))
-            {
-                WriteOfflineData(false, EzThrottler.Throttle("Periodic.SaveData", 1000 * 60 * 5));
-            }
-        }
-    }
+				if ((MultiMode.Active || AutoGCHandin.Operation || Utils.IsBusy || P.ConfigGui.IsOpen || Svc.Condition[ConditionFlag.LoggingOut] || Svc.Condition[ConditionFlag.OccupiedSummoningBell]) && EzThrottler.Throttle("Periodic.WriteOfflineData", 1000))
+				{
+						WriteOfflineData(false, EzThrottler.Throttle("Periodic.SaveData", 1000 * 60 * 5));
+				}
+		}
 
     internal static void WriteOfflineData(bool writeGatherables, bool saveConfig)
     {
@@ -149,9 +147,9 @@ internal unsafe static class OfflineDataManager
             if(numArray != null)
             {
                 var gil = numArray->IntArray[304];
-                if(gil != 0)
+                if(gil != 0 || S.FCPointsUpdater?.IsFCChestReady() == true)
                 {
-										C.FCData[fc->ID].Gil = gil;
+                    C.FCData[fc->ID].Gil = gil;
                     C.FCData[fc->ID].LastGilUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 								}
 						}

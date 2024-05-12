@@ -13,6 +13,6 @@ public class GilStats : NeoUIEntry
 
 		public override void Draw()
 		{
-				GilDisplay.Draw();
+        S.GilDisplay.Draw();
 		}
 }

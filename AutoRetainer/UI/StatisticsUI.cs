@@ -18,8 +18,8 @@ internal static class StatisticsUI
     {
         ImGuiEx.EzTabBar("statstab", [
                 ("Ventures", DrawVentures, null, true),
-                ("Owned gil", GilDisplay.Draw, null, true),
-                ("Owned FC points", FCPoints.Draw, null, true),
+                ("Owned gil", S.GilDisplay.Draw, null, true),
+                ("Owned FC points", S.FCData.Draw, null, true),
             ]);
     }
 

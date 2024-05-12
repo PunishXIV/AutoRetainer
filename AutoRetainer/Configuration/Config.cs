@@ -116,6 +116,8 @@ internal unsafe class Config : IEzConfig
     public bool VoyageDisableCalcParallel = false;
     public bool VoyageDisableCalcMultithreading = false;
     public Dictionary<ulong, FCData> FCData = [];
+    public bool UpdateStaleFCData = false;
+    public bool DisplayOnlyWalletFC = false;
 
     public bool LeastMBSFirst = false;
 

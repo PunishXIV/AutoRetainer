@@ -5,7 +5,7 @@ using ECommons.Singletons;
 
 namespace AutoRetainer.UI;
 
-internal class VentureBrowser : Window, ISingleton
+internal class VentureBrowser : Window
 {
     OfflineRetainerData SelectedRetainer = null;
     OfflineCharacterData SelectedCharacter = null;

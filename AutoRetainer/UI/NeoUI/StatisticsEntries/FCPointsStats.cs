@@ -12,6 +12,6 @@ public class FCPointsStats : NeoUIEntry
 
 		public override void Draw()
 		{
-				FCPoints.Draw();
+        S.FCData.Draw();
 		}
 }

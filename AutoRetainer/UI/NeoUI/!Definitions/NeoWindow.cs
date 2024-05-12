@@ -2,11 +2,12 @@
 using AutoRetainer.UI.NeoUI.InventoryManagementEntries;
 using AutoRetainer.UI.NeoUI.MultiModeEntries;
 using AutoRetainer.UI.NeoUI.StatisticsEntries;
+using ECommons.Singletons;
 using NightmareUI.OtterGuiWrapper.FileSystems.Configuration;
 using NightmareUI.PrimaryUI;
 
 namespace AutoRetainer.UI.NeoUI;
-public class NeoWindow : Window
+public sealed class NeoWindow : Window
 {
 		private readonly NeoUIEntry[] Tabs = [
 				new MainSettings(),
@@ -30,8 +31,6 @@ public class NeoWindow : Window
 				new LogTab(),
 				new ExpertTab(),
 				new DebugTab(),
-
-				
 				];
 
 		internal ConfigFileSystem<ConfigFileSystemEntry> FileSystem;
@@ -40,16 +39,7 @@ public class NeoWindow : Window
 		{
 				P.WindowSystem.AddWindow(this);
 				this.SetMinSize();
-				FileSystem = new(() => [.. Tabs.Where(x => x.ShouldDisplay())])
-				{
-						DrawButton = (x) =>
-						{
-								if (ImGui.Button("by Puni.sh", x))
-								{
-										ShellStart("https://puni.sh/");
-								}
-						}
-				};
+				FileSystem = new(() => [.. Tabs.Where(x => x.ShouldDisplay())]);
 		}
 
 		public void Reload()
@@ -59,7 +49,6 @@ public class NeoWindow : Window
 
 		public override void Draw()
 		{
-				NuiBuilder.Filter = FileSystem.Selector?.Filter ?? "";
 				FileSystem.Draw(null);
 		}
 }
