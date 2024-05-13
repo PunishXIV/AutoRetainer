@@ -153,7 +153,6 @@ public unsafe class AutoRetainer : IDalamudPlugin
 				API = new();
 				ApiTest.Init();
 				FPSManager.UnlockChillFrames();
-				Svc.GameNetwork.NetworkMessage += GameNetwork_NetworkMessage;
 				Utils.ResetEscIgnoreByWindows();
 				Svc.PluginInterface.UiBuilder.Draw += FPSLimiter.FPSLimit;
 				AutoCutsceneSkipper.Init(MiniTA.ProcessCutsceneSkip);
@@ -166,12 +165,6 @@ public unsafe class AutoRetainer : IDalamudPlugin
 						MultiMode.PerformAutoStart();
 				}
 				SingletonServiceManager.Initialize(typeof(AutoRetainerServiceManager));
-		}
-
-		private void GameNetwork_NetworkMessage(nint dataPtr, ushort opCode, uint sourceActorId, uint targetActorId, NetworkMessageDirection direction)
-		{
-				if (!LogOpcodes) return;
-				DuoLog.Information($"{opCode:X16}, {direction}");
 		}
 
 		private void Toasts_Toast(ref Dalamud.Game.Text.SeStringHandling.SeString message, ref Dalamud.Game.Gui.Toast.ToastOptions options, ref bool isHandled)
@@ -528,7 +521,6 @@ public unsafe class AutoRetainer : IDalamudPlugin
 						Safe(() => Svc.Framework.Update -= Tick);
 						Safe(() => Svc.Toasts.ErrorToast -= Toasts_ErrorToast);
 						Safe(() => Svc.Toasts.Toast -= Toasts_Toast);
-						Safe(() => Svc.GameNetwork.NetworkMessage -= GameNetwork_NetworkMessage);
 						Safe(() => NewYesAlreadyManager.Unlock());
 						Safe(() => TextAdvanceManager.UnlockTA());
 						Safe(() => StatisticsManager.Shutdown());
