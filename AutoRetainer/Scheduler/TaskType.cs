@@ -2,5 +2,5 @@
 
 public enum TaskType
 {
-    ManageVenture, EntrustDuplicates, WithdrawGil
+		ManageVenture, EntrustDuplicates, WithdrawGil
 }

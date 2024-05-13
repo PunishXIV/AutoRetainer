@@ -1,16 +1,16 @@
-﻿using Dalamud.Interface.Components;
-using ECommons.Configuration;
-using PunishLib.ImGuiMethods;
-using AutoRetainerAPI.Configuration;
+﻿using AutoRetainer.Modules.Voyage;
 using AutoRetainerAPI;
-using AutoRetainer.Modules.Voyage;
+using AutoRetainerAPI.Configuration;
+using Dalamud.Interface.Components;
+using ECommons.Configuration;
 using NightmareUI;
+using PunishLib.ImGuiMethods;
 
 namespace AutoRetainer.UI.MainWindow;
 
 internal unsafe class AutoRetainerWindow : Window
 {
-		TitleBarButton LockButton;
+		private TitleBarButton LockButton;
 
 		public AutoRetainerWindow() : base($"")
 		{
@@ -59,7 +59,7 @@ internal unsafe class AutoRetainerWindow : Window
 				}
 		}
 
-		string FormatToken(TimeSpan time)
+		private string FormatToken(TimeSpan time)
 		{
 				if (time.TotalMilliseconds > 0)
 				{
@@ -185,9 +185,9 @@ internal unsafe class AutoRetainerWindow : Window
 				}
 		}
 
-		void DrawStats()
+		private void DrawStats()
 		{
-				NuiTools.ButtonTabs([C.RecordStats?new("Ventures", S.VentureStats.DrawVentures):null, new("Gil", S.GilDisplay.Draw), new("FC Data", S.FCData.Draw)]);
+				NuiTools.ButtonTabs([C.RecordStats ? new("Ventures", S.VentureStats.DrawVentures) : null, new("Gil", S.GilDisplay.Draw), new("FC Data", S.FCData.Draw)]);
 		}
 
 		public override void OnClose()

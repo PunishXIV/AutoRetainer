@@ -5,7 +5,7 @@ using System.Collections.Frozen;
 namespace AutoRetainer.UI.NeoUI.MultiModeEntries;
 public class MultiModeContingency : NeoUIEntry
 {
-		static readonly FrozenDictionary<WorkshopFailAction, string> WorkshopFailActionNames = new Dictionary<WorkshopFailAction, string>()
+		private static readonly FrozenDictionary<WorkshopFailAction, string> WorkshopFailActionNames = new Dictionary<WorkshopFailAction, string>()
 		{
 				[WorkshopFailAction.StopPlugin] = "Halt all plugin operation",
 				[WorkshopFailAction.ExcludeVessel] = "Exclude deployable from operation",

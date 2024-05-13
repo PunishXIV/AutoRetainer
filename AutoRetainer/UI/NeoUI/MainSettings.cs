@@ -5,7 +5,7 @@ public class MainSettings : NeoUIEntry
 {
 		public override string Path => "General";
 
-		const string delayHelp = "The lower this value is the faster plugin will use actions. When dealing with low FPS or high latency you may want to increase this value. If you want the plugin to operate faster you may decrease it.";
+		private const string delayHelp = "The lower this value is the faster plugin will use actions. When dealing with low FPS or high latency you may want to increase this value. If you want the plugin to operate faster you may decrease it.";
 
 		public override NuiBuilder Builder { get; init; } = new NuiBuilder()
 						.Section("Delays")

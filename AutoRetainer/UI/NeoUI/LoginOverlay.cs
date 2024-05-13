@@ -1,7 +1,7 @@
 ﻿using NightmareUI.PrimaryUI;
 
 namespace AutoRetainer.UI.NeoUI;
-public class LoginOverlay: NeoUIEntry
+public class LoginOverlay : NeoUIEntry
 {
 		public override string Path => "Login Overlay";
 

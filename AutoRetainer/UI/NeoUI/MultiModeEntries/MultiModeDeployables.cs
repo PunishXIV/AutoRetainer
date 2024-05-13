@@ -3,7 +3,7 @@
 namespace AutoRetainer.UI.NeoUI.MultiModeEntries;
 public class MultiModeDeployables : NeoUIEntry
 {
-    public override string Path => "Multi Mode/Deployables";
+		public override string Path => "Multi Mode/Deployables";
 
 		public override NuiBuilder Builder { get; init; } = new NuiBuilder()
 						.Section("Multi Mode - Deployables")

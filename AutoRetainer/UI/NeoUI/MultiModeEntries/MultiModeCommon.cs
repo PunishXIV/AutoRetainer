@@ -1,7 +1,7 @@
 ﻿using NightmareUI.PrimaryUI;
 
 namespace AutoRetainer.UI.NeoUI.MultiModeEntries;
-public class MultiModeCommon: NeoUIEntry
+public class MultiModeCommon : NeoUIEntry
 {
 		public override string Path => "Multi Mode/Common Settings";
 

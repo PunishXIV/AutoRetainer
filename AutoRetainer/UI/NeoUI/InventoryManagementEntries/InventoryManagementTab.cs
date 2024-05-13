@@ -99,7 +99,7 @@ public unsafe class InventoryManagementTab : NeoUIEntry
 				}
 		}
 
-		void DrawListOfItems(List<uint> ItemList)
+		private void DrawListOfItems(List<uint> ItemList)
 		{
 				Dictionary<uint, List<Item>> ListByCategories = [];
 				foreach (var x in ItemList)

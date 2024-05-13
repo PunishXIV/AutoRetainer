@@ -5,10 +5,10 @@ public class DeployablesTab : NeoUIEntry
 {
 		public override string Path => "Deployables";
 
-		static int MinLevel = 0;
-		static int MaxLevel = 0;
-		static string Conf = "";
-		static bool InvertConf = false;
+		private static int MinLevel = 0;
+		private static int MaxLevel = 0;
+		private static string Conf = "";
+		private static bool InvertConf = false;
 
 		public override NuiBuilder Builder { get; init; } = new NuiBuilder()
 				.Section("General")
@@ -59,5 +59,5 @@ public class DeployablesTab : NeoUIEntry
 						}
 				});
 
-				
+
 }

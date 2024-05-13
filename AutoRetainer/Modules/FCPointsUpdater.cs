@@ -9,7 +9,7 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 namespace AutoRetainer.Modules;
 public sealed unsafe class FCPointsUpdater
 {
-		private readonly TaskManager TaskManager = new(new(timeLimitMS: 15000, abortOnTimeout: true, showDebug:true));
+		private readonly TaskManager TaskManager = new(new(timeLimitMS: 15000, abortOnTimeout: true, showDebug: true));
 		private int OldFCPoints;
 
 		private FCPointsUpdater()
@@ -21,7 +21,7 @@ public sealed unsafe class FCPointsUpdater
 
 		public bool IsFCChestReady()
 		{
-				if(TryGetAddonByName<AtkUnitBase>("FreeCompanyChest", out var addon) && IsAddonReady(addon))
+				if (TryGetAddonByName<AtkUnitBase>("FreeCompanyChest", out var addon) && IsAddonReady(addon))
 				{
 						var reader = new ReaderFreeCompanyChest(addon);
 						return reader.Ready;
@@ -39,9 +39,9 @@ public sealed unsafe class FCPointsUpdater
 				if (!Player.Available) return;
 				if (!C.UpdateStaleFCData) return;
 				if (!Player.IsInHomeWorld) return;
-				if(Data != null && Data.FCID != 0 && C.FCData.TryGetValue(Data.FCID, out var fcdata))
+				if (Data != null && Data.FCID != 0 && C.FCData.TryGetValue(Data.FCID, out var fcdata))
 				{
-						if(force || DateTimeOffset.Now.ToUnixTimeMilliseconds() > fcdata.FCPointsLastUpdate + 30 * 60 * 60 * 1000)
+						if (force || DateTimeOffset.Now.ToUnixTimeMilliseconds() > fcdata.FCPointsLastUpdate + 30 * 60 * 60 * 1000)
 						{
 								OldFCPoints = Utils.FCPoints;
 								TaskManager.Abort();

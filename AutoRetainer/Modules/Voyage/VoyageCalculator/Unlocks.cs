@@ -2,11 +2,11 @@
 
 public static class Unlocks
 {
-    public record UnlockedFrom(uint Point, bool Sub = false, bool Map = false);
+		public record UnlockedFrom(uint Point, bool Sub = false, bool Map = false);
 
-    public static readonly Dictionary<uint, UnlockedFrom> PointToUnlockPoint = new()
+		public static readonly Dictionary<uint, UnlockedFrom> PointToUnlockPoint = new()
 {
-    { 0, new UnlockedFrom(9999) },              // Map A
+		{ 0, new UnlockedFrom(9999) },              // Map A
     { 1, new UnlockedFrom(9000) },              // A    Default
     { 2, new UnlockedFrom(9000) },              // B    Default
     { 3, new UnlockedFrom(1) },                 // C    Deep-sea Site 2		        <-      The Ivory Shoals
@@ -118,26 +118,26 @@ public static class Unlocks
     { 105, new UnlockedFrom(101) },                         // Southeast Bellflower                <-       Lilac Sea 2
 };
 
-    public static List<(uint, UnlockedFrom)> FindUnlockPath(uint finalPoint)
-    {
-        if (!PointToUnlockPoint.TryGetValue(finalPoint, out var final))
-            return new List<(uint, UnlockedFrom)>();
+		public static List<(uint, UnlockedFrom)> FindUnlockPath(uint finalPoint)
+		{
+				if (!PointToUnlockPoint.TryGetValue(finalPoint, out var final))
+						return [];
 
-        // Unknown unlock at the time
-        if (final.Point == 9876)
-            return new List<(uint, UnlockedFrom)>();
+				// Unknown unlock at the time
+				if (final.Point == 9876)
+						return [];
 
-        var wayPoints = new List<(uint, UnlockedFrom)> { (finalPoint, final) };
+				var wayPoints = new List<(uint, UnlockedFrom)> { (finalPoint, final) };
 
-        var point = final.Point;
-        while (point != 9000)
-        {
-            var newPoint = PointToUnlockPoint[point];
-            wayPoints.Add((point, newPoint));
+				var point = final.Point;
+				while (point != 9000)
+				{
+						var newPoint = PointToUnlockPoint[point];
+						wayPoints.Add((point, newPoint));
 
-            point = newPoint.Point;
-        }
+						point = newPoint.Point;
+				}
 
-        return wayPoints;
-    }
+				return wayPoints;
+		}
 }
