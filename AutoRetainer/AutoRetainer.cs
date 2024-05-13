@@ -118,11 +118,11 @@ public unsafe class AutoRetainer : IDalamudPlugin
 				TaskManager = new() { AbortOnTimeout = true, TimeLimitMS = 20000 };
         Memory = new();
         Svc.PluginInterface.UiBuilder.Draw += WindowSystem.Draw;
-        Svc.PluginInterface.UiBuilder.OpenConfigUi += () =>
+        Svc.PluginInterface.UiBuilder.OpenMainUi += () =>
         {
             ConfigGui.IsOpen = true;
         };
-        Svc.PluginInterface.UiBuilder.OpenMainUi += () =>
+        Svc.PluginInterface.UiBuilder.OpenConfigUi += () =>
         {
             S.NeoWindow.IsOpen = true;
         };
@@ -246,8 +246,12 @@ public unsafe class AutoRetainer : IDalamudPlugin
                     MultiMode.OnMultiModeEnabled();
                 }
             }
-        }
-        else if (arguments.EqualsIgnoreCaseAny("b", "browser"))
+				}
+				else if (arguments.EqualsIgnoreCaseAny("s", "settings"))
+				{
+            S.NeoWindow.IsOpen = true;
+				}
+				else if (arguments.EqualsIgnoreCaseAny("b", "browser"))
         {
             VentureBrowser.IsOpen = !VentureBrowser.IsOpen;
         }

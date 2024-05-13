@@ -194,4 +194,8 @@ internal unsafe class Config : IEzConfig
     public int IMAutoVendorHardStackLimit = 20;
     public bool IMDry = false;
     public bool TreatSoftAsHard = false;
+
+    public Vector2 WindowSize;
+    public Vector2 WindowPos;
+    public bool PinWindow = false;
 }

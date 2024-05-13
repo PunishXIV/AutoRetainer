@@ -1,5 +1,6 @@
 ﻿using AutoRetainer.UI.NeoUI.AdvancedEntries;
 using AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;
+using AutoRetainer.UI.NeoUI.Experiments;
 using AutoRetainer.UI.NeoUI.InventoryManagementEntries;
 using AutoRetainer.UI.NeoUI.MultiModeEntries;
 using NightmareUI.OtterGuiWrapper.FileSystems.Configuration;
@@ -23,6 +24,8 @@ public sealed class NeoWindow : Window
 
 				new LoginOverlay(),
 				new MiscTab(),
+
+				..ConfigFileSystemHelpers.CreateInstancesOf<ExperimentUIEntry>(),
 
 				new LogTab(),
 				new ExpertTab(),

@@ -4,9 +4,9 @@ using ECommons.ExcelServices;
 
 namespace AutoRetainer.UI.Statistics;
 
-public sealed class GilDisplay
+public sealed class GilDisplayManager
 {
-    private GilDisplay() { }
+    private GilDisplayManager() { }
 
     public void Draw()
     {
@@ -33,18 +33,35 @@ public sealed class GilDisplay
             var dcTotal = 0L;
             foreach (var c in x.Value)
             {
+                FCData fcdata = null;
                 var charTotal = c.Gil + c.RetainerData.Sum(s => s.Gil);
+                foreach(var fc in C.FCData)
+                {
+                    if(S.FCData.GetHolderChara(fc.Key, fc.Value) == c && fc.Value.GilCountsTowardsChara)
+                    {
+                        fcdata = fc.Value;
+												charTotal += fcdata.Gil;
+                        break;
+										}
+                }
                 if (charTotal > C.MinGilDisplay)
                 {
-                    if (!C.GilOnlyChars) ImGuiEx.Text($"    {Censor.Character(c.Name, c.World)}: {c.Gil:N0}");
-                    foreach (var r in c.RetainerData)
+                    if (!C.GilOnlyChars)
                     {
-                        if (r.Gil > C.MinGilDisplay && !C.GilOnlyChars)
+                        ImGuiEx.Text($"    {Censor.Character(c.Name, c.World)}: {c.Gil:N0}");
+                        foreach (var r in c.RetainerData)
                         {
-                            ImGuiEx.Text($"        {Censor.Retainer(r.Name)}: {r.Gil:N0}");
+                            if (r.Gil > C.MinGilDisplay)
+                            {
+                                ImGuiEx.Text($"        {Censor.Retainer(r.Name)}: {r.Gil:N0}");
+                            }
+                        }
+                        if (fcdata != null && fcdata.Gil > 0)
+                        {
+                            ImGuiEx.Text(ImGuiColors.DalamudYellow, $"        Free Company {fcdata.Name}: {fcdata.Gil:N0}");
                         }
                     }
-                    ImGuiEx.Text(ImGuiColors.DalamudViolet, $"    {Censor.Character(c.Name, c.World)} total: {charTotal:N0}");
+										ImGuiEx.Text(ImGuiColors.DalamudViolet, $"    {Censor.Character(c.Name, c.World)}{(fcdata != null && fcdata.Gil > 0?"+FC":"")} total: {charTotal:N0}");
                     dcTotal += charTotal;
                     ImGui.Separator();
                 }

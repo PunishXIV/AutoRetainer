@@ -133,11 +133,11 @@ internal unsafe class DebugMisc : DebugUIEntry
         ImGuiEx.Text($"QSI status: {P.quickSellItems?.openInventoryContextHook?.IsEnabled}");
         ImGuiEx.Text($"QuickSellItems.IsReadyToUse: {QuickSellItems.IsReadyToUse()}");
 
-        foreach (var x in VentureStats.CharTotal)
+        foreach (var x in S.VentureStats.CharTotal)
         {
             ImGuiEx.Text($"{x.Key} : {x.Value}");
         }
-        foreach (var x in VentureStats.RetTotal)
+        foreach (var x in S.VentureStats.RetTotal)
         {
             ImGuiEx.Text($"{x.Key} : {x.Value}");
         }

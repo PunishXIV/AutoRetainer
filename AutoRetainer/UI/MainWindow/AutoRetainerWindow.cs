@@ -4,172 +4,201 @@ using PunishLib.ImGuiMethods;
 using AutoRetainerAPI.Configuration;
 using AutoRetainerAPI;
 using AutoRetainer.Modules.Voyage;
+using NightmareUI;
 
 namespace AutoRetainer.UI.MainWindow;
 
 internal unsafe class AutoRetainerWindow : Window
 {
-    public AutoRetainerWindow() : base($"")
-    {
-        SizeConstraints = new()
-        {
-            MinimumSize = new(250, 100),
-            MaximumSize = new(9999, 9999)
-        };
-        P.WindowSystem.AddWindow(this);
-        TitleBarButtons.Add(new()
-        {
-            Click = (m) => { if (m == ImGuiMouseButton.Left) S.NeoWindow.IsOpen = true; },
-            Icon = FontAwesomeIcon.Cog,
-        });
-    }
+		TitleBarButton LockButton;
 
-    public override void PreDraw()
-    {
-        var prefix = SchedulerMain.PluginEnabled ? $" [{SchedulerMain.Reason}]" : "";
-        var tokenRem = TimeSpan.FromMilliseconds(P.TimeLaunched[0] + 3 * 24 * 60 * 60 * 1000 - DateTimeOffset.Now.ToUnixTimeMilliseconds());
-        WindowName = $"{P.Name} {P.GetType().Assembly.GetName().Version}{prefix} | {FormatToken(tokenRem)}###AutoRetainer";
-    }
+		public AutoRetainerWindow() : base($"")
+		{
+				LockButton = new()
+				{
+						Click = OnLockButtonClick,
+						Icon = C.PinWindow ? FontAwesomeIcon.Lock : FontAwesomeIcon.LockOpen,
+						IconOffset = new(3, 2),
+						ShowTooltip = () => ImGui.SetTooltip("Lock window position and size"),
+				};
+				SizeConstraints = new()
+				{
+						MinimumSize = new(250, 100),
+						MaximumSize = new(9999, 9999)
+				};
+				P.WindowSystem.AddWindow(this);
+				this.AllowPinning = false;
+				TitleBarButtons.Add(new()
+				{
+						Click = (m) => { if (m == ImGuiMouseButton.Left) S.NeoWindow.IsOpen = true; },
+						Icon = FontAwesomeIcon.Cog,
+						IconOffset = new(2, 2),
+						ShowTooltip = () => ImGui.SetTooltip("Open settings window"),
+				});
+				TitleBarButtons.Add(LockButton);
+		}
 
-    string FormatToken(TimeSpan time)
-    {
-        if (time.TotalMilliseconds > 0)
-        {
-            if (time.Days > 0)
-            {
-                return $"Session expires in {time.Days} day{(time.Days == 1 ? "" : "s")}" + (time.Hours > 0 ? $" {time.Hours} hours" : "");
-            }
-            else
-            {
-                if (time.Hours > 0)
-                {
-                    return $"Session expires in {time.Hours} hours";
-                }
-                else
-                {
-                    return $"Session expires in less than an hour";
-                }
-            }
-        }
-        else
-        {
-            return "Session expired";
-        }
-    }
-    public override void Draw()
-    {
-        ImGuiEx.RightFloat(() =>
-                {
-                    if (ImGuiEx.IconButton(FontAwesomeIcon.Cog)) S.NeoWindow.IsOpen = true;
-                });
+		private void OnLockButtonClick(ImGuiMouseButton m)
+		{
+				if (m == ImGuiMouseButton.Left)
+				{
+						C.PinWindow = !C.PinWindow;
+						this.LockButton.Icon = C.PinWindow ? FontAwesomeIcon.Lock : FontAwesomeIcon.LockOpen;
+				}
+		}
 
-        var e = SchedulerMain.PluginEnabledInternal;
-        var disabled = MultiMode.Active && !ImGui.GetIO().KeyCtrl;
+		public override void PreDraw()
+		{
+				var prefix = SchedulerMain.PluginEnabled ? $" [{SchedulerMain.Reason}]" : "";
+				var tokenRem = TimeSpan.FromMilliseconds(P.TimeLaunched[0] + 3 * 24 * 60 * 60 * 1000 - DateTimeOffset.Now.ToUnixTimeMilliseconds());
+				WindowName = $"{P.Name} {P.GetType().Assembly.GetName().Version}{prefix} | {FormatToken(tokenRem)}###AutoRetainer";
+				if (C.PinWindow)
+				{
+						ImGuiHelpers.SetNextWindowPosRelativeMainViewport(C.WindowPos);
+						ImGui.SetNextWindowSize(C.WindowSize);
+				}
+		}
 
-        if (disabled)
-        {
-            ImGui.BeginDisabled();
-        }
-        if (ImGui.Checkbox($"Enable {P.Name}", ref e))
-        {
-            P.WasEnabled = false;
-            if (e)
-            {
-                SchedulerMain.EnablePlugin(PluginEnableReason.Auto);
-            }
-            else
-            {
-                SchedulerMain.DisablePlugin();
-            }
-        }
-        if (C.ShowDeployables && (VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType) || VoyageScheduler.Enabled))
-        {
-            ImGui.SameLine();
-            ImGui.Checkbox($"Deployables", ref VoyageScheduler.Enabled);
-        }
-        if (disabled)
-        {
-            ImGui.EndDisabled();
-            ImGuiComponents.HelpMarker($"MultiMode controls this option. Hold CTRL to override.");
-        }
+		string FormatToken(TimeSpan time)
+		{
+				if (time.TotalMilliseconds > 0)
+				{
+						if (time.Days > 0)
+						{
+								return $"Session expires in {time.Days} day{(time.Days == 1 ? "" : "s")}" + (time.Hours > 0 ? $" {time.Hours} hours" : "");
+						}
+						else
+						{
+								if (time.Hours > 0)
+								{
+										return $"Session expires in {time.Hours} hours";
+								}
+								else
+								{
+										return $"Session expires in less than an hour";
+								}
+						}
+				}
+				else
+				{
+						return "Session expired";
+				}
+		}
+		public override void Draw()
+		{
+				var e = SchedulerMain.PluginEnabledInternal;
+				var disabled = MultiMode.Active && !ImGui.GetIO().KeyCtrl;
 
-        if (P.WasEnabled)
-        {
-            ImGui.SameLine();
-            ImGuiEx.Text(GradientColor.Get(ImGuiColors.DalamudGrey, ImGuiColors.DalamudGrey3, 500), $"Paused");
-        }
+				if (disabled)
+				{
+						ImGui.BeginDisabled();
+				}
+				if (ImGui.Checkbox($"Enable {P.Name}", ref e))
+				{
+						P.WasEnabled = false;
+						if (e)
+						{
+								SchedulerMain.EnablePlugin(PluginEnableReason.Auto);
+						}
+						else
+						{
+								SchedulerMain.DisablePlugin();
+						}
+				}
+				if (C.ShowDeployables && (VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType) || VoyageScheduler.Enabled))
+				{
+						ImGui.SameLine();
+						ImGui.Checkbox($"Deployables", ref VoyageScheduler.Enabled);
+				}
+				if (disabled)
+				{
+						ImGui.EndDisabled();
+						ImGuiComponents.HelpMarker($"MultiMode controls this option. Hold CTRL to override.");
+				}
 
-        ImGui.SameLine();
-        if (ImGui.Checkbox("Multi", ref MultiMode.Enabled))
-        {
-            MultiMode.OnMultiModeEnabled();
-        }
-        if (C.ShowNightMode)
-        {
-            ImGui.SameLine();
-            if (ImGui.Checkbox("Night", ref C.NightMode))
-            {
-                MultiMode.BailoutNightMode();
-            }
-        }
-        if (C.DisplayMMType)
-        {
-            ImGui.SameLine();
-            ImGuiEx.SetNextItemWidthScaled(100f);
-            ImGuiEx.EnumCombo("##mode", ref C.MultiModeType);
-        }
-        if (C.CharEqualize && MultiMode.Enabled)
-        {
-            ImGui.SameLine();
-            if (ImGui.Button("Reset counters"))
-            {
-                MultiMode.CharaCnt.Clear();
-            }
-        }
+				if (P.WasEnabled)
+				{
+						ImGui.SameLine();
+						ImGuiEx.Text(GradientColor.Get(ImGuiColors.DalamudGrey, ImGuiColors.DalamudGrey3, 500), $"Paused");
+				}
 
-        Svc.PluginInterface.GetIpcProvider<object>(ApiConsts.OnMainControlsDraw).SendMessage();
+				ImGui.SameLine();
+				if (ImGui.Checkbox("Multi", ref MultiMode.Enabled))
+				{
+						MultiMode.OnMultiModeEnabled();
+				}
+				if (C.ShowNightMode)
+				{
+						ImGui.SameLine();
+						if (ImGui.Checkbox("Night", ref C.NightMode))
+						{
+								MultiMode.BailoutNightMode();
+						}
+				}
+				if (C.DisplayMMType)
+				{
+						ImGui.SameLine();
+						ImGuiEx.SetNextItemWidthScaled(100f);
+						ImGuiEx.EnumCombo("##mode", ref C.MultiModeType);
+				}
+				if (C.CharEqualize && MultiMode.Enabled)
+				{
+						ImGui.SameLine();
+						if (ImGui.Button("Reset counters"))
+						{
+								MultiMode.CharaCnt.Clear();
+						}
+				}
 
-        if (IPC.Suppressed)
-        {
-            ImGuiEx.Text(ImGuiColors.DalamudRed, $"Plugin operation is suppressed by other plugin.");
-            ImGui.SameLine();
-            if (ImGui.SmallButton("Cancel"))
-            {
-                IPC.Suppressed = false;
-            }
-        }
+				Svc.PluginInterface.GetIpcProvider<object>(ApiConsts.OnMainControlsDraw).SendMessage();
 
-        if (P.TaskManager.IsBusy)
-        {
-            ImGui.SameLine();
-            if (ImGui.Button($"Abort {P.TaskManager.NumQueuedTasks} tasks"))
-            {
-                P.TaskManager.Abort();
-            }
-        }
+				if (IPC.Suppressed)
+				{
+						ImGuiEx.Text(ImGuiColors.DalamudRed, $"Plugin operation is suppressed by other plugin.");
+						ImGui.SameLine();
+						if (ImGui.SmallButton("Cancel"))
+						{
+								IPC.Suppressed = false;
+						}
+				}
 
-        ImGuiEx.EzTabBar("tabbar",
-                        ("Retainers", MultiModeUI.Draw, null, true),
+				if (P.TaskManager.IsBusy)
+				{
+						ImGui.SameLine();
+						if (ImGui.Button($"Abort {P.TaskManager.NumQueuedTasks} tasks"))
+						{
+								P.TaskManager.Abort();
+						}
+				}
+
+				ImGuiEx.EzTabBar("tabbar",
+												("Retainers", MultiModeUI.Draw, null, true),
 												("Deployables", WorkshopUI.Draw, null, true),
 												("Statistics", DrawStats, null, true),
 												("About", delegate { AboutTab.Draw(P.Name); }, null, true)
-                        );
-    }
+												);
 
-    void DrawStats()
-    {
+				if (!C.PinWindow)
+				{
+						C.WindowPos = ImGui.GetWindowPos();
+						C.WindowSize = ImGui.GetWindowSize();
+				}
+		}
 
-    }
+		void DrawStats()
+		{
+				NuiTools.ButtonTabs([C.RecordStats?new("Ventures", S.VentureStats.DrawVentures):null, new("Gil", S.GilDisplay.Draw), new("FC Data", S.FCData.Draw)]);
+		}
 
 		public override void OnClose()
-    {
-        EzConfig.Save();
-        S.VentureStatsManager.Data.Clear();
-        MultiModeUI.JustRelogged = false;
-    }
+		{
+				EzConfig.Save();
+				S.VentureStats.Data.Clear();
+				MultiModeUI.JustRelogged = false;
+		}
 
-    public override void OnOpen()
-    {
-        MultiModeUI.JustRelogged = true;
-    }
+		public override void OnOpen()
+		{
+				MultiModeUI.JustRelogged = true;
+		}
 }

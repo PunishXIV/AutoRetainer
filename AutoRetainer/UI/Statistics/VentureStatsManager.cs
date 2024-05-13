@@ -5,9 +5,9 @@ using System.IO;
 
 namespace AutoRetainer.UI.Statistics;
 
-public sealed class VentureStats
+public sealed class VentureStatsManager
 {
-    private VentureStats() { }
+    private VentureStatsManager() { }
 
     internal Dictionary<string, Dictionary<string, Dictionary<uint, StatisticsData>>> Data = new();
     internal Dictionary<string, uint> CharTotal = new();
