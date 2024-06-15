@@ -251,7 +251,8 @@ internal static class Lang
 
 		//Your retainer will be unable to process item buyback requests once recalled. Are you sure you wish to proceed?
 		internal static readonly string[] WillBeUnableToProcessBuyback = [
-				"Your retainer will be unable to process item buyback requests once recalled. Are you sure you wish to proceed?"
+				"Your retainer will be unable to process item buyback requests once recalled. Are you sure you wish to proceed?",
+				"リテイナーを帰すと売却依頼アイテムの買い戻しができなくなりますが、よろしいですか？"
 				];
 
 }
