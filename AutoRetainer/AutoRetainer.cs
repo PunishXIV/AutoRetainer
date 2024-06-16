@@ -99,7 +99,6 @@ public unsafe class AutoRetainer : IDalamudPlugin
 		{
 				EzConfig.Migrate<Config>();
 				config = EzConfig.Init<Config>();
-				Migrator.MigrateGC();
 
 				//windows
 				WindowSystem = new();
@@ -137,7 +136,6 @@ public unsafe class AutoRetainer : IDalamudPlugin
 				StatisticsManager.Init();
 				AutoGCHandin.Init();
 				IPC.Init();
-				Utils.FixKeys();
 				VoyageMain.Init();
 
 				MultiMode.Init();

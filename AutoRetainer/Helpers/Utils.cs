@@ -33,7 +33,13 @@ internal static unsafe class Utils
 		internal static int FCPoints => *(int*)((nint)AgentModule.Instance()->GetAgentByInternalId(AgentId.FreeCompanyCreditShop) + 256);
 		internal static float AnimationLock => *(float*)((nint)ActionManager.Instance() + 8);
 
-		internal static bool IsSureNotInFcTerritory()
+    public static bool IsPublic(this World w)
+    {
+        if (w.IsPublic) return true;
+        return w.RowId.EqualsAny<uint>(408, 409, 410, 411);
+    }
+
+    internal static bool IsSureNotInFcTerritory()
 		{
 				var h = HousingManager.Instance();
 				if (h->OutdoorTerritory != null)
@@ -110,22 +116,6 @@ internal static unsafe class Utils
 		internal static bool MultiModeOrArtisan => MultiMode.Active || (SchedulerMain.PluginEnabled && SchedulerMain.Reason == PluginEnableReason.Artisan);
 		internal static bool IsBusy => P.TaskManager.IsBusy || AutoGCHandin.Operation || AutoLogin.Instance.IsRunning;
 		internal static AtkValue ZeroAtkValue = new() { Type = 0, Int = 0 };
-
-		internal static void FixKeys()
-		{
-				Fix(ref C.EntrustKey);
-				Fix(ref C.RetrieveKey);
-				Fix(ref C.SellKey);
-				Fix(ref C.SellMarketKey);
-				Fix(ref C.TempCollectB);
-				Fix(ref C.Suppress);
-				static void Fix(ref LimitedKeys key)
-				{
-						if (((Keys)key).EqualsAny(Keys.Control, Keys.ControlKey)) key = LimitedKeys.LeftControlKey;
-						if (((Keys)key).EqualsAny(Keys.Shift, Keys.ShiftKey)) key = LimitedKeys.LeftShiftKey;
-						if (((Keys)key).EqualsAny(Keys.Alt, Keys.Menu)) key = LimitedKeys.LeftAltKey;
-				}
-		}
 
 		internal static IEnumerable<string> GetEObjNames(params uint[] values)
 		{

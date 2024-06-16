@@ -45,7 +45,7 @@ public sealed unsafe class FCPointsUpdater
 						{
 								OldFCPoints = Utils.FCPoints;
 								TaskManager.Abort();
-								TaskManager.Enqueue(IsScreenReady);
+								TaskManager.Enqueue(() => IsScreenReady() && Player.Interactable);
 								TaskManager.Enqueue(() =>
 								{
 										if (TryGetAddonByName<AtkUnitBase>("FreeCompany", out var addon))

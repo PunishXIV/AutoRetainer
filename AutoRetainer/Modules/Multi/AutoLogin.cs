@@ -316,7 +316,7 @@ internal unsafe class AutoLogin
 				if (stringArray == null || tempWorld == null) return false;
 
 				var world = Svc.Data.Excel.GetSheet<World>()?.GetRow(tempWorld.Value);
-				if (world is not { IsPublic: true }) return false;
+				if (!world.IsPublic()) return false;
 
 				var checkedWorldCount = 0;
 

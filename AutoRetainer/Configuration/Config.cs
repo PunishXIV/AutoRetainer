@@ -17,7 +17,6 @@ internal unsafe class Config : IEzConfig
 		public int UnsyncCompensation = -5;
 		public bool StatsUnifyHQ = false;
 		public bool RecordStats = true;
-		public bool EnableAutoGCHandin = false; //todo: remove
 		public bool AutoGCContinuation = false;
 		public bool ShouldSerializeEnableAutoGCHandin() => false;
 		public bool GCHandinNotify = false;
@@ -122,6 +121,7 @@ internal unsafe class Config : IEzConfig
 		public bool LeastMBSFirst = false;
 
 		public string DefaultSubmarineUnlockPlan = "";
+		public bool AcceptedDisclamer = false;
 
 		internal bool DontReassign
 		{

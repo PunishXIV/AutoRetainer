@@ -12,6 +12,7 @@ public sealed class NeoWindow : Window
 		[
 				new MainSettings(),
 				new DeployablesTab(),
+				new Keybinds(),
 
 				new MultiModeCommon(),
 				new MultiModeRetainers(),
@@ -19,8 +20,9 @@ public sealed class NeoWindow : Window
 				new MultiModeContingency(),
 				new CharaOrder(),
 				new Exclusions(),
+				new MultiModeFPSLimiter(),
 
-				new InventoryManagementTab(),
+        new InventoryManagementTab(),
 
 				new LoginOverlay(),
 				new MiscTab(),

@@ -4,6 +4,7 @@ using AutoRetainerAPI.Configuration;
 using Dalamud.Interface.Components;
 using ECommons.Configuration;
 using NightmareUI;
+using NightmareUI.PrimaryUI;
 using PunishLib.ImGuiMethods;
 
 namespace AutoRetainer.UI.MainWindow;
@@ -86,6 +87,28 @@ internal unsafe class AutoRetainerWindow : Window
 		}
 		public override void Draw()
 		{
+				if (!C.AcceptedDisclamer)
+				{
+						new NuiBuilder()
+								.Section("Disclamer")
+								.TextWrapped(ImGuiColors.DalamudRed, "To avoid unnecessary consequences please follow these rules when using AutoRetainer:")
+								.TextWrapped("1. Do not acknowledge your use of AutoRetainer in game chat;")
+								.TextWrapped("2. Do not leave AutoRetainer unattended for prolonged period of time;")
+								.TextWrapped("3. Ensure that your total playing+AutoRetainer usage time does not exceeds 16 hours per day; ensure that periods of inactivity exist between your retainer/submersible checking routine;")
+								.TextWrapped("4. Never reply back to players that are trying to do so-called bot checks by trading or chatting with you; instead, blacklist these players immediately;")
+								.TextWrapped("5. If questioned by game master, always claim that you are doing all actions manually and never admit plugin usage.")
+								.TextWrapped("Failure to follow these rules may result in actions taken against your account.")
+								.Widget(() =>
+								{
+										if (ImGuiEx.IconButtonWithText(FontAwesomeIcon.Check, "Accept and continue"))
+										{
+												C.AcceptedDisclamer = true;
+												EzConfig.Save();
+										}
+								})
+								.Draw();
+						return;
+				}
 				var e = SchedulerMain.PluginEnabledInternal;
 				var disabled = MultiMode.Active && !ImGui.GetIO().KeyCtrl;
 
@@ -187,7 +210,7 @@ internal unsafe class AutoRetainerWindow : Window
 
 		private void DrawStats()
 		{
-				NuiTools.ButtonTabs([C.RecordStats ? new("Ventures", S.VentureStats.DrawVentures) : null, new("Gil", S.GilDisplay.Draw), new("FC Data", S.FCData.Draw)]);
+				NuiTools.ButtonTabs([[C.RecordStats ? new("Ventures", S.VentureStats.DrawVentures) : null, new("Gil", S.GilDisplay.Draw), new("FC Data", S.FCData.Draw)]]);
 		}
 
 		public override void OnClose()
