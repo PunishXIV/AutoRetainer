@@ -17,7 +17,6 @@ internal static unsafe class VoyageMain
     {
         Svc.Framework.Update += Tick;
         Svc.Toasts.ErrorToast += Toasts_ErrorToast;
-        VoyageMemory.Init();
         WaitOverlay = new();
         P.WindowSystem.AddWindow(WaitOverlay);
     }
@@ -69,7 +68,6 @@ internal static unsafe class VoyageMain
     {
         Svc.Framework.Update -= Tick;
         Svc.Toasts.ErrorToast -= Toasts_ErrorToast;
-        VoyageMemory.Dispose();
     }
 
     internal static void Tick(object _)
