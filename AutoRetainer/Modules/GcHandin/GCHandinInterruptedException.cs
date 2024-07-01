@@ -2,7 +2,7 @@
 
 internal class GCHandinInterruptedException : Exception
 {
-		public GCHandinInterruptedException(string message) : base(message)
-		{
-		}
+    public GCHandinInterruptedException(string message) : base(message)
+    {
+    }
 }

@@ -2,9 +2,9 @@
 
 internal static class TaskQuitMenu
 {
-		internal static void Enqueue()
-		{
-				VoyageUtils.Log($"Task enqueued: {nameof(TaskQuitMenu)}");
-				P.TaskManager.Enqueue(VoyageScheduler.SelectQuitVesselSelectorMenu);
-		}
+    internal static void Enqueue()
+    {
+        VoyageUtils.Log($"Task enqueued: {nameof(TaskQuitMenu)}");
+        P.TaskManager.Enqueue(VoyageScheduler.SelectQuitVesselSelectorMenu);
+    }
 }

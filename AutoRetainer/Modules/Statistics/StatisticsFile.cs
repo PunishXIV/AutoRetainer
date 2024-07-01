@@ -6,7 +6,7 @@ namespace AutoRetainer.Modules.Statistics;
 [IgnoreDefaultValue]
 public class StatisticsFile : IEzConfig
 {
-		public List<StatisticsRecord> Records = [];
-		public string PlayerName = $"Unnamed{Guid.NewGuid()}";
-		public string RetainerName = $"Unnamed{Guid.NewGuid()}";
+    public List<StatisticsRecord> Records = [];
+    public string PlayerName = $"Unnamed{Guid.NewGuid()}";
+    public string RetainerName = $"Unnamed{Guid.NewGuid()}";
 }

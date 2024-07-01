@@ -2,8 +2,8 @@
 
 internal static class AutoGCHandinUI
 {
-		internal static void Draw()
-		{
-				ImGui.Checkbox("Tray notification upon handin completion (requires NotificationMaster)", ref C.GCHandinNotify);
-		}
+    internal static void Draw()
+    {
+        ImGui.Checkbox("Tray notification upon handin completion (requires NotificationMaster)", ref C.GCHandinNotify);
+    }
 }

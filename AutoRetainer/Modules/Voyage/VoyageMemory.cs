@@ -7,159 +7,159 @@ namespace AutoRetainer.Modules.Voyage;
 
 internal unsafe class VoyageMemory
 {
-		private const string AirshipTimers = "E8 ?? ?? ?? ?? 33 D2 48 8D 4C 24 ?? 41 B8 ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8D 54 24 ?? 48 8B CB E8 ?? ?? ?? ?? 48 8B 0D";
-		private const string AirshipStatus = "48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 41 54 41 55 41 56 41 57 48 83 EC ?? 48 8D 99 ?? ?? ?? ?? C6 81";
-		private const string SubmersibleTimers = "E8 ?? ?? ?? ?? 48 8B 0D ?? ?? ?? ?? 48 85 C9 74 ?? E8 ?? ?? ?? ?? 84 C0 75";
-		private const string SubmersibleStatus = "48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 48 83 EC ?? 0F 10 02 4C 8D 81";
+    private const string AirshipTimers = "E8 ?? ?? ?? ?? 33 D2 48 8D 4C 24 ?? 41 B8 ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8D 54 24 ?? 48 8B CB E8 ?? ?? ?? ?? 48 8B 0D";
+    private const string AirshipStatus = "48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 41 54 41 55 41 56 41 57 48 83 EC ?? 48 8D 99 ?? ?? ?? ?? C6 81";
+    private const string SubmersibleTimers = "E8 ?? ?? ?? ?? 48 8B 0D ?? ?? ?? ?? 48 85 C9 74 ?? E8 ?? ?? ?? ?? 84 C0 75";
+    private const string SubmersibleStatus = "48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 48 83 EC ?? 0F 10 02 4C 8D 81";
 
-		private delegate void PacketHandler(IntPtr manager, IntPtr data);
+    private delegate void PacketHandler(IntPtr manager, IntPtr data);
 
-		[Signature(SubmersibleTimers, DetourName = nameof(SubmersibleTimersDetour))]
-		private Hook<PacketHandler> _submersibleTimersHook;
+    [Signature(SubmersibleTimers, DetourName = nameof(SubmersibleTimersDetour))]
+    private Hook<PacketHandler> _submersibleTimersHook;
 
-		[Signature(SubmersibleStatus, DetourName = nameof(SubmersibleStatusListDetour))]
-		private Hook<PacketHandler> _submersibleStatusListHook;
+    [Signature(SubmersibleStatus, DetourName = nameof(SubmersibleStatusListDetour))]
+    private Hook<PacketHandler> _submersibleStatusListHook;
 
-		[Signature(AirshipTimers, DetourName = nameof(AirshipTimersDetour))]
-		private Hook<PacketHandler> _airshipTimersHook;
+    [Signature(AirshipTimers, DetourName = nameof(AirshipTimersDetour))]
+    private Hook<PacketHandler> _airshipTimersHook;
 
-		[Signature(AirshipStatus, DetourName = nameof(AirshipStatusListDetour))]
-		private Hook<PacketHandler> _airshipStatusListHook;
+    [Signature(AirshipStatus, DetourName = nameof(AirshipStatusListDetour))]
+    private Hook<PacketHandler> _airshipStatusListHook;
 
-		private VoyageMemory()
-		{
-				Svc.Hook.InitializeFromAttributes(this);
-				_submersibleStatusListHook?.Enable();
-				_submersibleTimersHook?.Enable();
-				_airshipTimersHook?.Enable();
-				_airshipStatusListHook?.Enable();
-		}
+    private VoyageMemory()
+    {
+        Svc.Hook.InitializeFromAttributes(this);
+        _submersibleStatusListHook?.Enable();
+        _submersibleTimersHook?.Enable();
+        _airshipTimersHook?.Enable();
+        _airshipStatusListHook?.Enable();
+    }
 
-		internal static VoyageMemory Instance { get; private set; }
-		public int LastAirshipData { get; private set; }
-		public int LastSubmarineData { get; private set; }
+    internal static VoyageMemory Instance { get; private set; }
+    public int LastAirshipData { get; private set; }
+    public int LastSubmarineData { get; private set; }
 
-		public static void Init()
-		{
-				if (Instance != null)
-				{
-						throw new Exception("Already initialized!");
-				}
-				Instance = new();
-		}
+    public static void Init()
+    {
+        if (Instance != null)
+        {
+            throw new Exception("Already initialized!");
+        }
+        Instance = new();
+    }
 
-		public static void Dispose() => Instance?.DisposeInternal();
+    public static void Dispose() => Instance?.DisposeInternal();
 
-		private void DisposeInternal()
-		{
-				_submersibleStatusListHook?.Disable();
-				_submersibleTimersHook?.Disable();
-				_airshipTimersHook?.Disable();
-				_airshipStatusListHook?.Disable();
-				_submersibleStatusListHook?.Dispose();
-				_submersibleTimersHook?.Dispose();
-				_airshipTimersHook?.Dispose();
-				_airshipStatusListHook?.Dispose();
-		}
+    private void DisposeInternal()
+    {
+        _submersibleStatusListHook?.Disable();
+        _submersibleTimersHook?.Disable();
+        _airshipTimersHook?.Disable();
+        _airshipStatusListHook?.Disable();
+        _submersibleStatusListHook?.Dispose();
+        _submersibleTimersHook?.Dispose();
+        _airshipTimersHook?.Dispose();
+        _airshipStatusListHook?.Dispose();
+    }
 
-		private void SubmersibleTimersDetour(IntPtr manager, IntPtr data)
-		{
-				try
-				{
-						var timer = (SubmersibleTimer*)data;
-						var temp = new List<OfflineVesselData>();
-						for (byte i = 0; i < 4; ++i)
-						{
-								if (timer[i].RawName[0] == 0) break;
-								temp.Add(new(timer[i].TimeStamp, timer[i].Name));
-						}
-						if (temp.Count > 0)
-						{
-								if (Data == null) PluginLog.Error($"Data is null");
-								Data.OfflineSubmarineData = temp;
-								VoyageUtils.Log($"Updated airship data from SubmersibleTimer");
-						}
-				}
-				catch (Exception e)
-				{
-						e.Log();
-				}
-				_submersibleTimersHook.Original(manager, data);
-		}
+    private void SubmersibleTimersDetour(IntPtr manager, IntPtr data)
+    {
+        try
+        {
+            var timer = (SubmersibleTimer*)data;
+            var temp = new List<OfflineVesselData>();
+            for (byte i = 0; i < 4; ++i)
+            {
+                if (timer[i].RawName[0] == 0) break;
+                temp.Add(new(timer[i].TimeStamp, timer[i].Name));
+            }
+            if (temp.Count > 0)
+            {
+                if (Data == null) PluginLog.Error($"Data is null");
+                Data.OfflineSubmarineData = temp;
+                VoyageUtils.Log($"Updated airship data from SubmersibleTimer");
+            }
+        }
+        catch (Exception e)
+        {
+            e.Log();
+        }
+        _submersibleTimersHook.Original(manager, data);
+    }
 
-		private void SubmersibleStatusListDetour(IntPtr manager, IntPtr data)
-		{
-				try
-				{
-						var status = (SubmersibleStatus*)data;
-						var temp = new List<OfflineVesselData>();
-						for (byte i = 0; i < 4; ++i)
-						{
-								if (status[i].RawName[0] == 0) break;
-								temp.Add(new(status[i].TimeStamp, status[i].Name));
-						}
-						//if (temp.Count > 0)
-						{
-								Data.OfflineSubmarineData = temp;
-								VoyageUtils.Log($"Updated airship data from SubmersibleStatus");
-								LastSubmarineData = ImGui.GetFrameCount();
-						}
-				}
-				catch (Exception e)
-				{
-						e.Log();
-				}
-				_submersibleStatusListHook.Original(manager, data);
-		}
+    private void SubmersibleStatusListDetour(IntPtr manager, IntPtr data)
+    {
+        try
+        {
+            var status = (SubmersibleStatus*)data;
+            var temp = new List<OfflineVesselData>();
+            for (byte i = 0; i < 4; ++i)
+            {
+                if (status[i].RawName[0] == 0) break;
+                temp.Add(new(status[i].TimeStamp, status[i].Name));
+            }
+            //if (temp.Count > 0)
+            {
+                Data.OfflineSubmarineData = temp;
+                VoyageUtils.Log($"Updated airship data from SubmersibleStatus");
+                LastSubmarineData = ImGui.GetFrameCount();
+            }
+        }
+        catch (Exception e)
+        {
+            e.Log();
+        }
+        _submersibleStatusListHook.Original(manager, data);
+    }
 
 
-		private unsafe void AirshipTimersDetour(IntPtr manager, IntPtr data)
-		{
-				try
-				{
-						var timer = (AirshipTimer*)data;
-						var temp = new List<OfflineVesselData>();
-						for (byte i = 0; i < 4; ++i)
-						{
-								if (timer[i].RawName[0] == 0) break;
-								temp.Add(new(timer[i].TimeStamp, timer[i].Name));
-						}
-						if (temp.Count > 0)
-						{
-								Data.OfflineAirshipData = temp;
-								VoyageUtils.Log($"Updated airship data from AirshipTimer");
-						}
-				}
-				catch (Exception e)
-				{
-						e.Log();
-				}
-				_airshipTimersHook.Original(manager, data);
-		}
+    private unsafe void AirshipTimersDetour(IntPtr manager, IntPtr data)
+    {
+        try
+        {
+            var timer = (AirshipTimer*)data;
+            var temp = new List<OfflineVesselData>();
+            for (byte i = 0; i < 4; ++i)
+            {
+                if (timer[i].RawName[0] == 0) break;
+                temp.Add(new(timer[i].TimeStamp, timer[i].Name));
+            }
+            if (temp.Count > 0)
+            {
+                Data.OfflineAirshipData = temp;
+                VoyageUtils.Log($"Updated airship data from AirshipTimer");
+            }
+        }
+        catch (Exception e)
+        {
+            e.Log();
+        }
+        _airshipTimersHook.Original(manager, data);
+    }
 
-		private unsafe void AirshipStatusListDetour(IntPtr manager, IntPtr data)
-		{
-				try
-				{
-						var status = (AirshipStatus*)data;
-						var temp = new List<OfflineVesselData>();
-						for (byte i = 0; i < 4; ++i)
-						{
-								if (status[i].RawName[0] == 0) break;
-								temp.Add(new(status[i].TimeStamp, status[i].Name));
-						}
-						//if (temp.Count > 0)
-						{
-								Data.OfflineAirshipData = temp;
-								VoyageUtils.Log($"Updated airship data from AirshipStatus");
-								LastAirshipData = ImGui.GetFrameCount();
-						}
-				}
-				catch (Exception e)
-				{
-						e.Log();
-				}
-				_airshipStatusListHook.Original(manager, data);
-		}
+    private unsafe void AirshipStatusListDetour(IntPtr manager, IntPtr data)
+    {
+        try
+        {
+            var status = (AirshipStatus*)data;
+            var temp = new List<OfflineVesselData>();
+            for (byte i = 0; i < 4; ++i)
+            {
+                if (status[i].RawName[0] == 0) break;
+                temp.Add(new(status[i].TimeStamp, status[i].Name));
+            }
+            //if (temp.Count > 0)
+            {
+                Data.OfflineAirshipData = temp;
+                VoyageUtils.Log($"Updated airship data from AirshipStatus");
+                LastAirshipData = ImGui.GetFrameCount();
+            }
+        }
+        catch (Exception e)
+        {
+            e.Log();
+        }
+        _airshipStatusListHook.Original(manager, data);
+    }
 
 }

@@ -2,5 +2,5 @@
 
 internal enum VoyageType
 {
-		Airship, Submersible
+    Airship, Submersible
 }

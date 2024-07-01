@@ -25,6 +25,6 @@ global using System.Text;
 global using System.Threading.Tasks;
 global using static AutoRetainer.AutoRetainer;
 global using static ECommons.GenericHelpers;
-global using S = AutoRetainer.Services.AutoRetainerServiceManager;
 global using Callback = ECommons.Automation.Callback;
 global using CSFramework = FFXIVClientStructs.FFXIV.Client.System.Framework.Framework;
+global using S = AutoRetainer.Services.AutoRetainerServiceManager;

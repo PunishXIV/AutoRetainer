@@ -2,7 +2,7 @@
 
 public enum RetainerItemCommand : long
 {
-		RetrieveFromRetainer = 0,
-		EntrustToRetainer = 1,
-		HaveRetainerSellItem = 5,
+    RetrieveFromRetainer = 0,
+    EntrustToRetainer = 1,
+    HaveRetainerSellItem = 5,
 }

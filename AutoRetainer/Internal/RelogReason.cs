@@ -2,5 +2,5 @@
 
 public enum RelogReason
 {
-		Overlay, Command, ConfigGUI, MultiMode
+    Overlay, Command, ConfigGUI, MultiMode
 }

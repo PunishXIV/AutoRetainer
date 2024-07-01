@@ -9,19 +9,19 @@ namespace AutoRetainer.Internal;
 
 internal class ContextMenuManager
 {
-		private SeString Prefix = new SeStringBuilder().AddUiForeground(" ", 539).Build();
+    private SeString Prefix = new SeStringBuilder().AddUiForeground(" ", 539).Build();
 
-		public ContextMenuManager()
-		{
-				//ContextMenu.OnOpenInventoryContextMenu += ContextMenu_OnOpenInventoryContextMenu;
-		}
+    public ContextMenuManager()
+    {
+        //ContextMenu.OnOpenInventoryContextMenu += ContextMenu_OnOpenInventoryContextMenu;
+    }
 
-		public void Dispose()
-		{
-				//ContextMenu.Dispose();
-		}
+    public void Dispose()
+    {
+        //ContextMenu.Dispose();
+    }
 
-		/*private void ContextMenu_OnOpenInventoryContextMenu(InventoryContextMenuOpenArgs args)
+    /*private void ContextMenu_OnOpenInventoryContextMenu(InventoryContextMenuOpenArgs args)
 		{
 				if (!C.IMEnableContextMenu) return;
 				var id = args.ItemId % 1000000;
