@@ -519,7 +519,6 @@ public unsafe class AutoRetainer : IDalamudPlugin
             {
 
                 MultiMode.Enabled = false;
-                AutoLogin.Instance.Abort();
             }
         }
     }
@@ -542,7 +541,6 @@ public unsafe class AutoRetainer : IDalamudPlugin
             Safe(() => NewYesAlreadyManager.Unlock());
             Safe(() => TextAdvanceManager.UnlockTA());
             Safe(() => StatisticsManager.Shutdown());
-            Safe(() => AutoLogin.Dispose());
             Safe(() => Memory.Dispose());
             Safe(() => IPC.Shutdown());
             Safe(() => API.Dispose());
@@ -692,7 +690,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         }
         SchedulerMain.DisablePlugin();
 
-        if (!AutoLogin.Instance.IsRunning)
+        if (!P.TaskManager.IsBusy)
         {
             MultiMode.LastLogin = 0;
         }

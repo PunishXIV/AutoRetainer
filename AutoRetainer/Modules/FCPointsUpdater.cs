@@ -9,7 +9,7 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 namespace AutoRetainer.Modules;
 public sealed unsafe class FCPointsUpdater
 {
-    private readonly TaskManager TaskManager = new(new(timeLimitMS: 15000, abortOnTimeout: true, showDebug: true));
+    private readonly TaskManager TaskManager = new(new(timeLimitMS: 15000, abortOnTimeout: true, showDebug: false));
     private int OldFCPoints;
 
     private FCPointsUpdater()
@@ -45,6 +45,7 @@ public sealed unsafe class FCPointsUpdater
             {
                 OldFCPoints = Utils.FCPoints;
                 TaskManager.Abort();
+                TaskManager.Enqueue(() => !IsOccupied());
                 TaskManager.Enqueue(() => IsScreenReady() && Player.Interactable);
                 TaskManager.Enqueue(() =>
                 {

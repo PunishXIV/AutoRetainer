@@ -18,7 +18,7 @@ internal class MultiModeOverlay : Window
 
     public override bool DrawConditions()
     {
-        return !C.HideOverlayIcons && (P.TaskManager.IsBusy || P.IsNextToBell || MultiMode.Enabled || AutoLogin.Instance.IsRunning || SchedulerMain.PluginEnabled || DisplayNotify || VoyageScheduler.Enabled || Shutdown.Active);
+        return !C.HideOverlayIcons && (P.TaskManager.IsBusy || P.IsNextToBell || MultiMode.Enabled || SchedulerMain.PluginEnabled || DisplayNotify || VoyageScheduler.Enabled || Shutdown.Active);
     }
 
     private Vector2 StatusPanelSize => new(C.StatusBarIconWidth);
@@ -184,32 +184,6 @@ internal class MultiModeOverlay : Window
             }
             ImGui.SameLine();
         }
-        if (AutoLogin.Instance.IsRunning && ShouldDisplay())
-        {
-            displayed = true;
-            if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "login.png"), out var t))
-            {
-                ImGui.Image(t.ImGuiHandle, StatusPanelSize);
-                if (ImGui.IsItemHovered())
-                {
-                    ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-                    if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
-                    {
-                        Svc.Commands.ProcessCommand("/ays");
-                    }
-                    if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
-                    {
-                        AutoLogin.Instance.Abort();
-                    }
-                    ImGui.SetTooltip("Autologin is running.\nLeft click - open AutoRetainer. \nRight click - disable Multi Mode.");
-                }
-            }
-            else
-            {
-                ImGuiEx.Text($"loading login.png");
-            }
-            ImGui.SameLine();
-        }
         if (VoyageScheduler.Enabled && ShouldDisplay())
         {
             displayed = true;
@@ -292,7 +266,7 @@ internal class MultiModeOverlay : Window
         ImGui.Dummy(Vector2.One);
         if (Data != null && !C.OldStatusIcons)
         {
-            ImGuiEx.ImGuiLineCentered("Status", delegate
+            ImGuiEx.LineCentered("Status", delegate
             {
                 if (C.MultiModeWorkshopConfiguration.MultiWaitForAll)
                 {

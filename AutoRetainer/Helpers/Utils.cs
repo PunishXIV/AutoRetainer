@@ -117,7 +117,7 @@ internal static unsafe class Utils
     }
 
     internal static bool MultiModeOrArtisan => MultiMode.Active || (SchedulerMain.PluginEnabled && SchedulerMain.Reason == PluginEnableReason.Artisan);
-    internal static bool IsBusy => P.TaskManager.IsBusy || AutoGCHandin.Operation || AutoLogin.Instance.IsRunning;
+    internal static bool IsBusy => P.TaskManager.IsBusy || AutoGCHandin.Operation;
     internal static AtkValue ZeroAtkValue = new() { Type = 0, Int = 0 };
 
     internal static IEnumerable<string> GetEObjNames(params uint[] values)
@@ -205,7 +205,6 @@ internal static unsafe class Utils
         return !Svc.ClientState.IsLoggedIn
             && !Svc.Condition.Any()
             && !P.TaskManager.IsBusy
-            && !AutoLogin.Instance.IsRunning
             && IsTitleScreenReady();
     }
 

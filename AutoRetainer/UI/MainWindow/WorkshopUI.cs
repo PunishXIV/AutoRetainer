@@ -79,16 +79,8 @@ internal static unsafe class WorkshopUI
 
                 if (ImGuiGroup.BeginGroupBox("Deployable Task Estate Teleportation Settings"))
                 {
-                    var inst = Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "TeleporterPlugin" && x.IsLoaded);
-                    if (!inst) ImGui.BeginDisabled();
                     ImGui.Checkbox($"Enable Estate Hall Teleport", ref data.TeleportToFCHouse);
                     data.DrawEntranceConfig(ref data.FreeCompanyHouseEntrance);
-
-                    if (!inst)
-                    {
-                        ImGui.EndDisabled();
-                        ImGuiComponents.HelpMarker("You must have Teleporter plugin installed and enabled to use this function.");
-                    }
                     ImGuiGroup.EndGroupBox();
                 }
 

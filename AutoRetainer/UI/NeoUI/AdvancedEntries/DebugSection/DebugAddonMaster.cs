@@ -1,4 +1,6 @@
-﻿using ECommons.UIHelpers.AddonMasterImplementations;
+﻿using ECommons.ExcelServices;
+using ECommons.UIHelpers.AddonMasterImplementations;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
 using System;
@@ -30,7 +32,7 @@ public unsafe class DebugAddonMaster : DebugUIEntry
 
         if (ImGui.CollapsingHeader("_TitleMenu"))
         {
-            if(TryGetAddonMaster<AddonMaster._TitleMenu>("_TitleMenu", out var m) && m.IsAddonReady)
+            if(TryGetAddonMaster<AddonMaster._TitleMenu>(out var m) && m.IsAddonReady)
             {
                 ImGuiEx.Text($"Ready: {m.IsReady}");
                 if (ImGui.Button("Start")) m.Start();
@@ -41,7 +43,7 @@ public unsafe class DebugAddonMaster : DebugUIEntry
 
         if (ImGui.CollapsingHeader("TitleDCWorldMap"))
         {
-            if(TryGetAddonMaster<AddonMaster.TitleDCWorldMap>("TitleDCWorldMap", out var m) && m.IsAddonReady)
+            if(TryGetAddonMaster<AddonMaster.TitleDCWorldMap>(out var m) && m.IsAddonReady)
             {
                 foreach(var x in AddonMaster.TitleDCWorldMap.PublicDC)
                 {
@@ -55,7 +57,7 @@ public unsafe class DebugAddonMaster : DebugUIEntry
 
         if (ImGui.CollapsingHeader("_CharaSelectWorldServer"))
         {
-            if(TryGetAddonMaster<AddonMaster._CharaSelectWorldServer>("_CharaSelectWorldServer", out var m))
+            if(TryGetAddonMaster<AddonMaster._CharaSelectWorldServer>(out var m))
             {
                 foreach(var x in m.Worlds)
                 {
@@ -69,7 +71,7 @@ public unsafe class DebugAddonMaster : DebugUIEntry
 
         if (ImGui.CollapsingHeader("_CharaSelectListMenu"))
         {
-            if (TryGetAddonMaster<AddonMaster._CharaSelectListMenu>("_CharaSelectListMenu", out var m) && m.IsAddonReady)
+            if (TryGetAddonMaster<AddonMaster._CharaSelectListMenu>(out var m) && m.IsAddonReady)
             {
                 foreach(var x in m.Characters)
                 {

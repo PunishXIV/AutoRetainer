@@ -111,8 +111,6 @@ internal static unsafe class MultiModeUI
 
                 if (ImGuiGroup.BeginGroupBox("Retainer Task Estate Teleportation Settings"))
                 {
-                    var inst = Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "TeleporterPlugin" && x.IsLoaded);
-                    if (!inst) ImGui.BeginDisabled();
                     ImGui.Checkbox($"Enable Estate Hall Teleport", ref data.TeleportToRetainerHouse);
                     ImGuiEx.SetNextItemWidthScaled(150f);
                     ImGuiEx.EnumCombo("Estate Teleport Location Preference", ref data.HouseTeleportTarget);
@@ -126,12 +124,6 @@ internal static unsafe class MultiModeUI
                         data.DrawEntranceConfig(ref data.FreeCompanyHouseEntrance);
                     }
                     ImGui.Checkbox($"Enforce teleport to registered FC and Private houses at login", ref data.EnforceTeleportsOnLogin);
-
-                    if (!inst)
-                    {
-                        ImGui.EndDisabled();
-                        ImGuiComponents.HelpMarker("You must have Teleporter plugin installed and enabled to use this function.");
-                    }
                     ImGuiGroup.EndGroupBox();
                 }
                 SharedUI.DrawExcludeReset(data);

@@ -132,7 +132,7 @@ internal static unsafe class MultiMode
                 DuoLog.Warning($"Invalid configuration: {nameof(C.MultiModeWorkshopConfiguration.MultiWaitForAll)} was not activated but {nameof(C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn)} was. The configuration was fixed.");
                 C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn = false;
             }
-            if (!Svc.ClientState.IsLoggedIn && TryGetAddonByName<AtkUnitBase>("Title", out _) && !AutoLogin.Instance.IsRunning)
+            if (!Svc.ClientState.IsLoggedIn && TryGetAddonByName<AtkUnitBase>("Title", out _) && !P.TaskManager.IsBusy)
             {
                 LastLogin = 0;
             }
@@ -182,7 +182,7 @@ internal static unsafe class MultiMode
                     return;
                 }
             }
-            if (ProperOnLogin.PlayerPresent && !AutoLogin.Instance.IsRunning)
+            if (ProperOnLogin.PlayerPresent && !P.TaskManager.IsBusy)
             {
                 if (!Utils.IsInventoryFree())
                 {
@@ -192,7 +192,7 @@ internal static unsafe class MultiMode
                     }
                 }
             }
-            if (ProperOnLogin.PlayerPresent && !AutoLogin.Instance.IsRunning && IsInteractionAllowed()
+            if (ProperOnLogin.PlayerPresent && !P.TaskManager.IsBusy && IsInteractionAllowed()
                 && (!Synchronize || C.OfflineData.All(x => x.GetEnabledRetainers().All(z => z.GetVentureSecondsRemaining() <= C.UnsyncCompensation))))
             {
                 Synchronize = false;
@@ -372,9 +372,9 @@ internal static unsafe class MultiMode
             }
         }
         ErrorMessage = string.Empty;
-        if (AutoLogin.Instance.IsRunning)
+        if (P.TaskManager.IsBusy)
         {
-            ErrorMessage = "AutoLogin is already running";
+            ErrorMessage = "AutoRetainer is processing tasks";
         }
         else if (SchedulerMain.CharacterPostProcessLocked)
         {
@@ -410,11 +410,11 @@ internal static unsafe class MultiMode
                     TaskPostprocessCharacterIPC.Enqueue();
                     if (data != null)
                     {
-                        P.TaskManager.Enqueue(() => AutoLogin.Instance.SwapCharacter(data.CurrentWorld, data.Name, ExcelWorldHelper.GetWorldByName(data.World).RowId, data.ServiceAccount));
+                        P.TaskManager.Enqueue(() => TaskChangeCharacter.Enqueue(data.CurrentWorld, data.Name, data.World, data.ServiceAccount));
                     }
                     else
                     {
-                        P.TaskManager.Enqueue(() => AutoLogin.Instance.Logoff());
+                        P.TaskManager.Enqueue(() => TaskChangeCharacter.Logout());
                     }
                     return true;
                 }
@@ -423,7 +423,7 @@ internal static unsafe class MultiMode
             {
                 if (Utils.CanAutoLogin())
                 {
-                    AutoLogin.Instance.Login(data.CurrentWorld, data.Name, ExcelWorldHelper.GetWorldByName(data.World).RowId, data.ServiceAccount);
+                    TaskChangeCharacter.EnqueueLogin(data.CurrentWorld, data.Name, data.World, data.ServiceAccount);
                     return true;
                 }
                 else
