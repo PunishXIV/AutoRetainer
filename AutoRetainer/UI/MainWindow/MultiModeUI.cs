@@ -109,21 +109,9 @@ internal static unsafe class MultiModeUI
                 }
 
 
-                if (ImGuiGroup.BeginGroupBox("Retainer Task Estate Teleportation Settings"))
+                if (ImGuiGroup.BeginGroupBox("Estate entrance override"))
                 {
-                    ImGui.Checkbox($"Enable Estate Hall Teleport", ref data.TeleportToRetainerHouse);
-                    ImGuiEx.SetNextItemWidthScaled(150f);
-                    ImGuiEx.EnumCombo("Estate Teleport Location Preference", ref data.HouseTeleportTarget);
-
-                    if (data.HouseTeleportTarget == HouseTeleportTarget.Private_Estate_Hall)
-                    {
-                        data.DrawEntranceConfig(ref data.PrivateHouseEntrance);
-                    }
-                    if (data.HouseTeleportTarget == HouseTeleportTarget.Free_Company_Estate_Hall)
-                    {
-                        data.DrawEntranceConfig(ref data.FreeCompanyHouseEntrance);
-                    }
-                    ImGui.Checkbox($"Enforce teleport to registered FC and Private houses at login", ref data.EnforceTeleportsOnLogin);
+                    data.DrawEntranceConfig(ref data.FreeCompanyHouseEntrance);
                     ImGuiGroup.EndGroupBox();
                 }
                 SharedUI.DrawExcludeReset(data);

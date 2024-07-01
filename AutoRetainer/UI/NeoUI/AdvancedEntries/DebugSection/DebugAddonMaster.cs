@@ -75,11 +75,17 @@ public unsafe class DebugAddonMaster : DebugUIEntry
             {
                 foreach(var x in m.Characters)
                 {
-                    if (ImGui.Button(x.ToString()))
+                    if (ImGui.Button(x.ToString() + "/select"))
                     {
                         x.Select();
                     }
-                    if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                    ImGui.SameLine();
+                    if (ImGui.Button(x.ToString() + "/login"))
+                    {
+                        x.Login();
+                    }
+                    ImGui.SameLine();
+                    if (ImGui.Button(x.ToString() + "/context"))
                     {
                         x.OpenContextMenu();
                     }

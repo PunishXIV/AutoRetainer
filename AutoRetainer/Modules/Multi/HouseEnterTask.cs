@@ -18,34 +18,10 @@ internal static unsafe class HouseEnterTask
 {
     internal static readonly uint[] FCAetherytes = [56, 57, 58, 96, 164];
     internal static readonly uint[] PrivateAetherytes = [59, 60, 61, 97, 165];
-    internal static void EnqueueTask(bool ignoreTeleportZoneCheck = false, bool noTeleport = false)
+    internal static void EnqueueTask()
     {
-        noTeleport = true;
-        PluginLog.Debug($"Enqueued HouseEnterTast(ignoreTeleportZoneCheck={ignoreTeleportZoneCheck}) from {new StackTrace().GetFrames().Select(x => x.GetMethod()?.Name).Prepend("      ").Print("\n")}");
+        PluginLog.Debug($"Enqueued HouseEnterTask from {new StackTrace().GetFrames().Select(x => x.GetMethod()?.Name).Prepend("      ").Print("\n")}");
         P.TaskManager.Enqueue(NewYesAlreadyManager.WaitForYesAlreadyDisabledTask);
-        if (!noTeleport) P.TaskManager.Enqueue(() =>
-        {
-            if ((Data.TeleportToFCHouse || Data.TeleportToRetainerHouse) && (!Player.Territory.EqualsAny([Utils.GetFCHouseTerritory(), Utils.GetPrivateHouseTerritory(), .. VoyageUtils.Workshops]) || ignoreTeleportZoneCheck))
-            {
-                P.TaskManager.EnqueueImmediate(() => Player.Interactable, $"WaitForPlayerInteractable");
-                var canTpToFc = (Data.TeleportToFCHouse && !MultiMode.IsCurrentCharacterCaptainDone()) || (Data.TeleportToRetainerHouse && Data.HouseTeleportTarget == HouseTeleportTarget.Free_Company_Estate_Hall);
-                var canTpToPrivate = (Data.TeleportToRetainerHouse && Data.HouseTeleportTarget == HouseTeleportTarget.Private_Estate_Hall);
-                var canTpToApartment = (Data.TeleportToRetainerHouse && Data.HouseTeleportTarget == HouseTeleportTarget.Apartment);
-                if (canTpToFc)
-                {
-                    P.TaskManager.EnqueueImmediate(() => EnqueueTeleportToHouse(HouseType.FC), $"TeleportTo(FCAetherytes)");
-                }
-                else if (canTpToPrivate)
-                {
-                    P.TaskManager.EnqueueImmediate(() => EnqueueTeleportToHouse(HouseType.House), "TeleportTo(PrivateAetherytes)");
-                }
-                else if (canTpToApartment)
-                {
-                    P.TaskManager.EnqueueImmediate(() => EnqueueTeleportToHouse(HouseType.Apartment), "TeleportTo(Apartment)");
-                }
-                P.TaskManager.EnqueueImmediate(() => Player.Interactable && Svc.ClientState.TerritoryType.EqualsAny(ResidentalAreas.List), 1000 * 60, "WaitUntilArrival (teleport)");
-            }
-        });
         P.TaskManager.Enqueue(WaitUntilNotBusy, 180 * 1000);
         P.TaskManager.Enqueue(() =>
         {
@@ -70,54 +46,6 @@ internal static unsafe class HouseEnterTask
             return true;
         }, "Master HET");
         TaskEnterWorkshop.Enqueue();
-    }
-
-    internal static void EnqueueForcedTeleport()
-    {
-        if (Data.WorkshopEnabled && Data.AreAnyEnabledVesselsReturnInNext(60 * 60, C.MultiModeWorkshopConfiguration.MultiWaitForAll))
-        {
-            if (((Data.FreeCompanyHouseEntrance != null && !Data.FreeCompanyHouseEntrance.Descriptor.IsInThisHouse()) || Utils.IsSureNotInFcTerritory()) && Utils.GetFCHouseTerritory() != 0)
-            {
-                EnqueueTeleportToHouse(HouseType.FC);
-            }
-        }
-        else if (Data.Enabled)
-        {
-            if (Data.HouseTeleportTarget == HouseTeleportTarget.Private_Estate_Hall)
-            {
-                if (((Data.PrivateHouseEntrance != null && !Data.PrivateHouseEntrance.Descriptor.IsInThisHouse()) || Utils.IsSureNotInPrivateTerritory()) && Utils.GetPrivateHouseTerritory() != 0)
-                {
-                    EnqueueTeleportToHouse(HouseType.House);
-                }
-            }
-            else if (((Data.FreeCompanyHouseEntrance != null && !Data.FreeCompanyHouseEntrance.Descriptor.IsInThisHouse()) || Utils.IsSureNotInFcTerritory()) && Utils.GetFCHouseTerritory() != 0)
-            {
-                if (Data.FreeCompanyHouseEntrance != null && !Data.FreeCompanyHouseEntrance.Descriptor.IsInThisHouse())
-                {
-                    EnqueueTeleportToHouse(HouseType.FC);
-                }
-            }
-            else if (Data.HouseTeleportTarget == HouseTeleportTarget.Apartment)
-            {
-                if (Utils.GetNearestEntrance(out _)?.Name.ExtractText().EqualsAny(Lang.ApartmentEntrance) != true)
-                {
-                    EnqueueTeleportToHouse(HouseType.Apartment);
-                }
-            }
-        }
-    }
-
-    public enum HouseType { House, FC, Apartment }
-
-    private static void EnqueueTeleportToHouse(HouseType type)
-    {
-        P.TaskManager.EnqueueImmediate(NewYesAlreadyManager.WaitForYesAlreadyDisabledTask);
-        P.TaskManager.EnqueueImmediate(() => Player.Interactable, $"WaitForPlayerInteractable");
-        if (type == HouseType.House) P.TaskManager.EnqueueImmediate(() => S.LifestreamIPC.TeleportToHome());
-        if (type == HouseType.Apartment) P.TaskManager.EnqueueImmediate(() => S.LifestreamIPC.TeleportToApartment());
-        if (type == HouseType.FC) P.TaskManager.EnqueueImmediate(() => S.LifestreamIPC.TeleportToFC());
-        P.TaskManager.EnqueueImmediate(() => Svc.Condition[ConditionFlag.BetweenAreas] || Svc.Condition[ConditionFlag.BetweenAreas51]);
-        P.TaskManager.EnqueueImmediate(() => !S.LifestreamIPC.IsBusy() && IsScreenReady() && Player.Interactable, int.MaxValue, "WaitUntilArrival (Teleport)");
     }
 
     internal static bool? WaitUntilNotBusy()

@@ -77,9 +77,8 @@ internal static unsafe class WorkshopUI
                     ImGuiGroup.EndGroupBox();
                 }
 
-                if (ImGuiGroup.BeginGroupBox("Deployable Task Estate Teleportation Settings"))
+                if (ImGuiGroup.BeginGroupBox("Estate entrance override"))
                 {
-                    ImGui.Checkbox($"Enable Estate Hall Teleport", ref data.TeleportToFCHouse);
                     data.DrawEntranceConfig(ref data.FreeCompanyHouseEntrance);
                     ImGuiGroup.EndGroupBox();
                 }
@@ -141,15 +140,6 @@ internal static unsafe class WorkshopUI
                     ImGuiEx.TextV("\uf252");
                     ImGui.PopFont();
                     ImGuiEx.Tooltip($"Wait for all deployables is enabled for this character.");
-                    ImGui.SameLine(0, 3);
-                }
-
-                if (data.TeleportToFCHouse)
-                {
-                    ImGui.PushFont(UiBuilder.IconFont);
-                    ImGuiEx.TextV("\uf1ad");
-                    ImGui.PopFont();
-                    ImGuiEx.Tooltip($"This character is allowed to teleport to FC house upon readiness");
                     ImGui.SameLine(0, 3);
                 }
             }

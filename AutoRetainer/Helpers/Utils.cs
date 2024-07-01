@@ -558,32 +558,11 @@ internal static unsafe class Utils
         IGameObject currentObject = null;
 
         var fcOverride = Data.FreeCompanyHouseEntrance == null ? null : GetEntranceAtLocation(Data.FreeCompanyHouseEntrance.Entrance);
-        var pOverride = Data.PrivateHouseEntrance == null ? null : GetEntranceAtLocation(Data.PrivateHouseEntrance.Entrance);
 
-        if (fcOverride != null && pOverride != null)
-        {
-            var fcd = Vector3.Distance(Player.Object.Position, fcOverride.Position);
-            var pd = Vector3.Distance(Player.Object.Position, pOverride.Position);
-            if (fcd > pd)
-            {
-                Distance = pd;
-                return pOverride;
-            }
-            else
-            {
-                Distance = fcd;
-                return fcOverride;
-            }
-        }
         if (fcOverride != null)
         {
             Distance = Vector3.Distance(Player.Object.Position, fcOverride.Position);
             return fcOverride;
-        }
-        if (pOverride != null)
-        {
-            Distance = Vector3.Distance(Player.Object.Position, pOverride.Position);
-            return pOverride;
         }
 
         foreach (var x in Svc.Objects)

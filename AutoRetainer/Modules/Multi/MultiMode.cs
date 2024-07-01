@@ -37,7 +37,7 @@ internal static unsafe class MultiMode
     internal static CircularBuffer<long> Interactions = new(5);
 
     internal static Dictionary<ulong, int> CharaCnt = [];
-    internal static bool CanHET => Active && C.ExpertMultiAllowHET && (ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType) || Data.TeleportToFCHouse || Data.TeleportToRetainerHouse);
+    internal static bool CanHET => Active && C.ExpertMultiAllowHET && (ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType));
 
     internal static void Init()
     {
@@ -55,10 +55,6 @@ internal static unsafe class MultiMode
             if (CanHET)
             {
                 DebugLog($"ProperOnLogin: {Svc.ClientState.LocalPlayer}, residential area, scheduling HET");
-                if (Data.EnforceTeleportsOnLogin)
-                {
-                    HouseEnterTask.EnqueueForcedTeleport();
-                }
                 HouseEnterTask.EnqueueTask();
             }
             MultiModeUI.JustRelogged = true;
@@ -90,7 +86,7 @@ internal static unsafe class MultiMode
         LastLogin = 0;
         if (C.MultiHETOnEnable && Player.Available && CanHET)
         {
-            HouseEnterTask.EnqueueTask(noTeleport: true);
+            HouseEnterTask.EnqueueTask();
         }
         if (Utils.GetNearestWorkshopEntrance(out _) != null && Utils.GetReachableRetainerBell(false) == null)
         {
@@ -245,27 +241,16 @@ internal static unsafe class MultiMode
                 {
                     if (AnyRetainersAvailable() && EnabledRetainers)
                     {
-                        //DuoLog.Information($"1234");
-                        if (CanHET && Data.TeleportToRetainerHouse && Utils.GetReachableRetainerBell(true) == null)
+                        EnsureCharacterValidity();
+                        RestoreValidityInWorkshop();
+                        if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data) && data.Enabled)
                         {
-                            HouseEnterTask.EnqueueTask();
+                            DebugLog($"Enqueueing interaction with bell");
+                            TaskInteractWithNearestBell.Enqueue();
+                            P.TaskManager.Enqueue(() => { SchedulerMain.EnablePlugin(PluginEnableReason.MultiMode); return true; });
                             BlockInteraction(10);
                             Interactions.PushBack(Environment.TickCount64);
-                            DebugLog($"Added interaction because of HET teleport (state: {Interactions.Print()})");
-                        }
-                        else
-                        {
-                            EnsureCharacterValidity();
-                            RestoreValidityInWorkshop();
-                            if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data) && data.Enabled)
-                            {
-                                DebugLog($"Enqueueing interaction with bell");
-                                TaskInteractWithNearestBell.Enqueue();
-                                P.TaskManager.Enqueue(() => { SchedulerMain.EnablePlugin(PluginEnableReason.MultiMode); return true; });
-                                BlockInteraction(10);
-                                Interactions.PushBack(Environment.TickCount64);
-                                DebugLog($"Added interaction because of interacting (state: {Interactions.Print()})");
-                            }
+                            DebugLog($"Added interaction because of interacting (state: {Interactions.Print()})");
                         }
                     }
                     else if (Data.WorkshopEnabled && Data.AnyEnabledVesselsAvailable() && MultiMode.EnabledSubmarines)

@@ -82,6 +82,10 @@ public static unsafe class TaskChangeCharacter
                 return true;
             }
         }
+        else
+        {
+            Utils.RethrottleGeneric();
+        }
         return false;
     }
 
@@ -101,6 +105,10 @@ public static unsafe class TaskChangeCharacter
                 return false;
             }
         }
+        else
+        {
+            Utils.RethrottleGeneric();
+        }
         return false;
     }
 
@@ -113,6 +121,10 @@ public static unsafe class TaskChangeCharacter
                 m.Select(dc);
                 return true;
             }
+        }
+        else
+        {
+            Utils.RethrottleGeneric();
         }
         return false;
     }
@@ -139,6 +151,7 @@ public static unsafe class TaskChangeCharacter
                     if (Utils.GenericThrottle && EzThrottler.Throttle("SelectChara"))
                     {
                         c.Select();
+                        c.Login();
                     }
                     return false;
                 }
@@ -154,6 +167,10 @@ public static unsafe class TaskChangeCharacter
                     return false;
                 }
             }
+        }
+        else
+        {
+            Utils.RethrottleGeneric();
         }
         return false;
     }
@@ -174,6 +191,10 @@ public static unsafe class TaskChangeCharacter
                     return true;
                 }
             }
+        }
+        else
+        {
+            Utils.RethrottleGeneric();
         }
         return false;
     }

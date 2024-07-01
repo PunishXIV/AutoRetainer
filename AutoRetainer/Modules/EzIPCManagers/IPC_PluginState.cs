@@ -22,5 +22,5 @@ public class IPC_PluginState
     }
     [EzIPC] public void EnableMultiMode() => Svc.Commands.ProcessCommand("/autoretainer multi enable");
     [EzIPC] public int GetInventoryFreeSlotCount() => Utils.GetInventoryFreeSlotCount();
-    [EzIPC] public void EnqueueHET(bool ignoreTeleportZonecheck, bool noTeleport) => HouseEnterTask.EnqueueTask(ignoreTeleportZonecheck, noTeleport);
+    [EzIPC] public void EnqueueHET(bool ignoreTeleportZonecheck, bool noTeleport) => HouseEnterTask.EnqueueTask();
 }

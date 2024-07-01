@@ -294,19 +294,6 @@ internal class MultiModeOverlay : Window
                     }
                     ImGui.SameLine();
                 }
-
-                if (Data.TeleportToFCHouse || Data.TeleportToRetainerHouse)
-                {
-                    if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "home.png"), out var t))
-                    {
-                        ImGui.Image(t.ImGuiHandle, StatusPanelSize / 2);
-                        ImGuiEx.Tooltip("This character is allowed to teleport to house upon readiness.");
-                    }
-                    else
-                    {
-                        ImGuiEx.Text($"loading home.png");
-                    }
-                }
             });
         }
 

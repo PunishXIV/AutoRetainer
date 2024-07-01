@@ -10,14 +10,7 @@ internal static class TaskInteractWithNearestPanel
         VoyageUtils.Log($"Task enqueued: {nameof(TaskInteractWithNearestPanel)} interact={interact}");
         if (!VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType))
         {
-            if ((!Houses.List.Contains(Svc.ClientState.TerritoryType) || Utils.GetNearestWorkshopEntrance(out _) == null) && (Data.TeleportToFCHouse || Data.TeleportToRetainerHouse))
-            {
-                HouseEnterTask.EnqueueTask(true);
-            }
-            else
-            {
-                TaskEnterWorkshop.EnqueueEnterWorkshop();
-            }
+            TaskEnterWorkshop.EnqueueEnterWorkshop();
         }
         P.TaskManager.Enqueue(() =>
         {
