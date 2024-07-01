@@ -28,11 +28,18 @@ internal unsafe class VoyageMemory
 
     private VoyageMemory()
     {
-        Svc.Hook.InitializeFromAttributes(this);
-        _submersibleStatusListHook?.Enable();
-        _submersibleTimersHook?.Enable();
-        _airshipTimersHook?.Enable();
-        _airshipStatusListHook?.Enable();
+        try
+        {
+            Svc.Hook.InitializeFromAttributes(this);
+            _submersibleStatusListHook?.Enable();
+            _submersibleTimersHook?.Enable();
+            _airshipTimersHook?.Enable();
+            _airshipStatusListHook?.Enable();
+        }
+        catch(Exception e)
+        {
+            e.Log();
+        }
     }
 
     internal static VoyageMemory Instance { get; private set; }

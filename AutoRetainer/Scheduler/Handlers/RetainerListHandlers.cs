@@ -18,15 +18,15 @@ internal static unsafe class RetainerListHandlers
         }
         if (TryGetAddonByName<AtkUnitBase>("RetainerList", out var retainerList) && IsAddonReady(retainerList))
         {
-            var list = new ReaderRetainerList(retainerList);
-            for (var i = 0; i < list.Retainers.Count; i++)
+            var list = new AddonMaster.RetainerList(retainerList);
+            foreach(var retainer in list.Retainers)
             {
-                if (list.Retainers[i].Name == name)
+                if (retainer.Name == name)
                 {
                     if (Utils.GenericThrottle)
                     {
-                        DebugLog($"Selecting retainer {list.Retainers[i].Name} with index {i}");
-                        new AddonMaster.RetainerList(retainerList).Select(i);
+                        DebugLog($"Selecting retainer {retainer.Name} with index {retainer.Index}");
+                        retainer.Select();
                         return true;
                     }
                 }

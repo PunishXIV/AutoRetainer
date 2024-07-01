@@ -78,20 +78,13 @@ internal unsafe class Memory : IDisposable
     public void Dispose()
     {
         InteractWithObjectHook?.Dispose();
-        AddonAirShipExploration_SelectDestinationHook?.Dispose();
         OnReceiveMarketPricePacketHook?.Dispose();
         ReceiveRetainerVentureListUpdateHook?.Dispose();
     }
 
-    internal delegate void AddonAirShipExploration_SelectDestinationDelegate(nint a1, nint a2, AirshipExplorationInputData* a3);
-    [Signature("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 48 83 EC 20 41 8B 78 10", DetourName = nameof(AddonAirShipExploration_SelectDestinationDetour))]
-    internal Hook<AddonAirShipExploration_SelectDestinationDelegate> AddonAirShipExploration_SelectDestinationHook;
-
     internal void AddonAirShipExploration_SelectDestinationDetour(nint a1, nint a2, AirshipExplorationInputData* a3)
     {
-        AddonAirShipExploration_SelectDestinationHook.Original(a1, a2, a3);
-        var addr = *(nint*)(*(nint*)a3 + 168);
-        PluginLog.Debug($"{(nint)a1:X16},{(nint)a2:X16},{(nint)a3:X16}\n{a3->Unk0}, {a3->Unk1}, {(nint)a3->Unk2}, {(nint)(a3->Unk2->Unk0):X16}\n{addr:X16}, {(a3->Unk2->Unk0->Unk0):X16}");
+        ((AtkUnitBase*)a1)->ReceiveEvent((AtkEventType)35, 0, (AtkEvent*)a2, (AtkEventData*)a3);
     }
 
     internal void SelectRoutePointUnsafe(int which)

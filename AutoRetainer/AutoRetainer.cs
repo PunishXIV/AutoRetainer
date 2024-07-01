@@ -94,11 +94,12 @@ public unsafe class AutoRetainer : IDalamudPlugin
             {
                 new SingletonNotifyWindow();
             }
-            Svc.AddonLifecycle.RegisterListener(AddonEvent.PreReceiveEvent, "RetainerList", OnEvent);
+            Svc.AddonLifecycle.RegisterListener(AddonEvent.PreReceiveEvent, EventAddon, OnEvent);
         }
         //);
     }
 
+    private const string EventAddon = "AirShipExploration";
     private void OnEvent(AddonEvent type, AddonArgs args)
     {
         return;
@@ -527,7 +528,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     {
         //if (PluginLoader.IsLoaded)
         {
-            Svc.AddonLifecycle.UnregisterListener(AddonEvent.PreReceiveEvent, "RetainerList", OnEvent);
+            Svc.AddonLifecycle.UnregisterListener(AddonEvent.PreReceiveEvent, EventAddon, OnEvent);
             Safe(() => FFXIVInstanceMonitor.ReleaseLock());
             Safe(() => quickSellItems.Disable());
             Safe(() => quickSellItems.Dispose());

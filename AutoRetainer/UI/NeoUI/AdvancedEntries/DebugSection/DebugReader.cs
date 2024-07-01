@@ -10,6 +10,16 @@ internal unsafe class DebugReader : DebugUIEntry
     public override void Draw()
     {
         {
+            if(TryGetAddonByName<AtkUnitBase>("RetainerList", out var a) && IsAddonReady(a))
+            {
+                var reader = new ReaderRetainerList(a);
+                foreach(var x in reader.Retainers)
+                {
+                    ImGuiEx.Text($"{x.Name}/act {x.IsActive}/gil {x.Gil}/lvl {x.Level}/inv {x.Inventory}");
+                }
+            }
+        }
+        {
             if (TryGetAddonByName<AtkUnitBase>("RetainerItemTransferList", out var a) && IsAddonReady(a))
             {
                 var reader = new ReaderRetainerItemTransferList(a);
