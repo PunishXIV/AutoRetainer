@@ -1,4 +1,4 @@
-﻿using FFXIVClientStructs.FFXIV.Client.Game.Housing;
+﻿using FFXIVClientStructs.FFXIV.Client.Game;
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
 
@@ -9,7 +9,7 @@ internal static unsafe class CurrentSubmarine
 		internal static ExcelSheet<SubmarineExplorationPretty> ExplorationSheet => Svc.Data.GetExcelSheet<SubmarineExplorationPretty>();
 		internal static HousingWorkshopSubmersibleSubData* Get()
 		{
-				var cur = HousingManager.Instance()->WorkshopTerritory->Submersible.DataPointerListSpan[4];
+				var cur = HousingManager.Instance()->WorkshopTerritory->Submersible.DataPointers[4];
 				return cur.Value;
 		}
 

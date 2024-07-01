@@ -2,6 +2,7 @@
 using AutoRetainer.Modules.Voyage.Readers;
 using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using AutoRetainerAPI.Configuration;
+using Dalamud.Game;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Memory;
@@ -9,7 +10,6 @@ using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
 using ECommons.Interop;
 using FFXIVClientStructs.FFXIV.Client.Game;
-using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
@@ -112,11 +112,11 @@ internal static unsafe class VoyageUtils
 				if (adata.IndexOverride > 0) return adata.IndexOverride - 1;
 				if (type == VoyageType.Airship)
 				{
-						var v = w->Airship.DataListSpan;
+						var v = w->Airship.Data;
 						for (int i = 0; i < v.Length; i++)
 						{
 								var sub = v[i];
-								if (Utils.Read(sub.Name) == name)
+								if (GenericHelpers.Read(sub.Name) == name)
 								{
 										return i;
 								}
@@ -124,11 +124,11 @@ internal static unsafe class VoyageUtils
 				}
 				if (type == VoyageType.Submersible)
 				{
-						var v = w->Submersible.DataListSpan;
+						var v = w->Submersible.Data;
 						for (int i = 0; i < v.Length; i++)
 						{
 								var sub = v[i];
-								if (Utils.Read(sub.Name) == name)
+								if (GenericHelpers.Read(sub.Name) == name)
 								{
 										return i;
 								}
@@ -195,7 +195,7 @@ internal static unsafe class VoyageUtils
 				if (plan == null) return "No or unknown plan selected";
 				if (plan.Name.Length > 0) return plan.Name;
 				if (plan.Points.Count == 0) return $"Plan {plan.GUID}";
-				return $"{plan.GetMap()?.Name}: {plan.Points.Select(x => Svc.Data.GetExcelSheet<SubmarineExplorationPretty>(Dalamud.ClientLanguage.Japanese).GetRow(x).Location.ToString()).Join("→")}";
+				return $"{plan.GetMap()?.Name}: {plan.Points.Select(x => Svc.Data.GetExcelSheet<SubmarineExplorationPretty>(ClientLanguage.Japanese).GetRow(x).Location.ToString()).Join("→")}";
 		}
 
 		internal static uint GetMapId(this SubmarinePointPlan plan) => GetMap(plan)?.RowId ?? 0;
@@ -248,7 +248,7 @@ internal static unsafe class VoyageUtils
         throw new ArgumentOutOfRangeException(nameof(type));
     }*/
 
-		internal static bool IsVoyagePanel(this GameObject obj)
+		internal static bool IsVoyagePanel(this IGameObject obj)
 		{
 				return obj?.Name.ToString().EqualsIgnoreCaseAny(Lang.PanelName) == true;
 		}
@@ -267,7 +267,7 @@ internal static unsafe class VoyageUtils
 				return false;
 		}
 
-		internal static bool TryGetNearestVoyagePanel(out GameObject obj)
+		internal static bool TryGetNearestVoyagePanel(out IGameObject obj)
 		{
 				//Data ID: 2007820
 				if (Svc.Objects.TryGetFirst(x => x.Name.ToString().EqualsIgnoreCaseAny(Lang.PanelName) && x.IsTargetable, out var o))
@@ -307,9 +307,9 @@ internal static unsafe class VoyageUtils
 						{
 								var vessels = HousingManager.Instance()->WorkshopTerritory->Airship;
 								var temp = new List<OfflineVesselData>();
-								foreach (var x in vessels.DataListSpan)
+								foreach (var x in vessels.Data)
 								{
-										var name = MemoryHelper.ReadSeStringNullTerminated((nint)x.Name).ExtractText();
+										var name = x.Name.Read();
 										if (name != "")
 										{
 												temp.Add(new(name, x.ReturnTime));
@@ -327,10 +327,10 @@ internal static unsafe class VoyageUtils
 						{
 								var vessels = HousingManager.Instance()->WorkshopTerritory->Submersible;
 								var temp = new List<OfflineVesselData>();
-								for (int i = 0; i < vessels.DataListSpan.Length; i++)
+								for (int i = 0; i < vessels.DataPointers.Length; i++)
 								{
-										var vessel = vessels.DataListSpan[i];
-										var name = MemoryHelper.ReadSeStringNullTerminated((nint)vessel.Name).ExtractText();
+										var vessel = *vessels.DataPointers[i].Value;
+										var name = vessel.Name.Read();
 										if (name != "")
 										{
 												temp.Add(new(name, vessel.ReturnTime));
@@ -339,11 +339,11 @@ internal static unsafe class VoyageUtils
 												adata.NextLevelExp = vessel.NextLevelExp;
 												adata.CurrentExp = vessel.CurrentExp;
 												//PluginLog.Debug("Write offline sub data");
-												adata.Part1 = (int)GetVesselComponent(i, VoyageType.Submersible, 0)->ItemID;
-												adata.Part2 = (int)GetVesselComponent(i, VoyageType.Submersible, 1)->ItemID;
-												adata.Part3 = (int)GetVesselComponent(i, VoyageType.Submersible, 2)->ItemID;
-												adata.Part4 = (int)GetVesselComponent(i, VoyageType.Submersible, 3)->ItemID;
-												adata.Points = new Span<byte>(vessel.CurrentExplorationPoints, 5).ToArray();
+												adata.Part1 = (int)GetVesselComponent(i, VoyageType.Submersible, 0)->ItemId;
+												adata.Part2 = (int)GetVesselComponent(i, VoyageType.Submersible, 1)->ItemId;
+												adata.Part3 = (int)GetVesselComponent(i, VoyageType.Submersible, 2)->ItemId;
+												adata.Part4 = (int)GetVesselComponent(i, VoyageType.Submersible, 3)->ItemId;
+												adata.Points = vessel.CurrentExplorationPoints.ToArray();
 										}
 								}
 								if (temp.Count > 0)
@@ -411,8 +411,8 @@ internal static unsafe class VoyageUtils
 				for (var i = 0; i < 4; i++)
 				{
 						var slot = GetVesselComponent(num, type, i);
-						log.Add($"index: {i}, id: {slot->ItemID}, cond: {slot->Condition}");
-						if (slot->ItemID == 0)
+						log.Add($"index: {i}, id: {slot->ItemId}, cond: {slot->Condition}");
+						if (slot->ItemId == 0)
 						{
 								PluginLog.Warning($"Item id for airship component was 0 ({i})");
 								continue;
@@ -456,9 +456,9 @@ internal static unsafe class VoyageUtils
 				{
 						if (type == VoyageType.Airship)
 						{
-								foreach (var x in h->Airship.DataListSpan)
+								foreach (var x in h->Airship.Data)
 								{
-										if (MemoryHelper.ReadStringNullTerminated((nint)x.Name) == name)
+										if (x.Name.Read() == name)
 										{
 												return index;
 										}
@@ -470,9 +470,9 @@ internal static unsafe class VoyageUtils
 						}
 						else if (type == VoyageType.Submersible)
 						{
-								foreach (var x in h->Submersible.DataListSpan)
+								foreach (var x in h->Submersible.Data)
 								{
-										if (MemoryHelper.ReadStringNullTerminated((nint)x.Name) == name)
+										if (x.Name.Read() == name)
 										{
 												return index;
 										}

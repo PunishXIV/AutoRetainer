@@ -4,6 +4,7 @@ using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using AutoRetainer.Scheduler.Tasks;
 using AutoRetainerAPI.Configuration;
+using Dalamud.Game;
 using Dalamud.Interface.Components;
 using PunishLib.ImGuiMethods;
 
@@ -240,19 +241,19 @@ internal static unsafe class WorkshopUI
 												}
 												if (ImGui.Button("Select best path with 1 unlock included"))
 												{
-														TaskCalculateAndPickBestExpRoute.Enqueue(VoyageUtils.GetSubmarineUnlockPlanByGuid(Data.GetAdditionalVesselData(Utils.Read(CurrentSubmarine.Get()->Name), VoyageType.Submersible).SelectedUnlockPlan) ?? new());
+														TaskCalculateAndPickBestExpRoute.Enqueue(VoyageUtils.GetSubmarineUnlockPlanByGuid(Data.GetAdditionalVesselData(GenericHelpers.Read(CurrentSubmarine.Get()->Name), VoyageType.Submersible).SelectedUnlockPlan) ?? new());
 												}
 												if (ImGui.Button("Select unlock path (up to 5)"))
 												{
-														TaskDeployOnUnlockRoute.EnqueuePickOrCalc(VoyageUtils.GetSubmarineUnlockPlanByGuid(Data.GetAdditionalVesselData(Utils.Read(CurrentSubmarine.Get()->Name), VoyageType.Submersible).SelectedUnlockPlan) ?? new(), UnlockMode.MultiSelect);
+														TaskDeployOnUnlockRoute.EnqueuePickOrCalc(VoyageUtils.GetSubmarineUnlockPlanByGuid(Data.GetAdditionalVesselData(GenericHelpers.Read(CurrentSubmarine.Get()->Name), VoyageType.Submersible).SelectedUnlockPlan) ?? new(), UnlockMode.MultiSelect);
 												}
 												if (ImGui.Button("Select unlock path (only 1)"))
 												{
-														TaskDeployOnUnlockRoute.EnqueuePickOrCalc(VoyageUtils.GetSubmarineUnlockPlanByGuid(Data.GetAdditionalVesselData(Utils.Read(CurrentSubmarine.Get()->Name), VoyageType.Submersible).SelectedUnlockPlan) ?? new(), UnlockMode.SpamOne);
+														TaskDeployOnUnlockRoute.EnqueuePickOrCalc(VoyageUtils.GetSubmarineUnlockPlanByGuid(Data.GetAdditionalVesselData(GenericHelpers.Read(CurrentSubmarine.Get()->Name), VoyageType.Submersible).SelectedUnlockPlan) ?? new(), UnlockMode.SpamOne);
 												}
 												if (ImGui.Button("Select point planner path"))
 												{
-														var plan = VoyageUtils.GetSubmarinePointPlanByGuid(Data.GetAdditionalVesselData(Utils.Read(CurrentSubmarine.Get()->Name), VoyageType.Submersible).SelectedPointPlan);
+														var plan = VoyageUtils.GetSubmarinePointPlanByGuid(Data.GetAdditionalVesselData(GenericHelpers.Read(CurrentSubmarine.Get()->Name), VoyageType.Submersible).SelectedPointPlan);
 														if (plan != null)
 														{
 																TaskDeployOnPointPlan.EnqueuePick(plan);
@@ -450,7 +451,7 @@ internal static unsafe class WorkshopUI
 						{
 								if (x != 0)
 								{
-										var d = Svc.Data.GetExcelSheet<SubmarineExplorationPretty>(Dalamud.ClientLanguage.Japanese).GetRow(x);
+										var d = Svc.Data.GetExcelSheet<SubmarineExplorationPretty>(ClientLanguage.Japanese).GetRow(x);
 										if (d != null && d.Location.ToString().Length > 0)
 										{
 												points.Add(d.Location.ToString());

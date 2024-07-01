@@ -5,7 +5,7 @@ using AutoRetainer.Scheduler.Tasks;
 using AutoRetainer.UI.MainWindow;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game.Config;
-using Dalamud.Interface.Internal.Notifications;
+using Dalamud.Interface.ImGuiNotification;
 using ECommons.CircularBuffers;
 using ECommons.Events;
 using ECommons.ExcelServices;
@@ -92,7 +92,7 @@ internal static unsafe class MultiMode
 				{
 						HouseEnterTask.EnqueueTask(noTeleport: true);
 				}
-				if (Utils.GetNearestWorkshopEntrance(out _) && Utils.GetReachableRetainerBell(false) == null)
+				if (Utils.GetNearestWorkshopEntrance(out _) != null && Utils.GetReachableRetainerBell(false) == null)
 				{
 						TaskEnterWorkshop.Enqueue();
 				}
@@ -560,7 +560,7 @@ internal static unsafe class MultiMode
 				return false;
 		}
 
-		/*internal static GameObject GetNearbyBell()
+		/*internal static IGameObject GetNearbyBell()
     {
         if (!ProperOnLogin.PlayerPresent) return null;
         foreach (var x in Svc.Objects)

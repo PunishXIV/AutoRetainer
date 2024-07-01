@@ -61,6 +61,6 @@ internal unsafe class AutoGCHandinOverlay : Window
 		{
 				return Svc.Condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.OccupiedInQuestEvent] && (Allowed || (TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon)
 								&& addon->UldManager.NodeListCount > 20
-								&& addon->UldManager.NodeList[5]->IsVisible));
+								&& addon->UldManager.NodeList[5]->IsVisible()));
 		}
 }

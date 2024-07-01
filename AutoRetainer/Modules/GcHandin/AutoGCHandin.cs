@@ -1,12 +1,13 @@
 ﻿using AutoRetainer.UI.Overlays;
 using AutoRetainerAPI.Configuration;
-using ClickLib.Clicks;
+
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Memory;
 using Dalamud.Utility;
 using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.Throttlers;
+using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI;
@@ -91,7 +92,7 @@ internal static unsafe class AutoGCHandin
 				{
 						if (addon->DeliverButton->IsEnabled && FrameThrottler.Throttle(Throttler, 10))
 						{
-								ClickGrandCompanySupplyReward.Using((IntPtr)addon).Deliver();
+								new AddonMaster.GrandCompanySupplyReward(addon).Deliver();
 								DebugLog($"Delivering Item");
 								return true;
 						}
@@ -117,7 +118,7 @@ internal static unsafe class AutoGCHandin
 								{
 										if (FrameThrottler.Throttle(Throttler, 10))
 										{
-												ClickSelectYesNo.Using((IntPtr)addon).Yes();
+												new AddonMaster.SelectYesno((IntPtr)addon).Yes();
 												DebugLog($"Selecting yes");
 										}
 								}
@@ -234,7 +235,7 @@ internal static unsafe class AutoGCHandin
 								GCSupplyListAddon != null
 								&& IsAddonReady(GCSupplyListAddon)
 								&& GCSupplyListAddon->UldManager.NodeListCount > 20
-								&& GCSupplyListAddon->UldManager.NodeList[5]->IsVisible
+								&& GCSupplyListAddon->UldManager.NodeList[5]->IsVisible()
 								&& IsSelectedFilterValid(GCSupplyListAddon);
 				}
 				catch (Exception)
@@ -244,7 +245,7 @@ internal static unsafe class AutoGCHandin
 		}
 		internal static bool IsDone(AtkUnitBase* addon)
 		{
-				return addon->UldManager.NodeList[20]->IsVisible;
+				return addon->UldManager.NodeList[20]->IsVisible();
 		}
 		internal static bool IsSelectedFilterValid(AtkUnitBase* addon)
 		{

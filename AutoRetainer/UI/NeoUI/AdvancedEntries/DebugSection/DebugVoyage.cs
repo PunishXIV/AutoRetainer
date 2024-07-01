@@ -3,7 +3,7 @@ using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using Dalamud.Memory;
-using FFXIVClientStructs.FFXIV.Client.Game.Housing;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using System.Diagnostics;
 
@@ -23,9 +23,9 @@ internal unsafe class DebugVoyage : DebugUIEntry
 								var h = HousingManager.Instance()->WorkshopTerritory;
 								if (h != null)
 								{
-										foreach (var x in h->Submersible.DataListSpan)
+										foreach (var x in h->Submersible.Data)
 										{
-												ImGuiEx.Text($"{MemoryHelper.ReadStringNullTerminated((nint)x.Name)}/{x.ReturnTime}/{*x.CurrentExplorationPoints}");
+												ImGuiEx.Text($"{x.Name.Read()}/{x.ReturnTime}/{x.CurrentExplorationPoints.ToArray().Print()}");
 										}
 								}
 								if (ImGui.Button("Erase offline data"))
@@ -96,7 +96,7 @@ internal unsafe class DebugVoyage : DebugUIEntry
 								ImGuiEx.Text($"Curnet: {(nint)CurrentSubmarine.Get()}");
 								if (CurrentSubmarine.Get() != null)
 								{
-										ImGuiEx.Text($"Name: {MemoryHelper.ReadStringNullTerminated((nint)CurrentSubmarine.Get()->Name)}");
+										ImGuiEx.Text($"Name: {CurrentSubmarine.Get()->Name.Read()}");
 										ImGuiEx.Text($"Hull: {CurrentSubmarine.Get()->HullId}");
 										ImGuiEx.Text($"->SternId: {CurrentSubmarine.Get()->SternId}");
 										ImGuiEx.Text($"BridgeId: {CurrentSubmarine.Get()->BridgeId}");
@@ -124,19 +124,19 @@ internal unsafe class DebugVoyage : DebugUIEntry
 								ImGuiEx.Text($"Num air: {HousingManager.Instance()->WorkshopTerritory->Airship.AirshipCount}");
 								//ImGuiEx.Text($"Num w: {HousingManager.Instance()->WorkshopTerritory->Submersible.DataList}");
 								{
-										var data = HousingManager.Instance()->WorkshopTerritory->Airship.DataListSpan;
+										var data = HousingManager.Instance()->WorkshopTerritory->Airship.Data;
 										for (int i = 0; i < data.Length; i++)
 										{
 												var d = data[i];
-												ImGuiEx.Text($"Air: {MemoryHelper.ReadSeStringNullTerminated((nint)d.Name).ExtractText()}, returns at {d.GetReturnTime()}, current: {d.CurrentExp}");
+												ImGuiEx.Text($"Air: {d.Name.Read()}, returns at {d.GetReturnTime()}, current: {d.CurrentExp}");
 										}
 								}
 								{
-										var data = HousingManager.Instance()->WorkshopTerritory->Submersible.DataListSpan;
+										var data = HousingManager.Instance()->WorkshopTerritory->Submersible.Data;
 										for (int i = 0; i < data.Length; i++)
 										{
 												var d = data[i];
-												ImGuiEx.Text($"Sub: {MemoryHelper.ReadSeStringNullTerminated((nint)d.Name).ExtractText()}, returns at {d.GetReturnTime()}, current: {d.CurrentExp}");
+												ImGuiEx.Text($"Sub: {d.Name.Read()}, returns at {d.GetReturnTime()}, current: {d.CurrentExp}");
 										}
 								}
 						}

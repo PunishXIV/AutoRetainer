@@ -1,4 +1,5 @@
-﻿using ClickLib.Clicks;
+﻿
+using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.UI;
 
 namespace AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;
@@ -25,7 +26,7 @@ internal unsafe class DebugIPC : DebugUIEntry
 								var index = entries.IndexOf(x);
 								if (ImGui.SmallButton($"{x} / {index}") && index >= 0)
 								{
-										ClickSelectString.Using((nint)sel).SelectItem((ushort)index);
+										new AddonMaster.SelectString(sel).Entries[index].Select();
 								}
 						}
 				}

@@ -36,9 +36,9 @@ public static unsafe class InventorySpaceManager
 								return true;
 						}
 						var slot = inv->Items[Task.Slot];
-						if (Task.ItemID != slot.ItemID || slot.ItemID == 0 || slot.Quantity != Task.Quantity)
+						if (Task.ItemID != slot.ItemId || slot.ItemId == 0 || slot.Quantity != Task.Quantity)
 						{
-								DuoLog.Warning($"Slot contains different item {ExcelItemHelper.GetName(slot.ItemID)}x{slot.Quantity}, should be {Task}");
+								DuoLog.Warning($"Slot contains different item {ExcelItemHelper.GetName(slot.ItemId)}x{slot.Quantity}, should be {Task}");
 								return true;
 						}
 						if (!IsRetainerInventoryLoaded())
@@ -92,11 +92,11 @@ public static unsafe class InventorySpaceManager
 						for (int i = 0; i < inv->Size; i++)
 						{
 								var item = inv->Items[i];
-								if (item.ItemID != 0 && item.ItemID == ItemId && item.Quantity == Quantity)
+								if (item.ItemId != 0 && item.ItemId == ItemId && item.Quantity == Quantity)
 								{
-										if (C.IMAutoVendorSoft.Contains(item.ItemID))
+										if (C.IMAutoVendorSoft.Contains(item.ItemId))
 										{
-												var task = new SellSlotTask(invType, (uint)i, item.ItemID, item.Quantity);
+												var task = new SellSlotTask(invType, (uint)i, item.ItemId, item.Quantity);
 												PluginLog.Information($"Enqueueing {task} for soft sale");
 												InventorySpaceManager.SellSlotTasks.Add(task);
 												return;
@@ -115,11 +115,11 @@ public static unsafe class InventorySpaceManager
 						for (int i = 0; i < inv->Size; i++)
 						{
 								var item = inv->Items[i];
-								if (item.ItemID != 0 && item.Quantity < C.IMAutoVendorHardStackLimit)
+								if (item.ItemId != 0 && item.Quantity < C.IMAutoVendorHardStackLimit)
 								{
-										if (C.IMAutoVendorHard.Contains(item.ItemID) || (C.TreatSoftAsHard && C.IMAutoVendorSoft.Contains(item.ItemID)))
+										if (C.IMAutoVendorHard.Contains(item.ItemId) || (C.TreatSoftAsHard && C.IMAutoVendorSoft.Contains(item.ItemId)))
 										{
-												var task = new SellSlotTask(invType, (uint)i, item.ItemID, item.Quantity);
+												var task = new SellSlotTask(invType, (uint)i, item.ItemId, item.Quantity);
 												PluginLog.Information($"Enqueueing {task} for hard sale");
 												InventorySpaceManager.SellSlotTasks.Add(task);
 										}

@@ -1,7 +1,8 @@
 ﻿using AutoRetainer.Modules.Voyage;
-using ClickLib.Clicks;
+
 using Dalamud.Game.ClientState.Conditions;
 using ECommons.Throttlers;
+using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.UI;
 
 namespace AutoRetainer.Modules;
@@ -21,7 +22,7 @@ internal static unsafe class MiniTA
 						{
 								if (TryGetAddonByName<AddonTalk>("Talk", out var addon) && addon->AtkUnitBase.IsVisible)
 								{
-										ClickTalk.Using((nint)addon).Click();
+										new AddonMaster.Talk((nint)addon).Click();
 								}
 						}
 				}
@@ -33,7 +34,7 @@ internal static unsafe class MiniTA
 				if (x != null && Utils.GenericThrottle)
 				{
 						VoyageUtils.Log("Confirming repair");
-						ClickSelectYesNo.Using((nint)x).Yes();
+						new AddonMaster.SelectYesno((nint)x).Yes();
 				}
 		}
 
@@ -51,7 +52,7 @@ internal static unsafe class MiniTA
 				if (EzThrottler.Throttle("SkipCutsceneConfirm"))
 				{
 						PluginLog.Debug("Selecting cutscene skipping");
-						ClickSelectString.Using(addon).SelectItem(0);
+						new AddonMaster.SelectString(addon).Entries[0].Select();
 				}
 		}
 

@@ -9,7 +9,7 @@ namespace AutoRetainer.Modules
             {
                 if(TryGetAddonByName<AtkUnitBase>("ItemSearchResult", out var addon) && IsAddonReady(addon))
                 {
-                    if (addon->UldManager.NodeList[25]->IsVisible)
+                    if (addon->UldManager.NodeList[25]->IsVisible())
                     {
                         var t = MemoryHelper.ReadSeString(&addon->UldManager.NodeList[25]->GetAsAtkTextNode()->NodeText).ExtractText();
                         if (t.EqualsAny(Utils.GetAddonText(1997), Utils.GetAddonText(1998)))
@@ -49,7 +49,7 @@ namespace AutoRetainer.Modules
                 }
                 if (TryGetAddonByName<AtkUnitBase>("ItemSearchResult", out var addon) && IsAddonReady(addon))
                 {
-                    if (addon->UldManager.NodeList[25]->IsVisible)
+                    if (addon->UldManager.NodeList[25]->IsVisible())
                     {
                         var t = MemoryHelper.ReadSeString(&addon->UldManager.NodeList[25]->GetAsAtkTextNode()->NodeText).ExtractText();
                         if (t.EqualsAny(Utils.GetAddonText(1997), Utils.GetAddonText(1998)))

@@ -1,4 +1,4 @@
-﻿using ClickLib.Clicks;
+﻿
 using Dalamud.Memory;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;
@@ -8,6 +8,8 @@ using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using ECommons.Automation.UIInput;
+using ECommons.UIHelpers.AddonMasterImplementations;
 
 namespace AutoRetainer.Modules.GcHandin;
 
@@ -87,7 +89,7 @@ internal static unsafe class GCContinuation
 				var x = Utils.GetSpecificYesno(x => x.Contains("Exchange") && x.Contains("seals for"));
 				if (x != null && EzThrottler.Throttle("GC ConfirmExchange"))
 				{
-						ClickSelectYesNo.Using((nint)x).Yes();
+						new AddonMaster.SelectYesno((nint)x).Yes();
 						return true;
 				}
 				return false;

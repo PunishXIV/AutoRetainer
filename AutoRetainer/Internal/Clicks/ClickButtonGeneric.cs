@@ -1,7 +1,7 @@
 ﻿using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace AutoRetainer.Internal.Clicks;
-
+/*
 internal unsafe class ClickButtonGeneric : ClickLib.Bases.ClickBase<ClickButtonGeneric, AtkUnitBase>
 {
 		internal string Name;
@@ -16,3 +16,4 @@ internal unsafe class ClickButtonGeneric : ClickLib.Bases.ClickBase<ClickButtonG
 				ClickAddonButton((AtkComponentButton*)target, which);
 		}
 }
+*/

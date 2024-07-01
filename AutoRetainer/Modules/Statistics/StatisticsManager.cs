@@ -29,7 +29,7 @@ internal static unsafe class StatisticsManager
 				OfflineDataManager.EnqueueWriteWhenPlayerAvailable();
 		}
 
-		private static void Chat_ChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
+		private static void Chat_ChatMessage(XivChatType type, int time, ref SeString sender, ref SeString message, ref bool isHandled)
 		{
 				if (Svc.Condition[ConditionFlag.OccupiedSummoningBell] && ProperOnLogin.PlayerPresent && (ushort)type == 2110 && Svc.Targets.Target.IsRetainerBell() && Utils.TryGetCurrentRetainer(out var retName))
 				{

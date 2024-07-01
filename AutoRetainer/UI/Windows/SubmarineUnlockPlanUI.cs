@@ -3,7 +3,7 @@ using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using AutoRetainerAPI.Configuration;
 using ECommons.GameHelpers;
 using ECommons.Throttlers;
-using FFXIVClientStructs.FFXIV.Client.Game.Housing;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using Newtonsoft.Json;
 
 namespace AutoRetainer.UI.Windows;
@@ -65,12 +65,9 @@ internal unsafe class SubmarineUnlockPlanUI : Window
 		internal bool IsSubDataAvail()
 		{
 				if (HousingManager.Instance()->WorkshopTerritory == null) return false;
-				if (HousingManager.Instance()->WorkshopTerritory->Submersible.DataListSpan.Length == 0) return false;
-				fixed (byte* data = HousingManager.Instance()->WorkshopTerritory->Submersible.DataListSpan[0].Name)
-				{
-						if (*data == 0) return false;
-				}
-				return true;
+				if (HousingManager.Instance()->WorkshopTerritory->Submersible.Data.Length == 0) return false;
+        if (HousingManager.Instance()->WorkshopTerritory->Submersible.Data[0].Name[0] == 0) return false;
+        return true;
 		}
 
 		internal int GetAmountOfOtherPlanUsers(string guid)

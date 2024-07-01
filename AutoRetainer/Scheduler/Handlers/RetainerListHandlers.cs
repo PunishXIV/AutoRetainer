@@ -1,7 +1,7 @@
 ﻿using AutoRetainer.Internal.InventoryManagement;
 using AutoRetainer.Scheduler.Tasks;
-using ClickLib.Clicks;
-using ECommons.UIHelpers.Implementations;
+using ECommons.UIHelpers.AddonMasterImplementations;
+using ECommons.UIHelpers.AtkReaderImplementations;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace AutoRetainer.Scheduler.Handlers;
@@ -26,7 +26,7 @@ internal static unsafe class RetainerListHandlers
 										if (Utils.GenericThrottle)
 										{
 												DebugLog($"Selecting retainer {list.Retainers[i].Name} with index {i}");
-												ClickRetainerList.Using((IntPtr)retainerList).Retainer(i);
+												new AddonMaster.RetainerList(retainerList).Select(i);
 												return true;
 										}
 								}

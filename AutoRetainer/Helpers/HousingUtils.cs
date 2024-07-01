@@ -1,5 +1,5 @@
 ﻿using AutoRetainerAPI.Configuration;
-using FFXIVClientStructs.FFXIV.Client.Game.Housing;
+using FFXIVClientStructs.FFXIV.Client.Game;
 
 namespace AutoRetainer.Helpers;
 

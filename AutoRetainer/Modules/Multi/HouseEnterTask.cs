@@ -1,12 +1,13 @@
 ﻿using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainerAPI.Configuration;
-using ClickLib.Clicks;
+
 using ECommons.Automation;
 using ECommons.Events;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
 using ECommons.Throttlers;
+using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using System.Diagnostics;
@@ -57,7 +58,7 @@ internal static unsafe class HouseEnterTask
 										P.TaskManager.EnqueueImmediate(Lockon);
 										P.TaskManager.EnqueueImmediate(Approach);
 										P.TaskManager.EnqueueImmediate(AutorunOff);
-										P.TaskManager.EnqueueImmediate(() => { Chat.Instance.SendMessage("/automove off"); });
+										P.TaskManager.EnqueueImmediate(() => { Chat.Instance.ExecuteCommand("/automove off"); });
 								}
 								P.TaskManager.EnqueueImmediate(() => SetTarget(5f));
 								P.TaskManager.EnqueueImmediate(Interact);
@@ -176,7 +177,7 @@ internal static unsafe class HouseEnterTask
 				var entrance = Utils.GetNearestEntrance(out _);
 				if (entrance != null && Svc.Targets.Target?.Address == entrance.Address && EzThrottler.Throttle("HET.Lockon"))
 				{
-						Chat.Instance.SendMessage("/lockon");
+						Chat.Instance.ExecuteCommand("/lockon");
 						return true;
 				}
 				return false;
@@ -186,7 +187,7 @@ internal static unsafe class HouseEnterTask
 		{
 				DebugLog($"Enabling automove");
 				Utils.RegenerateRandom();
-				Chat.Instance.SendMessage("/automove on");
+				Chat.Instance.ExecuteCommand("/automove on");
 				return true;
 		}
 
@@ -196,7 +197,7 @@ internal static unsafe class HouseEnterTask
 				if (entrance != null && d < 3f + Utils.Random && EzThrottler.Throttle("HET.DisableAutomove"))
 				{
 						DebugLog($"Disabling automove");
-						Chat.Instance.SendMessage("/automove off");
+						Chat.Instance.ExecuteCommand("/automove off");
 						return true;
 				}
 				return false;
@@ -240,7 +241,7 @@ internal static unsafe class HouseEnterTask
 						if (IsAddonReady(addon) && EzThrottler.Throttle("HET.SelectYesno"))
 						{
 								DebugLog("Select yes");
-								ClickSelectYesNo.Using((nint)addon).Yes();
+								new AddonMaster.SelectYesno((nint)addon).Yes();
 								return true;
 						}
 				}
@@ -269,7 +270,7 @@ internal static unsafe class HouseEnterTask
 						{
 								if (EzThrottler.Throttle("HET.LockonBell"))
 								{
-										Chat.Instance.SendMessage("/lockon");
+										Chat.Instance.ExecuteCommand("/lockon");
 										return true;
 								}
 						}
@@ -293,7 +294,7 @@ internal static unsafe class HouseEnterTask
 				if (bell != null && Vector3.Distance(Player.Object.Position, bell.Position) < 4f + Utils.Random * 0.25f)
 				{
 						DebugLog($"Disabling automove");
-						Chat.Instance.SendMessage("/automove off");
+						Chat.Instance.ExecuteCommand("/automove off");
 						return true;
 				}
 				return false;

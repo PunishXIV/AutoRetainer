@@ -1,4 +1,5 @@
-﻿using Lumina;
+﻿using Dalamud.Game;
+using Lumina;
 using Lumina.Data;
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
@@ -35,5 +36,5 @@ public class SubmarineExplorationPretty : SubmarineExploration
 		}
 
 		public string ConvertDestination() => Utils.UpperCaseStr(Destination);
-		public string FancyDestination() => $"[{Svc.Data.GetExcelSheet<SubmarineExplorationPretty>(Dalamud.ClientLanguage.Japanese).GetRow(this.RowId).Location}] " + Utils.UpperCaseStr(Destination);
+		public string FancyDestination() => $"[{Svc.Data.GetExcelSheet<SubmarineExplorationPretty>(ClientLanguage.Japanese).GetRow(this.RowId).Location}] " + Utils.UpperCaseStr(Destination);
 }

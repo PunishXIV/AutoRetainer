@@ -22,17 +22,12 @@ internal unsafe class Memory : IDisposable
 		[Signature("48 89 5C 24 ?? 57 48 83 EC 20 8B D9 8B F9")]
 		private GetIsGatheringItemGatheredDelegate GetIsGatheringItemGathered;
 
-		internal delegate byte AtkUnitBase_FireCallbackDelegate(AtkUnitBase* a1, int valueCount, AtkValue* values, byte updateState);
-		[Signature("E8 ?? ?? ?? ?? 8B 4C 24 20 0F B6 D8", DetourName = nameof(FireCallbackDetour), Fallibility = Fallibility.Fallible)]
-		internal Hook<AtkUnitBase_FireCallbackDelegate> FireCallbackHook;
-
-
 		internal delegate nint OnReceiveMarketPricePacketDelegate(nint a1, nint data);
 		[Signature("48 89 5C 24 ?? 57 48 83 EC 40 48 8B 0D ?? ?? ?? ?? 48 8B DA E8 ?? ?? ?? ?? 48 8B F8", DetourName = nameof(AddonItemSearchResult_OnRequestedUpdateDelegateDetour), Fallibility = Fallibility.Fallible)]
 		internal Hook<OnReceiveMarketPricePacketDelegate> OnReceiveMarketPricePacketHook;
 
 		internal delegate byte OutdoorTerritory_IsEstateResidentDelegate(nint a1, byte a2);
-		[Signature("8B 05 ?? ?? ?? ?? 44 0F B6 CA 44 8B 81")]
+		[Signature("8B 05 ?? ?? ?? ?? 44 0F B6 D2 44 8B 81")]
 		internal OutdoorTerritory_IsEstateResidentDelegate OutdoorTerritory_IsEstateResident;
 
 		internal delegate void RetainerItemCommandDelegate(nint AgentRetainerItemCommandModule, uint slot, InventoryType inventoryType, uint a4, RetainerItemCommand command);
@@ -62,7 +57,7 @@ internal unsafe class Memory : IDisposable
 		}
 
 		private delegate nint ReceiveRetainerVentureListUpdateDelegate(nint a1, int a2, nint a3);
-		[Signature("48 89 5C 24 ?? 56 41 56 41 57 48 83 EC 20 8B DA", DetourName = nameof(ReceiveRetainerVentureListUpdateDetour), Fallibility = Fallibility.Infallible)]
+		[Signature("40 53 41 55 41 56 41 57 48 83 EC 28 8B DA", DetourName = nameof(ReceiveRetainerVentureListUpdateDetour), Fallibility = Fallibility.Infallible)]
 		private Hook<ReceiveRetainerVentureListUpdateDelegate> ReceiveRetainerVentureListUpdateHook;
 
 		private nint ReceiveRetainerVentureListUpdateDetour(nint a1, int a2, nint a3)
@@ -80,35 +75,9 @@ internal unsafe class Memory : IDisposable
 				return ret;
 		}
 
-		internal byte FireCallbackDetour(AtkUnitBase* a1, int valueCount, AtkValue* values, byte updateState)
-		{
-				if (a1->ID == 118 && valueCount == 2 && values[0].Int == 5)
-				{
-						PluginLog.Verbose($"Last search item: {values[1].Int}");
-						LastSearchItem = values[1].Int;
-				}
-				return FireCallbackHook.Original(a1, valueCount, values, updateState);
-		}
-
-		internal ulong InteractWithObjectDetour(TargetSystem* system, GameObject* obj, bool los)
-		{
-				DuoLog.Information($"Interacted with {MemoryHelper.ReadSeStringNullTerminated((nint)obj->Name)}, los={los}");
-				return InteractWithObjectHook.Original(system, obj, los);
-		}
-
-		internal void InstallInteractHook()
-		{
-				if (InteractWithObjectHook == null)
-				{
-						InteractWithObjectHook = Svc.Hook.HookFromAddress<InteractWithObjectDelegate>((nint)TargetSystem.Addresses.InteractWithObject.Value, InteractWithObjectDetour);
-						InteractWithObjectHook.Enable();
-				}
-		}
-
 		public void Dispose()
 		{
 				InteractWithObjectHook?.Dispose();
-				FireCallbackHook?.Dispose();
 				AddonAirShipExploration_SelectDestinationHook?.Dispose();
 				OnReceiveMarketPricePacketHook?.Dispose();
 				ReceiveRetainerVentureListUpdateHook?.Dispose();

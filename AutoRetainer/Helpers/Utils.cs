@@ -1,8 +1,9 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage;
 using AutoRetainerAPI.Configuration;
-using ClickLib.Clicks;
+
 using Dalamud;
+using Dalamud.Game;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
@@ -15,8 +16,8 @@ using ECommons.Interop;
 using ECommons.MathHelpers;
 using ECommons.Reflection;
 using ECommons.Throttlers;
+using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.Game;
-using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -32,6 +33,7 @@ internal static unsafe class Utils
 		internal static bool IsCN => Svc.ClientState.ClientLanguage == (ClientLanguage)4;
 		internal static int FCPoints => *(int*)((nint)AgentModule.Instance()->GetAgentByInternalId(AgentId.FreeCompanyCreditShop) + 256);
 		internal static float AnimationLock => *(float*)((nint)ActionManager.Instance() + 8);
+		static bool IsNullOrEmpty(this string s) => GenericHelpers.IsNullOrEmpty(s);
 
     public static bool IsPublic(this World w)
     {
@@ -75,7 +77,7 @@ internal static unsafe class Utils
 		{
 				foreach (var x in Svc.AetheryteList)
 				{
-						if (HouseEnterTask.FCAetherytes.Contains(x.AetheryteId) && !x.IsAppartment && !x.IsSharedHouse) return x.TerritoryId;
+						if (HouseEnterTask.FCAetherytes.Contains(x.AetheryteId) && !x.IsApartment && !x.IsSharedHouse) return x.TerritoryId;
 				}
 				return 0;
 		}
@@ -84,12 +86,12 @@ internal static unsafe class Utils
 		{
 				foreach (var x in Svc.AetheryteList)
 				{
-						if (HouseEnterTask.PrivateAetherytes.Contains(x.AetheryteId) && !x.IsAppartment && !x.IsSharedHouse) return x.TerritoryId;
+						if (HouseEnterTask.PrivateAetherytes.Contains(x.AetheryteId) && !x.IsApartment && !x.IsSharedHouse) return x.TerritoryId;
 				}
 				return 0;
 		}
 
-		internal static int LoadedItems => AtkStage.GetSingleton()->GetNumberArrayData()[36]->IntArray[401];
+		internal static int LoadedItems => AtkStage.Instance()->GetNumberArrayData()[36]->IntArray[401];
 
 		internal static void ExtraLog(string s)
 		{
@@ -163,11 +165,11 @@ internal static unsafe class Utils
 				var agent = AgentLobby.Instance();
 				if (agent->AgentInterface.IsAgentActive())
 				{
-						var charaSpan = agent->LobbyData.CharaSelectEntries.Span;
+						var charaSpan = agent->LobbyData.CharaSelectEntries.AsSpan();
 						for (int i = 0; i < charaSpan.Length; i++)
 						{
 								var s = charaSpan[i];
-								ret.Add(($"{Utils.Read(s.Value->Name)}", s.Value->HomeWorldId));
+								ret.Add(($"{s.Value->Name.Read()}", s.Value->HomeWorldId));
 						}
 				}
 				return ret;
@@ -332,10 +334,10 @@ internal static unsafe class Utils
 				return ("InventoryRetainer", 5);
 		}
 
-		internal static GameObject GetNearestRetainerBell(out float Distance)
+		internal static IGameObject GetNearestRetainerBell(out float Distance)
 		{
 				var currentDistance = float.MaxValue;
-				GameObject currentObject = null;
+				IGameObject currentObject = null;
 				foreach (var x in Svc.Objects)
 				{
 						if (x.IsTargetable && (x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName))
@@ -352,7 +354,7 @@ internal static unsafe class Utils
 				return currentObject;
 		}
 
-		internal static GameObject GetReachableRetainerBell(bool extend)
+		internal static IGameObject GetReachableRetainerBell(bool extend)
 		{
 				if (Player.Object is null) return null;
 
@@ -477,17 +479,15 @@ internal static unsafe class Utils
 		{
 				if (TryGetAddonByName<AddonSelectString>("SelectString", out var addon) && IsAddonReady(&addon->AtkUnitBase))
 				{
-						var entry = GetEntries(addon).FirstOrDefault(inputTextTest);
-						if (entry != null)
+						if (new AddonMaster.SelectString(addon).Entries.TryGetFirst(x => inputTextTest(x.Text), out var entry))
 						{
-								var index = GetEntries(addon).IndexOf(entry);
-								if (index >= 0 && IsSelectItemEnabled(addon, index) && (Throttler?.Invoke() ?? GenericThrottle))
-								{
-										ClickSelectString.Using((nint)addon).SelectItem((ushort)index);
-										DebugLog($"TrySelectSpecificEntry: selecting {entry}/{index}");
-										return true;
-								}
-						}
+                if (IsSelectItemEnabled(addon, entry.Index) && (Throttler?.Invoke() ?? GenericThrottle))
+                {
+										entry.Select();
+                    DebugLog($"TrySelectSpecificEntry: selecting {entry}");
+                    return true;
+                }
+            }
 				}
 				else
 				{
@@ -526,7 +526,7 @@ internal static unsafe class Utils
 				}
 		}
 
-		internal static float GetValidInteractionDistance(GameObject bell)
+		internal static float GetValidInteractionDistance(IGameObject bell)
 		{
 				if (bell.ObjectKind == ObjectKind.Housing)
 				{
@@ -547,15 +547,15 @@ internal static unsafe class Utils
 				return (MathHelper.GetRelativeAngle(Svc.ClientState.LocalPlayer.Position.ToVector2(), pos) + Svc.ClientState.LocalPlayer.Rotation.RadToDeg()) % 360;
 		}
 
-		internal static bool IsApartmentEntrance(this GameObject obj)
+		internal static bool IsApartmentEntrance(this IGameObject obj)
 		{
 				return obj.Name.ToString().EqualsIgnoreCase(Lang.ApartmentEntrance);
 		}
 
-		internal static GameObject GetNearestEntrance(out float Distance, bool bypassPredefined = false)
+		internal static IGameObject GetNearestEntrance(out float Distance, bool bypassPredefined = false)
 		{
 				var currentDistance = float.MaxValue;
-				GameObject currentObject = null;
+				IGameObject currentObject = null;
 
 				var fcOverride = Data.FreeCompanyHouseEntrance == null ? null : GetEntranceAtLocation(Data.FreeCompanyHouseEntrance.Entrance);
 				var pOverride = Data.PrivateHouseEntrance == null ? null : GetEntranceAtLocation(Data.PrivateHouseEntrance.Entrance);
@@ -602,7 +602,7 @@ internal static unsafe class Utils
 				return currentObject;
 		}
 
-		internal static GameObject GetEntranceAtLocation(Vector3 pos)
+		internal static IGameObject GetEntranceAtLocation(Vector3 pos)
 		{
 				foreach (var x in Svc.Objects)
 				{
@@ -738,7 +738,7 @@ internal static unsafe class Utils
 				return Svc.Data.GetExcelSheet<Addon>().GetRow(num).Text.ToString();
 		}
 
-		internal static bool IsRetainerBell(this GameObject o)
+		internal static bool IsRetainerBell(this IGameObject o)
 		{
 				return o != null &&
 						(o.ObjectKind == ObjectKind.EventObj || o.ObjectKind == ObjectKind.Housing)
@@ -787,7 +787,7 @@ internal static unsafe class Utils
 						var inv = c->GetInventoryContainer(x);
 						for (var i = 0; i < inv->Size; i++)
 						{
-								if (inv->Items[i].ItemID == 0)
+								if (inv->Items[i].ItemId == 0)
 								{
 										slots++;
 								}
@@ -837,11 +837,11 @@ internal static unsafe class Utils
 				}
 		}
 
-		internal static GameObject GetNearestWorkshopEntrance(out float Distance)
+		internal static IGameObject GetNearestWorkshopEntrance(out float Distance)
 		{
 				Utils.ExtraLog($"GetNearestWorkshopEntrance: Begin");
 				var currentDistance = float.MaxValue;
-				GameObject currentObject = null;
+				IGameObject currentObject = null;
 				foreach (var x in Svc.Objects)
 				{
 						Utils.ExtraLog($"GetNearestWorkshopEntrance: Scanning object table: object={x}, targetable={x.IsTargetable}");

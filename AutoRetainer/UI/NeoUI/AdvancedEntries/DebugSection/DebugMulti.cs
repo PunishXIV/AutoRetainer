@@ -23,10 +23,6 @@ internal unsafe class DebugMulti : DebugUIEntry
 				ImGuiEx.Text($"{Svc.Data.GetExcelSheet<Addon>()?.GetRow(115)?.Text.ToDalamudString().ExtractText()}");
 				ImGuiEx.Text($"Server time: {CSFramework.GetServerTime()}");
 				ImGuiEx.Text($"PC time: {DateTimeOffset.Now.ToUnixTimeSeconds()}");
-				if (ImGui.Button("InstallInteractHook"))
-				{
-						P.Memory.InstallInteractHook();
-				}
 				if (ImGui.CollapsingHeader("HET"))
 				{
 						ImGuiEx.Text($"Nearest entrance: {Utils.GetNearestEntrance(out var d)}, d={d}");

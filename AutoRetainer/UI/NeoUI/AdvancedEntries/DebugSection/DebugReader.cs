@@ -1,6 +1,6 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage.Readers;
-using ECommons.UIHelpers.Implementations;
+using ECommons.UIHelpers.AtkReaderImplementations;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;

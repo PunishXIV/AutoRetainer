@@ -80,7 +80,7 @@ internal static unsafe class OfflineDataManager
 				data.Gil = (uint)InventoryManager.Instance()->GetInventoryItemCount(1);
 				for (int i = 0; i < 30; i++)
 				{
-						data.ClassJobLevelArray[i] = UIState.Instance()->PlayerState.ClassJobLevelArray[i];
+						data.ClassJobLevelArray[i] = UIState.Instance()->PlayerState.ClassJobLevels[i];
 				}
 				if (writeGatherables)
 				{
@@ -138,23 +138,23 @@ internal static unsafe class OfflineDataManager
 				if (Player.IsInHomeWorld)
 				{
 						var fc = InfoModule.Instance()->GetInfoProxyFreeCompany();
-						data.FCID = fc->ID;
-						if (!C.FCData.ContainsKey(fc->ID)) C.FCData[fc->ID] = new();
-						C.FCData[fc->ID].Name = MemoryHelper.ReadStringNullTerminated((nint)fc->Name);
+						data.FCID = fc->Id;
+						if (!C.FCData.ContainsKey(fc->Id)) C.FCData[fc->Id] = new();
+						C.FCData[fc->Id].Name = fc->Name.Read();
 						var numArray = UIModule.Instance()->GetRaptureAtkModule()->AtkModule.GetNumberArrayData(57);
 						if (numArray != null)
 						{
 								var gil = numArray->IntArray[304];
 								if (gil != 0 || S.FCPointsUpdater?.IsFCChestReady() == true)
 								{
-										C.FCData[fc->ID].Gil = gil;
-										C.FCData[fc->ID].LastGilUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+										C.FCData[fc->Id].Gil = gil;
+										C.FCData[fc->Id].LastGilUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 								}
 						}
 						if (Utils.FCPoints != 0)
 						{
-								C.FCData[fc->ID].FCPoints = Utils.FCPoints;
-								C.FCData[fc->ID].FCPointsLastUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+								C.FCData[fc->Id].FCPoints = Utils.FCPoints;
+								C.FCData[fc->Id].FCPointsLastUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 						}
 				}
 				data.WriteOfflineInventoryData();

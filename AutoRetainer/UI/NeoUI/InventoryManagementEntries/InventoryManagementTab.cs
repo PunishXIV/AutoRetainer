@@ -80,22 +80,6 @@ public unsafe class InventoryManagementTab : NeoUIEntry
 						{
 								ImGuiEx.TextWrappedCopy(InventorySpaceManager.Log.Print("\n"));
 						}
-						if (ImGui.CollapsingHeader("Hotbar slot"))
-						{
-								var slot = RaptureHotbarModule.Instance()->GetSlotById(0, 0);
-								ImGuiEx.Text($"CommandId {slot->CommandId}");
-								ImGuiEx.Text($"CommandType {slot->CommandType}");
-								ImGuiEx.Text($"UNK_0xC4 {slot->UNK_0xC4}");
-								ImGuiEx.Text($"UNK_0xD4 {slot->UNK_0xD4}");
-								ImGuiEx.Text($"UNK_0xD8 {slot->UNK_0xD8}");
-								ImGuiEx.Text($"UNK_0xDC {slot->UNK_0xDC}");
-								ImGuiEx.Text($"UNK_0xDD {slot->UNK_0xDD}");
-								ImGuiEx.Text($"UNK_0xDE {slot->UNK_0xDE}");
-								if (ImGui.Button("OpenCoffer")) TaskOpenAllCoffers.OpenCoffer();
-								ImGuiEx.Text($"{ActionManager.Instance()->GetActionStatus(ActionType.Item, 32161)}");
-								ImGuiEx.Text($"Animation lock: {Utils.AnimationLock}");
-								if (ImGui.Button("Open all coffers")) TaskOpenAllCoffers.Enqueue();
-						}
 				}
 		}
 

@@ -3,8 +3,8 @@ using ECommons.Automation;
 using ECommons.Events;
 using ECommons.ExcelServices;
 using ECommons.MathHelpers;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
-using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PInvoke;
 using ItemLevel = AutoRetainer.Helpers.ItemLevel;
@@ -21,7 +21,7 @@ internal unsafe class DebugMisc : DebugUIEntry
 						{
 								if (!TryGetAddonByName<AtkUnitBase>("LookingForGroup", out var _))
 								{
-										P.TaskManager.Enqueue(() => Chat.Instance.SendMessage("/partyfinder"));
+										P.TaskManager.Enqueue(() => Chat.Instance.ExecuteCommand("/partyfinder"));
 										P.TaskManager.DelayNext(500);
 								}
 								P.TaskManager.Enqueue(() =>
@@ -144,7 +144,7 @@ internal unsafe class DebugMisc : DebugUIEntry
 
 				ImGui.Separator();
 				{
-						if (ImGui.Button("Fire") && TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon) && IsAddonReady(addon) && addon->UldManager.NodeList[5]->IsVisible)
+						if (ImGui.Button("Fire") && TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon) && IsAddonReady(addon) && addon->UldManager.NodeList[5]->IsVisible())
 						{
 								AutoGCHandin.InvokeHandin(addon, 0);
 						}

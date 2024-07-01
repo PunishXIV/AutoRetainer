@@ -13,7 +13,7 @@ internal unsafe class DebugVenture : DebugUIEntry
 		public override void Draw()
 		{
 				{
-						var agent = AgentModule.Instance()->GetAgentByInternalID(140);
+						var agent = AgentModule.Instance()->GetAgentByInternalId((AgentId)140);
 						if (agent != null && agent->IsAgentActive())
 						{
 								ImGuiEx.TextCopy($"{(nint)agent:X16}");

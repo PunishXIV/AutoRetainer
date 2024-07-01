@@ -23,8 +23,8 @@ internal static unsafe class ItemLevel
 						if (i == 5) continue;
 						var slot = container->GetInventorySlot(i);
 						if (slot == null) continue;
-						var id = slot->ItemID;
-						var item = Svc.Data.Excel.GetSheet<Sheets.ExtendedItem>()?.GetRow(id);
+						var id = slot->ItemId;
+						var item = Svc.Data.Excel.GetSheet<ECommons.ExcelServices.Sheets.ExtendedItem>()?.GetRow(id);
 						if (item == null) continue;
 						if (ignoreCategory.Contains(item.ItemUICategory.Row))
 						{
@@ -55,7 +55,7 @@ internal static unsafe class ItemLevel
 										bonusPerception += baseParam.Value;
 								}
 						}
-						if (slot->Flags.HasFlag(InventoryItem.ItemFlags.HQ))
+						if (slot->Flags.HasFlag(InventoryItem.ItemFlags.HighQuality))
 						{
 								for (var j = 0; j < item.BaseParamSpecial.Length; j++)
 								{
@@ -73,7 +73,7 @@ internal static unsafe class ItemLevel
 						for (int j = 0; j < 5; j++)
 						{
 								var materia = slot->Materia[j];
-								var materiag = slot->MateriaGrade[j];
+								var materiag = slot->MateriaGrades[j];
 								if (materia != 0)
 								{
 										var m = Svc.Data.GetExcelSheet<Materia>().GetRow(materia);

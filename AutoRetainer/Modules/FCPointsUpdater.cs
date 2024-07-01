@@ -59,9 +59,9 @@ public sealed unsafe class FCPointsUpdater
 								{
 										if(TryGetAddonByName<AtkUnitBase>("FreeCompany", out var addon))
 										{
-												if (addon->IsVisible)
+												if (addon->IsVisible())
 												{
-														addon->IsVisible = false;
+														addon->IsVisible() = false;
 														return true;
 												}
 										}

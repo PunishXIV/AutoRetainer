@@ -19,9 +19,9 @@ internal static unsafe class TaskEntrustDuplicates
 						{
 								var slotItem = inv->GetInventorySlot(slot);
 								if (slotItem == null) continue;
-								if (FFXIVClientStructs.FFXIV.Client.Game.InventoryManager.Instance()->GetInventoryItemCount(slotItem->ItemID, slotItem->Flags.HasFlag(InventoryItem.ItemFlags.HQ)) > 0)
+								if (FFXIVClientStructs.FFXIV.Client.Game.InventoryManager.Instance()->GetInventoryItemCount(slotItem->ItemId, slotItem->Flags.HasFlag(InventoryItem.ItemFlags.HighQuality)) > 0)
 								{
-										if (!Data.TransferItemsBlacklist.Contains(slotItem->ItemID))
+										if (!Data.TransferItemsBlacklist.Contains(slotItem->ItemId))
 										{
 												return false;
 										}

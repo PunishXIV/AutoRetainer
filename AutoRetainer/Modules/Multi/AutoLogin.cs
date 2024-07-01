@@ -2,11 +2,12 @@
 #nullable enable
 
 
-using ClickLib.Clicks;
+
 using Dalamud.Memory;
 using Dalamud.Utility;
 using ECommons.Automation;
 using ECommons.Throttlers;
+using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -250,7 +251,7 @@ internal unsafe class AutoLogin
 		private bool SelectServiceAccount()
 		{
 				var dcMenu = (AtkUnitBase*)Svc.GameGui.GetAddonByName("TitleDCWorldMap", 1);
-				if (dcMenu != null) UiHelper.Close(dcMenu, true);
+				if (dcMenu != null) dcMenu->Close(true);
 				if (TryGetAddonByName<AtkUnitBase>("_CharaSelectWorldServer", out _))
 				{
 						return true;
@@ -263,7 +264,7 @@ internal unsafe class AutoLogin
 						if (text == compareTo)
 						{
 								PluginLog.Information($"Selecting service account");
-								ClickSelectString.Using((nint)addon).SelectItem((ushort)tempServiceAccount);
+								new AddonMaster.SelectString(addon).Entries[tempServiceAccount].Select();
 								return true;
 						}
 						else
@@ -308,7 +309,7 @@ internal unsafe class AutoLogin
 		{
 				// Select World
 				var dcMenu = (AtkUnitBase*)Svc.GameGui.GetAddonByName("TitleDCWorldMap", 1);
-				if (dcMenu != null) UiHelper.Close(dcMenu, true);
+				if (dcMenu != null) dcMenu->Close(true);
 				var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("_CharaSelectWorldServer", 1);
 				if (addon == null) return false;
 
@@ -356,7 +357,7 @@ internal unsafe class AutoLogin
 		{
 				var addon = Utils.GetSpecificYesno(Svc.Data.GetExcelSheet<Addon>()?.GetRow(115)?.Text.ToDalamudString().ExtractText());
 				if (addon == null || !IsAddonReady(addon)) return false;
-				ClickSelectYesNo.Using((nint)addon).Yes();
+				new AddonMaster.SelectYesno((nint)addon).Yes();
 				return true;
 		}
 
@@ -365,7 +366,7 @@ internal unsafe class AutoLogin
 				var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("SelectYesno", 1);
 				if (addon == null) return false;
 				Callback.Fire(addon, false, 0);
-				UiHelper.Close(addon, true);
+				addon->Close(true);
 				return true;
 		}
 
@@ -386,7 +387,7 @@ internal unsafe class AutoLogin
 				var isLoggedIn = Svc.Condition.Any();
 				if (!isLoggedIn) return true;
 
-				Chat.Instance.SendMessage("/logout");
+				Chat.Instance.ExecuteCommand("/logout");
 				return true;
 		}
 

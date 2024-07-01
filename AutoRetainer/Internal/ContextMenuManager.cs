@@ -1,5 +1,4 @@
-﻿using Dalamud.ContextMenu;
-using Dalamud.Game.Text.SeStringHandling;
+﻿using Dalamud.Game.Text.SeStringHandling;
 using ECommons.ChatMethods;
 using ECommons.ExcelServices;
 using ECommons.Interop;
@@ -10,21 +9,19 @@ namespace AutoRetainer.Internal;
 
 internal class ContextMenuManager
 {
-		private DalamudContextMenu ContextMenu;
 		private SeString Prefix = new SeStringBuilder().AddUiForeground(" ", 539).Build();
 
 		public ContextMenuManager()
 		{
-				ContextMenu = new(Svc.PluginInterface);
-				ContextMenu.OnOpenInventoryContextMenu += ContextMenu_OnOpenInventoryContextMenu;
+				//ContextMenu.OnOpenInventoryContextMenu += ContextMenu_OnOpenInventoryContextMenu;
 		}
 
 		public void Dispose()
 		{
-				ContextMenu.Dispose();
+				//ContextMenu.Dispose();
 		}
 
-		private void ContextMenu_OnOpenInventoryContextMenu(InventoryContextMenuOpenArgs args)
+		/*private void ContextMenu_OnOpenInventoryContextMenu(InventoryContextMenuOpenArgs args)
 		{
 				if (!C.IMEnableContextMenu) return;
 				var id = args.ItemId % 1000000;
@@ -94,5 +91,5 @@ internal class ContextMenuManager
 								}));
 						}
 				}
-		}
+		}*/
 }

@@ -150,12 +150,12 @@ internal unsafe class DebugScheduler : DebugUIEntry
 
 				if (ImGui.Button("AtkStage get focus"))
 				{
-						var ptr = (nint)AtkStage.GetSingleton()->GetFocus();
+						var ptr = (nint)AtkStage.Instance()->GetFocus();
 						Svc.Chat.Print($"Stage focus: {ptr}");
 				}
 				if (ImGui.Button("AtkStage clear focus"))
 				{
-						AtkStage.GetSingleton()->ClearFocus();
+						AtkStage.Instance()->ClearFocus();
 				}
 				if (ImGui.Button("Try retrieve current retainer name"))
 				{

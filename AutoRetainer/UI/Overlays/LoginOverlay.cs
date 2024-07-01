@@ -22,7 +22,7 @@ internal unsafe class LoginOverlay : Window
 		{
 				var num = 1;
 				ImGui.SetWindowFontScale(C.LoginOverlayScale);
-				ImGui.PushFont(Svc.PluginInterface.UiBuilder.GetGameFontHandle(new GameFontStyle(GameFontFamilyAndSize.MiedingerMid18)).ImFont);
+				//ImGui.PushFont(Svc.PluginInterface.UiBuilder.GetGameFontHandle(new GameFontStyle(GameFontFamilyAndSize.MiedingerMid18)).ImFont);
 				foreach (var x in C.OfflineData.Where(x => !x.Name.IsNullOrEmpty() && !x.ExcludeOverlay))
 				{
 						var n = Censor.Character(x.Name, x.World);
@@ -37,8 +37,8 @@ internal unsafe class LoginOverlay : Window
 								//AutoLogin.Instance.Login(x.CurrentWorld, x.Name, ExcelWorldHelper.GetWorldByName(x.World).RowId, x.ServiceAccount);
 						}
 				}
-				ImGui.PopFont();
-				ImGuiEx.ImGuiLineCentered("LoginCenter", delegate
+				//ImGui.PopFont();
+				ImGuiEx.LineCentered("LoginCenter", delegate
 				{
 						if (ImGui.Checkbox("Multi Mode", ref MultiMode.Enabled))
 						{

@@ -1,8 +1,9 @@
 ﻿using AutoRetainer.Modules.Voyage;
-using ClickLib.Clicks;
+
 using ECommons.Automation;
 using ECommons.GameHelpers;
 using ECommons.Throttlers;
+using ECommons.UIHelpers.AddonMasterImplementations;
 
 namespace AutoRetainer.Modules;
 
@@ -38,7 +39,7 @@ internal static unsafe class Shutdown
 												{
 														if (EzThrottler.Throttle("SendChat"))
 														{
-																Chat.Instance.SendMessage("/shutdown");
+																Chat.Instance.ExecuteCommand("/shutdown");
 																return true;
 														}
 														return false;
@@ -50,7 +51,7 @@ internal static unsafe class Shutdown
 														{
 																if (EzThrottler.Throttle("ClickExit"))
 																{
-																		ClickSelectYesNo.Using((nint)yesno).Yes();
+																		new AddonMaster.SelectYesno((nint)yesno).Yes();
 																		return true;
 																}
 														}

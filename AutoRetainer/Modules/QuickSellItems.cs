@@ -59,7 +59,6 @@ public unsafe class QuickSellItems : IDisposable
 				//99	Put Up for Sale
 				putUpForSaleText = Svc.Data.GetExcelSheet<Addon>()?.GetRow(99)?.Text?.RawString ?? "Put Up for Sale";
 				Svc.Hook.InitializeFromAttributes(this);
-				UiHelper.Setup();
 				Toggle();
 		}
 
@@ -124,20 +123,20 @@ public unsafe class QuickSellItems : IDisposable
 										var itemSlot = inventory->GetInventorySlot(slot);
 										if (itemSlot != null)
 										{
-												var itemId = itemSlot->ItemID;
+												var itemId = itemSlot->ItemId;
 												var item = Svc.Data.GetExcelSheet<Item>()?.GetRow(itemId);
 												if (item != null)
 												{
-														var addonId = agent->AgentInterface.GetAddonID();
+														var addonId = agent->AgentInterface.GetAddonId();
 														if (addonId == 0) return retVal;
-														var addon = Common.GetAddonByID(addonId);
+														var addon = AtkStage.Instance()->RaptureAtkUnitManager->GetAddonById((ushort)addonId);
 														if (addon == null) return retVal;
 
 														for (var i = 0; i < agent->ContextItemCount; i++)
 														{
-																var contextItemParam = agent->EventParamsSpan[agent->ContexItemStartIndex + i];
+																var contextItemParam = agent->EventParams[agent->ContexItemStartIndex + i];
 																if (contextItemParam.Type != ValueType.String) continue;
-																var contextItemName = contextItemParam.ValueString();
+																var contextItemName = contextItemParam.GetValueAsString();
 
 																if (text.Contains(contextItemName))
 																{
@@ -146,9 +145,9 @@ public unsafe class QuickSellItems : IDisposable
 																				DebugLog($"QRA found {i}:{contextItemName} but it's disabled");
 																				continue;
 																		}
-																		Common.GenerateCallback(addon, 0, i, 0U, 0, 0);
+																		Callback.Fire(addon, true, 0, i, 0U, 0, 0);
 																		agent->AgentInterface.Hide();
-																		UiHelper.Close(addon);
+																		addon->Close(true);
 																		DebugLog($"QRA Selected {i}:{contextItemName}");
 																		return retVal;
 																}

@@ -28,7 +28,7 @@ internal static unsafe class TaskEnterWorkshop
 				P.TaskManager.EnqueueImmediate(LockonAdditionalChambers, 1000, true);
 				P.TaskManager.EnqueueImmediate(HouseEnterTask.Approach);
 				P.TaskManager.EnqueueImmediate(AutorunOffAdd);
-				P.TaskManager.EnqueueImmediate(() => { Chat.Instance.SendMessage("/automove off"); });
+				P.TaskManager.EnqueueImmediate(() => { Chat.Instance.ExecuteCommand("/automove off"); });
 				P.TaskManager.EnqueueImmediate(InteractAdd);
 				P.TaskManager.EnqueueImmediate(SelectEnterWorkshop);
 				P.TaskManager.EnqueueImmediate(() => VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType), "Wait Until entered workshop");
@@ -41,7 +41,7 @@ internal static unsafe class TaskEnterWorkshop
 				P.TaskManager.Enqueue(LockonAdditionalChambers, 1000, true);
 				P.TaskManager.Enqueue(HouseEnterTask.Approach);
 				P.TaskManager.Enqueue(AutorunOffAdd);
-				P.TaskManager.Enqueue(() => { Chat.Instance.SendMessage("/automove off"); });
+				P.TaskManager.Enqueue(() => { Chat.Instance.ExecuteCommand("/automove off"); });
 				P.TaskManager.Enqueue(InteractAdd);
 				P.TaskManager.Enqueue(SelectEnterWorkshop);
 				P.TaskManager.Enqueue(() => VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType), "Wait Until entered workshop");
@@ -75,7 +75,7 @@ internal static unsafe class TaskEnterWorkshop
 				if (entrance != null && d < 3f + Utils.Random && EzThrottler.Throttle("HET.DisableAutomoveAdd"))
 				{
 						DebugLog($"Disabling automove");
-						Chat.Instance.SendMessage("/automove off");
+						Chat.Instance.ExecuteCommand("/automove off");
 						return true;
 				}
 				return false;
@@ -90,7 +90,7 @@ internal static unsafe class TaskEnterWorkshop
 						{
 								if (EzThrottler.Throttle("HET.LockonAdd"))
 								{
-										Chat.Instance.SendMessage("/lockon");
+										Chat.Instance.ExecuteCommand("/lockon");
 										return true;
 								}
 						}

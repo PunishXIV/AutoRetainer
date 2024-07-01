@@ -1,9 +1,11 @@
 ﻿using AutoRetainer.Internal.Clicks;
 using AutoRetainer.Scheduler.Tasks;
-using ClickLib.Clicks;
+
 using Dalamud.Memory;
 using Dalamud.Utility;
+using ECommons.Automation.UIInput;
 using ECommons.Throttlers;
+using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
@@ -21,7 +23,7 @@ internal static unsafe class RetainerHandlers
 				{
 						if (Utils.GenericThrottle && EzThrottler.Throttle("WillBeUnableToProcessBuyback"))
 						{
-								ClickSelectYesNo.Using((nint)yesno).Yes();
+								new AddonMaster.SelectYesno((nint)yesno).Yes();
 								return true;
 						}
 				}
@@ -93,7 +95,7 @@ internal static unsafe class RetainerHandlers
 						}
 						if (FrameThrottler.Check(thrName) && addon->ReassignButton->IsEnabled && Utils.GenericThrottle)
 						{
-								ClickRetainerTaskResult.Using((IntPtr)addon).Reassign();
+								new AddonMaster.RetainerTaskResult(addon).Reassign();
 								DebugLog($"Clicked reassign");
 								return true;
 						}
@@ -116,7 +118,7 @@ internal static unsafe class RetainerHandlers
 						}
 						if (FrameThrottler.Check(thrName) && addon->ConfirmButton->IsEnabled && Utils.GenericThrottle)
 						{
-								ClickRetainerTaskResult.Using((IntPtr)addon).Confirm();
+                new AddonMaster.RetainerTaskResult(addon).Confirm();
 								DebugLog($"Clicked confirm");
 								return true;
 						}
@@ -139,7 +141,7 @@ internal static unsafe class RetainerHandlers
 						}
 						if (FrameThrottler.Check(thrName) && addon->AssignButton->IsEnabled && Utils.GenericThrottle)
 						{
-								ClickRetainerTaskAsk.Using((IntPtr)addon).Assign();
+								new AddonMaster.RetainerTaskAsk((IntPtr)addon).Assign();
 								DebugLog("Clicked assign");
 								return true;
 						}
@@ -162,7 +164,7 @@ internal static unsafe class RetainerHandlers
 						}
 						if (FrameThrottler.Check(thrName) && addon->ReturnButton->IsEnabled && Utils.GenericThrottle)
 						{
-								ClickRetainerTaskAsk.Using((IntPtr)addon).Return();
+								new AddonMaster.RetainerTaskAsk((IntPtr)addon).Return();
 								DebugLog("Clicked return");
 								return true;
 						}
@@ -199,7 +201,7 @@ internal static unsafe class RetainerHandlers
 				if (TryGetAddonByName<AtkUnitBase>(invName.Name, out var addon) && IsAddonReady(addon))
 				{
 						var button = (AtkComponentButton*)addon->UldManager.NodeList[invName.EntrustDuplicatesIndex]->GetComponent();
-						if (addon->UldManager.NodeList[invName.EntrustDuplicatesIndex]->IsVisible && button->IsEnabled && Utils.GenericThrottle)
+						if (addon->UldManager.NodeList[invName.EntrustDuplicatesIndex]->IsVisible() && button->IsEnabled && Utils.GenericThrottle)
 						{
 								//new ClickButtonGeneric(addon, invName.Name).Click(button);
 								Callback.Fire(addon, false, (int)0);
@@ -219,9 +221,9 @@ internal static unsafe class RetainerHandlers
 				if (TryGetAddonByName<AtkUnitBase>("RetainerItemTransferList", out var addon) && IsAddonReady(addon))
 				{
 						var button = (AtkComponentButton*)addon->UldManager.NodeList[3]->GetComponent();
-						if (addon->UldManager.NodeList[3]->IsVisible && button->IsEnabled && Utils.GenericThrottle)
+						if (addon->UldManager.NodeList[3]->IsVisible() && button->IsEnabled && Utils.GenericThrottle)
 						{
-								new ClickButtonGeneric(addon, "RetainerItemTransferList").Click(button);
+								button->ClickAddonButton(addon);
 								DebugLog($"Clicked duplicates confirm");
 								return true;
 						}
@@ -241,9 +243,9 @@ internal static unsafe class RetainerHandlers
 				{
 						var button = (AtkComponentButton*)addon->UldManager.NodeList[2]->GetComponent();
 						var nodetext = MemoryHelper.ReadSeString(&addon->UldManager.NodeList[2]->GetComponent()->UldManager.NodeList[2]->GetAsAtkTextNode()->NodeText).ExtractText();
-						if (nodetext == text && addon->UldManager.NodeList[2]->IsVisible && button->IsEnabled && Utils.GenericThrottle)
+						if (nodetext == text && addon->UldManager.NodeList[2]->IsVisible() && button->IsEnabled && Utils.GenericThrottle)
 						{
-								new ClickButtonGeneric(addon, "RetainerItemTransferProgress").Click(button);
+								button->ClickAddonButton(addon);
 								DebugLog($"Clicked transfer progress close");
 								return true;
 						}
@@ -407,7 +409,7 @@ internal static unsafe class RetainerHandlers
 				if (TryGetAddonByName<AtkUnitBase>("Bank", out var addon) && IsAddonReady(addon))
 				{
 						var withdraw = (AtkComponentButton*)addon->UldManager.NodeList[3]->GetComponent();
-						if (addon->UldManager.NodeList[3]->IsVisible && withdraw->IsEnabled && !forceCancel)
+						if (addon->UldManager.NodeList[3]->IsVisible() && withdraw->IsEnabled && !forceCancel)
 						{
 								if (Utils.GenericThrottle)
 								{
@@ -417,8 +419,9 @@ internal static unsafe class RetainerHandlers
 												new() { Type = 0, Int = 0 }
 										};
 										addon->FireCallback(2, v);
-										UiHelper.Close(addon, true);
-										DebugLog($"Clicked withdraw");
+										addon->Close(true);
+
+                    DebugLog($"Clicked withdraw");
 										//new ClickButtonGeneric(addon, "Bank").Click(withdraw);
 										return true;
 								}
@@ -426,7 +429,7 @@ internal static unsafe class RetainerHandlers
 						else
 						{
 								var cancel = (AtkComponentButton*)addon->UldManager.NodeList[2]->GetComponent();
-								if (addon->UldManager.NodeList[2]->IsVisible && cancel->IsEnabled)
+								if (addon->UldManager.NodeList[2]->IsVisible() && cancel->IsEnabled)
 								{
 										if (Utils.GenericThrottle)
 										{
@@ -436,7 +439,7 @@ internal static unsafe class RetainerHandlers
 														new() { Type = 0, Int = 0 }
 												};
 												addon->FireCallback(2, v);
-												UiHelper.Close(addon, true);
+												addon->Close(true);
 												DebugLog($"Clicked cancel");
 												//new ClickButtonGeneric(addon, "Bank").Click(cancel);
 												return true;
@@ -486,10 +489,10 @@ internal static unsafe class RetainerHandlers
 		{
 				if (TryGetAddonByName<AddonRetainerTaskAsk>("RetainerTaskAsk", out var addon) && IsAddonReady(&addon->AtkUnitBase))
 				{
-						if (addon->AtkUnitBase.UldManager.NodeList[6]->IsVisible)
+						if (addon->AtkUnitBase.UldManager.NodeList[6]->IsVisible())
 						{
 								//An Error is on screen.
-								ClickRetainerTaskAsk.Using((IntPtr)addon).Return();
+								new AddonMaster.RetainerTaskAsk((IntPtr)addon).Return();
 								DebugLog($"Clicked cancel");
 								P.TaskManager.EnqueueImmediate(() => SelectSpecificVentureByName(ventureID), "SelectSpecificVenture");
 								P.TaskManager.DelayNextImmediate(10, false);
@@ -537,7 +540,7 @@ internal static unsafe class RetainerHandlers
 
 						if (FrameThrottler.Check("RetainerTaskSupply.InitWait") && Utils.GenericThrottle)
 						{
-								if (addon->UldManager.NodeList[3]->IsVisible)
+								if (addon->UldManager.NodeList[3]->IsVisible())
 								{
 										var list = addon->UldManager.NodeList[3]->GetAsAtkComponentList();
 										PluginLog.Debug($"Cnt: {list->ListLength}");

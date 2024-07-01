@@ -8,8 +8,11 @@ using AutoRetainer.UI.Overlays;
 using AutoRetainer.UI.Windows;
 using AutoRetainerAPI;
 using AutoRetainerAPI.Configuration;
+using Dalamud.Game.Addon.Lifecycle;
+using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.Network;
+using Dalamud.Memory;
 using Dalamud.Utility;
 using ECommons.Automation;
 using ECommons.Automation.LegacyTaskManager;
@@ -74,7 +77,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
 		internal static OfflineCharacterData Data => Utils.GetCurrentCharacterData();
 
-		public AutoRetainer(DalamudPluginInterface pi)
+		public AutoRetainer(IDalamudPluginInterface pi)
 		{
 				//PluginLoader.CheckAndLoad(pi, "https://love.puni.sh/plugins/AutoRetainer/blacklist.txt", delegate
 				{
@@ -91,11 +94,26 @@ public unsafe class AutoRetainer : IDalamudPlugin
 						{
 								new SingletonNotifyWindow();
 						}
+						Svc.AddonLifecycle.RegisterListener(AddonEvent.PreReceiveEvent, "RetainerList", OnEvent);
 				}
 				//);
 		}
 
-		public void Load()
+    private void OnEvent(AddonEvent type, AddonArgs args)
+    {
+				return;
+        if(args is AddonReceiveEventArgs a)
+				{
+						PluginLog.Information($"""
+								RL Event:
+								{a.AtkEvent:X16}/{a.AtkEventType}
+								{a.Data}/{MemoryHelper.ReadRaw(a.Data, 40).ToHexString()}
+								{a.EventParam}
+								""");
+				}
+    }
+
+    public void Load()
 		{
 				EzConfig.Migrate<Config>();
 				config = EzConfig.Init<Config>();
@@ -509,7 +527,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
 		{
 				//if (PluginLoader.IsLoaded)
 				{
-						Safe(() => FFXIVInstanceMonitor.ReleaseLock());
+            Svc.AddonLifecycle.UnregisterListener(AddonEvent.PreReceiveEvent, "RetainerList", OnEvent);
+            Safe(() => FFXIVInstanceMonitor.ReleaseLock());
 						Safe(() => this.quickSellItems.Disable());
 						Safe(() => this.quickSellItems.Dispose());
 						Safe(() => Svc.PluginInterface.UiBuilder.Draw -= FPSLimiter.FPSLimit);

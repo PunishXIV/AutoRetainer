@@ -1,11 +1,12 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage.Tasks;
-using ClickLib.Clicks;
+
 using Dalamud.Game.ClientState.Conditions;
 using ECommons.Automation;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;
 using ECommons.Throttlers;
+using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -115,7 +116,7 @@ internal static unsafe class VoyageScheduler
 								if (Utils.GenericThrottle)
 								{
 										Log("Locking on workshop CP");
-										Chat.Instance.SendMessage("/lockon");
+										Chat.Instance.ExecuteCommand("/lockon");
 										return true;
 								}
 						}
@@ -129,7 +130,7 @@ internal static unsafe class VoyageScheduler
 				{
 						if (Utils.GenericThrottle)
 						{
-								Chat.Instance.SendMessage("/automove on");
+								Chat.Instance.ExecuteCommand("/automove on");
 								Utils.RegenerateRandom();
 								return true;
 						}
@@ -145,7 +146,7 @@ internal static unsafe class VoyageScheduler
 						{
 								if (Utils.GenericThrottle)
 								{
-										Chat.Instance.SendMessage("/automove off");
+										Chat.Instance.ExecuteCommand("/automove off");
 										return true;
 								}
 						}
@@ -204,9 +205,9 @@ internal static unsafe class VoyageScheduler
 								{
 										if (index >= 0 && Utils.IsSelectItemEnabled(addon, index.Value) && Utils.GenericThrottle && EzThrottler.Throttle("SelectVesselByName"))
 										{
-												ClickSelectString.Using((nint)addon).SelectItem((ushort)index);
 												DebugLog($"Selecting vessel {name}/{type}/{entries[index.Value]}/{index}");
-												return true;
+                        new AddonMaster.SelectString(addon).Entries[index.Value].Select();
+                        return true;
 										}
 								}
 						}
