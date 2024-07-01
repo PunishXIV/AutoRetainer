@@ -122,7 +122,7 @@ internal static unsafe class OfflineDataManager
 										VentureID = ret.VentureID,
 										Gil = ret.Gil,
 										RetainerID = ret.RetainerID,
-										MBItems = ret.MarkerItemCount,
+										MBItems = ret.MarketItemCount,
 								});
 
 								for (int p = 0; p < GameRetainerManager.Count; p++)
