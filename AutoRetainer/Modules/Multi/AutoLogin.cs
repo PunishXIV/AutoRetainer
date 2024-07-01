@@ -242,7 +242,7 @@ internal unsafe class AutoLogin
     {
         var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("_TitleMenu", 1);
         if (addon == null || addon->IsVisible == false) return false;
-        Callback.Fire(addon, false, 13);
+        Callback.Fire(addon, false, 5);
         var nextAddon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("TitleDCWorldMap", 1);
         if (nextAddon == null) return false;
         return true;
@@ -286,7 +286,7 @@ internal unsafe class AutoLogin
         if (Utils.IsTitleScreenReady() && TryGetAddonByName<AtkUnitBase>("_TitleMenu", out var title) && IsAddonReady(title) && FrameThrottler.Throttle("TitleScreenClickStart"))
         {
             PluginLog.Debug($"[DCChange] Clicking start");
-            Callback.Fire(title, true, (int)1);
+            Callback.Fire(title, true, (int)4);
             FrameThrottler.Throttle($"TitleScreenClickStart", 15, true);
             return false;
         }
@@ -301,7 +301,7 @@ internal unsafe class AutoLogin
     {
         var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("TitleDCWorldMap", 1);
         if (addon == null || tempDc == null) return false;
-        Callback.Fire(addon, false, 2, (int)tempDc);
+        Callback.Fire(addon, false, 17, (int)tempDc);
         return true;
     }
 
@@ -329,7 +329,7 @@ internal unsafe class AutoLogin
             if (s.Trim().Length == 0) continue;
             checkedWorldCount++;
             if (s != world.Name.RawString) continue;
-            Callback.Fire(addon, false, 10, 0, i);
+            Callback.Fire(addon, false, 25, 0, i);
             return true;
         }
 
@@ -346,7 +346,7 @@ internal unsafe class AutoLogin
         if (AgentLobby.Instance()->TemporaryLocked) return false;
         if (Utils.TryGetCharacterIndex(tempCharacter, charaWorld, out var index))
         {
-            Callback.Fire(addon, false, (int)18, (int)0, (int)index);
+            Callback.Fire(addon, false, (int)29, (int)0, (int)index);
             var nextAddon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("SelectYesno", 1);
             return nextAddon != null;
         }
