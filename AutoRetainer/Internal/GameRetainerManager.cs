@@ -18,7 +18,7 @@ public static unsafe class GameRetainerManager
 				public ulong RetainerID => Handle.RetainerId;
 				public uint Gil => Handle.Gil;
 				public uint VentureCompleteTimeStamp => Handle.VentureComplete;
-				public int MarkerItemCount => Handle.MarketItemCount;
+				public int MarketItemCount => Handle.MarketItemCount;
 				public uint MarketExpire => Handle.MarketExpire;
 				public int Level => Handle.Level;
 				public uint ClassJob => Handle.ClassJob;
