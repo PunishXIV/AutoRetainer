@@ -11,6 +11,7 @@ using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace AutoRetainer.Modules.GcHandin;
@@ -321,7 +322,7 @@ internal static unsafe class AutoGCHandin
             var reader = new ReaderGrandCompanySupplyList(addon);
             if (IsListReady())
             {
-                var ptr = (GCExpectEntry*)*(nint*)((nint)(addon) + 624);
+                var ptr = (GCExpectEntry*)*(nint*)((nint)(addon) + 640);
                 for (var i = 0; i < reader.NumItems; i++)
                 {
                     var entry = ptr[i];

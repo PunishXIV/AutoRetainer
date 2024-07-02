@@ -141,10 +141,10 @@ internal static unsafe class OfflineDataManager
             data.FCID = fc->Id;
             if (!C.FCData.ContainsKey(fc->Id)) C.FCData[fc->Id] = new();
             C.FCData[fc->Id].Name = fc->Name.Read();
-            var numArray = UIModule.Instance()->GetRaptureAtkModule()->AtkModule.GetNumberArrayData(57);
+            var numArray = UIModule.Instance()->GetRaptureAtkModule()->AtkModule.GetNumberArrayData(58);
             if (numArray != null)
             {
-                var gil = numArray->IntArray[304];
+                var gil = numArray->IntArray[354];
                 if (gil != 0 || S.FCPointsUpdater?.IsFCChestReady() == true)
                 {
                     C.FCData[fc->Id].Gil = gil;
