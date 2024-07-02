@@ -2,6 +2,7 @@
 using AutoRetainerAPI;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Interface.Components;
+using ECommons.GameHelpers;
 using PunishLib.ImGuiMethods;
 using ThreadLoadImageHandler = ECommons.ImGuiMethods.ThreadLoadImageHandler;
 
@@ -255,7 +256,7 @@ internal static unsafe class MultiModeUI
                             {
                                 add += $"{Lang.CharPlant}{adata.Gathering}/{adata.Perception}";
                             }
-                            var cap = ret.Level < 90 && data.GetJobLevel(ret.Job) == ret.Level;
+                            var cap = ret.Level < Player.MaxLevel && data.GetJobLevel(ret.Job) == ret.Level;
                             if (cap) ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
                             ImGuiEx.TextV(level.ReplaceByChar(Lang.Digits.Normal, Lang.Digits.GameFont));
                             if (cap) ImGui.PopStyleColor();

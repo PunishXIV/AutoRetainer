@@ -14,7 +14,7 @@ internal class VentureBrowser : Window
     private int MaxIlvl = 0;
     private string search = "";
     private int minLevel = 1;
-    private int maxLevel = 90;
+    private int maxLevel = Player.MaxLevel;
     private bool GatherBuddyPresent = false;
     public VentureBrowser() : base("Venture Browser")
     {
@@ -83,12 +83,12 @@ internal class VentureBrowser : Window
                 ImGuiEx.TextV($"{Lang.CharLevel}:");
                 ImGui.SameLine();
                 ImGuiEx.SetNextItemWidthScaled(50f);
-                ImGui.DragInt("##minL", ref minLevel, 1, 1, 90);
+                ImGui.DragInt("##minL", ref minLevel, 1, 1, Player.MaxLevel);
                 ImGui.SameLine();
                 ImGuiEx.Text($"-");
                 ImGui.SameLine();
                 ImGuiEx.SetNextItemWidthScaled(50f);
-                ImGui.DragInt("##maxL", ref maxLevel, 1, 1, 90);
+                ImGui.DragInt("##maxL", ref maxLevel, 1, 1, Player.MaxLevel);
             });
             if (adata.Gathering == -1 || adata.Perception == -1 || adata.Ilvl == -1 || SelectedRetainer.Level == 0)
             {

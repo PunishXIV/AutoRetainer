@@ -10,7 +10,7 @@ public sealed class VenturePlanner : Window
     private OfflineCharacterData SelectedCharacter = null;
     private string search = "";
     private int minLevel = 1;
-    private int maxLevel = 90;
+    private int maxLevel = Player.MaxLevel;
     private Dictionary<uint, (string l, string r, bool avail)> Cache = [];
 
     public VenturePlanner() : base("Venture Planner")
@@ -220,12 +220,12 @@ public sealed class VenturePlanner : Window
                     ImGuiEx.TextV($"Level range:");
                     ImGui.SameLine();
                     ImGuiEx.SetNextItemWidthScaled(50f);
-                    ImGui.DragInt("##minL", ref minLevel, 1, 1, 90);
+                    ImGui.DragInt("##minL", ref minLevel, 1, 1, Player.MaxLevel);
                     ImGui.SameLine();
                     ImGuiEx.Text($"-");
                     ImGui.SameLine();
                     ImGuiEx.SetNextItemWidthScaled(50f);
-                    ImGui.DragInt("##maxL", ref maxLevel, 1, 1, 90);
+                    ImGui.DragInt("##maxL", ref maxLevel, 1, 1, Player.MaxLevel);
                     ImGuiEx.TextV($"Unavailable ventures:");
                     ImGui.SameLine();
                     ImGuiEx.SetNextItemFullWidth();
