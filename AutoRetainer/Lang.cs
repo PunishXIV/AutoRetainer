@@ -33,7 +33,7 @@ internal static class Lang
     internal const string IconPath = "\uf55b";
     internal const string IconFire = "\uf06d";
 
-    internal static string LogOutAndExitGame => Svc.Data.GetExcelSheet<Addon>().GetRow(116).Text.ExtractText();
+    internal static string LogOutAndExitGame => Svc.Data.GetExcelSheet<Addon>().GetRow(116).Text.ExtractText(true);
 
     internal static readonly ReadOnlyDictionary<UnlockMode, string> UnlockModeNames = new(new Dictionary<UnlockMode, string>()
     {

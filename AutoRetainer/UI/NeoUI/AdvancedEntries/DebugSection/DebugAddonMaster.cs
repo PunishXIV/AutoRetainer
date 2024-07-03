@@ -73,7 +73,10 @@ public unsafe class DebugAddonMaster : DebugUIEntry
         {
             if (TryGetAddonMaster<AddonMaster._CharaSelectListMenu>(out var m) && m.IsAddonReady)
             {
-                foreach(var x in m.Characters)
+                //PluginLog.Information($"Chars: {m.Characters.Print("\n")}");
+                ImGuiEx.Text($"{AgentLobby.Instance()->LobbyUpdateStage}");
+                ImGuiEx.Text($"{AgentLobby.Instance()->HoveredCharacterContentId}");
+                foreach (var x in m.Characters)
                 {
                     if (ImGui.Button(x.ToString() + "/select"))
                     {
