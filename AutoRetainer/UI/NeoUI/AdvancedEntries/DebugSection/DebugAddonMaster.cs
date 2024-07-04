@@ -92,6 +92,10 @@ public unsafe class DebugAddonMaster : DebugUIEntry
                     {
                         x.OpenContextMenu();
                     }
+                    if (x.IsSelected)
+                    {
+                        ImGuiEx.Text($"Selected");
+                    }
                 }
             }
         }

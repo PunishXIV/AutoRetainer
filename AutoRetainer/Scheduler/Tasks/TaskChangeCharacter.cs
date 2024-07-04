@@ -28,7 +28,7 @@ public static unsafe class TaskChangeCharacter
     public static void EnqueueLogout()
     {
         P.TaskManager.Enqueue(Logout);
-        P.TaskManager.Enqueue(SelectYesLogout);
+        P.TaskManager.Enqueue(SelectYesLogout, 100000);
     }
 
     public static void EnqueueLogin(string currentWorld, string charaName, string charaWorld, int account)
@@ -44,25 +44,28 @@ public static unsafe class TaskChangeCharacter
 
     public static bool? SelectYesLogout()
     {
+        if (!Svc.ClientState.IsLoggedIn) return true;
         var addon = Utils.GetSpecificYesno(Svc.Data.GetExcelSheet<Addon>()?.GetRow(115)?.Text.ToDalamudString().ExtractText());
         if (addon == null || !IsAddonReady(addon)) return false;
         if (Utils.GenericThrottle && EzThrottler.Throttle("ConfirmLogout"))
         {
             new AddonMaster.SelectYesno((nint)addon).Yes();
-            return true;
+            return false;
         }
         return false;
     }
 
     public static bool? Logout()
     {
+        var addon = Utils.GetSpecificYesno(Svc.Data.GetExcelSheet<Addon>()?.GetRow(115)?.Text.ToDalamudString().ExtractText());
+        if (addon != null) return true;
         var isLoggedIn = Svc.Condition.Any();
         if (!isLoggedIn) return true;
 
         if (Player.Interactable && !Player.IsAnimationLocked && Utils.GenericThrottle && EzThrottler.Throttle("InitiateLogout"))
         {
             Chat.Instance.ExecuteCommand("/logout");
-            return true;
+            return false;
         }
         return false;
     }
@@ -144,14 +147,21 @@ public static unsafe class TaskChangeCharacter
         if (TryGetAddonMaster<AddonMaster._CharaSelectListMenu>(out var m) && m.IsAddonReady && TryGetAddonMaster<AddonMaster._CharaSelectWorldServer>(out var mw))
         {
             if (m.TemporarilyLocked) return false;
+            if(mw.Worlds.Length == 0) return false;
             foreach (var c in m.Characters)
             {
                 if (c.Name == name && ExcelWorldHelper.GetName(c.HomeWorld) == world)
                 {
                     if (Utils.GenericThrottle && EzThrottler.Throttle("SelectChara"))
                     {
-                        c.Select();
-                        c.Login();
+                        if (!c.IsSelected)
+                        {
+                            c.Select();
+                        }
+                        else
+                        {
+                            c.Login();
+                        }
                     }
                     return false;
                 }
