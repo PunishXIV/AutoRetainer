@@ -43,6 +43,17 @@ internal static unsafe class MultiMode
     {
         ProperOnLogin.RegisterInteractable(delegate
         {
+            if(TaskChangeCharacter.Expected != null)
+            {
+                if (MultiMode.Enabled)
+                {
+                    if (TaskChangeCharacter.Expected.Value.Name != Player.Name || TaskChangeCharacter.Expected.Value.World != Player.HomeWorld)
+                    {
+                        DuoLog.Warning($"[ARERRCMM] Character mismatch, expected {TaskChangeCharacter.Expected}, but logged in on {Player.NameWithWorld}. Please report this to developer unless you have manually interfered with login process");
+                    }
+                }
+                TaskChangeCharacter.Expected = null;
+            }
             BailoutManager.IsLogOnTitleEnabled = false;
             WriteOfflineData(true, true);
             if (LastLogin == Svc.ClientState.LocalContentId && Active)
@@ -395,11 +406,11 @@ internal static unsafe class MultiMode
                     TaskPostprocessCharacterIPC.Enqueue();
                     if (data != null)
                     {
-                        P.TaskManager.Enqueue(() => TaskChangeCharacter.Enqueue(data.CurrentWorld, data.Name, data.World, data.ServiceAccount));
+                        TaskChangeCharacter.Enqueue(data.CurrentWorld, data.Name, data.World, data.ServiceAccount);
                     }
                     else
                     {
-                        P.TaskManager.Enqueue(() => TaskChangeCharacter.Logout());
+                        TaskChangeCharacter.EnqueueLogout();
                     }
                     return true;
                 }

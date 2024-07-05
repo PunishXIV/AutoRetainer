@@ -132,8 +132,11 @@ public static unsafe class TaskChangeCharacter
         return false;
     }
 
+    public static (string Name, string World)? Expected = null;
+
     public static bool? SelectCharacter(string name, string world)
     {
+        Expected = (name, world);
         if (TryGetAddonByName<AtkUnitBase>("SelectYesno", out _))
         {
             Utils.RethrottleGeneric();
@@ -154,14 +157,15 @@ public static unsafe class TaskChangeCharacter
                 {
                     if (Utils.GenericThrottle && EzThrottler.Throttle("SelectChara"))
                     {
-                        if (!c.IsSelected)
+                        /*if (!c.IsSelected)
                         {
                             c.Select();
                         }
                         else
                         {
                             c.Login();
-                        }
+                        }*/
+                        c.Login();
                     }
                     return false;
                 }

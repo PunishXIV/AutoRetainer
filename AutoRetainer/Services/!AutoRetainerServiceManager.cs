@@ -12,5 +12,6 @@ public static class AutoRetainerServiceManager
     public static GilDisplayManager GilDisplay { get; private set; }
     public static VentureStatsManager VentureStats { get; private set; }
     public static LifestreamIPC LifestreamIPC { get; private set; }
+    //public static CharaListDebugger CharaListDebugger { get; private set; }
 
 }

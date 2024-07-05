@@ -1,4 +1,6 @@
-﻿using Dalamud.Utility;
+﻿using AutoRetainer.Internal;
+using AutoRetainer.Scheduler.Tasks;
+using Dalamud.Utility;
 using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
@@ -12,6 +14,12 @@ internal unsafe class DebugMulti : DebugUIEntry
 {
     public override void Draw()
     {
+        ImGuiEx.Text($"Expected: {TaskChangeCharacter.Expected}");
+        if (ImGui.Button("Force mismatch")) TaskChangeCharacter.Expected = ("AAAAAAAA", "BBBBBBB");
+        if(ImGui.Button("Simulate nothing left"))
+        {
+            MultiMode.Relog(null, out var error, RelogReason.MultiMode);
+        }
         if (ImGui.Button($"Simulate autostart"))
         {
             MultiMode.PerformAutoStart();
