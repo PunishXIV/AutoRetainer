@@ -329,21 +329,22 @@ internal static unsafe class VoyageUtils
                 var temp = new List<OfflineVesselData>();
                 for (var i = 0; i < Math.Min(4,vessels.DataPointers.Length); i++)
                 {
-                    var vessel = *vessels.DataPointers[i].Value;
-                    var name = vessel.Name.Read();
+                    var vessel = vessels.DataPointers[i].Value;
+                    if (vessel == null) continue;
+                    var name = vessel->Name.Read();
                     if (name != "")
                     {
-                        temp.Add(new(name, vessel.ReturnTime));
+                        temp.Add(new(name, vessel->ReturnTime));
                         var adata = Data.GetAdditionalVesselData(name, VoyageType.Submersible);
-                        adata.Level = vessel.RankId;
-                        adata.NextLevelExp = vessel.NextLevelExp;
-                        adata.CurrentExp = vessel.CurrentExp;
+                        adata.Level = vessel->RankId;
+                        adata.NextLevelExp = vessel->NextLevelExp;
+                        adata.CurrentExp = vessel->CurrentExp;
                         //PluginLog.Debug("Write offline sub data");
                         adata.Part1 = (int)GetVesselComponent(i, VoyageType.Submersible, 0)->ItemId;
                         adata.Part2 = (int)GetVesselComponent(i, VoyageType.Submersible, 1)->ItemId;
                         adata.Part3 = (int)GetVesselComponent(i, VoyageType.Submersible, 2)->ItemId;
                         adata.Part4 = (int)GetVesselComponent(i, VoyageType.Submersible, 3)->ItemId;
-                        adata.Points = vessel.CurrentExplorationPoints.ToArray();
+                        adata.Points = vessel->CurrentExplorationPoints.ToArray();
                     }
                 }
                 if (temp.Count > 0)

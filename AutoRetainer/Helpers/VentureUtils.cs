@@ -440,7 +440,7 @@ internal static unsafe class VentureUtils
     internal static List<string> GetAvailableVentureNames()
     {
         List<string> ret = [];
-        var data = CSFramework.Instance()->UIModule->GetRaptureAtkModule()->AtkModule.GetStringArrayData(96);
+        var data = CSFramework.Instance()->UIModule->GetRaptureAtkModule()->AtkModule.GetStringArrayData(97);
         if (data != null)
         {
             for (var i = 0; i < data->AtkArrayData.Size; i++)

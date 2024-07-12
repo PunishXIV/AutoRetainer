@@ -1,4 +1,9 @@
-﻿using NightmareUI.PrimaryUI;
+﻿using AutoRetainer.Internal;
+using AutoRetainer.Modules.Voyage;
+using AutoRetainerAPI.Configuration;
+using ECommons.MathHelpers;
+using NightmareUI.PrimaryUI;
+using VesselDescriptor = (ulong CID, string VesselName);
 
 namespace AutoRetainer.UI.NeoUI;
 public class DeployablesTab : NeoUIEntry
@@ -10,15 +15,19 @@ public class DeployablesTab : NeoUIEntry
     private static string Conf = "";
     private static bool InvertConf = false;
 
-    public override NuiBuilder Builder { get; init; } = new NuiBuilder()
+    public override NuiBuilder Builder { get; init; }
+
+    public DeployablesTab()
+    {
+        Builder = new NuiBuilder()
         .Section("General")
         .Checkbox($"Resend vessels when accessing the Voyage Control Panel", () => ref C.SubsAutoResend2)
-                .Checkbox($"Finalize all vessels before resending them", () => ref C.FinalizeBeforeResend)
-                .Checkbox($"Hide Airships from Deployables UI", () => ref C.HideAirships)
+        .Checkbox($"Finalize all vessels before resending them", () => ref C.FinalizeBeforeResend)
+        .Checkbox($"Hide Airships from Deployables UI", () => ref C.HideAirships)
 
         .Section("Alert Settings")
         .Checkbox($"Less than possible vessels enabled", () => ref C.AlertNotAllEnabled)
-                .Checkbox($"Enabled vessel isn't deployed", () => ref C.AlertNotDeployed)
+        .Checkbox($"Enabled vessel isn't deployed", () => ref C.AlertNotDeployed)
         .Widget("Unoptimal submersible configuration alerts:", (z) =>
         {
             foreach (var x in C.UnoptimalVesselConfigurations)
@@ -57,7 +66,176 @@ public class DeployablesTab : NeoUIEntry
                     ConfigurationsInvert = InvertConf
                 });
             }
-        });
+        })
+        .Section("Mass configuration change")
+        .Widget(MassConfigurationChangeWidget);
+    }
 
+    HashSet<VesselDescriptor> SelectedVessels = [];
+    int MassMinLevel = 0;
+    int MassMaxLevel = 120;
+    VesselBehavior MassBehavior = VesselBehavior.Finalize;
+    UnlockMode MassUnlockMode = UnlockMode.WhileLevelling;
+    SubmarineUnlockPlan SelectedUnlockPlan;
+    SubmarinePointPlan SelectedPointPlan;
 
+    private void MassConfigurationChangeWidget()
+    {
+        ImGuiEx.Text($"Select submersibles:");
+        ImGuiEx.SetNextItemFullWidth();
+        if(ImGui.BeginCombo($"##sel", $"Selected {SelectedVessels.Count}"))
+        {
+            foreach(var x in C.OfflineData)
+            {
+                if (x.OfflineSubmarineData.Count > 0)
+                {
+                    ImGuiEx.Text(Censor.Character(x.Name, x.World));
+                    ImGui.Indent();
+                    ImGui.PushID(x.CID.ToString());
+                    foreach(var v in x.OfflineSubmarineData)
+                    {
+                        ImGuiEx.CollectionCheckbox($"{v.Name}", (x.CID, v.Name), SelectedVessels);
+                    }
+                    ImGui.PopID();
+                    ImGui.Unindent();
+                }
+            }
+            ImGui.EndCombo();
+        }
+        if(ImGuiEx.IconButtonWithText((FontAwesomeIcon)'\uf057', "Deselect All"))
+        {
+            SelectedVessels.Clear();
+        }
+        ImGui.SameLine();
+        if (ImGuiEx.IconButtonWithText((FontAwesomeIcon)'\uf055', "Select All"))
+        {
+            SelectedVessels.Clear();
+            foreach (var x in C.OfflineData) foreach (var v in x.OfflineSubmarineData) SelectedVessels.Add((x.CID, v.Name));
+        }
+        ImGui.Separator();
+        ImGuiEx.TextV("By level:");
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(100f);
+        ImGui.DragInt("##minlevel", ref MassMinLevel, 0.1f);
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(100f);
+        ImGui.DragInt("##maxlevel", ref MassMaxLevel, 0.1f);
+        if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Plus, "Add vessels by level to selection"))
+        {
+            foreach (var x in C.OfflineData)
+            {
+                foreach (var v in x.OfflineSubmarineData)
+                {
+                    var adata = x.GetAdditionalVesselData(v.Name, VoyageType.Submersible);
+                    if(adata.Level.InRange(MassMinLevel, MassMaxLevel))
+                    {
+                        SelectedVessels.Add((x.CID, v.Name));
+                    }
+                }
+            }
+        }
+        ImGui.Separator();
+        ImGuiEx.Text("Actions:");
+
+        ImGui.Separator();
+        ImGui.SetNextItemWidth(150f);
+        ImGuiEx.EnumCombo("##behavior", ref this.MassBehavior);
+        if (ImGuiEx.IconButtonWithText((FontAwesomeIcon)'\uf018', "Set behavior"))
+        {
+            int num = 0;
+            foreach (var x in SelectedVessels)
+            {
+                var odata = C.OfflineData.FirstOrDefault(z => z.CID == x.CID);
+                if (odata != null)
+                {
+                    var vdata = odata.GetOfflineVesselData(x.VesselName, VoyageType.Submersible);
+                    var adata = odata.GetAdditionalVesselData(x.VesselName, VoyageType.Submersible);
+                    adata.VesselBehavior = MassBehavior;
+                    num++;
+                }
+            }
+            Notify.Success($"Affected {num} submarines");
+        }
+
+        ImGui.Separator();
+        ImGui.SetNextItemWidth(150f);
+        ImGuiEx.EnumCombo("##unlockmode", ref this.MassUnlockMode, Lang.UnlockModeNames);
+        if (ImGuiEx.IconButtonWithText((FontAwesomeIcon)'\uf09c', "Set unlock mode"))
+        {
+            int num = 0;
+            foreach (var x in SelectedVessels)
+            {
+                var odata = C.OfflineData.FirstOrDefault(z => z.CID == x.CID);
+                if (odata != null)
+                {
+                    var vdata = odata.GetOfflineVesselData(x.VesselName, VoyageType.Submersible);
+                    var adata = odata.GetAdditionalVesselData(x.VesselName, VoyageType.Submersible);
+                    adata.UnlockMode = MassUnlockMode;
+                    num++;
+                }
+            }
+            Notify.Success($"Affected {num} submarines");
+        }
+
+        ImGui.Separator();
+
+        ImGui.SetNextItemWidth(150f);
+        if (ImGui.BeginCombo("##uplan", "Unlock plan: " + (SelectedUnlockPlan?.Name ?? "not selected")))
+        {
+            foreach (var plan in C.SubmarineUnlockPlans)
+            {
+                if (ImGui.Selectable($"{plan.Name}##{plan.GUID}"))
+                {
+                    SelectedUnlockPlan = plan;
+                }
+            }
+            ImGui.EndCombo();
+        }
+        if (ImGuiEx.IconButtonWithText((FontAwesomeIcon)'\uf3c1', "Set unlock plan", SelectedUnlockPlan != null))
+        {
+            int num = 0;
+            foreach (var x in SelectedVessels)
+            {
+                var odata = C.OfflineData.FirstOrDefault(z => z.CID == x.CID);
+                if (odata != null)
+                {
+                    var vdata = odata.GetOfflineVesselData(x.VesselName, VoyageType.Submersible);
+                    var adata = odata.GetAdditionalVesselData(x.VesselName, VoyageType.Submersible);
+                    adata.SelectedUnlockPlan = SelectedUnlockPlan.GUID.ToString();
+                    num++;
+                }
+            }
+            Notify.Success($"Affected {num} submarines");
+        }
+        ImGui.Separator();
+
+        ImGui.SetNextItemWidth(150f);
+        if (ImGui.BeginCombo("##uplan", "Point plan: " + (SelectedPointPlan?.Name ?? "not selected")))
+        {
+            foreach (var plan in C.SubmarinePointPlans)
+            {
+                if (ImGui.Selectable($"{plan.Name}##{plan.GUID}"))
+                {
+                    SelectedPointPlan = plan;
+                }
+            }
+            ImGui.EndCombo();
+        }
+        if (ImGuiEx.IconButtonWithText((FontAwesomeIcon)'\uf55b', "Set point plan", SelectedPointPlan != null))
+        {
+            int num = 0;
+            foreach (var x in SelectedVessels)
+            {
+                var odata = C.OfflineData.FirstOrDefault(z => z.CID == x.CID);
+                if (odata != null)
+                {
+                    var vdata = odata.GetOfflineVesselData(x.VesselName, VoyageType.Submersible);
+                    var adata = odata.GetAdditionalVesselData(x.VesselName, VoyageType.Submersible);
+                    adata.SelectedPointPlan = SelectedPointPlan.GUID.ToString();
+                    num++;
+                }
+            }
+            Notify.Success($"Affected {num} submarines");
+        }
+    }
 }
