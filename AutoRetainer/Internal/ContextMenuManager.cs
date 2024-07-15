@@ -7,6 +7,7 @@ using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Memory;
 using ECommons.ChatMethods;
 using ECommons.ExcelServices;
+using ECommons.EzContextMenu;
 using ECommons.Interop;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -20,38 +21,11 @@ namespace AutoRetainer.Internal;
 internal unsafe class ContextMenuManager
 {
     private SeString Prefix = new SeStringBuilder().AddUiForeground(" ", 539).Build();
-    private SeIconChar DalamudPrefix = (SeIconChar)ushort.MaxValue;
 
     public ContextMenuManager()
     {
+        ContextMenuPrefixRemover.Initialize();
         Svc.ContextMenu.OnMenuOpened += ContextMenu_OnMenuOpened;
-        Svc.AddonLifecycle.RegisterListener(AddonEvent.PreRequestedUpdate, "ContextMenu", OnContextMenuUpdate);
-    }
-
-    private void OnContextMenuUpdate(AddonEvent type, AddonArgs args)
-    {
-        var addon = (AddonContextMenu*)args.Addon;
-        var numEntries = addon->AtkValues[0].UInt;
-        for (int i = 0; i < numEntries; i++)
-        {
-            var entry = addon->AtkValues[7 + i];
-            if(entry.Type.EqualsAny(ValueType.String, ValueType.ManagedString, ValueType.String8))
-            {
-                var seString = MemoryHelper.ReadSeStringNullTerminated((nint)entry.String);
-                for (int x = 0; x < seString.Payloads.Count; x++)
-                {
-                    {
-                        if (seString.Payloads[x] is TextPayload payload && payload.Text.Length >= 1 && payload.Text[0] == (char)DalamudPrefix)
-                        {
-                            seString.Payloads.RemoveAt(x);
-                            seString.Payloads.Add(new TextPayload("\0"));
-                            break;
-                        }
-                    }
-                }
-                MemoryHelper.WriteSeString((nint)entry.String, seString);
-            }
-        }
     }
 
     private void ContextMenu_OnMenuOpened(IMenuOpenedArgs args)
@@ -64,9 +38,8 @@ internal unsafe class ContextMenuManager
             {
                 if (C.IMProtectList.Contains(id))
                 {
-                    args.AddMenuItem(new()
+                    args.AddMenuItem(new MenuItem()
                     {
-                        Prefix = DalamudPrefix,
                         Name = new SeStringBuilder().Append(Prefix).AddText("= Item has been protected =").Build(),
                         OnClicked = (a) =>
                         {
@@ -82,29 +55,27 @@ internal unsafe class ContextMenuManager
                                 Notify.Error($"Hold both CTRL+SHIFT while clicking to remove protection from item");
                             }
                         }
-                    });
+                    }.RemovePrefix());
                 }
                 else
                 {
                     var data = Svc.Data.GetExcelSheet<Item>().GetRow(id);
                     if (C.IMAutoVendorSoft.Contains(id))
                     {
-                        args.AddMenuItem(new()
+                        args.AddMenuItem(new MenuItem()
                         {
-                            Prefix = DalamudPrefix,
                             Name = new SeStringBuilder().Append(Prefix).AddUiForeground("- Remove from soft vendor list", (ushort)UIColor.Orange).Build(),
                             OnClicked = (a) =>
                             {
                                 C.IMAutoVendorSoft.Remove(id);
                                 Notify.Info($"Item {ExcelItemHelper.GetName(id)} removed from soft vendor list");
                             }
-                        });
+                        }.RemovePrefix());
                     }
                     else if (data.PriceLow > 0)
                     {
-                        args.AddMenuItem(new()
+                        args.AddMenuItem(new MenuItem()
                         {
-                            Prefix = DalamudPrefix,
                             Name = new SeStringBuilder().Append(Prefix).AddUiForeground("+ Add to soft vendor list", (ushort)UIColor.Yellow).Build(),
                             OnClicked = (a) =>
                             {
@@ -112,27 +83,25 @@ internal unsafe class ContextMenuManager
                                 C.IMAutoVendorSoft.Add(id);
                                 Notify.Success($"Item {ExcelItemHelper.GetName(id)} added to soft vendor list");
                             }
-                        });
+                        }.RemovePrefix());
                     }
 
                     if (C.IMAutoVendorHard.Contains(id))
                     {
-                        args.AddMenuItem(new()
+                        args.AddMenuItem(new MenuItem()
                         {
-                            Prefix = DalamudPrefix,
                             Name = new SeStringBuilder().Append(Prefix).AddUiForeground("- Remove from hard vendor list", (ushort)UIColor.Orange).Build(),
                             OnClicked = (a) =>
                             {
                                 C.IMAutoVendorHard.Remove(id);
                                 Notify.Success($"Item {ExcelItemHelper.GetName(id)} removed from hard vendor list");
                             }
-                        });
+                        }.RemovePrefix());
                     }
                     else if (data.PriceLow > 0)
                     {
-                        args.AddMenuItem(new()
+                        args.AddMenuItem(new MenuItem()
                         {
-                            Prefix = DalamudPrefix,
                             Name = new SeStringBuilder().Append(Prefix).AddUiForeground("+ Add to hard vendor list", (ushort)UIColor.Yellow).Build(),
                             OnClicked = (a) =>
                             {
@@ -140,11 +109,10 @@ internal unsafe class ContextMenuManager
                                 C.IMAutoVendorHard.Add(id);
                                 Notify.Success($"Item {ExcelItemHelper.GetName(id)} added to hard vendor list");
                             }
-                        });
+                        }.RemovePrefix());
                     }
-                    args.AddMenuItem(new()
+                    args.AddMenuItem(new MenuItem()
                     {
-                        Prefix = DalamudPrefix,
                         Name = new SeStringBuilder().Append(Prefix).AddText("Protect item from auto actions").Build(),
                         OnClicked = (a) =>
                         {
@@ -153,7 +121,7 @@ internal unsafe class ContextMenuManager
                             C.IMProtectList.Add(id);
                             Notify.Success($"{ExcelItemHelper.GetName(id)} added to protection list");
                         }
-                    });
+                    }.RemovePrefix());
                 }
             }
         }
@@ -162,6 +130,5 @@ internal unsafe class ContextMenuManager
     public void Dispose()
     {
         Svc.ContextMenu.OnMenuOpened -= ContextMenu_OnMenuOpened;
-        Svc.AddonLifecycle.UnregisterListener(AddonEvent.PreRequestedUpdate, "ContextMenu", OnContextMenuUpdate);
     }
 }
