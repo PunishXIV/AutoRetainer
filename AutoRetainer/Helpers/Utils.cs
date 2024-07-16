@@ -453,7 +453,7 @@ internal static unsafe class Utils
 
     internal static bool TrySelectSpecificEntry(IEnumerable<string> text, Func<bool> Throttler = null)
     {
-        return TrySelectSpecificEntry((x) => x.EqualsAny(text), Throttler);
+        return TrySelectSpecificEntry((x) => x.StartsWithAny(text), Throttler);
         /*if (TryGetAddonByName<AddonSelectString>("SelectString", out var addon) && IsAddonReady(&addon->AtkUnitBase))
         {
             var entry = GetEntries(addon).FirstOrDefault(x => x.EqualsAny(text));

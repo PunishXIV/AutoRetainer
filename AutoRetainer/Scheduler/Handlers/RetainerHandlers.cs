@@ -184,14 +184,14 @@ internal static unsafe class RetainerHandlers
     internal static bool? SelectEntrustItems()
     {
         //2378	Entrust or withdraw items.
-        var text = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(2378).Text.ToDalamudString().ExtractText();
+        var text = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(2378).Text.ToDalamudString().ExtractText(true);
         return Utils.TrySelectSpecificEntry(text);
     }
 
     internal static bool? SelectEntrustGil()
     {
         //2379	Entrust or withdraw gil.
-        var text = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(2379).Text.ToDalamudString().ExtractText();
+        var text = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(2379).Text.ToDalamudString().ExtractText(true);
         return Utils.TrySelectSpecificEntry(text);
     }
 
