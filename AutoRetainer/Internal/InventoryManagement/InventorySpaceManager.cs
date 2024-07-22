@@ -1,4 +1,5 @@
-﻿using ECommons.ExcelServices;
+﻿using AutoRetainer.Scheduler.Tasks;
+using ECommons.ExcelServices;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
@@ -117,7 +118,7 @@ public static unsafe class InventorySpaceManager
                 var item = inv->Items[i];
                 if (item.ItemId != 0 && item.Quantity < C.IMAutoVendorHardStackLimit)
                 {
-                    if (C.IMAutoVendorHard.Contains(item.ItemId) || (C.TreatSoftAsHard && C.IMAutoVendorSoft.Contains(item.ItemId)))
+                    if ((C.IMAutoVendorHard.Contains(item.ItemId) || (C.TreatSoftAsHard && C.IMAutoVendorSoft.Contains(item.ItemId))) && !TaskDesynthItems.DesynthEligible(item.ItemId))
                     {
                         var task = new SellSlotTask(invType, (uint)i, item.ItemId, item.Quantity);
                         PluginLog.Information($"Enqueueing {task} for hard sale");

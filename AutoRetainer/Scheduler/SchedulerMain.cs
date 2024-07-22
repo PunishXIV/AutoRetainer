@@ -211,6 +211,7 @@ internal static unsafe class SchedulerMain
                                         P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
                                         P.TaskManager.Enqueue(DisablePlugin);
                                         if (C.IMEnableCofferAutoOpen) TaskOpenAllCoffers.Enqueue();
+                                        if (C.IMEnableItemDesynthesis) TaskDesynthItems.Enqueue();
                                     }
                                     else if (Reason == PluginEnableReason.Artisan)
                                     {

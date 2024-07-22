@@ -198,5 +198,10 @@ internal unsafe class DebugScheduler : DebugUIEntry
                 }
             }
         }
+
+        ImGui.Separator();
+
+        if (ImGui.Button("TaskDesynthItems"))
+            TaskDesynthItems.Enqueue();
     }
 }
