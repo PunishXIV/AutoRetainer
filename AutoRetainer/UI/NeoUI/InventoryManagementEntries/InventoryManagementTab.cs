@@ -13,6 +13,7 @@ public unsafe class InventoryManagementTab : NeoUIEntry
     {
         ImGui.Checkbox($"Auto-open coffers", ref C.IMEnableCofferAutoOpen);
         ImGui.Checkbox($"Auto-vendor items", ref C.IMEnableAutoVendor);
+        ImGui.Checkbox($"Auto-desynth items", ref C.IMEnableItemDesynthesis);
         ImGui.Checkbox($"Enable context menu integration", ref C.IMEnableContextMenu);
         ImGui.InputInt($"Hard list max stack size", ref C.IMAutoVendorHardStackLimit);
         ImGui.Checkbox($"Dry mode", ref C.IMDry);
