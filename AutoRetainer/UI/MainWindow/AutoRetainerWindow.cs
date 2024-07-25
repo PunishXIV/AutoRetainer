@@ -3,6 +3,7 @@ using AutoRetainerAPI;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Interface.Components;
 using ECommons.Configuration;
+using ECommons.Funding;
 using NightmareUI;
 using NightmareUI.PrimaryUI;
 using PunishLib.ImGuiMethods;
@@ -15,6 +16,7 @@ internal unsafe class AutoRetainerWindow : Window
 
     public AutoRetainerWindow() : base($"")
     {
+        PatreonBanner.IsOfficialPlugin = () => true;
         LockButton = new()
         {
             Click = OnLockButtonClick,
@@ -90,7 +92,7 @@ internal unsafe class AutoRetainerWindow : Window
         if (!C.AcceptedDisclamer)
         {
             new NuiBuilder()
-                .Section("Disclamer")
+                .Section("Disclaimer")
                 .TextWrapped(ImGuiColors.DalamudRed, "To avoid unnecessary consequences please follow these rules when using AutoRetainer:")
                 .TextWrapped("1. Do not acknowledge your use of AutoRetainer in game chat;")
                 .TextWrapped("2. Do not leave AutoRetainer unattended for prolonged period of time;")
@@ -194,13 +196,13 @@ internal unsafe class AutoRetainerWindow : Window
             }
         }
 
-        ImGuiEx.EzTabBar("tabbar",
+        PatreonBanner.DrawRight();
+        ImGuiEx.EzTabBar("tabbar", PatreonBanner.Text, 
                         ("Retainers", MultiModeUI.Draw, null, true),
                         ("Deployables", WorkshopUI.Draw, null, true),
                         ("Statistics", DrawStats, null, true),
-                        ("About", delegate { AboutTab.Draw(P.Name); }, null, true)
+                        ("About", CustomAboutTab.Draw, null, true)
                         );
-
         if (!C.PinWindow)
         {
             C.WindowPos = ImGui.GetWindowPos();

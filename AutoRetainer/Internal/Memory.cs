@@ -5,6 +5,7 @@ using Dalamud.Utility.Signatures;
 using ECommons.EzHookManager;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
+using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
@@ -23,7 +24,7 @@ internal unsafe class Memory : IDisposable
     private GetIsGatheringItemGatheredDelegate GetIsGatheringItemGathered;
 
     internal delegate nint OnReceiveMarketPricePacketDelegate(nint a1, nint data);
-    [Signature("48 89 5C 24 ?? 57 48 83 EC 40 48 8B 0D ?? ?? ?? ?? 48 8B DA E8 ?? ?? ?? ?? 48 8B F8", DetourName = nameof(AddonItemSearchResult_OnRequestedUpdateDelegateDetour), Fallibility = Fallibility.Fallible)]
+    [Signature("48 89 5C 24 ?? 57 48 83 EC 20 48 8B 0D ?? ?? ?? ?? 48 8B FA E8 ?? ?? ?? ?? 48 8B D8 48 85 C0 74 4A", DetourName = nameof(AddonItemSearchResult_OnRequestedUpdateDelegateDetour), Fallibility = Fallibility.Fallible)]
     internal Hook<OnReceiveMarketPricePacketDelegate> OnReceiveMarketPricePacketHook;
 
     internal delegate byte OutdoorTerritory_IsEstateResidentDelegate(nint a1, byte a2);
@@ -38,6 +39,7 @@ internal unsafe class Memory : IDisposable
     internal Memory()
     {
         Svc.Hook.InitializeFromAttributes(this);
+        EzSignatureHelper.Initialize(this);
         if (C.MarketCooldownOverlay) OnReceiveMarketPricePacketHook?.Enable();
         ReceiveRetainerVentureListUpdateHook?.Enable();
         RetainerItemCommandHook = new("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 48 83 EC 30 48 8B 6C 24", RetainerItemCommandDetour, false);
@@ -103,6 +105,35 @@ internal unsafe class Memory : IDisposable
                 }
             };
             AddonAirShipExploration_SelectDestinationDetour((nint)addon, (nint)dummyEvent, inputData);
+        }
+    }
+
+    delegate void SellItemDelegate(uint a1, InventoryType a2);
+    [EzHook("48 89 5C 24 ?? 48 89 6C 24 ?? 56 48 83 EC 20 8B E9")]
+    EzHook<SellItemDelegate> SellItemHook;
+
+    void SellItemDetour(uint inventorySlot, InventoryType a2)
+    {
+        PluginLog.Debug($"SellItemDetour: {inventorySlot}, {a2}");
+        SellItemHook.Original(inventorySlot, a2);
+    }
+
+    public void SellItemToShop(InventoryType type, int slot)
+    {
+        if (TryGetAddonByName<AtkUnitBase>("Shop", out var addon) && IsAddonReady(addon))
+        {
+            if (InventoryManager.Instance()->GetInventoryContainer(type)->GetInventorySlot(slot)->ItemId != 0)
+            {
+                SellItemDetour((uint)slot, type);
+            }
+            else
+            {
+                PluginLog.Warning($"Requested inventory slot {type}({slot}) had no item in it to sell.");
+            }
+        }
+        else
+        {
+            throw new InvalidOperationException("Could not find Shop.");
         }
     }
 }

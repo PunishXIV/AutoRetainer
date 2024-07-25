@@ -10,7 +10,7 @@ internal static class TaskInteractWithNearestPanel
         VoyageUtils.Log($"Task enqueued: {nameof(TaskInteractWithNearestPanel)} interact={interact}");
         if (!VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType))
         {
-            TaskEnterWorkshop.EnqueueEnterWorkshop();
+            TaskContinueHET.EnqueueEnterWorkshop();
         }
         P.TaskManager.Enqueue(() =>
         {

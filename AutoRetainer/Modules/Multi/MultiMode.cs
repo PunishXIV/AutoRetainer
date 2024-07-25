@@ -101,7 +101,7 @@ internal static unsafe class MultiMode
         }
         if (Utils.GetNearestWorkshopEntrance(out _) != null && Utils.GetReachableRetainerBell(false) == null)
         {
-            TaskEnterWorkshop.Enqueue();
+            TaskContinueHET.Enqueue();
         }
     }
 
@@ -143,9 +143,9 @@ internal static unsafe class MultiMode
             {
                 LastLogin = 0;
             }
-            if (IsOccupied() || !ProperOnLogin.PlayerPresent)
+            if (IsOccupied() || !IsScreenReady() || !ProperOnLogin.PlayerPresent)
             {
-                BlockInteraction(3);
+                BlockInteraction(1);
             }
             if (P.TaskManager.IsBusy)
             {

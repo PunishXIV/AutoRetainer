@@ -48,8 +48,6 @@ internal unsafe class DebugMisc : DebugSectionBase
         ImGuiEx.Text($"FC points: {Utils.FCPoints}");
         if (ImGui.CollapsingHeader("Housing"))
         {
-            ImGuiEx.Text($"FC aetheryte: {ExcelTerritoryHelper.GetName(Utils.GetFCHouseTerritory())} / {Utils.IsSureNotInFcTerritory()}");
-            ImGuiEx.Text($"Private aetheryte: {ExcelTerritoryHelper.GetName(Utils.GetPrivateHouseTerritory())} / {Utils.IsSureNotInPrivateTerritory()}");
             var h = HousingManager.Instance();
             ImGuiEx.Text($"GetCurrentDivision {h->GetCurrentDivision()}");
             ImGuiEx.Text($"GetCurrentHouseId {h->GetCurrentHouseId()}");

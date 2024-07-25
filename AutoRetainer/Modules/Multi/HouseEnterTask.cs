@@ -1,4 +1,5 @@
-﻿using AutoRetainer.Modules.Voyage;
+﻿using AutoRetainer.Internal.InventoryManagement;
+using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game.ClientState.Conditions;
@@ -16,8 +17,6 @@ namespace AutoRetainer.Modules.Multi;
 
 internal static unsafe class HouseEnterTask
 {
-    internal static readonly uint[] FCAetherytes = [56, 57, 58, 96, 164];
-    internal static readonly uint[] PrivateAetherytes = [59, 60, 61, 97, 165];
     internal static void EnqueueTask()
     {
         PluginLog.Debug($"Enqueued HouseEnterTask from {new StackTrace().GetFrames().Select(x => x.GetMethod()?.Name).Prepend("      ").Print("\n")}");
@@ -42,14 +41,17 @@ internal static unsafe class HouseEnterTask
                 P.TaskManager.EnqueueImmediate(SelectYesno);
                 P.TaskManager.EnqueueImmediate(WaitUntilLeavingZone);
                 P.TaskManager.DelayNextImmediate(60, true);
+                P.TaskManager.Enqueue(Utils.WaitForScreen);
             }
             return true;
         }, "Master HET");
-        TaskEnterWorkshop.Enqueue();
+        P.TaskManager.Enqueue(NpcSaleManager.EnqueueIfItemsPresent);
+        TaskContinueHET.Enqueue();
     }
 
     internal static bool? WaitUntilNotBusy()
     {
+        if (!IsScreenReady()) return false;
         if (!ProperOnLogin.PlayerPresent || !ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType)) return null;
         if (MultiMode.IsInteractionAllowed())
         {

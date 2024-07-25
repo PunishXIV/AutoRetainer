@@ -18,6 +18,7 @@ using ECommons.Reflection;
 using ECommons.Throttlers;
 using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -36,60 +37,26 @@ internal static unsafe class Utils
 
     private static bool IsNullOrEmpty(this string s) => GenericHelpers.IsNullOrEmpty(s);
 
+    public static bool IsItemSellableByHardList(uint item, uint quantity)
+    {
+        if (C.IMProtectList.Contains(item)) return false;
+        if (C.IMAutoVendorHard.Contains(item))
+        {
+            if(C.IMAutoVendorHardIgnoreStack.Contains(item)) return true;
+            return quantity < C.IMAutoVendorHardStackLimit;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public static bool? WaitForScreen() => IsScreenReady();
+
     public static bool IsPublic(this World w)
     {
         if (w.IsPublic) return true;
         return w.RowId.EqualsAny<uint>(408, 409, 410, 411);
-    }
-
-    internal static bool IsSureNotInFcTerritory()
-    {
-        var h = HousingManager.Instance();
-        if (h->OutdoorTerritory != null)
-        {
-            var success = false;
-            for (var i = 0; i < 30; i++)
-            {
-                if (P.Memory.OutdoorTerritory_IsEstateResident((nint)h->OutdoorTerritory, (byte)i) == 1) success = true;
-            }
-            if (!success) return false;
-        }
-        if (GetFCHouseTerritory() == GetPrivateHouseTerritory()) return false;
-        return Player.Territory != GetFCHouseTerritory();
-    }
-
-    internal static bool IsSureNotInPrivateTerritory()
-    {
-        var h = HousingManager.Instance();
-        if (h->OutdoorTerritory != null)
-        {
-            var success = false;
-            for (var i = 0; i < 30; i++)
-            {
-                if (P.Memory.OutdoorTerritory_IsEstateResident((nint)h->OutdoorTerritory, (byte)i) == 1) success = true;
-            }
-            if (!success) return false;
-        }
-        if (GetFCHouseTerritory() == GetPrivateHouseTerritory()) return false;
-        return Player.Territory != GetPrivateHouseTerritory();
-    }
-
-    internal static uint GetFCHouseTerritory()
-    {
-        foreach (var x in Svc.AetheryteList)
-        {
-            if (HouseEnterTask.FCAetherytes.Contains(x.AetheryteId) && !x.IsApartment && !x.IsSharedHouse) return x.TerritoryId;
-        }
-        return 0;
-    }
-
-    internal static uint GetPrivateHouseTerritory()
-    {
-        foreach (var x in Svc.AetheryteList)
-        {
-            if (HouseEnterTask.PrivateAetherytes.Contains(x.AetheryteId) && !x.IsApartment && !x.IsSharedHouse) return x.TerritoryId;
-        }
-        return 0;
     }
 
     internal static int LoadedItems => AtkStage.Instance()->GetNumberArrayData()[36]->IntArray[401];

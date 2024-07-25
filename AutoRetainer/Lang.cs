@@ -250,11 +250,15 @@ internal static class Lang
         ];
 
     //Your retainer will be unable to process item buyback requests once recalled. Are you sure you wish to proceed?
+    //215	TEXT_CMNDEFRETAINERCALL_00010_ASK_RETURN_WITH_BUYBACK	Wenn du deinen Gehilfen wegschickst, kannst du die von ihm verkauften Gegenstände nicht mehr zurückkaufen. Möchtest du trotzdem fortfahren?
+    //215	TEXT_CMNDEFRETAINERCALL_00010_ASK_RETURN_WITH_BUYBACK	Renvoyer le servant effacera la liste de rachat. Confirmer<Indent/>?
+
     internal static readonly string[] WillBeUnableToProcessBuyback = [
         "Your retainer will be unable to process item buyback requests once recalled. Are you sure you wish to proceed?",
-        "リテイナーを帰すと売却依頼アイテムの買い戻しができなくなりますが、よろしいですか？"
+        "リテイナーを帰すと売却依頼アイテムの買い戻しができなくなりますが、よろしいですか？",
+        "Renvoyer le servant effacera la liste de rachat. Confirmer",
+        "Wenn du deinen Gehilfen wegschickst, kannst du die von ihm verkauften Gegenstände nicht mehr zurückkaufen. Möchtest du trotzdem fortfahren"
         ];
 
     internal static readonly string[] LogInPartialText = ["Logging in with", "Log in with", "でログインします。", "einloggen?", "eingeloggt.", "Se connecter avec", "Vous allez vous connecter avec", "Souhaitez-vous vous connecter avec", "登入吗", "登入嗎"];
-
 }

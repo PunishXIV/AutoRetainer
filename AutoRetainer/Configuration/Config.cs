@@ -194,8 +194,8 @@ internal unsafe class Config : IEzConfig
     public List<uint> IMProtectList = [];
     public int IMAutoVendorHardStackLimit = 20;
     public bool IMDry = false;
-    public bool TreatSoftAsHard = false;
     public bool IMEnableItemDesynthesis = false;
+    public bool IMEnableNpcSell = false;
 
     public Vector2 WindowSize;
     public Vector2 WindowPos;

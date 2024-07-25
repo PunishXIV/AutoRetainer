@@ -4,11 +4,12 @@ using FFXIVClientStructs.FFXIV.Client.Game.Control;
 
 namespace AutoRetainer.Modules.Voyage.Tasks;
 
-internal static unsafe class TaskEnterWorkshop
+internal static unsafe class TaskContinueHET
 {
     internal static void Enqueue()
     {
-        VoyageUtils.Log($"Task enqueued: {nameof(TaskEnterWorkshop)}");
+        VoyageUtils.Log($"Task enqueued: {nameof(TaskContinueHET)}");
+        P.TaskManager.Enqueue(Utils.WaitForScreen);
         P.TaskManager.Enqueue(() => !IsOccupied(), 180 * 1000, "WaitUntilNotOccupied1");
         P.TaskManager.Enqueue(() =>
         {
@@ -24,7 +25,7 @@ internal static unsafe class TaskEnterWorkshop
 
     internal static void EnqueueImmediateEnterWorkshop()
     {
-        P.TaskManager.EnqueueImmediate(() => !IsOccupied(), 180 * 1000, "WaitUntilNotOccupied2");
+        P.TaskManager.EnqueueImmediate(() => !IsOccupied() && IsScreenReady(), 180 * 1000, "WaitUntilNotOccupied2");
         P.TaskManager.EnqueueImmediate(LockonAdditionalChambers, 1000, true);
         P.TaskManager.EnqueueImmediate(HouseEnterTask.Approach);
         P.TaskManager.EnqueueImmediate(AutorunOffAdd);
@@ -33,11 +34,12 @@ internal static unsafe class TaskEnterWorkshop
         P.TaskManager.EnqueueImmediate(SelectEnterWorkshop);
         P.TaskManager.EnqueueImmediate(() => VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType), "Wait Until entered workshop");
         P.TaskManager.DelayNextImmediate(60, true);
+        P.TaskManager.EnqueueImmediate(Utils.WaitForScreen);
     }
 
     internal static void EnqueueEnterWorkshop()
     {
-        P.TaskManager.Enqueue(() => !IsOccupied(), 180 * 1000, "WaitUntilNotOccupied2");
+        P.TaskManager.Enqueue(() => !IsOccupied() && IsScreenReady(), 180 * 1000, "WaitUntilNotOccupied2");
         P.TaskManager.Enqueue(LockonAdditionalChambers, 1000, true);
         P.TaskManager.Enqueue(HouseEnterTask.Approach);
         P.TaskManager.Enqueue(AutorunOffAdd);
@@ -46,6 +48,7 @@ internal static unsafe class TaskEnterWorkshop
         P.TaskManager.Enqueue(SelectEnterWorkshop);
         P.TaskManager.Enqueue(() => VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType), "Wait Until entered workshop");
         P.TaskManager.DelayNext(60, true);
+        P.TaskManager.Enqueue(Utils.WaitForScreen);
     }
 
     internal static bool? SelectEnterWorkshop()
