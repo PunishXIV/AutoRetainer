@@ -8,7 +8,7 @@ using Lumina.Excel.GeneratedSheets;
 
 namespace AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;
 
-internal unsafe class DebugScheduler : DebugUIEntry
+internal unsafe class DebugScheduler : DebugSectionBase
 {
     private string dbgRetName = string.Empty;
     public override void Draw()

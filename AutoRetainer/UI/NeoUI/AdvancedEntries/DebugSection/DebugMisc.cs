@@ -11,7 +11,7 @@ using ItemLevel = AutoRetainer.Helpers.ItemLevel;
 
 namespace AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;
 
-internal unsafe class DebugMisc : DebugUIEntry
+internal unsafe class DebugMisc : DebugSectionBase
 {
     public override void Draw()
     {

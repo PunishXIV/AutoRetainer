@@ -2,7 +2,7 @@
 
 namespace AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;
 
-internal unsafe class DebugThrottle : DebugUIEntry
+internal unsafe class DebugThrottle : DebugSectionBase
 {
     public override void Draw()
     {

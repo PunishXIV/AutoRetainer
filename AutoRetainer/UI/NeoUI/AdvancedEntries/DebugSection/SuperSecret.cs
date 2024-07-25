@@ -2,7 +2,7 @@
 
 namespace AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;
 
-internal class SuperSecret : DebugUIEntry
+internal class SuperSecret : DebugSectionBase
 {
     public override void Draw()
     {

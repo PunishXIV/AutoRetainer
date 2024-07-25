@@ -97,7 +97,7 @@ internal static unsafe class GCContinuation
 
     internal static bool? SelectGCExchangeVerticalTab(int which)
     {
-        if (!which.InRange(0, 3)) throw new ArgumentOutOfRangeException(nameof(which));
+        if (!which.InRange(0, 3, false)) throw new ArgumentOutOfRangeException(nameof(which));
         if (TryGetAddonByName<AtkUnitBase>("GrandCompanyExchange", out var addon) && IsAddonReady(addon) && EzThrottler.Throttle("GC SelectGCExchangeVerticalTab"))
         {
             var button = addon->GetNodeById((uint)(37 + which))->GetAsAtkComponentRadioButton();
@@ -109,7 +109,7 @@ internal static unsafe class GCContinuation
 
     internal static bool? SelectGCExchangeHorizontalTab(int which)
     {
-        if (!which.InRange(0, 4)) throw new ArgumentOutOfRangeException(nameof(which));
+        if (!which.InRange(0, 4, false)) throw new ArgumentOutOfRangeException(nameof(which));
         if (TryGetAddonByName<AtkUnitBase>("GrandCompanyExchange", out var addon) && IsAddonReady(addon) && EzThrottler.Throttle("GC SelectGCExchangeHorizontalTab"))
         {
             var button = addon->GetNodeById((uint)(44 + which))->GetAsAtkComponentRadioButton();
@@ -172,7 +172,7 @@ internal static unsafe class GCContinuation
 
     internal static bool? SelectSupplyListTab(int which)
     {
-        if (!which.InRange(0, 3)) throw new ArgumentOutOfRangeException(nameof(which));
+        if (!which.InRange(0, 3, false)) throw new ArgumentOutOfRangeException(nameof(which));
         if (TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon) && IsAddonReady(addon) && EzThrottler.Throttle("GC SelectGCExpertDelivery"))
         {
             var button = addon->GetNodeById((uint)(11 + which))->GetAsAtkComponentRadioButton();

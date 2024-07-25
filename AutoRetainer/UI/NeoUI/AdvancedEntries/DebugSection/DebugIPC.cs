@@ -4,7 +4,7 @@ using FFXIVClientStructs.FFXIV.Client.UI;
 
 namespace AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;
 
-internal unsafe class DebugIPC : DebugUIEntry
+internal unsafe class DebugIPC : DebugSectionBase
 {
     public override void Draw()
     {

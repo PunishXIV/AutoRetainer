@@ -3,7 +3,7 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;
 
-internal unsafe class DebugGCAuto : DebugUIEntry
+internal unsafe class DebugGCAuto : DebugSectionBase
 {
     public override void Draw()
     {

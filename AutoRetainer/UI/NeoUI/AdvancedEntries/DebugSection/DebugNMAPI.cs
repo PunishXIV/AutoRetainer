@@ -1,6 +1,6 @@
 ﻿namespace AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;
 
-internal class DebugNMAPI : DebugUIEntry
+internal class DebugNMAPI : DebugSectionBase
 {
     private static float vol;
     private static bool repeat;

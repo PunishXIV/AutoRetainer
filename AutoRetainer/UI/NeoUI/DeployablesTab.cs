@@ -127,7 +127,7 @@ public class DeployablesTab : NeoUIEntry
                 foreach (var v in x.OfflineSubmarineData)
                 {
                     var adata = x.GetAdditionalVesselData(v.Name, VoyageType.Submersible);
-                    if(adata.Level.InRange(MassMinLevel, MassMaxLevel))
+                    if(adata.Level.InRange(MassMinLevel, MassMaxLevel, true))
                     {
                         SelectedVessels.Add((x.CID, v.Name));
                     }

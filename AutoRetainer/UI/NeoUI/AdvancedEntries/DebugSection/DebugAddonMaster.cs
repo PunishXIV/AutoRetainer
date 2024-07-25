@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;
-public unsafe class DebugAddonMaster : DebugUIEntry
+public unsafe class DebugAddonMaster : DebugSectionBase
 {
     public override void Draw()
     {

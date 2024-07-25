@@ -10,7 +10,7 @@ using Lumina.Excel.GeneratedSheets;
 
 namespace AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;
 
-internal unsafe class DebugMulti : DebugUIEntry
+internal unsafe class DebugMulti : DebugSectionBase
 {
     public override void Draw()
     {

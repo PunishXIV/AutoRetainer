@@ -9,7 +9,7 @@ using System.Diagnostics;
 
 namespace AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;
 
-internal unsafe class DebugVoyage : DebugUIEntry
+internal unsafe class DebugVoyage : DebugSectionBase
 {
     private static string data1 = "";
     private static VoyageType data2 = default;

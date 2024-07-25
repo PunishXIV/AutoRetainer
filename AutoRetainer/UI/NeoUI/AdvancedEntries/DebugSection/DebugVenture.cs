@@ -6,7 +6,7 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
 namespace AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;
 
-internal unsafe class DebugVenture : DebugUIEntry
+internal unsafe class DebugVenture : DebugSectionBase
 {
     internal int VentureID = 0;
     internal string VentureName = "";

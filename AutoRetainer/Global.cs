@@ -28,3 +28,4 @@ global using static ECommons.GenericHelpers;
 global using Callback = ECommons.Automation.Callback;
 global using CSFramework = FFXIVClientStructs.FFXIV.Client.System.Framework.Framework;
 global using S = AutoRetainer.Services.AutoRetainerServiceManager;
+global using NightmareUI.PrimaryUI;

@@ -189,6 +189,7 @@ internal unsafe class Config : IEzConfig
     public bool IMEnableAutoVendor = false;
     public bool IMEnableContextMenu = false;
     public List<uint> IMAutoVendorHard = [];
+    public List<uint> IMAutoVendorHardIgnoreStack = [];
     public List<uint> IMAutoVendorSoft = [];
     public List<uint> IMProtectList = [];
     public int IMAutoVendorHardStackLimit = 20;

@@ -3,7 +3,7 @@ using Dalamud.Interface.Components;
 using FFXIVClientStructs.FFXIV.Client.Game;
 
 namespace AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;
-internal unsafe class RetainersOld : DebugUIEntry
+internal unsafe class RetainersOld : DebugSectionBase
 {
     private static Dictionary<int, (Vector2 start, Vector2 end)> bars = [];
     public override void Draw()

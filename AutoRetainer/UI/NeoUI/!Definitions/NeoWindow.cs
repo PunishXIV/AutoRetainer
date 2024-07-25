@@ -22,7 +22,7 @@ public sealed class NeoWindow : Window
         new Exclusions(),
         new MultiModeFPSLimiter(),
 
-        new InventoryManagementTab(),
+        ..ConfigFileSystemHelpers.CreateInstancesOf<InventoryManagemenrBase>(),
 
         new LoginOverlay(),
         new MiscTab(),
@@ -32,10 +32,10 @@ public sealed class NeoWindow : Window
         new LogTab(),
         new ExpertTab(),
 
-        ..ConfigFileSystemHelpers.CreateInstancesOf<DebugUIEntry>(),
+        ..ConfigFileSystemHelpers.CreateInstancesOf<DebugSectionBase>(),
     ];
 
-    internal ConfigFileSystem<ConfigFileSystemEntry> FileSystem;
+    internal ConfigFileSystem FileSystem;
 
     public NeoWindow() : base("AutoRetainer Configuration")
     {

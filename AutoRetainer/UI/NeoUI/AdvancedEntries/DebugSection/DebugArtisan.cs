@@ -1,6 +1,6 @@
 ﻿namespace AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;
 
-internal class DebugArtisan : DebugUIEntry
+internal class DebugArtisan : DebugSectionBase
 {
     public override void Draw()
     {
