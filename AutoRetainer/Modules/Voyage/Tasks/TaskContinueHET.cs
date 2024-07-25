@@ -1,4 +1,5 @@
-﻿using ECommons.Automation;
+﻿using AutoRetainer.Internal.InventoryManagement;
+using ECommons.Automation;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 
@@ -9,6 +10,7 @@ internal static unsafe class TaskContinueHET
     internal static void Enqueue()
     {
         VoyageUtils.Log($"Task enqueued: {nameof(TaskContinueHET)}");
+        P.TaskManager.Enqueue(NpcSaleManager.EnqueueIfItemsPresent);
         P.TaskManager.Enqueue(Utils.WaitForScreen);
         P.TaskManager.Enqueue(() => !IsOccupied(), 180 * 1000, "WaitUntilNotOccupied1");
         P.TaskManager.Enqueue(() =>

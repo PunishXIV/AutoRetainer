@@ -107,6 +107,7 @@ internal static unsafe class OfflineDataManager
             {
                 var ret = GameRetainerManager.Retainers[i];
                 if (ret.RetainerID == 0) continue;
+                if (!ret.Available) continue;
                 if (ret.RetainerID != 0 && !cleared)
                 {
                     data.RetainerData.Clear();

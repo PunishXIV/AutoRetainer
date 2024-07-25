@@ -15,6 +15,7 @@ internal static unsafe class WorkshopUI
     private static List<(ulong cid, ulong frame, Vector2 start, Vector2 end, float percent)> bars = [];
     internal static void Draw()
     {
+        List<OverlayTextData> overlayTexts = [];
         SharedUI.DrawExcludedNotification(false, true);
         //ImGuiEx.ImGuiLineCentered("WorkshopBetaWarning", () => ImGuiEx.Text(ImGuiColors.DalamudYellow, "This feature is in beta testing."));
         var sortedData = new List<OfflineCharacterData>();
@@ -180,19 +181,17 @@ internal static unsafe class WorkshopUI
                 if (colpref) ImGui.PopStyleColor();
             }
 
-            var rightText = $"R: {data.RepairKits} | C: {data.Ceruleum} | I: {data.InventorySpace}";
-            var subNum = data.GetEnabledVesselsData(VoyageType.Submersible).Count();
-            var col = data.RepairKits < C.UIWarningDepRepairNum || data.Ceruleum < C.UIWarningDepTanksNum || data.InventorySpace < C.UIWarningDepSlotNum;
-            var cur = ImGui.GetCursorPos();
-            ImGui.SameLine();
-            ImGui.SetCursorPos(new(ImGui.GetContentRegionMax().X - ImGui.CalcTextSize(rightText).X - ImGui.GetStyle().FramePadding.X, rCurPos.Y + pad));
-            ImGuiEx.Text(col ? ImGuiColors.DalamudOrange : null, rightText);
+            ImGui.SameLine(0, 0);
+            List<(bool, string)> texts = [(data.RepairKits < C.UIWarningDepRepairNum, $"R: {data.RepairKits}"), (data.Ceruleum < C.UIWarningDepTanksNum, $"C: {data.Ceruleum}"), (data.InventorySpace < C.UIWarningDepSlotNum, $"I: {data.InventorySpace}")];
+            overlayTexts.Add((new Vector2(ImGui.GetContentRegionMax().X - ImGui.GetStyle().FramePadding.X, rCurPos.Y + ImGui.GetStyle().FramePadding.Y), [.. texts]));
+            ImGui.NewLine();
 
             ImGui.PopID();
         }
+        UIUtils.DrawOverlayTexts(overlayTexts);
         bars.RemoveAll(x => x.frame != Svc.PluginInterface.UiBuilder.FrameCount);
 
-        ImGuiEx.ImGuiLineCentered("WorkshopUI planner button", () =>
+        ImGuiEx.LineCentered("WorkshopUI planner button", () =>
         {
             if (ImGui.Button("Open Voyage Route Planner"))
             {

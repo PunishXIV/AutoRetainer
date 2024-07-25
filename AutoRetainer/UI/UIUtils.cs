@@ -1,9 +1,32 @@
-﻿using ECommons.Interop;
+﻿global using OverlayTextData = (System.Numerics.Vector2 Curpos, (bool Warning, string Text)[] Texts);
+using ECommons.Interop;
 
 namespace AutoRetainer.UI;
 
 internal static class UIUtils
 {
+    public static void DrawOverlayTexts(List<OverlayTextData> overlayTexts)
+    {
+        if (overlayTexts.Count > 0)
+        {
+            var maxSizes = new float[overlayTexts[0].Texts.Length];
+            for (int i = 0; i < maxSizes.Length; i++)
+            {
+                maxSizes[i] = overlayTexts.Select(x => ImGui.CalcTextSize(x.Texts[i].Text).X).Max();
+            }
+            foreach (var x in overlayTexts)
+            {
+                var cur = ImGui.GetCursorPos();
+                for (int i = x.Texts.Length - 1; i >= 0; i--)
+                {
+                    ImGui.SetCursorPos(new(x.Curpos.X - maxSizes[i..].Sum() - (maxSizes[i..].Length - 1) * ImGui.CalcTextSize("      ").X, x.Curpos.Y));
+                    ImGuiEx.Text(x.Texts[i].Warning ? ImGuiColors.DalamudOrange : null, x.Texts[i].Text);
+                }
+                ImGui.SetCursorPos(cur);
+            }
+        }
+    }
+
     internal static void SliderIntFrameTimeAsFPS(string name, ref int frameTime, int min = 1)
     {
         var fps = 60;

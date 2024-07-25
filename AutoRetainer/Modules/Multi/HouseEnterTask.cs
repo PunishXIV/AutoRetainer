@@ -45,7 +45,6 @@ internal static unsafe class HouseEnterTask
             }
             return true;
         }, "Master HET");
-        P.TaskManager.Enqueue(NpcSaleManager.EnqueueIfItemsPresent);
         TaskContinueHET.Enqueue();
     }
 

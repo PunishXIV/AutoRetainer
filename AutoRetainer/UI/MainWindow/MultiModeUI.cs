@@ -2,6 +2,7 @@
 using AutoRetainerAPI;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Interface.Components;
+using ECommons;
 using ECommons.GameHelpers;
 using PunishLib.ImGuiMethods;
 using ThreadLoadImageHandler = ECommons.ImGuiMethods.ThreadLoadImageHandler;
@@ -14,6 +15,7 @@ internal static unsafe class MultiModeUI
     private static Dictionary<string, (Vector2 start, Vector2 end)> bars = [];
     internal static void Draw()
     {
+        List<OverlayTextData> overlayTexts = [];
         SharedUI.DrawExcludedNotification(true, false);
         C.OfflineData.RemoveAll(x => C.Blacklist.Any(z => z.CID == x.CID));
         var sortedData = new List<OfflineCharacterData>();
@@ -130,7 +132,6 @@ internal static unsafe class MultiModeUI
                 ImGui.PopStyleColor();
                 ImGui.SetCursorPos(initCurpos);
             }
-            float pad = 0;
             var col = data.Preferred;
             if (col)
             {
@@ -148,7 +149,6 @@ internal static unsafe class MultiModeUI
                     ImGui.PopStyleColor();
                     col = false;
                 }
-                pad = ImGui.GetStyle().FramePadding.Y;
                 var enabledRetainers = data.GetEnabledRetainers();
                 ImGui.PushID(data.CID.ToString());
 
@@ -334,14 +334,18 @@ internal static unsafe class MultiModeUI
                     col = false;
                 }
             }
-            var rightText = (C.CharEqualize && MultiMode.Enabled ? $"C: {MultiMode.CharaCnt.GetOrDefault(data.CID)} | " : "") + $"V: {data.Ventures} | I: {data.InventorySpace}";
-            Vector4? rCol = data.Ventures < C.UIWarningRetVentureNum || data.InventorySpace < C.UIWarningRetSlotNum ? ImGuiColors.DalamudOrange : null;
-            var cur = ImGui.GetCursorPos();
-            ImGui.SameLine();
-            ImGui.SetCursorPos(new(ImGui.GetContentRegionMax().X - ImGui.CalcTextSize(rightText).X - ImGui.GetStyle().FramePadding.X, rCurPos.Y + pad));
-            ImGuiEx.Text(rCol, rightText);
+            ImGui.SameLine(0,0);
+            List<(bool, string)> texts = [(data.Ventures < C.UIWarningRetVentureNum, $"V: {data.Ventures}"), (data.InventorySpace < C.UIWarningRetSlotNum, $"I: {data.InventorySpace}")];
+            if(C.CharEqualize && MultiMode.Enabled)
+            {
+                texts.Insert(0, (false, $"C: {MultiMode.CharaCnt.GetOrDefault(data.CID)}"));
+            }
+            overlayTexts.Add((new Vector2(ImGui.GetContentRegionMax().X - ImGui.GetStyle().FramePadding.X, rCurPos.Y + ImGui.GetStyle().FramePadding.Y), [.. texts]));
+            ImGui.NewLine();
             ImGui.PopID();
         }
+
+        UIUtils.DrawOverlayTexts(overlayTexts);
 
         if (C.Verbose && ImGui.CollapsingHeader("Debug"))
         {
