@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.Internal.InventoryManagement;
+using ECommons.GameHelpers;
 using NightmareUI.PrimaryUI;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ public class GeneralSettings : InventoryManagemenrBase
             .Indent()
             .Widget("Sell now", (x) =>
             {
-                if(ImGuiEx.Button(x, C.IMEnableNpcSell && NpcSaleManager.GetValidNPC() != null && !IsOccupied() && !P.TaskManager.IsBusy))
+                if(ImGuiEx.Button(x, Player.Interactable && C.IMEnableNpcSell && NpcSaleManager.GetValidNPC() != null && !IsOccupied() && !P.TaskManager.IsBusy))
                 {
                     NpcSaleManager.EnqueueIfItemsPresent();
                 }
