@@ -2,12 +2,14 @@
 using Dalamud.Hooking;
 using Dalamud.Memory;
 using Dalamud.Utility.Signatures;
+using ECommons.ExcelServices;
 using ECommons.EzHookManager;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using System.Linq;
 
 namespace AutoRetainer.Internal;
 
@@ -109,7 +111,7 @@ internal unsafe class Memory : IDisposable
     }
 
     delegate void SellItemDelegate(uint a1, InventoryType a2);
-    [EzHook("48 89 5C 24 ?? 48 89 6C 24 ?? 56 48 83 EC 20 8B E9")]
+    [EzHook("48 89 5C 24 ?? 48 89 6C 24 ?? 56 48 83 EC 20 8B E9", false)]
     EzHook<SellItemDelegate> SellItemHook;
 
     void SellItemDetour(uint inventorySlot, InventoryType a2)
@@ -122,8 +124,10 @@ internal unsafe class Memory : IDisposable
     {
         if (TryGetAddonByName<AtkUnitBase>("Shop", out var addon) && IsAddonReady(addon))
         {
-            if (InventoryManager.Instance()->GetInventoryContainer(type)->GetInventorySlot(slot)->ItemId != 0)
+            var slotPtr = InventoryManager.Instance()->GetInventoryContainer(type)->GetInventorySlot(slot);
+            if (slotPtr->ItemId != 0)
             {
+                if (C.IMProtectList.Contains(slotPtr->ItemId)) throw new InvalidOperationException($"Attempted to sell protected item: {ExcelItemHelper.GetName(slotPtr->ItemId)}");
                 SellItemDetour((uint)slot, type);
             }
             else
