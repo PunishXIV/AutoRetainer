@@ -24,11 +24,11 @@ internal static unsafe class HouseEnterTask
         P.TaskManager.Enqueue(WaitUntilNotBusy, 180 * 1000);
         P.TaskManager.Enqueue(() =>
         {
-            if (Utils.GetReachableRetainerBell(false) == null)
+            if(Utils.GetReachableRetainerBell(false) == null)
             {
                 var entrance = Utils.GetNearestEntrance(out var d);
                 var validDistance = entrance.IsApartmentEntrance() ? 4.85f : 4f;
-                if (entrance != null && d > validDistance)
+                if(entrance != null && d > validDistance)
                 {
                     P.TaskManager.EnqueueImmediate(() => SetTarget(40f));
                     P.TaskManager.EnqueueImmediate(Lockon);
@@ -50,9 +50,9 @@ internal static unsafe class HouseEnterTask
 
     internal static bool? WaitUntilNotBusy()
     {
-        if (!IsScreenReady()) return false;
-        if (!ProperOnLogin.PlayerPresent || !ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType)) return null;
-        if (MultiMode.IsInteractionAllowed())
+        if(!IsScreenReady()) return false;
+        if(!ProperOnLogin.PlayerPresent || !ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType)) return null;
+        if(MultiMode.IsInteractionAllowed())
         {
             return true;
         }
@@ -62,7 +62,7 @@ internal static unsafe class HouseEnterTask
     internal static bool? Lockon()
     {
         var entrance = Utils.GetNearestEntrance(out _);
-        if (entrance != null && Svc.Targets.Target?.Address == entrance.Address && EzThrottler.Throttle("HET.Lockon"))
+        if(entrance != null && Svc.Targets.Target?.Address == entrance.Address && EzThrottler.Throttle("HET.Lockon"))
         {
             Chat.Instance.ExecuteCommand("/lockon");
             return true;
@@ -81,7 +81,7 @@ internal static unsafe class HouseEnterTask
     internal static bool? AutorunOff()
     {
         var entrance = Utils.GetNearestEntrance(out var d);
-        if (entrance != null && d < 3f + Utils.Random && EzThrottler.Throttle("HET.DisableAutomove"))
+        if(entrance != null && d < 3f + Utils.Random && EzThrottler.Throttle("HET.DisableAutomove"))
         {
             DebugLog($"Disabling automove");
             Chat.Instance.ExecuteCommand("/automove off");
@@ -94,7 +94,7 @@ internal static unsafe class HouseEnterTask
     internal static bool? SetTarget(float distance)
     {
         var entrance = Utils.GetNearestEntrance(out var d);
-        if (entrance != null && d < distance && EzThrottler.Throttle("HET.SetTarget", 200))
+        if(entrance != null && d < distance && EzThrottler.Throttle("HET.SetTarget", 200))
         {
             DebugLog($"Setting entrance target ({distance})");
             Svc.Targets.Target = (entrance);
@@ -106,7 +106,7 @@ internal static unsafe class HouseEnterTask
     internal static bool? Interact()
     {
         var entrance = Utils.GetNearestEntrance(out var d);
-        if (entrance != null && Svc.Targets.Target?.Address == entrance.Address && EzThrottler.Throttle("HET.Interact", 1000))
+        if(entrance != null && Svc.Targets.Target?.Address == entrance.Address && EzThrottler.Throttle("HET.Interact", 1000))
         {
             DebugLog($"Interacting with entrance");
             TargetSystem.Instance()->InteractWithObject((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)entrance.Address, false);
@@ -118,14 +118,14 @@ internal static unsafe class HouseEnterTask
 
     internal static bool? SelectYesno()
     {
-        if (!ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType))
+        if(!ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType))
         {
             return null;
         }
         var addon = Utils.GetSpecificYesno(Lang.ConfirmHouseEntrance);
-        if (addon != null)
+        if(addon != null)
         {
-            if (IsAddonReady(addon) && EzThrottler.Throttle("HET.SelectYesno"))
+            if(IsAddonReady(addon) && EzThrottler.Throttle("HET.SelectYesno"))
             {
                 DebugLog("Select yes");
                 new AddonMaster.SelectYesno((nint)addon).Yes();
@@ -134,7 +134,7 @@ internal static unsafe class HouseEnterTask
         }
         else
         {
-            if (Utils.TrySelectSpecificEntry(Lang.GoToYourApartment, () => EzThrottler.Throttle("HET.SelectYesno")))
+            if(Utils.TrySelectSpecificEntry(Lang.GoToYourApartment, () => EzThrottler.Throttle("HET.SelectYesno")))
             {
                 DebugLog("Confirmed going to apartment");
                 return true;
@@ -151,11 +151,11 @@ internal static unsafe class HouseEnterTask
     internal static bool? LockonBell()
     {
         var bell = Utils.GetNearestRetainerBell(out var d);
-        if (bell != null && d < 20f)
+        if(bell != null && d < 20f)
         {
-            if (Svc.Targets.Target?.Address == bell.Address)
+            if(Svc.Targets.Target?.Address == bell.Address)
             {
-                if (EzThrottler.Throttle("HET.LockonBell"))
+                if(EzThrottler.Throttle("HET.LockonBell"))
                 {
                     Chat.Instance.ExecuteCommand("/lockon");
                     return true;
@@ -163,7 +163,7 @@ internal static unsafe class HouseEnterTask
             }
             else
             {
-                if (EzThrottler.Throttle("HET.SetTargetBell", 200))
+                if(EzThrottler.Throttle("HET.SetTargetBell", 200))
                 {
                     DebugLog($"Setting bell target ({bell})");
                     Svc.Targets.Target = bell;
@@ -177,8 +177,8 @@ internal static unsafe class HouseEnterTask
     internal static bool? AutorunOffBell()
     {
         var bell = Utils.GetReachableRetainerBell(false);
-        if (bell != null) PluginLog.Information($"Dist {Vector3.Distance(Player.Object.Position, bell.Position)}");
-        if (bell != null && Vector3.Distance(Player.Object.Position, bell.Position) < 4f + Utils.Random * 0.25f)
+        if(bell != null) PluginLog.Information($"Dist {Vector3.Distance(Player.Object.Position, bell.Position)}");
+        if(bell != null && Vector3.Distance(Player.Object.Position, bell.Position) < 4f + Utils.Random * 0.25f)
         {
             DebugLog($"Disabling automove");
             Chat.Instance.ExecuteCommand("/automove off");

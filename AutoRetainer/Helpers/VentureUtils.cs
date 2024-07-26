@@ -18,7 +18,7 @@ internal static unsafe class VentureUtils
     {
         try
         {
-            if (adata.VenturePlan.ListUnwrapped.Count > 500)
+            if(adata.VenturePlan.ListUnwrapped.Count > 500)
             {
                 ImGuiEx.Text($"The venture list is too large to show preview.");
                 ImGuiEx.Text($"Progress: {adata.VenturePlanIndex}/{adata.VenturePlan.ListUnwrapped.Count}");
@@ -26,15 +26,15 @@ internal static unsafe class VentureUtils
             }
             List<(Vector4? col, string str)> strings = [];
             var focus = 0;
-            for (var j = 0; j < adata.VenturePlan.ListUnwrapped.Count; j++)
+            for(var j = 0; j < adata.VenturePlan.ListUnwrapped.Count; j++)
             {
                 var v = adata.VenturePlan.ListUnwrapped[j];
-                if (j == adata.VenturePlanIndex - 1)
+                if(j == adata.VenturePlanIndex - 1)
                 {
                     focus = j;
                     strings.Add((ImGuiColors.ParsedGreen, $"{VentureUtils.GetFancyVentureName(v, data, ret, out _)}"));
                 }
-                else if (j == adata.VenturePlanIndex || (j == 0 && adata.VenturePlan.PlanCompleteBehavior == PlanCompleteBehavior.Restart_plan && adata.VenturePlanIndex >= adata.VenturePlan.ListUnwrapped.Count))
+                else if(j == adata.VenturePlanIndex || (j == 0 && adata.VenturePlan.PlanCompleteBehavior == PlanCompleteBehavior.Restart_plan && adata.VenturePlanIndex >= adata.VenturePlan.ListUnwrapped.Count))
                 {
                     strings.Add((ImGuiColors.DalamudYellow, $"{VentureUtils.GetFancyVentureName(v, data, ret, out _)}"));
                 }
@@ -45,15 +45,15 @@ internal static unsafe class VentureUtils
             }
             var min = Math.Max(focus - 8, 0);
             var max = Math.Min(focus + 10, strings.Count);
-            if (min != 0) ImGuiEx.Text($"... {min} more ...");
-            for (var i = min; i < max; i++)
+            if(min != 0) ImGuiEx.Text($"... {min} more ...");
+            for(var i = min; i < max; i++)
             {
                 var s = strings[i];
                 ImGuiEx.Text(s.col, s.str);
             }
-            if (max != strings.Count) ImGuiEx.Text($"... {strings.Count - max} more ...");
+            if(max != strings.Count) ImGuiEx.Text($"... {strings.Count - max} more ...");
         }
-        catch (Exception e)
+        catch(Exception e)
         {
             PluginLog.Error($"{e}");
         }
@@ -61,20 +61,20 @@ internal static unsafe class VentureUtils
 
     internal static void ProcessVenturePlanner(this GameRetainerManager.Retainer ret, uint next)
     {
-        if (next != 0)
+        if(next != 0)
         {
             var adj = VentureUtils.GetAdjustedRetainerTask(next, (Job)ret.ClassJob);
-            if (adj != next)
+            if(adj != next)
             {
                 PluginLog.Debug($"Adjusted venture ID {next}->{adj}");
                 next = adj;
             }
         }
         DebugLog($"Not completed or restarting");
-        if (ret.VentureID != 0)
+        if(ret.VentureID != 0)
         {
             DebugLog($"Venture id is not zero, next={next}, ventureID={ret.VentureID}");
-            if (next == ret.VentureID)
+            if(next == ret.VentureID)
             {
                 DebugLog($"Reassigning");
                 TaskReassignVenture.Enqueue();
@@ -83,12 +83,12 @@ internal static unsafe class VentureUtils
             {
                 DebugLog($"Collecting");
                 TaskCollectVenture.Enqueue();
-                if (VentureUtils.GetVentureById(next).IsFieldExploration())
+                if(VentureUtils.GetVentureById(next).IsFieldExploration())
                 {
                     DebugLog($"Assigning field exploration: {next}");
                     TaskAssignFieldExploration.Enqueue(next);
                 }
-                else if (VentureUtils.GetVentureById(next).IsQuickExploration())
+                else if(VentureUtils.GetVentureById(next).IsQuickExploration())
                 {
                     DebugLog($"Assigning quick: {next}");
                     TaskAssignQuickVenture.Enqueue();
@@ -103,12 +103,12 @@ internal static unsafe class VentureUtils
         else
         {
             DebugLog($"Venture not assigned");
-            if (VentureUtils.GetVentureById(next).IsFieldExploration())
+            if(VentureUtils.GetVentureById(next).IsFieldExploration())
             {
                 DebugLog($"Assigning field exploration: {next}");
                 TaskAssignFieldExploration.Enqueue(next);
             }
-            else if (VentureUtils.GetVentureById(next).IsQuickExploration())
+            else if(VentureUtils.GetVentureById(next).IsQuickExploration())
             {
                 DebugLog($"Assigning quick: {next}");
                 TaskAssignQuickVenture.Enqueue();
@@ -129,31 +129,31 @@ internal static unsafe class VentureUtils
     internal static int GetVentureItemAmount(this RetainerTask task, OfflineCharacterData data, OfflineRetainerData retainer, out int index)
     {
         index = 0;
-        if (task.IsRandom)
+        if(task.IsRandom)
         {
             return 0;
         }
         var adata = Utils.GetAdditionalData(data.CID, retainer.Name);
 
         var param = task.RetainerTaskParameter.Value;
-        if (param == null) return 0;
+        if(param == null) return 0;
         var normal = Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRow(task.Task);
-        if (task.Task == 0 || normal == null) return 0;
-        if (retainer.Job == (uint)Job.FSH)
+        if(task.Task == 0 || normal == null) return 0;
+        if(retainer.Job == (uint)Job.FSH)
         {
-            for (var i = 0; i < param.PerceptionFSH.Length; i++)
+            for(var i = 0; i < param.PerceptionFSH.Length; i++)
             {
-                if (adata.Perception >= param.PerceptionFSH[i])
+                if(adata.Perception >= param.PerceptionFSH[i])
                 {
                     index = i + 1;
                 }
             }
         }
-        else if (IsDoL(retainer.Job))
+        else if(IsDoL(retainer.Job))
         {
-            for (var i = 0; i < param.PerceptionDoL.Length; i++)
+            for(var i = 0; i < param.PerceptionDoL.Length; i++)
             {
-                if (adata.Perception >= param.PerceptionDoL[i])
+                if(adata.Perception >= param.PerceptionDoL[i])
                 {
                     index = i + 1;
                 }
@@ -161,21 +161,21 @@ internal static unsafe class VentureUtils
         }
         else
         {
-            for (var i = 0; i < param.ItemLevelDoW.Length; i++)
+            for(var i = 0; i < param.ItemLevelDoW.Length; i++)
             {
-                if (adata.Ilvl >= param.ItemLevelDoW[i])
+                if(adata.Ilvl >= param.ItemLevelDoW[i])
                 {
                     index = i + 1;
                 }
             }
         }
-        if (index >= normal.Quantity.Length) return 0;
+        if(index >= normal.Quantity.Length) return 0;
         return normal.Quantity[index];
     }
 
     internal static int GetVentureRequitement(this RetainerTask task)
     {
-        if (IsDoL(task.ClassJobCategory.Row))
+        if(IsDoL(task.ClassJobCategory.Row))
         {
             return task.RequiredGathering;
         }
@@ -197,17 +197,17 @@ internal static unsafe class VentureUtils
         [
             normal.Quantity[0]
         ];
-        if (retainer.Job == (uint)Job.FSH)
+        if(retainer.Job == (uint)Job.FSH)
         {
-            for (var i = 0; i < param.PerceptionFSH.Length; i++)
+            for(var i = 0; i < param.PerceptionFSH.Length; i++)
             {
                 amount.Add(normal.Quantity[i + 1]);
                 stat.Add(param.PerceptionFSH[i]);
             }
         }
-        else if (IsDoL(retainer.Job))
+        else if(IsDoL(retainer.Job))
         {
-            for (var i = 0; i < param.PerceptionDoL.Length; i++)
+            for(var i = 0; i < param.PerceptionDoL.Length; i++)
             {
                 amount.Add(normal.Quantity[i + 1]);
                 stat.Add(param.PerceptionDoL[i]);
@@ -215,7 +215,7 @@ internal static unsafe class VentureUtils
         }
         else
         {
-            for (var i = 0; i < param.ItemLevelDoW.Length; i++)
+            for(var i = 0; i < param.ItemLevelDoW.Length; i++)
             {
                 amount.Add(normal.Quantity[i + 1]);
                 stat.Add(param.ItemLevelDoW[i]);
@@ -235,7 +235,7 @@ internal static unsafe class VentureUtils
     internal static string GetFancyVentureName(this RetainerTask Task, OfflineCharacterData data, OfflineRetainerData retainer, out bool Available, out string left, out string right)
     {
         var signature = $"{Task.RowId}/{data.Identity}/{retainer.Identity}";
-        if (FancyVentureNameCache.TryGetValue(signature, out var cached) && cached.IsValid)
+        if(FancyVentureNameCache.TryGetValue(signature, out var cached) && cached.IsValid)
         {
             left = cached.Left;
             right = cached.Right;
@@ -254,7 +254,7 @@ internal static unsafe class VentureUtils
 
     internal static string GetShortName(this ClassJobCategory cat)
     {
-        if (cat.RowId == GetCategory((uint)Job.BRD)) return "DoW";
+        if(cat.RowId == GetCategory((uint)Job.BRD)) return "DoW";
         return cat.Name;
     }
 
@@ -264,12 +264,12 @@ internal static unsafe class VentureUtils
         var adata = Utils.GetAdditionalData(data.CID, retainer.Name);
         var UnavailabilitySymbol = "";
         var canNotGather = Task.RequiredGathering > 0 && adata.Gathering < Task.RequiredGathering && adata.Gathering > -1;
-        if (!Task.IsFieldExploration() && IsDoL(Task.ClassJobCategory.Row))
+        if(!Task.IsFieldExploration() && IsDoL(Task.ClassJobCategory.Row))
         {
             var gathered = data.UnlockedGatheringItems.Count == 0 || data.UnlockedGatheringItems.Contains(VentureUtils.GetGatheringItemByItemID(Task.GetVentureItemId()));
-            if (gathered)
+            if(gathered)
             {
-                if (canNotGather)
+                if(canNotGather)
                 {
                     Available = false;
                     UnavailabilitySymbol = Lang.CharPlant;
@@ -282,7 +282,7 @@ internal static unsafe class VentureUtils
             else
             {
                 Available = false;
-                if (canNotGather)
+                if(canNotGather)
                 {
                     UnavailabilitySymbol = Lang.CharQuestion + Lang.CharPlant;
                 }
@@ -295,15 +295,15 @@ internal static unsafe class VentureUtils
         else
         {
             //PluginLog.Information($"{Task.GetVentureName()}, {Task.RequiredItemLevel} > {adata.Ilvl}, {Task.RequiredGathering} > {adata.Gathering}");
-            if (Task.RequiredItemLevel > 0 && adata.Ilvl > -1)
+            if(Task.RequiredItemLevel > 0 && adata.Ilvl > -1)
             {
                 Available = Task.RequiredItemLevel <= adata.Ilvl;
-                if (!Available) UnavailabilitySymbol = Lang.CharItemLevel;
+                if(!Available) UnavailabilitySymbol = Lang.CharItemLevel;
             }
-            else if (Task.RequiredGathering > 0 && adata.Gathering > -1)
+            else if(Task.RequiredGathering > 0 && adata.Gathering > -1)
             {
                 Available = !canNotGather;
-                if (!Available) UnavailabilitySymbol = Lang.CharPlant;
+                if(!Available) UnavailabilitySymbol = Lang.CharPlant;
             }
             else
             {
@@ -311,7 +311,7 @@ internal static unsafe class VentureUtils
             }
         }
         retp.Name = Task.GetVentureName();
-        if (Task.RetainerLevel == 0)
+        if(Task.RetainerLevel == 0)
         {
             //
         }
@@ -319,17 +319,17 @@ internal static unsafe class VentureUtils
         {
             retp.Level = Task.RetainerLevel;
         }
-        if (retainer.Level < Task.RetainerLevel)
+        if(retainer.Level < Task.RetainerLevel)
         {
             Available = false;
             UnavailabilitySymbol += Lang.CharLevelSync;
         }
-        if (!Available)
+        if(!Available)
         {
             retp.UnavailabilitySymbols = UnavailabilitySymbol;
 
         }
-        if (!Task.IsRandom)
+        if(!Task.IsRandom)
         {
             var amount = Task.GetVentureItemAmount(data, retainer, out retp.YieldRate);
             retp.Yield = amount;
@@ -342,40 +342,40 @@ internal static unsafe class VentureUtils
 
     internal static RetainerTask GetAdjustedRetainerTask(this RetainerTask task, Job job)
     {
-        if (task.GetVentureItemId() == 0) return task;
+        if(task.GetVentureItemId() == 0) return task;
         var n = Svc.Data.GetExcelSheet<RetainerTask>().FirstOrDefault(x => x.GetVentureItemId() == task.GetVentureItemId() && x.ClassJobCategory.Value.RowId == GetCategory((uint)job));
         return n ?? task;
     }
 
     internal static int GetCategory(uint ClassJob)
     {
-        if (ClassJob == (int)Job.BTN) return 18;
-        if (ClassJob == (int)Job.MIN) return 17;
-        if (ClassJob == (int)Job.FSH) return 19;
+        if(ClassJob == (int)Job.BTN) return 18;
+        if(ClassJob == (int)Job.MIN) return 17;
+        if(ClassJob == (int)Job.FSH) return 19;
         return 34;
     }
 
     internal static string GetHuntingVentureName(uint ClassJob)
     {
-        if (ClassJob == (int)Job.BTN) return Lang.HuntingVentureNames[2][..^1];
-        if (ClassJob == (int)Job.MIN) return Lang.HuntingVentureNames[1][..^1];
-        if (ClassJob == (int)Job.FSH) return Lang.HuntingVentureNames[3][..^1];
+        if(ClassJob == (int)Job.BTN) return Lang.HuntingVentureNames[2][..^1];
+        if(ClassJob == (int)Job.MIN) return Lang.HuntingVentureNames[1][..^1];
+        if(ClassJob == (int)Job.FSH) return Lang.HuntingVentureNames[3][..^1];
         return Lang.HuntingVentureNames[0][..^1];
     }
 
     internal static string GetFieldExVentureName(uint ClassJob)
     {
-        if (ClassJob == (int)Job.BTN) return Lang.FieldExplorationNames[2][..^1];
-        if (ClassJob == (int)Job.MIN) return Lang.FieldExplorationNames[1][..^1];
-        if (ClassJob == (int)Job.FSH) return Lang.FieldExplorationNames[3][..^1];
+        if(ClassJob == (int)Job.BTN) return Lang.FieldExplorationNames[2][..^1];
+        if(ClassJob == (int)Job.MIN) return Lang.FieldExplorationNames[1][..^1];
+        if(ClassJob == (int)Job.FSH) return Lang.FieldExplorationNames[3][..^1];
         return Lang.FieldExplorationNames[0][..^1];
     }
 
     internal static bool IsDoL(uint ClassJob)
     {
-        if (ClassJob == (int)Job.BTN) return true;
-        if (ClassJob == (int)Job.MIN) return true;
-        if (ClassJob == (int)Job.FSH) return true;
+        if(ClassJob == (int)Job.BTN) return true;
+        if(ClassJob == (int)Job.MIN) return true;
+        if(ClassJob == (int)Job.FSH) return true;
         return false;
     }
 
@@ -416,8 +416,8 @@ internal static unsafe class VentureUtils
 
     internal static string GetVentureName(this RetainerTask Task)
     {
-        if (Task == null) return null;
-        if (Task.IsRandom)
+        if(Task == null) return null;
+        if(Task.IsRandom)
         {
             return $"{Svc.Data.GetExcelSheet<RetainerTaskRandom>().GetRow(Task.Task)?.Name.ToDalamudString().ExtractText()}";
         }
@@ -441,14 +441,14 @@ internal static unsafe class VentureUtils
     {
         List<string> ret = [];
         var data = CSFramework.Instance()->UIModule->GetRaptureAtkModule()->AtkModule.GetStringArrayData(97);
-        if (data != null)
+        if(data != null)
         {
-            for (var i = 0; i < data->AtkArrayData.Size; i++)
+            for(var i = 0; i < data->AtkArrayData.Size; i++)
             {
-                if (data->StringArray[i] == null) break;
-                if (i % 4 != 1) continue;
+                if(data->StringArray[i] == null) break;
+                if(i % 4 != 1) continue;
                 var item = data->StringArray[i];
-                if (item != null)
+                if(item != null)
                 {
                     var str = MemoryHelper.ReadSeStringNullTerminated((nint)item);
                     ret.Add(str.ExtractText());
@@ -465,9 +465,9 @@ internal static unsafe class VentureUtils
 
     internal static string[] GetVentureLevelCategory(this RetainerTask Task)
     {
-        foreach (var x in Svc.Data.GetExcelSheet<RetainerTaskLvRange>())
+        foreach(var x in Svc.Data.GetExcelSheet<RetainerTaskLvRange>())
         {
-            if (Task.RetainerLevel >= x.Min && Task.RetainerLevel <= x.Max)
+            if(Task.RetainerLevel >= x.Min && Task.RetainerLevel <= x.Max)
             {
                 return [$" {x.Min}-{x.Max}.", $"  {x.Min}～{x.Max}", $" {x.Min} - {x.Max}", $" {x.Min} à {x.Max}"];
             }

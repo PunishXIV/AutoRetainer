@@ -10,9 +10,9 @@ internal static class NewYesAlreadyManager
     private static bool IsBusy => Utils.IsBusy || VoyageScheduler.Enabled;
     internal static void Tick()
     {
-        if (WasChanged)
+        if(WasChanged)
         {
-            if (!IsBusy)
+            if(!IsBusy)
             {
                 WasChanged = false;
                 Unlock();
@@ -21,7 +21,7 @@ internal static class NewYesAlreadyManager
         }
         else
         {
-            if (IsBusy)
+            if(IsBusy)
             {
                 WasChanged = true;
                 Lock();
@@ -31,7 +31,7 @@ internal static class NewYesAlreadyManager
     }
     internal static void Lock()
     {
-        if (EzSharedData.TryGet<HashSet<string>>("YesAlready.StopRequests", out var data))
+        if(EzSharedData.TryGet<HashSet<string>>("YesAlready.StopRequests", out var data))
         {
             data.Add(P.Name);
         }
@@ -39,7 +39,7 @@ internal static class NewYesAlreadyManager
 
     internal static void Unlock()
     {
-        if (EzSharedData.TryGet<HashSet<string>>("YesAlready.StopRequests", out var data))
+        if(EzSharedData.TryGet<HashSet<string>>("YesAlready.StopRequests", out var data))
         {
             data.Remove(P.Name);
         }
@@ -47,7 +47,7 @@ internal static class NewYesAlreadyManager
 
     internal static bool? WaitForYesAlreadyDisabledTask()
     {
-        if (EzSharedData.TryGet<HashSet<string>>("YesAlready.StopRequests", out var data))
+        if(EzSharedData.TryGet<HashSet<string>>("YesAlready.StopRequests", out var data))
         {
             return data.Contains(P.Name);
         }

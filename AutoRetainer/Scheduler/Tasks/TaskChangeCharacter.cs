@@ -18,7 +18,7 @@ public static unsafe class TaskChangeCharacter
 {
     public static void Enqueue(string currentWorld, string charaName, string charaWorld, int account)
     {
-        if (Svc.ClientState.IsLoggedIn)
+        if(Svc.ClientState.IsLoggedIn)
         {
             EnqueueLogout();
         }
@@ -44,10 +44,10 @@ public static unsafe class TaskChangeCharacter
 
     public static bool? SelectYesLogout()
     {
-        if (!Svc.ClientState.IsLoggedIn) return true;
+        if(!Svc.ClientState.IsLoggedIn) return true;
         var addon = Utils.GetSpecificYesno(Svc.Data.GetExcelSheet<Addon>()?.GetRow(115)?.Text.ToDalamudString().ExtractText());
-        if (addon == null || !IsAddonReady(addon)) return false;
-        if (Utils.GenericThrottle && EzThrottler.Throttle("ConfirmLogout"))
+        if(addon == null || !IsAddonReady(addon)) return false;
+        if(Utils.GenericThrottle && EzThrottler.Throttle("ConfirmLogout"))
         {
             new AddonMaster.SelectYesno((nint)addon).Yes();
             return false;
@@ -58,11 +58,11 @@ public static unsafe class TaskChangeCharacter
     public static bool? Logout()
     {
         var addon = Utils.GetSpecificYesno(Svc.Data.GetExcelSheet<Addon>()?.GetRow(115)?.Text.ToDalamudString().ExtractText());
-        if (addon != null) return true;
+        if(addon != null) return true;
         var isLoggedIn = Svc.Condition.Any();
-        if (!isLoggedIn) return true;
+        if(!isLoggedIn) return true;
 
-        if (Player.Interactable && !Player.IsAnimationLocked && Utils.GenericThrottle && EzThrottler.Throttle("InitiateLogout"))
+        if(Player.Interactable && !Player.IsAnimationLocked && Utils.GenericThrottle && EzThrottler.Throttle("InitiateLogout"))
         {
             Chat.Instance.ExecuteCommand("/logout");
             return false;
@@ -72,14 +72,14 @@ public static unsafe class TaskChangeCharacter
 
     public static bool? SelectServiceAccount(int account)
     {
-        if (TryGetAddonByName<AtkUnitBase>("_CharaSelectWorldServer", out _))
+        if(TryGetAddonByName<AtkUnitBase>("_CharaSelectWorldServer", out _))
         {
             return true;
         }
-        if (TryGetAddonMaster<AddonMaster.SelectString>(out var m) && m.IsAddonReady)
+        if(TryGetAddonMaster<AddonMaster.SelectString>(out var m) && m.IsAddonReady)
         {
             var compareTo = Svc.Data.GetExcelSheet<Lobby>()?.GetRow(11)?.Text.ExtractText();
-            if (m.Text == compareTo)
+            if(m.Text == compareTo)
             {
                 m.Entries[account].Select();
                 return true;
@@ -94,15 +94,15 @@ public static unsafe class TaskChangeCharacter
 
     public static bool? ClickSelectDataCenter()
     {
-        if (TryGetAddonByName<AtkUnitBase>("TitleDCWorldMap", out var addon) && addon->IsVisible)
+        if(TryGetAddonByName<AtkUnitBase>("TitleDCWorldMap", out var addon) && addon->IsVisible)
         {
             PluginLog.Information($"Visible");
             Utils.RethrottleGeneric();
             return true;
         }
-        if (TryGetAddonMaster<AddonMaster._TitleMenu>(out var m) && m.IsReady)
+        if(TryGetAddonMaster<AddonMaster._TitleMenu>(out var m) && m.IsReady)
         {
-            if (Utils.GenericThrottle && EzThrottler.Throttle("ClickTitleMenuStart"))
+            if(Utils.GenericThrottle && EzThrottler.Throttle("ClickTitleMenuStart"))
             {
                 m.DataCenter();
                 return false;
@@ -117,9 +117,9 @@ public static unsafe class TaskChangeCharacter
 
     public static bool? SelectDataCenter(int dc)
     {
-        if (TryGetAddonMaster<AddonMaster.TitleDCWorldMap>(out var m) && m.IsAddonReady)
+        if(TryGetAddonMaster<AddonMaster.TitleDCWorldMap>(out var m) && m.IsAddonReady)
         {
-            if (Utils.GenericThrottle && EzThrottler.Throttle("ClickDCSelect"))
+            if(Utils.GenericThrottle && EzThrottler.Throttle("ClickDCSelect"))
             {
                 m.Select(dc);
                 return true;
@@ -137,25 +137,25 @@ public static unsafe class TaskChangeCharacter
     public static bool? SelectCharacter(string name, string world)
     {
         Expected = (name, world);
-        if (TryGetAddonByName<AtkUnitBase>("SelectYesno", out _))
+        if(TryGetAddonByName<AtkUnitBase>("SelectYesno", out _))
         {
             Utils.RethrottleGeneric();
             return true;
         }
-        if (TryGetAddonByName<AtkUnitBase>("SelectOk", out _))
+        if(TryGetAddonByName<AtkUnitBase>("SelectOk", out _))
         {
             Utils.RethrottleGeneric();
             return true;
         }
-        if (TryGetAddonMaster<AddonMaster._CharaSelectListMenu>(out var m) && m.IsAddonReady && TryGetAddonMaster<AddonMaster._CharaSelectWorldServer>(out var mw))
+        if(TryGetAddonMaster<AddonMaster._CharaSelectListMenu>(out var m) && m.IsAddonReady && TryGetAddonMaster<AddonMaster._CharaSelectWorldServer>(out var mw))
         {
-            if (m.TemporarilyLocked) return false;
-            if (mw.Worlds.Length == 0) return false;
-            foreach (var c in m.Characters)
+            if(m.TemporarilyLocked) return false;
+            if(mw.Worlds.Length == 0) return false;
+            foreach(var c in m.Characters)
             {
-                if (c.Name == name && ExcelWorldHelper.GetName(c.HomeWorld) == world)
+                if(c.Name == name && ExcelWorldHelper.GetName(c.HomeWorld) == world)
                 {
-                    if (Utils.GenericThrottle && EzThrottler.Throttle("SelectChara"))
+                    if(Utils.GenericThrottle && EzThrottler.Throttle("SelectChara"))
                     {
                         /*if (!c.IsSelected)
                         {
@@ -170,11 +170,11 @@ public static unsafe class TaskChangeCharacter
                     return false;
                 }
             }
-            foreach (var w in mw.Worlds)
+            foreach(var w in mw.Worlds)
             {
-                if (w.Name == world)
+                if(w.Name == world)
                 {
-                    if (Utils.GenericThrottle && EzThrottler.Throttle("SelectWorld"))
+                    if(Utils.GenericThrottle && EzThrottler.Throttle("SelectWorld"))
                     {
                         w.Select();
                     }
@@ -191,15 +191,15 @@ public static unsafe class TaskChangeCharacter
 
     public static bool? ConfirmLogin()
     {
-        if (TryGetAddonByName<AtkUnitBase>("SelectOk", out _))
+        if(TryGetAddonByName<AtkUnitBase>("SelectOk", out _))
         {
             return true;
         }
-        if (TryGetAddonMaster<AddonMaster.SelectYesno>(out var m) && m.IsAddonReady)
+        if(TryGetAddonMaster<AddonMaster.SelectYesno>(out var m) && m.IsAddonReady)
         {
-            if (m.Text.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.LogInPartialText))
+            if(m.Text.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.LogInPartialText))
             {
-                if (Utils.GenericThrottle && EzThrottler.Throttle("ConfirmLogin"))
+                if(Utils.GenericThrottle && EzThrottler.Throttle("ConfirmLogin"))
                 {
                     m.Yes();
                     return true;

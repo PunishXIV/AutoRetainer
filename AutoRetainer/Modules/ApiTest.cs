@@ -16,7 +16,7 @@ internal static class ApiTest
 
     private static void API_OnRetainerPostprocessTask(string retainerName)
     {
-        if (!Enabled) return;
+        if(!Enabled) return;
         PluginLog.Information($"Now requesting postprocess for {retainerName}");
         P.API.RequestRetainerPostprocess();
     }
@@ -26,7 +26,7 @@ internal static class ApiTest
         PluginLog.Information($"Now postprocessing {retainerName}");
         TaskManager.Enqueue(() =>
         {
-            if (GenericHelpers.IsKeyPressed(System.Windows.Forms.Keys.Back))
+            if(GenericHelpers.IsKeyPressed(System.Windows.Forms.Keys.Back))
             {
                 return true;
             }

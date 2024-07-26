@@ -12,18 +12,18 @@ internal static unsafe class RetainerListHandlers
     {
         TaskWithdrawGil.forceCheck = false;
         InventorySpaceManager.SellSlotTasks.Clear();
-        if (name.IsNullOrEmpty())
+        if(name.IsNullOrEmpty())
         {
             throw new Exception($"Name can not be null or empty");
         }
-        if (TryGetAddonByName<AtkUnitBase>("RetainerList", out var retainerList) && IsAddonReady(retainerList))
+        if(TryGetAddonByName<AtkUnitBase>("RetainerList", out var retainerList) && IsAddonReady(retainerList))
         {
             var list = new AddonMaster.RetainerList(retainerList);
-            foreach (var retainer in list.Retainers)
+            foreach(var retainer in list.Retainers)
             {
-                if (retainer.Name == name)
+                if(retainer.Name == name)
                 {
-                    if (Utils.GenericThrottle)
+                    if(Utils.GenericThrottle)
                     {
                         DebugLog($"Selecting retainer {retainer.Name} with index {retainer.Index}");
                         retainer.Select();
@@ -38,9 +38,9 @@ internal static unsafe class RetainerListHandlers
 
     internal static bool? CloseRetainerList()
     {
-        if (TryGetAddonByName<AtkUnitBase>("RetainerList", out var retainerList) && IsAddonReady(retainerList))
+        if(TryGetAddonByName<AtkUnitBase>("RetainerList", out var retainerList) && IsAddonReady(retainerList))
         {
-            if (Utils.GenericThrottle)
+            if(Utils.GenericThrottle)
             {
                 var v = stackalloc AtkValue[1]
                 {

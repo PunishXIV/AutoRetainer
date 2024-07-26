@@ -11,12 +11,12 @@ internal static class NotificationHandler
     internal static void Tick()
     {
         var currentState = GetNotifyState();
-        if (currentState != CurrentState)
+        if(currentState != CurrentState)
         {
             CurrentState = currentState;
-            if (currentState)
+            if(currentState)
             {
-                if (C.NotifyDisplayInChatX) Svc.Chat.Print(new()
+                if(C.NotifyDisplayInChatX) Svc.Chat.Print(new()
                 {
                     Message = new SeStringBuilder().AddUiForeground("[AutoRetainer] Some of the retainers have completed their ventures!", (ushort)UIColor.Green).Build()
                 });
@@ -33,15 +33,15 @@ internal static class NotificationHandler
 
     internal static bool GetNotifyState()
     {
-        if (C.NotifyIncludeAllChara)
+        if(C.NotifyIncludeAllChara)
         {
-            foreach (var x in C.OfflineData)
+            foreach(var x in C.OfflineData)
             {
-                if (!C.NotifyIgnoreNoMultiMode || x.Enabled)
+                if(!C.NotifyIgnoreNoMultiMode || x.Enabled)
                 {
-                    foreach (var r in x.RetainerData)
+                    foreach(var r in x.RetainerData)
                     {
-                        if (r.HasVenture && r.GetVentureSecondsRemaining() <= 0)
+                        if(r.HasVenture && r.GetVentureSecondsRemaining() <= 0)
                         {
                             return true;
                         }
@@ -52,11 +52,11 @@ internal static class NotificationHandler
         }
         else
         {
-            if (Svc.ClientState.LocalContentId != 0 && C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var x))
+            if(Svc.ClientState.LocalContentId != 0 && C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var x))
             {
-                foreach (var r in x.RetainerData)
+                foreach(var r in x.RetainerData)
                 {
-                    if (r.HasVenture && r.GetVentureSecondsRemaining() <= 0)
+                    if(r.HasVenture && r.GetVentureSecondsRemaining() <= 0)
                     {
                         return true;
                     }

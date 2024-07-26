@@ -8,19 +8,19 @@ internal static unsafe class FPSLimiter
     private static readonly Stopwatch Stopwatch = new();
     internal static void FPSLimit()
     {
-        if (MultiMode.Active)
+        if(MultiMode.Active)
         {
-            if (
+            if(
                 (!C.NoFPSLockWhenActive || CSFramework.Instance()->WindowInactive)
                 && (!C.FpsLockOnlyShutdownTimer || Shutdown.Active || (C.NightMode && C.NightModeFPSLimit))
                 )
             {
-                if (Utils.IsBusy)
+                if(Utils.IsBusy)
                 {
-                    if (C.TargetMSPTIdle > 0)
+                    if(C.TargetMSPTIdle > 0)
                     {
                         var ms = (int)(C.TargetMSPTRunning - Stopwatch.ElapsedMilliseconds);
-                        if (ms > 0 && ms <= C.TargetMSPTRunning)
+                        if(ms > 0 && ms <= C.TargetMSPTRunning)
                         {
                             Thread.Sleep(ms);
                         }
@@ -28,15 +28,15 @@ internal static unsafe class FPSLimiter
                 }
                 else
                 {
-                    if (C.TargetMSPTIdle > 0)
+                    if(C.TargetMSPTIdle > 0)
                     {
                         var targetMSPT = C.TargetMSPTIdle;
-                        if (C.NightMode && Utils.CanAutoLogin() && MultiMode.Active)
+                        if(C.NightMode && Utils.CanAutoLogin() && MultiMode.Active)
                         {
                             targetMSPT = CSFramework.Instance()->WindowInactive ? 5000 : 100;
                         }
                         var ms = (int)(targetMSPT - Stopwatch.ElapsedMilliseconds);
-                        if (ms > 0 && ms <= targetMSPT)
+                        if(ms > 0 && ms <= targetMSPT)
                         {
                             Thread.Sleep(ms);
                         }

@@ -28,20 +28,20 @@ internal class MultiModeOverlay : Window
         var displayed = false;
         bool ShouldDisplay() => !displayed || !C.StatusBarMSI;
         CImGui.igBringWindowToDisplayBack(CImGui.igGetCurrentWindow());
-        if (BailoutManager.IsLogOnTitleEnabled && ShouldDisplay())
+        if(BailoutManager.IsLogOnTitleEnabled && ShouldDisplay())
         {
             displayed = true;
-            if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "bailoutTitleRestart.png"), out var t))
+            if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "bailoutTitleRestart.png"), out var t))
             {
                 ImGui.Image(t.ImGuiHandle, StatusPanelSize);
-                if (ImGui.IsItemHovered())
+                if(ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-                    if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
+                    if(ImGui.IsItemClicked(ImGuiMouseButton.Left))
                     {
                         Svc.Commands.ProcessCommand("/ays");
                     }
-                    if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                    if(ImGui.IsItemClicked(ImGuiMouseButton.Right))
                     {
                         BailoutManager.IsLogOnTitleEnabled = false;
                     }
@@ -54,20 +54,20 @@ internal class MultiModeOverlay : Window
             }
             ImGui.SameLine();
         }
-        if (Shutdown.Active && ShouldDisplay())
+        if(Shutdown.Active && ShouldDisplay())
         {
             displayed = true;
-            if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "timer.png"), out var t))
+            if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "timer.png"), out var t))
             {
                 ImGui.Image(t.ImGuiHandle, StatusPanelSize);
-                if (ImGui.IsItemHovered())
+                if(ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-                    if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
+                    if(ImGui.IsItemClicked(ImGuiMouseButton.Left))
                     {
                         Svc.Commands.ProcessCommand("/ays");
                     }
-                    if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                    if(ImGui.IsItemClicked(ImGuiMouseButton.Right))
                     {
                         Shutdown.ForceShutdownAt = 0;
                         Shutdown.ShutdownAt = 0;
@@ -81,20 +81,20 @@ internal class MultiModeOverlay : Window
             }
             ImGui.SameLine();
         }
-        if (P.TaskManager.IsBusy && ShouldDisplay())
+        if(P.TaskManager.IsBusy && ShouldDisplay())
         {
             displayed = true;
-            if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "processing.png"), out var t))
+            if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "processing.png"), out var t))
             {
                 ImGui.Image(t.ImGuiHandle, StatusPanelSize);
-                if (ImGui.IsItemHovered())
+                if(ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-                    if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
+                    if(ImGui.IsItemClicked(ImGuiMouseButton.Left))
                     {
                         Svc.Commands.ProcessCommand("/ays");
                     }
-                    if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                    if(ImGui.IsItemClicked(ImGuiMouseButton.Right))
                     {
                         P.TaskManager.Abort();
                     }
@@ -107,16 +107,16 @@ internal class MultiModeOverlay : Window
             }
             ImGui.SameLine();
         }
-        if (P.IsNextToBell && ShouldDisplay())
+        if(P.IsNextToBell && ShouldDisplay())
         {
             displayed = true;
-            if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "bellalert.png"), out var t))
+            if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "bellalert.png"), out var t))
             {
                 ImGui.Image(t.ImGuiHandle, StatusPanelSize);
-                if (ImGui.IsItemHovered())
+                if(ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-                    if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
+                    if(ImGui.IsItemClicked(ImGuiMouseButton.Left))
                     {
                         Svc.Commands.ProcessCommand("/ays");
                     }
@@ -131,20 +131,20 @@ internal class MultiModeOverlay : Window
             }
             ImGui.SameLine();
         }
-        if (MultiMode.Enabled && ShouldDisplay())
+        if(MultiMode.Enabled && ShouldDisplay())
         {
             displayed = true;
-            if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "multi.png"), out var t))
+            if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "multi.png"), out var t))
             {
                 ImGui.Image(t.ImGuiHandle, StatusPanelSize);
-                if (ImGui.IsItemHovered())
+                if(ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-                    if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
+                    if(ImGui.IsItemClicked(ImGuiMouseButton.Left))
                     {
                         Svc.Commands.ProcessCommand("/ays");
                     }
-                    if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                    if(ImGui.IsItemClicked(ImGuiMouseButton.Right))
                     {
                         MultiMode.Enabled = false;
                     }
@@ -157,20 +157,20 @@ internal class MultiModeOverlay : Window
             }
             ImGui.SameLine();
         }
-        if (C.NightMode && MultiMode.Enabled && ShouldDisplay())
+        if(C.NightMode && MultiMode.Enabled && ShouldDisplay())
         {
             displayed = true;
-            if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "Night.png"), out var t))
+            if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "Night.png"), out var t))
             {
                 ImGui.Image(t.ImGuiHandle, StatusPanelSize);
-                if (ImGui.IsItemHovered())
+                if(ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-                    if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
+                    if(ImGui.IsItemClicked(ImGuiMouseButton.Left))
                     {
                         Svc.Commands.ProcessCommand("/ays");
                     }
-                    if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                    if(ImGui.IsItemClicked(ImGuiMouseButton.Right))
                     {
                         C.NightMode = false;
                         MultiMode.BailoutNightMode();
@@ -184,20 +184,20 @@ internal class MultiModeOverlay : Window
             }
             ImGui.SameLine();
         }
-        if (VoyageScheduler.Enabled && ShouldDisplay())
+        if(VoyageScheduler.Enabled && ShouldDisplay())
         {
             displayed = true;
-            if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "submarine.png"), out var t))
+            if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "submarine.png"), out var t))
             {
                 ImGui.Image(t.ImGuiHandle, StatusPanelSize);
-                if (ImGui.IsItemHovered())
+                if(ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-                    if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
+                    if(ImGui.IsItemClicked(ImGuiMouseButton.Left))
                     {
                         Svc.Commands.ProcessCommand("/ays");
                     }
-                    if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                    if(ImGui.IsItemClicked(ImGuiMouseButton.Right))
                     {
                         VoyageScheduler.Enabled = false;
                     }
@@ -210,20 +210,20 @@ internal class MultiModeOverlay : Window
             }
             ImGui.SameLine();
         }
-        if (SchedulerMain.PluginEnabled && ShouldDisplay())
+        if(SchedulerMain.PluginEnabled && ShouldDisplay())
         {
             displayed = true;
-            if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", Utils.GetReachableRetainerBell(false) == null ? "bellcrossed.png" : "bell.png"), out var t))
+            if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", Utils.GetReachableRetainerBell(false) == null ? "bellcrossed.png" : "bell.png"), out var t))
             {
                 ImGui.Image(t.ImGuiHandle, StatusPanelSize);
-                if (ImGui.IsItemHovered())
+                if(ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-                    if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
+                    if(ImGui.IsItemClicked(ImGuiMouseButton.Left))
                     {
                         Svc.Commands.ProcessCommand("/ays");
                     }
-                    if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                    if(ImGui.IsItemClicked(ImGuiMouseButton.Right))
                     {
                         SchedulerMain.DisablePlugin();
                     }
@@ -236,21 +236,21 @@ internal class MultiModeOverlay : Window
             }
             ImGui.SameLine();
         }
-        if (DisplayNotify && ShouldDisplay())
+        if(DisplayNotify && ShouldDisplay())
         {
             displayed = true;
-            if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "notify.png"), out var t))
+            if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "notify.png"), out var t))
             {
                 ImGui.Image(t.ImGuiHandle, StatusPanelSize);
-                if (ImGui.IsItemHovered())
+                if(ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-                    if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
+                    if(ImGui.IsItemClicked(ImGuiMouseButton.Left))
                     {
                         NotificationHandler.IsHidden = true;
                         Svc.Commands.ProcessCommand("/ays");
                     }
-                    if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                    if(ImGui.IsItemClicked(ImGuiMouseButton.Right))
                     {
                         NotificationHandler.IsHidden = true;
                     }
@@ -264,13 +264,13 @@ internal class MultiModeOverlay : Window
             ImGui.SameLine();
         }
         ImGui.Dummy(Vector2.One);
-        if (Data != null && !C.OldStatusIcons)
+        if(Data != null && !C.OldStatusIcons)
         {
             ImGuiEx.LineCentered("Status", delegate
             {
-                if (C.MultiModeWorkshopConfiguration.MultiWaitForAll)
+                if(C.MultiModeWorkshopConfiguration.MultiWaitForAll)
                 {
-                    if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "wait.png"), out var t))
+                    if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "wait.png"), out var t))
                     {
                         ImGui.Image(t.ImGuiHandle, StatusPanelSize / 2);
                         ImGuiEx.Tooltip("Wait for all deployables is globally enabled.");
@@ -281,9 +281,9 @@ internal class MultiModeOverlay : Window
                     }
                     ImGui.SameLine();
                 }
-                else if (Data.MultiWaitForAllDeployables)
+                else if(Data.MultiWaitForAllDeployables)
                 {
-                    if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "wait.png"), out var t))
+                    if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "wait.png"), out var t))
                     {
                         ImGui.Image(t.ImGuiHandle, StatusPanelSize / 2);
                         ImGuiEx.Tooltip("Wait for all deployables is enabled for this character.");

@@ -21,7 +21,7 @@ public class MainSettings : NeoUIEntry
             .Section("Operation")
         .Widget("Assign + Reassign", (x) =>
         {
-            if (ImGui.RadioButton(x, C.EnableAssigningQuickExploration && !C._dontReassign))
+            if(ImGui.RadioButton(x, C.EnableAssigningQuickExploration && !C._dontReassign))
             {
                 C.EnableAssigningQuickExploration = true;
                 C.DontReassign = false;
@@ -29,7 +29,7 @@ public class MainSettings : NeoUIEntry
         }, "Automatically assigns enabled retainers to a Quick Venture if they have none already in progress and reassigns current venture.")
         .Widget("Collect", (x) =>
         {
-            if (ImGui.RadioButton(x, !C.EnableAssigningQuickExploration && C._dontReassign))
+            if(ImGui.RadioButton(x, !C.EnableAssigningQuickExploration && C._dontReassign))
             {
                 C.EnableAssigningQuickExploration = false;
                 C.DontReassign = true;
@@ -37,7 +37,7 @@ public class MainSettings : NeoUIEntry
         }, "Only collect venture rewards from the retainer, and will not reassign them.\nHold CTRL when interacting with the Summoning Bell to apply this mode temporarily.")
         .Widget("Reassign", (x) =>
         {
-            if (ImGui.RadioButton("Reassign", !C.EnableAssigningQuickExploration && !C._dontReassign))
+            if(ImGui.RadioButton("Reassign", !C.EnableAssigningQuickExploration && !C._dontReassign))
             {
                 C.EnableAssigningQuickExploration = false;
                 C.DontReassign = false;
@@ -53,7 +53,7 @@ public class MainSettings : NeoUIEntry
         .Checkbox("Display Extended Retainer Info", () => ref C.ShowAdditionalInfo, "Displays retainer item level/gathering/perception and the name of their current venture in the main UI.")
         .Widget("Do not close AutoRetainer windows on ESC key press", (x) =>
         {
-            if (ImGui.Checkbox(x, ref C.IgnoreEsc)) Utils.ResetEscIgnoreByWindows();
+            if(ImGui.Checkbox(x, ref C.IgnoreEsc)) Utils.ResetEscIgnoreByWindows();
         })
         .Checkbox("Display only most significant icon in status bar", () => ref C.StatusBarMSI)
         .SliderInt(120f, "Status bar icon size", () => ref C.StatusBarIconWidth, 32, 128);

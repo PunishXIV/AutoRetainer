@@ -14,7 +14,7 @@ public class FFXIVInstanceMonitor
             Stream = new FileStream(LockFileName, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
             return true;
         }
-        catch (Exception e)
+        catch(Exception e)
         {
             PluginLog.Warning($"Could not acquire lock.");
             e.LogWarning();
@@ -28,19 +28,19 @@ public class FFXIVInstanceMonitor
         var reference = Process.GetCurrentProcess().ProcessName;
         try
         {
-            foreach (var p in Process.GetProcesses())
+            foreach(var p in Process.GetProcesses())
             {
                 try
                 {
-                    if (p.ProcessName.EqualsIgnoreCase(reference)) ret++;
+                    if(p.ProcessName.EqualsIgnoreCase(reference)) ret++;
                 }
-                catch (Exception ex)
+                catch(Exception ex)
                 {
                     ex.LogInfo();
                 }
             }
         }
-        catch (Exception e)
+        catch(Exception e)
         {
             e.Log();
         }
@@ -53,7 +53,7 @@ public class FFXIVInstanceMonitor
         {
             Stream.Dispose();
         }
-        catch (Exception e)
+        catch(Exception e)
         {
             e.LogInfo();
         }

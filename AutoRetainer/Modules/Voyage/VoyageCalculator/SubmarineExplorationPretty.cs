@@ -18,14 +18,14 @@ public class SubmarineExplorationPretty : SubmarineExploration
 
     public uint GetSurveyTime(float speed)
     {
-        if (speed < 1)
+        if(speed < 1)
             speed = 1;
         return (uint)Math.Floor(SurveyDurationmin * 7000 / (speed * 100) * 60);
     }
 
     public uint GetVoyageTime(SubmarineExplorationPretty other, float speed)
     {
-        if (speed < 1)
+        if(speed < 1)
             speed = 1;
         return (uint)Math.Floor(Vector3.Distance(Position, other.Position) * 3990 / (speed * 100) * 60);
     }

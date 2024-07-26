@@ -17,42 +17,42 @@ internal static class Artisan
 
     internal static void ArtisanTick()
     {
-        if (C.ArtisanIntegration)
+        if(C.ArtisanIntegration)
         {
-            if (IsCurrentlyOperating() && MultiMode.EnsureCharacterValidity(true))
+            if(IsCurrentlyOperating() && MultiMode.EnsureCharacterValidity(true))
             {
                 try
                 {
                     var bell = Utils.GetReachableRetainerBell(true);
-                    if (AnyRetainersAvailable() && bell != null)
+                    if(AnyRetainersAvailable() && bell != null)
                     {
-                        if (!WasPaused)
+                        if(!WasPaused)
                         {
                             WasPaused = true;
                             SetStopRequest(true);
                         }
 
-                        if (!SchedulerMain.PluginEnabled || SchedulerMain.Reason != PluginEnableReason.Artisan)
+                        if(!SchedulerMain.PluginEnabled || SchedulerMain.Reason != PluginEnableReason.Artisan)
                         {
                             SchedulerMain.EnablePlugin(PluginEnableReason.Artisan);
                             DebugLog($"Enabling AutoRetainer because of Artisan integration");
                         }
                     }
                 }
-                catch (Exception ex)
+                catch(Exception ex)
                 {
                     {
                         ex.Log();
                     }
                 }
             }
-            if (!AnyRetainersAvailable() && WasPaused)
+            if(!AnyRetainersAvailable() && WasPaused)
             {
-                if (IsOccupied())
+                if(IsOccupied())
                 {
                     EzThrottler.Throttle("ArtisanCanReenableOccupied", 2500, true);
                 }
-                if (EzThrottler.Check("ArtisanCanReenableOccupied"))
+                if(EzThrottler.Check("ArtisanCanReenableOccupied"))
                 {
                     WasPaused = false;
                     SetStopRequest(false);
@@ -63,7 +63,7 @@ internal static class Artisan
 
     internal static bool AnyRetainersAvailable()
     {
-        if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
+        if(C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
         {
             return data.GetEnabledRetainers().Any(z => z.GetVentureSecondsRemaining() <= C.UnsyncCompensation);
         }
@@ -76,7 +76,7 @@ internal static class Artisan
         {
             return IsListRunning || GetEnduranceStatus;
         }
-        catch (Exception ex)
+        catch(Exception ex)
         {
             ex.LogWarning();
         }

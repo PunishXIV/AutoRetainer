@@ -30,20 +30,20 @@ internal unsafe class ContextMenuManager
 
     private void ContextMenu_OnMenuOpened(IMenuOpenedArgs args)
     {
-        if (!C.IMEnableContextMenu) return;
-        if (args.MenuType == ContextMenuType.Inventory && args.Target is MenuTargetInventory inv && inv.TargetItem != null)
+        if(!C.IMEnableContextMenu) return;
+        if(args.MenuType == ContextMenuType.Inventory && args.Target is MenuTargetInventory inv && inv.TargetItem != null)
         {
             var id = inv.TargetItem.Value.ItemId;
-            if (id != 0)
+            if(id != 0)
             {
-                if (C.IMProtectList.Contains(id))
+                if(C.IMProtectList.Contains(id))
                 {
                     args.AddMenuItem(new MenuItem()
                     {
                         Name = new SeStringBuilder().Append(Prefix).AddText("= Item has been protected =").Build(),
                         OnClicked = (a) =>
                         {
-                            if (IsKeyPressed([LimitedKeys.LeftControlKey, LimitedKeys.RightControlKey]) && IsKeyPressed([LimitedKeys.RightShiftKey, LimitedKeys.LeftShiftKey]))
+                            if(IsKeyPressed([LimitedKeys.LeftControlKey, LimitedKeys.RightControlKey]) && IsKeyPressed([LimitedKeys.RightShiftKey, LimitedKeys.LeftShiftKey]))
                             {
                                 var t = $"Item {ExcelItemHelper.GetName(id)} removed from protection list";
                                 Notify.Success(t);
@@ -60,7 +60,7 @@ internal unsafe class ContextMenuManager
                 else
                 {
                     var data = Svc.Data.GetExcelSheet<Item>().GetRow(id);
-                    if (C.IMAutoVendorSoft.Contains(id))
+                    if(C.IMAutoVendorSoft.Contains(id))
                     {
                         args.AddMenuItem(new MenuItem()
                         {
@@ -72,7 +72,7 @@ internal unsafe class ContextMenuManager
                             }
                         }.RemovePrefix());
                     }
-                    else if (data.PriceLow > 0)
+                    else if(data.PriceLow > 0)
                     {
                         args.AddMenuItem(new MenuItem()
                         {
@@ -86,7 +86,7 @@ internal unsafe class ContextMenuManager
                         }.RemovePrefix());
                     }
 
-                    if (C.IMAutoVendorHard.Contains(id))
+                    if(C.IMAutoVendorHard.Contains(id))
                     {
                         args.AddMenuItem(new MenuItem()
                         {
@@ -98,7 +98,7 @@ internal unsafe class ContextMenuManager
                             }
                         }.RemovePrefix());
                     }
-                    else if (data.PriceLow > 0)
+                    else if(data.PriceLow > 0)
                     {
                         args.AddMenuItem(new MenuItem()
                         {

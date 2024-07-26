@@ -10,7 +10,7 @@ internal static class TaskIntelligentRepair
         P.TaskManager.Enqueue(() =>
         {
             var rep = VoyageUtils.GetIsVesselNeedsRepair(name, type, out var log);
-            if (rep.Count > 0)
+            if(rep.Count > 0)
             {
                 TaskRepairAll.EnqueueImmediate(rep, name, type);
             }

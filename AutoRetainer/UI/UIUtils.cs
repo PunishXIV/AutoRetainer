@@ -7,17 +7,17 @@ internal static class UIUtils
 {
     public static void DrawOverlayTexts(List<OverlayTextData> overlayTexts)
     {
-        if (overlayTexts.Count > 0)
+        if(overlayTexts.Count > 0)
         {
             var maxSizes = new float[overlayTexts[0].Texts.Length];
-            for (var i = 0; i < maxSizes.Length; i++)
+            for(var i = 0; i < maxSizes.Length; i++)
             {
                 maxSizes[i] = overlayTexts.Select(x => ImGui.CalcTextSize(x.Texts[i].Text).X).Max();
             }
-            foreach (var x in overlayTexts)
+            foreach(var x in overlayTexts)
             {
                 var cur = ImGui.GetCursorPos();
-                for (var i = x.Texts.Length - 1; i >= 0; i--)
+                for(var i = x.Texts.Length - 1; i >= 0; i--)
                 {
                     ImGui.SetCursorPos(new(x.Curpos.X - maxSizes[i..].Sum() - (maxSizes[i..].Length - 1) * ImGui.CalcTextSize("      ").X, x.Curpos.Y));
                     ImGuiEx.Text(x.Texts[i].Warning ? ImGuiColors.DalamudOrange : null, x.Texts[i].Text);
@@ -30,7 +30,7 @@ internal static class UIUtils
     internal static void SliderIntFrameTimeAsFPS(string name, ref int frameTime, int min = 1)
     {
         var fps = 60;
-        if (frameTime != 0)
+        if(frameTime != 0)
         {
             fps = (int)(1000f / frameTime);
         }
@@ -40,7 +40,7 @@ internal static class UIUtils
 
     internal static void QRA(string text, ref LimitedKeys key)
     {
-        if (DrawKeybind(text, ref key))
+        if(DrawKeybind(text, ref key))
         {
             P.quickSellItems.Toggle();
         }
@@ -57,14 +57,14 @@ internal static class UIUtils
         ImGui.Dummy(new(20, 1));
         ImGui.SameLine();
         ImGuiEx.SetNextItemWidthScaled(200f);
-        if (ImGui.BeginCombo("##inputKey", $"{key}"))
+        if(ImGui.BeginCombo("##inputKey", $"{key}"))
         {
-            if (text == KeyInputActive)
+            if(text == KeyInputActive)
             {
                 ImGuiEx.Text(ImGuiColors.DalamudYellow, $"Now press new key...");
-                foreach (var x in Enum.GetValues<LimitedKeys>())
+                foreach(var x in Enum.GetValues<LimitedKeys>())
                 {
-                    if (IsKeyPressed(x))
+                    if(IsKeyPressed(x))
                     {
                         KeyInputActive = null;
                         key = x;
@@ -75,7 +75,7 @@ internal static class UIUtils
             }
             else
             {
-                if (ImGui.Selectable("Auto-detect new key", false, ImGuiSelectableFlags.DontClosePopups))
+                if(ImGui.Selectable("Auto-detect new key", false, ImGuiSelectableFlags.DontClosePopups))
                 {
                     KeyInputActive = text;
                 }
@@ -87,15 +87,15 @@ internal static class UIUtils
         }
         else
         {
-            if (text == KeyInputActive)
+            if(text == KeyInputActive)
             {
                 KeyInputActive = null;
             }
         }
-        if (key != LimitedKeys.None)
+        if(key != LimitedKeys.None)
         {
             ImGui.SameLine();
-            if (ImGuiEx.IconButton(FontAwesomeIcon.Trash))
+            if(ImGuiEx.IconButton(FontAwesomeIcon.Trash))
             {
                 key = LimitedKeys.None;
                 ret = true;

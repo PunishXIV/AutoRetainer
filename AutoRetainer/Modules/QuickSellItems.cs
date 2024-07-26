@@ -64,7 +64,7 @@ public unsafe class QuickSellItems : IDisposable
 
     public void Enable()
     {
-        if (openInventoryContextHook?.IsEnabled == false)
+        if(openInventoryContextHook?.IsEnabled == false)
         {
             openInventoryContextHook?.Enable();
             PluginLog.Information("QuickSellItems enabled");
@@ -73,36 +73,36 @@ public unsafe class QuickSellItems : IDisposable
 
     internal static bool IsReadyToUse()
     {
-        if (!Svc.Condition[ConditionFlag.OccupiedSummoningBell]) return false;
-        if (!Svc.Targets.Target.IsRetainerBell()) return false;
-        if (!Svc.Objects.Any(x => x.ObjectKind == ObjectKind.Retainer)) return false;
-        { if (TryGetAddonByName<AtkUnitBase>("RetainerSellList", out var addon) && IsAddonReady(addon)) return true; }
-        { if (TryGetAddonByName<AtkUnitBase>("RetainerGrid0", out var addon) && IsAddonReady(addon)) return true; }
-        { if (TryGetAddonByName<AtkUnitBase>("RetainerGrid1", out var addon) && IsAddonReady(addon)) return true; }
-        { if (TryGetAddonByName<AtkUnitBase>("RetainerGrid2", out var addon) && IsAddonReady(addon)) return true; }
-        { if (TryGetAddonByName<AtkUnitBase>("RetainerGrid3", out var addon) && IsAddonReady(addon)) return true; }
-        { if (TryGetAddonByName<AtkUnitBase>("RetainerGrid4", out var addon) && IsAddonReady(addon)) return true; }
-        { if (TryGetAddonByName<AtkUnitBase>("RetainerCrystalGrid", out var addon) && IsAddonReady(addon)) return true; }
+        if(!Svc.Condition[ConditionFlag.OccupiedSummoningBell]) return false;
+        if(!Svc.Targets.Target.IsRetainerBell()) return false;
+        if(!Svc.Objects.Any(x => x.ObjectKind == ObjectKind.Retainer)) return false;
+        { if(TryGetAddonByName<AtkUnitBase>("RetainerSellList", out var addon) && IsAddonReady(addon)) return true; }
+        { if(TryGetAddonByName<AtkUnitBase>("RetainerGrid0", out var addon) && IsAddonReady(addon)) return true; }
+        { if(TryGetAddonByName<AtkUnitBase>("RetainerGrid1", out var addon) && IsAddonReady(addon)) return true; }
+        { if(TryGetAddonByName<AtkUnitBase>("RetainerGrid2", out var addon) && IsAddonReady(addon)) return true; }
+        { if(TryGetAddonByName<AtkUnitBase>("RetainerGrid3", out var addon) && IsAddonReady(addon)) return true; }
+        { if(TryGetAddonByName<AtkUnitBase>("RetainerGrid4", out var addon) && IsAddonReady(addon)) return true; }
+        { if(TryGetAddonByName<AtkUnitBase>("RetainerCrystalGrid", out var addon) && IsAddonReady(addon)) return true; }
         return false;
     }
 
     internal bool GetAction(out List<string> text)
     {
         text = [];
-        if (CSFramework.Instance()->WindowInactive) return false;
-        if (IsKeyPressed(C.SellKey))
+        if(CSFramework.Instance()->WindowInactive) return false;
+        if(IsKeyPressed(C.SellKey))
         {
             text.Add(retainerSellText);
         }
-        if (IsKeyPressed(C.RetrieveKey))
+        if(IsKeyPressed(C.RetrieveKey))
         {
             text.Add(retrieveFromRetainerText);
         }
-        if (IsKeyPressed(C.EntrustKey))
+        if(IsKeyPressed(C.EntrustKey))
         {
             text.Add(entrustToRetainerText);
         }
-        if (IsKeyPressed(C.SellMarketKey))
+        if(IsKeyPressed(C.SellMarketKey))
         {
             text.Add(putUpForSaleText);
         }
@@ -115,32 +115,32 @@ public unsafe class QuickSellItems : IDisposable
         InternalLog.Verbose($"Inventory hook: {inventoryType}, {slot}");
         try
         {
-            if (CanSellFrom.Contains(inventoryType) && IsReadyToUse() && GetAction(out var text))
+            if(CanSellFrom.Contains(inventoryType) && IsReadyToUse() && GetAction(out var text))
             {
                 var inventory = InventoryManager.Instance()->GetInventoryContainer(inventoryType);
-                if (inventory != null)
+                if(inventory != null)
                 {
                     var itemSlot = inventory->GetInventorySlot(slot);
-                    if (itemSlot != null)
+                    if(itemSlot != null)
                     {
                         var itemId = itemSlot->ItemId;
                         var item = Svc.Data.GetExcelSheet<Item>()?.GetRow(itemId);
-                        if (item != null)
+                        if(item != null)
                         {
                             var addonId = agent->AgentInterface.GetAddonId();
-                            if (addonId == 0) return retVal;
+                            if(addonId == 0) return retVal;
                             var addon = AtkStage.Instance()->RaptureAtkUnitManager->GetAddonById((ushort)addonId);
-                            if (addon == null) return retVal;
+                            if(addon == null) return retVal;
 
-                            for (var i = 0; i < agent->ContextItemCount; i++)
+                            for(var i = 0; i < agent->ContextItemCount; i++)
                             {
                                 var contextItemParam = agent->EventParams[agent->ContexItemStartIndex + i];
-                                if (contextItemParam.Type != ValueType.String) continue;
+                                if(contextItemParam.Type != ValueType.String) continue;
                                 var contextItemName = contextItemParam.GetValueAsString();
 
-                                if (text.Contains(contextItemName))
+                                if(text.Contains(contextItemName))
                                 {
-                                    if (Bitmask.IsBitSet(agent->ContextItemDisabledMask, i))
+                                    if(Bitmask.IsBitSet(agent->ContextItemDisabledMask, i))
                                     {
                                         DebugLog($"QRA found {i}:{contextItemName} but it's disabled");
                                         continue;
@@ -157,7 +157,7 @@ public unsafe class QuickSellItems : IDisposable
                 }
             }
         }
-        catch (Exception ex)
+        catch(Exception ex)
         {
             ex.Log();
         }
@@ -167,7 +167,7 @@ public unsafe class QuickSellItems : IDisposable
 
     public void Disable()
     {
-        if (openInventoryContextHook?.IsEnabled == true)
+        if(openInventoryContextHook?.IsEnabled == true)
         {
             openInventoryContextHook?.Disable();
             PluginLog.Information("QuickSellItems disabled");
@@ -176,7 +176,7 @@ public unsafe class QuickSellItems : IDisposable
 
     public void Toggle()
     {
-        if (C.SellKey == LimitedKeys.None && C.RetrieveKey == LimitedKeys.None && C.EntrustKey == LimitedKeys.None && C.SellMarketKey == LimitedKeys.None)
+        if(C.SellKey == LimitedKeys.None && C.RetrieveKey == LimitedKeys.None && C.EntrustKey == LimitedKeys.None && C.SellMarketKey == LimitedKeys.None)
         {
             Disable();
         }

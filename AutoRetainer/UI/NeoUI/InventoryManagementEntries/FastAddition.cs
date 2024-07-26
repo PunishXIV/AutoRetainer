@@ -25,31 +25,31 @@ public class FastAddition : InventoryManagemenrBase
         ImGuiEx.Text($"* Items that already in Quick Venture Sell List WILL BE MOVED to Unconditional Sell List");
         ImGuiEx.Text(!ImGui.GetIO().KeyAlt ? ImGuiColors.DalamudGrey : ImGuiColors.DalamudRed, $"Alt - delete from either list");
         ImGuiEx.Text("\nItems that are protected are unaffected by these actions");
-        if (Svc.GameGui.HoveredItem > 0)
+        if(Svc.GameGui.HoveredItem > 0)
         {
             var id = (uint)(Svc.GameGui.HoveredItem % 1000000);
-            if (ImGui.GetIO().KeyShift)
+            if(ImGui.GetIO().KeyShift)
             {
-                if (!C.IMProtectList.Contains(id) && !C.IMAutoVendorSoft.Contains(id) && !C.IMAutoVendorHard.Contains(id))
+                if(!C.IMProtectList.Contains(id) && !C.IMAutoVendorSoft.Contains(id) && !C.IMAutoVendorHard.Contains(id))
                 {
                     C.IMAutoVendorSoft.Add(id);
                     Notify.Success($"Added {ExcelItemHelper.GetName(id)} to Quick Venture Sell List");
                     C.IMAutoVendorHard.Remove(id);
                 }
             }
-            if (ImGui.GetIO().KeyCtrl)
+            if(ImGui.GetIO().KeyCtrl)
             {
-                if (!C.IMProtectList.Contains(id) && !C.IMAutoVendorHard.Contains(id) && !C.IMAutoVendorSoft.Contains(id))
+                if(!C.IMProtectList.Contains(id) && !C.IMAutoVendorHard.Contains(id) && !C.IMAutoVendorSoft.Contains(id))
                 {
                     C.IMAutoVendorHard.Add(id);
                     Notify.Success($"Added {ExcelItemHelper.GetName(id)} to Unconditional Sell List");
                     C.IMAutoVendorSoft.Remove(id);
                 }
             }
-            if (ImGui.GetIO().KeyAlt)
+            if(ImGui.GetIO().KeyAlt)
             {
-                if (C.IMAutoVendorSoft.Remove(id)) Notify.Info($"Removed {ExcelItemHelper.GetName(id)} from Quick Venture Sell List");
-                if (C.IMAutoVendorHard.Remove(id)) Notify.Info($"Removed {ExcelItemHelper.GetName(id)} from Unconditional Sell List");
+                if(C.IMAutoVendorSoft.Remove(id)) Notify.Info($"Removed {ExcelItemHelper.GetName(id)} from Quick Venture Sell List");
+                if(C.IMAutoVendorHard.Remove(id)) Notify.Info($"Removed {ExcelItemHelper.GetName(id)} from Unconditional Sell List");
             }
         }
     }

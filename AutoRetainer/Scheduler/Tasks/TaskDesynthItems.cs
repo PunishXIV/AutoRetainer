@@ -40,18 +40,18 @@ public static unsafe class TaskDesynthItems
 
     private static bool? RecursivelyDesynthItems()
     {
-        if (!QuestManager.IsQuestComplete(65688)) return true;
+        if(!QuestManager.IsQuestComplete(65688)) return true;
         _salvageItem = Marshal.GetDelegateForFunctionPointer<SalvageItemDelegate>(Svc.SigScanner.ScanText("E8 ?? ?? ?? ?? EB 46 48 8B 03"));
 
         var eligibleItems = GetEligibleItems();
-        if (eligibleItems.Count == 0) return true;
+        if(eligibleItems.Count == 0) return true;
 
-        foreach (var item in eligibleItems)
+        foreach(var item in eligibleItems)
         {
             // check IsOccupied vs just Occupied39 or else it might trigger when exiting the retainer menu
-            if (Utils.AnimationLock == 0 && !IsOccupied())
+            if(Utils.AnimationLock == 0 && !IsOccupied())
             {
-                if (Utils.GenericThrottle && EzThrottler.Throttle("DesynthingItem", 1000))
+                if(Utils.GenericThrottle && EzThrottler.Throttle("DesynthingItem", 1000))
                     DesynthItem(item);
             }
             else
@@ -63,13 +63,13 @@ public static unsafe class TaskDesynthItems
     private static List<Pointer<InventoryItem>> GetEligibleItems()
     {
         List<Pointer<InventoryItem>> items = [];
-        foreach (var inv in DesynthableInventories)
+        foreach(var inv in DesynthableInventories)
         {
             var cont = InventoryManager.Instance()->GetInventoryContainer(inv);
-            for (var i = 0; i < cont->Size; ++i)
+            for(var i = 0; i < cont->Size; ++i)
             {
                 var item = cont->GetInventorySlot(i);
-                if (IsOnIMList(item->ItemId) && DesynthEligible(item->ItemId))
+                if(IsOnIMList(item->ItemId) && DesynthEligible(item->ItemId))
                     items.Add(item);
             }
         }

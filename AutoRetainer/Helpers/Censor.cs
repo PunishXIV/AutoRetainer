@@ -16,7 +16,7 @@ internal static class Censor
 
     internal static string Character(string name, string world)
     {
-        if (C.NoNames)
+        if(C.NoNames)
         {
             var n1 = Crc32.Get(Seed + name) % Adjectives.Length;
             var n2 = Crc32.Get(Seed + name) % Animals.Length;
@@ -31,9 +31,9 @@ internal static class Censor
 
     internal static string Character(string name)
     {
-        if (C.NoNames)
+        if(C.NoNames)
         {
-            if (name.Contains('@'))
+            if(name.Contains('@'))
             {
                 var x = name.Split("@");
                 return Character(x[0], x[1]);
@@ -50,7 +50,7 @@ internal static class Censor
 
     internal static string World(string world)
     {
-        if (C.NoNames)
+        if(C.NoNames)
         {
             var w = Crc32.Get(Seed + world) % Worlds.Length;
             return $"{Worlds[w]}";
@@ -63,7 +63,7 @@ internal static class Censor
 
     internal static string Retainer(string name)
     {
-        if (C.NoNames)
+        if(C.NoNames)
         {
             var w = Crc32.Get(Seed + name) % Fishes.Length;
             return $"{Fishes[w]}";

@@ -25,7 +25,7 @@ internal class WaitOverlay : Window
 
     public override void Draw()
     {
-        if (ImGui.GetFrameCount() - Frame > 1) StartTime = Environment.TickCount64;
+        if(ImGui.GetFrameCount() - Frame > 1) StartTime = Environment.TickCount64;
         Frame = ImGui.GetFrameCount();
         CImGui.igBringWindowToDisplayFront(CImGui.igGetCurrentWindow());
         ImGui.Dummy(new(ImGuiHelpers.MainViewport.Size.X, ImGuiHelpers.MainViewport.Size.Y / 3));
@@ -38,7 +38,7 @@ internal class WaitOverlay : Window
         ImGuiEx.Text("");
         ImGuiEx.ImGuiLineCentered("Waitoverlay3", () =>
         {
-            if (ImGui.Button("Hide this overlay"))
+            if(ImGui.Button("Hide this overlay"))
             {
                 IsProcessing = false;
             }

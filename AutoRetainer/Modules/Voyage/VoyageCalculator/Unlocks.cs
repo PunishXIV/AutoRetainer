@@ -120,17 +120,17 @@ public static class Unlocks
 
     public static List<(uint, UnlockedFrom)> FindUnlockPath(uint finalPoint)
     {
-        if (!PointToUnlockPoint.TryGetValue(finalPoint, out var final))
+        if(!PointToUnlockPoint.TryGetValue(finalPoint, out var final))
             return [];
 
         // Unknown unlock at the time
-        if (final.Point == 9876)
+        if(final.Point == 9876)
             return [];
 
         var wayPoints = new List<(uint, UnlockedFrom)> { (finalPoint, final) };
 
         var point = final.Point;
-        while (point != 9000)
+        while(point != 9000)
         {
             var newPoint = PointToUnlockPoint[point];
             wayPoints.Add((point, newPoint));

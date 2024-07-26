@@ -10,13 +10,13 @@ public sealed class FcDataManager
     {
         ImGui.Checkbox($"Update every 30 hours", ref C.UpdateStaleFCData);
         ImGui.SameLine();
-        if (ImGuiEx.Button("Update", Player.Interactable))
+        if(ImGuiEx.Button("Update", Player.Interactable))
         {
             S.FCPointsUpdater.ScheduleUpdateIfNeeded(true);
         }
         ImGui.SameLine();
         ImGui.Checkbox($"Show only wallet FC", ref C.DisplayOnlyWalletFC);
-        if (ImGui.BeginTable("FCData", 5, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg))
+        if(ImGui.BeginTable("FCData", 5, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg))
         {
             ImGui.TableSetupColumn($"Name", ImGuiTableColumnFlags.WidthStretch);
             ImGui.TableSetupColumn($"Characters");
@@ -29,25 +29,25 @@ public sealed class FcDataManager
             var totalPoint = 0L;
 
             var i = 0;
-            foreach (var x in C.FCData)
+            foreach(var x in C.FCData)
             {
-                if (x.Key == 0) continue;
-                if (!x.Value.GilCountsTowardsChara && C.DisplayOnlyWalletFC) continue;
+                if(x.Key == 0) continue;
+                if(!x.Value.GilCountsTowardsChara && C.DisplayOnlyWalletFC) continue;
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
                 ImGuiEx.TextV(C.NoNames ? $"Free company {++i}" : x.Value.Name);
 
                 ImGui.TableNextColumn();
-                foreach (var c in C.OfflineData.Where(z => z.FCID == x.Key))
+                foreach(var c in C.OfflineData.Where(z => z.FCID == x.Key))
                 {
                     ImGuiEx.Text(x.Value.HolderChara == c.CID && x.Value.GilCountsTowardsChara ? EColor.GreenBright : null, Censor.Character(c.Name, c.World));
-                    if (ImGuiEx.HoveredAndClicked("Left click - Relog to this character"))
+                    if(ImGuiEx.HoveredAndClicked("Left click - Relog to this character"))
                     {
                         Svc.Commands.ProcessCommand($"/ays relog {c.Name}@{c.World}");
                     }
-                    if (x.Value.GilCountsTowardsChara)
+                    if(x.Value.GilCountsTowardsChara)
                     {
-                        if (ImGuiEx.HoveredAndClicked("Right click - set as gil holder", ImGuiMouseButton.Right))
+                        if(ImGuiEx.HoveredAndClicked("Right click - set as gil holder", ImGuiMouseButton.Right))
                         {
                             x.Value.HolderChara = c.CID;
                         }
@@ -55,7 +55,7 @@ public sealed class FcDataManager
                 }
 
                 ImGui.TableNextColumn();
-                if (x.Value.LastGilUpdate != -1 && x.Value.LastGilUpdate != 0)
+                if(x.Value.LastGilUpdate != -1 && x.Value.LastGilUpdate != 0)
                 {
                     ImGuiEx.Text($"{x.Value.Gil:N0}");
                     totalGil += x.Value.Gil;
@@ -67,7 +67,7 @@ public sealed class FcDataManager
                 }
 
                 ImGui.TableNextColumn();
-                if (x.Value.FCPointsLastUpdate != 0)
+                if(x.Value.FCPointsLastUpdate != 0)
                 {
                     ImGuiEx.Text($"{x.Value.FCPoints:N0}");
                     totalPoint += x.Value.FCPoints;
@@ -103,20 +103,20 @@ public sealed class FcDataManager
         string UpdatedWhen(long time)
         {
             var diff = DateTimeOffset.Now.ToUnixTimeMilliseconds() - time;
-            if (diff < 1000L * 60) return "just now";
-            if (diff < 1000L * 60 * 60) return $"{(int)(diff / 1000 / 60)} minute(s) ago";
-            if (diff < 1000L * 60 * 60 * 60) return $"{(int)(diff / 1000 / 60 / 60)} hour(s) ago";
+            if(diff < 1000L * 60) return "just now";
+            if(diff < 1000L * 60 * 60) return $"{(int)(diff / 1000 / 60)} minute(s) ago";
+            if(diff < 1000L * 60 * 60 * 60) return $"{(int)(diff / 1000 / 60 / 60)} hour(s) ago";
             return $"{(int)(diff / 1000 / 60 / 60 / 24)} day(s) ago";
         }
     }
 
     public OfflineCharacterData GetHolderChara(ulong fcid, FCData data)
     {
-        if (C.OfflineData.TryGetFirst(x => x.FCID == fcid && x.CID == data.HolderChara, out var chara))
+        if(C.OfflineData.TryGetFirst(x => x.FCID == fcid && x.CID == data.HolderChara, out var chara))
         {
             return chara;
         }
-        else if (C.OfflineData.TryGetFirst(x => x.FCID == fcid, out var fchara))
+        else if(C.OfflineData.TryGetFirst(x => x.FCID == fcid, out var fchara))
         {
             data.HolderChara = fchara.CID;
             return fchara;

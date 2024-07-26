@@ -8,7 +8,7 @@ internal unsafe class RetainersOld : DebugSectionBase
     private static Dictionary<int, (Vector2 start, Vector2 end)> bars = [];
     public override void Draw()
     {
-        if (!(GameRetainerManager.Ready && Svc.ClientState.LocalPlayer != null))
+        if(!(GameRetainerManager.Ready && Svc.ClientState.LocalPlayer != null))
         {
             ImGuiEx.Text("Data Not Ready");
             return;
@@ -29,12 +29,12 @@ internal unsafe class RetainersOld : DebugSectionBase
                 $"{ventures}");
         ImGuiComponents.HelpMarker("The plugin will automatically disable itself at < 2 Ventures or inventory slots available.");
         var storePos = ImGui.GetCursorPos();
-        for (var i = 0; i < GameRetainerManager.Count; i++)
+        for(var i = 0; i < GameRetainerManager.Count; i++)
         {
-            if (bars.TryGetValue(i, out var v))
+            if(bars.TryGetValue(i, out var v))
             {
                 var ret = GameRetainerManager.Retainers[i];
-                if (ret.VentureID == 0 || !ret.Available || ret.Name.ToString().IsNullOrEmpty()) continue;
+                if(ret.VentureID == 0 || !ret.Available || ret.Name.ToString().IsNullOrEmpty()) continue;
                 ImGui.SetCursorPos(v.start - ImGui.GetStyle().CellPadding with { Y = 0 });
                 ImGui.PushStyleColor(ImGuiCol.PlotHistogram, 0xbb500000);
                 ImGui.PushStyleColor(ImGuiCol.FrameBg, 0);
@@ -50,18 +50,18 @@ internal unsafe class RetainersOld : DebugSectionBase
         ImGui.TableSetupColumn("Interaction");
         ImGui.TableHeadersRow();
         var retainers = P.GetSelectedRetainers(Svc.ClientState.LocalContentId);
-        for (var i = 0; i < GameRetainerManager.Count; i++)
+        for(var i = 0; i < GameRetainerManager.Count; i++)
         {
             var ret = GameRetainerManager.Retainers[i];
-            if (!ret.Available || ret.Name.ToString().IsNullOrEmpty()) continue;
+            if(!ret.Available || ret.Name.ToString().IsNullOrEmpty()) continue;
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
             ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
             var start = ImGui.GetCursorPos();
             var selected = retainers.Contains(ret.Name.ToString());
-            if (ImGui.Checkbox($"Retainer {(C.NoNames ? i + 1 : ret.Name)}", ref selected))
+            if(ImGui.Checkbox($"Retainer {(C.NoNames ? i + 1 : ret.Name)}", ref selected))
             {
-                if (selected)
+                if(selected)
                 {
                     retainers.Add(ret.Name.ToString());
                 }

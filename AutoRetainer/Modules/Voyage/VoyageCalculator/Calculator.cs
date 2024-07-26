@@ -27,7 +27,7 @@ internal unsafe class Calculator
         try
         {
             var routeBuild = RouteBuild.Value;
-            if (CurrentBuild != null)
+            if(CurrentBuild != null)
             {
                 VoyageUtils.Log($"Starting to get best path for map {mapId}");
                 var mapDictionary = new ConcurrentDictionary<int, (int, List<SubmarineExplorationPretty>)[]>();
@@ -40,7 +40,7 @@ internal unsafe class Calculator
                             .Where(r => r.Map.Row == mapId && !r.StartingPoint && r.RankReq <= routeBuild.Rank)
                             .Where(r => CurrentSubmarine.GetUnlockedSectors().Contains(r.RowId))
                             .ToList();
-                    if (AllowedSectors.Any())
+                    if(AllowedSectors.Any())
                     {
                         valid = ExplorationSheet
                                 .Where(r => r.Map.Row == mapId && !r.StartingPoint && r.RankReq <= routeBuild.Rank)
@@ -49,24 +49,24 @@ internal unsafe class Calculator
                     }
                     highestRank = valid.Max(r => r.RankReq);
                 }
-                catch (KeyNotFoundException)
+                catch(KeyNotFoundException)
                 {
                     return null;
                 }
 
                 var startPoint = ExplorationSheet.First(r => r.Map.Row == mapId);
-                if (!mapDictionary.TryGetValue(highestRank, out var distances) || !distances.Any(t => t.Item2.ContainsAllItems(MustInclude)))
+                if(!mapDictionary.TryGetValue(highestRank, out var distances) || !distances.Any(t => t.Item2.ContainsAllItems(MustInclude)))
                 {
                     var paths = valid.Select(t => new[] { startPoint.RowId, t.RowId }.ToList()).ToHashSet(new ListComparer());
-                    if (MustInclude.Any())
+                    if(MustInclude.Any())
                         paths = new[] { MustInclude.Select(t => t.RowId).Prepend(startPoint.RowId).ToList() }.ToHashSet(new ListComparer());
 
                     var i = MustInclude.Any() ? MustInclude.Count : 1;
-                    while (i++ < 5)
+                    while(i++ < 5)
                     {
-                        foreach (var path in paths.ToArray())
+                        foreach(var path in paths.ToArray())
                         {
-                            foreach (var validPoint in valid.Where(t => !path.Contains(t.RowId)))
+                            foreach(var validPoint in valid.Where(t => !path.Contains(t.RowId)))
                             {
                                 var pathNew = path.ToList();
                                 pathNew.Add(validPoint.RowId);
@@ -77,7 +77,7 @@ internal unsafe class Calculator
 
                     var allPaths = C.VoyageDisableCalcParallel ? paths.Select(t => t.Select(f => valid.FirstOrDefault(k => k.RowId == f) ?? startPoint)).ToList() : paths.AsParallel().Select(t => t.Select(f => valid.FirstOrDefault(k => k.RowId == f) ?? startPoint)).ToList();
 
-                    if (!allPaths.Any())
+                    if(!allPaths.Any())
                     {
                         return null;
                     }
@@ -88,7 +88,7 @@ internal unsafe class Calculator
 
                 var build = routeBuild.GetSubmarineBuild;
                 var optimalDistances = C.VoyageDisableCalcParallel ? distances.Where(t => t.Item1 <= build.Range && t.Item2.ContainsAllItems(MustInclude)).ToArray() : distances.AsParallel().Where(t => t.Item1 <= build.Range && t.Item2.ContainsAllItems(MustInclude)).ToArray();
-                if (!optimalDistances.Any())
+                if(!optimalDistances.Any())
                 {
                     return null;
                 }
@@ -108,14 +108,14 @@ internal unsafe class Calculator
                   //.Select(t => t.Item1)
                   .FirstOrDefault();
 
-                if (bestPath == null)
+                if(bestPath == null)
                 {
                     return null;
                 }
                 return (bestPath.Item1, bestPath.Item2, bestPath.Item3);
             }
         }
-        catch (Exception e)
+        catch(Exception e)
         {
             PluginLog.Error($"Error calculating best path");
             e.Log();

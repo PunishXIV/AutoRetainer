@@ -33,7 +33,7 @@ internal unsafe class AutoRetainerWindow : Window
         AllowPinning = false;
         TitleBarButtons.Add(new()
         {
-            Click = (m) => { if (m == ImGuiMouseButton.Left) S.NeoWindow.IsOpen = true; },
+            Click = (m) => { if(m == ImGuiMouseButton.Left) S.NeoWindow.IsOpen = true; },
             Icon = FontAwesomeIcon.Cog,
             IconOffset = new(2, 2),
             ShowTooltip = () => ImGui.SetTooltip("Open settings window"),
@@ -43,7 +43,7 @@ internal unsafe class AutoRetainerWindow : Window
 
     private void OnLockButtonClick(ImGuiMouseButton m)
     {
-        if (m == ImGuiMouseButton.Left)
+        if(m == ImGuiMouseButton.Left)
         {
             C.PinWindow = !C.PinWindow;
             LockButton.Icon = C.PinWindow ? FontAwesomeIcon.Lock : FontAwesomeIcon.LockOpen;
@@ -55,7 +55,7 @@ internal unsafe class AutoRetainerWindow : Window
         var prefix = SchedulerMain.PluginEnabled ? $" [{SchedulerMain.Reason}]" : "";
         var tokenRem = TimeSpan.FromMilliseconds(P.TimeLaunched[0] + 3 * 24 * 60 * 60 * 1000 - DateTimeOffset.Now.ToUnixTimeMilliseconds());
         WindowName = $"{P.Name} {P.GetType().Assembly.GetName().Version}{prefix} | {FormatToken(tokenRem)}###AutoRetainer";
-        if (C.PinWindow)
+        if(C.PinWindow)
         {
             ImGuiHelpers.SetNextWindowPosRelativeMainViewport(C.WindowPos);
             ImGui.SetNextWindowSize(C.WindowSize);
@@ -64,15 +64,15 @@ internal unsafe class AutoRetainerWindow : Window
 
     private string FormatToken(TimeSpan time)
     {
-        if (time.TotalMilliseconds > 0)
+        if(time.TotalMilliseconds > 0)
         {
-            if (time.Days > 0)
+            if(time.Days > 0)
             {
                 return $"Session expires in {time.Days} day{(time.Days == 1 ? "" : "s")}" + (time.Hours > 0 ? $" {time.Hours} hours" : "");
             }
             else
             {
-                if (time.Hours > 0)
+                if(time.Hours > 0)
                 {
                     return $"Session expires in {time.Hours} hours";
                 }
@@ -89,7 +89,7 @@ internal unsafe class AutoRetainerWindow : Window
     }
     public override void Draw()
     {
-        if (!C.AcceptedDisclamer)
+        if(!C.AcceptedDisclamer)
         {
             new NuiBuilder()
                 .Section("Disclaimer")
@@ -102,7 +102,7 @@ internal unsafe class AutoRetainerWindow : Window
                 .TextWrapped("Failure to follow these rules may result in actions taken against your account.")
                 .Widget(() =>
                 {
-                    if (ImGuiEx.IconButtonWithText(FontAwesomeIcon.Check, "Accept and continue"))
+                    if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Check, "Accept and continue"))
                     {
                         C.AcceptedDisclamer = true;
                         EzConfig.Save();
@@ -114,14 +114,14 @@ internal unsafe class AutoRetainerWindow : Window
         var e = SchedulerMain.PluginEnabledInternal;
         var disabled = MultiMode.Active && !ImGui.GetIO().KeyCtrl;
 
-        if (disabled)
+        if(disabled)
         {
             ImGui.BeginDisabled();
         }
-        if (ImGui.Checkbox($"Enable {P.Name}", ref e))
+        if(ImGui.Checkbox($"Enable {P.Name}", ref e))
         {
             P.WasEnabled = false;
-            if (e)
+            if(e)
             {
                 SchedulerMain.EnablePlugin(PluginEnableReason.Auto);
             }
@@ -130,46 +130,46 @@ internal unsafe class AutoRetainerWindow : Window
                 SchedulerMain.DisablePlugin();
             }
         }
-        if (C.ShowDeployables && (VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType) || VoyageScheduler.Enabled))
+        if(C.ShowDeployables && (VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType) || VoyageScheduler.Enabled))
         {
             ImGui.SameLine();
             ImGui.Checkbox($"Deployables", ref VoyageScheduler.Enabled);
         }
-        if (disabled)
+        if(disabled)
         {
             ImGui.EndDisabled();
             ImGuiComponents.HelpMarker($"MultiMode controls this option. Hold CTRL to override.");
         }
 
-        if (P.WasEnabled)
+        if(P.WasEnabled)
         {
             ImGui.SameLine();
             ImGuiEx.Text(GradientColor.Get(ImGuiColors.DalamudGrey, ImGuiColors.DalamudGrey3, 500), $"Paused");
         }
 
         ImGui.SameLine();
-        if (ImGui.Checkbox("Multi", ref MultiMode.Enabled))
+        if(ImGui.Checkbox("Multi", ref MultiMode.Enabled))
         {
             MultiMode.OnMultiModeEnabled();
         }
-        if (C.ShowNightMode)
+        if(C.ShowNightMode)
         {
             ImGui.SameLine();
-            if (ImGui.Checkbox("Night", ref C.NightMode))
+            if(ImGui.Checkbox("Night", ref C.NightMode))
             {
                 MultiMode.BailoutNightMode();
             }
         }
-        if (C.DisplayMMType)
+        if(C.DisplayMMType)
         {
             ImGui.SameLine();
             ImGuiEx.SetNextItemWidthScaled(100f);
             ImGuiEx.EnumCombo("##mode", ref C.MultiModeType);
         }
-        if (C.CharEqualize && MultiMode.Enabled)
+        if(C.CharEqualize && MultiMode.Enabled)
         {
             ImGui.SameLine();
-            if (ImGui.Button("Reset counters"))
+            if(ImGui.Button("Reset counters"))
             {
                 MultiMode.CharaCnt.Clear();
             }
@@ -177,20 +177,20 @@ internal unsafe class AutoRetainerWindow : Window
 
         Svc.PluginInterface.GetIpcProvider<object>(ApiConsts.OnMainControlsDraw).SendMessage();
 
-        if (IPC.Suppressed)
+        if(IPC.Suppressed)
         {
             ImGuiEx.Text(ImGuiColors.DalamudRed, $"Plugin operation is suppressed by other plugin.");
             ImGui.SameLine();
-            if (ImGui.SmallButton("Cancel"))
+            if(ImGui.SmallButton("Cancel"))
             {
                 IPC.Suppressed = false;
             }
         }
 
-        if (P.TaskManager.IsBusy)
+        if(P.TaskManager.IsBusy)
         {
             ImGui.SameLine();
-            if (ImGui.Button($"Abort {P.TaskManager.NumQueuedTasks} tasks"))
+            if(ImGui.Button($"Abort {P.TaskManager.NumQueuedTasks} tasks"))
             {
                 P.TaskManager.Abort();
             }
@@ -203,7 +203,7 @@ internal unsafe class AutoRetainerWindow : Window
                         ("Statistics", DrawStats, null, true),
                         ("About", CustomAboutTab.Draw, null, true)
                         );
-        if (!C.PinWindow)
+        if(!C.PinWindow)
         {
             C.WindowPos = ImGui.GetWindowPos();
             C.WindowSize = ImGui.GetWindowSize();

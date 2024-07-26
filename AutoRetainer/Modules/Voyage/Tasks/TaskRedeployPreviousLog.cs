@@ -22,23 +22,23 @@ internal static unsafe class TaskRedeployPreviousLog
 
     internal static bool? CheckForFuel()
     {
-        if (TryGetAddonByName<AtkUnitBase>("AirShipExplorationDetail", out var addon) && IsAddonReady(addon))
+        if(TryGetAddonByName<AtkUnitBase>("AirShipExplorationDetail", out var addon) && IsAddonReady(addon))
         {
             var fuel = addon->AtkValues[1].String;
-            if (fuel != null)
+            if(fuel != null)
             {
                 var values = MemoryHelper.ReadStringNullTerminated((nint)fuel).Split("/");
-                if (values.Length == 2 && uint.TryParse(values[0], out var req) && uint.TryParse(values[1], out var have))
+                if(values.Length == 2 && uint.TryParse(values[0], out var req) && uint.TryParse(values[1], out var have))
                 {
-                    if (req > have)
+                    if(req > have)
                     {
                         P.TaskManager.Abort();
                         DuoLog.Warning($"[Voyage] You are out of fuel!");
-                        if (C.FailureNoFuel == WorkshopFailAction.ExcludeChar)
+                        if(C.FailureNoFuel == WorkshopFailAction.ExcludeChar)
                         {
                             Data.WorkshopEnabled = false;
                         }
-                        else if (C.FailureNoFuel == WorkshopFailAction.StopPlugin)
+                        else if(C.FailureNoFuel == WorkshopFailAction.StopPlugin)
                         {
                             MultiMode.Enabled = false;
                             VoyageScheduler.Enabled = false;

@@ -16,9 +16,9 @@ internal static unsafe class CurrentSubmarine
     public static List<uint> GetUnlockedSectors()
     {
         var ret = new List<uint>();
-        foreach (var submarineExploration in Svc.Data.GetExcelSheet<SubmarineExploration>())
+        foreach(var submarineExploration in Svc.Data.GetExcelSheet<SubmarineExploration>())
         {
-            if (HousingManager.IsSubmarineExplorationUnlocked((byte)submarineExploration.RowId)) ret.Add(submarineExploration.RowId);
+            if(HousingManager.IsSubmarineExplorationUnlocked((byte)submarineExploration.RowId)) ret.Add(submarineExploration.RowId);
         }
         return ret;
     }
@@ -26,9 +26,9 @@ internal static unsafe class CurrentSubmarine
     public static List<uint> GetExploredSectors()
     {
         var ret = new List<uint>();
-        foreach (var submarineExploration in Svc.Data.GetExcelSheet<SubmarineExploration>())
+        foreach(var submarineExploration in Svc.Data.GetExcelSheet<SubmarineExploration>())
         {
-            if (HousingManager.IsSubmarineExplorationExplored((byte)submarineExploration.RowId)) ret.Add(submarineExploration.RowId);
+            if(HousingManager.IsSubmarineExplorationExplored((byte)submarineExploration.RowId)) ret.Add(submarineExploration.RowId);
         }
         return ret;
     }
@@ -52,11 +52,11 @@ internal static unsafe class CurrentSubmarine
         Task.Run(() =>
         {
             VoyageMain.WaitOverlay.IsProcessing = true;
-            foreach (var x in maps)
+            foreach(var x in maps)
             {
                 calc.RouteBuild.Value.ChangeMap((int)x);
                 var best = calc.FindBestPath(x);
-                if (best != null)
+                if(best != null)
                 {
                     DuoLog.Information($"Map {x}: {best.Value.path.Select(z => $"{z}/{ExplorationSheet.GetRow(z).Location}").Print()}, {best.Value.duration}, {best.Value.exp} / ");
                 }
@@ -74,12 +74,12 @@ internal static unsafe class CurrentSubmarine
             VoyageMain.WaitOverlay.IsProcessing = true;
             calc.RouteBuild.Value.ChangeMap((int)1);
             var best = calc.FindBestPath(1);
-            if (best != null)
+            if(best != null)
             {
                 DuoLog.Information($"{best.Value.path.Select(z => $"{z}/{ExplorationSheet.GetRow(z).Location}").Print()}, {best.Value.duration}, {best.Value.exp}");
                 new TickScheduler(delegate
                 {
-                    foreach (var x in best.Value.path)
+                    foreach(var x in best.Value.path)
                     {
                         P.TaskManager.Enqueue(() => P.Memory.SelectRoutePointUnsafe((int)(x)));
                     }

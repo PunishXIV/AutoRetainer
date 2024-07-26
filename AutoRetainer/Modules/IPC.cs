@@ -69,7 +69,7 @@ internal static class IPC
 
     private static void RequestRetainerPostprocess(string pluginName)
     {
-        if (SchedulerMain.RetainerPostprocess.Contains(pluginName))
+        if(SchedulerMain.RetainerPostprocess.Contains(pluginName))
         {
             throw new Exception($"Retainer Postprocess request from {pluginName} already exist");
         }
@@ -79,7 +79,7 @@ internal static class IPC
 
     private static void RequestCharacterPostprocess(string pluginName)
     {
-        if (SchedulerMain.CharacterPostprocess.Contains(pluginName))
+        if(SchedulerMain.CharacterPostprocess.Contains(pluginName))
         {
             throw new Exception($"Character Postprocess request from {pluginName} already exist");
         }
@@ -100,13 +100,13 @@ internal static class IPC
     private static void SetOCD(OfflineCharacterData OCD)
     {
         var index = C.OfflineData.IndexOf(x => x.CID == OCD.CID);
-        if (index != -1)
+        if(index != -1)
         {
             //C.OfflineData[index] = OCD;
             var data = C.OfflineData[index];
-            foreach (var field in OCD.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance))
+            foreach(var field in OCD.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance))
             {
-                if (data.GetFoP(field.Name) != null)
+                if(data.GetFoP(field.Name) != null)
                 {
                     data.SetFoP(field.Name, field.GetValue(OCD));
                     PluginLog.Verbose($"Setting {field.Name} to {field.GetValue(data)}");
@@ -127,9 +127,9 @@ internal static class IPC
     private static void SetARD(ulong cid, string name, AdditionalRetainerData data)
     {
         var x = C.AdditionalData[Utils.GetAdditionalDataKey(cid, name)];
-        foreach (var field in data.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance))
+        foreach(var field in data.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance))
         {
-            if (x.GetFoP(field.Name) != null)
+            if(x.GetFoP(field.Name) != null)
             {
                 x.SetFoP(field.Name, field.GetValue(data));
                 PluginLog.Verbose($"Setting {field.Name} to {field.GetValue(data)}");

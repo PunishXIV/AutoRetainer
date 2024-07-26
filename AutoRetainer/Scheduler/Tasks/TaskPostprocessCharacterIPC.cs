@@ -12,7 +12,7 @@ public class TaskPostprocessCharacterIPC
         P.TaskManager.Enqueue(() =>
         {
             DebugLog($"SchedulerMain.CharacterPostprocess contains: {SchedulerMain.CharacterPostprocess.Print()}, pluginToProcess = {pluginToProcess}");
-            foreach (var x in SchedulerMain.CharacterPostprocess.Where(x => pluginToProcess == null || x == pluginToProcess))
+            foreach(var x in SchedulerMain.CharacterPostprocess.Where(x => pluginToProcess == null || x == pluginToProcess))
             {
                 P.TaskManager.EnqueueImmediate(() =>
                     {

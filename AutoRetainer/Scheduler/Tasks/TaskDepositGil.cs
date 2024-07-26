@@ -13,7 +13,7 @@ internal static unsafe class TaskDepositGil
     {
         Func<int, bool?> depFunc = isGilAmount ? RetainerHandlers.SetDepositGilAmountExact : RetainerHandlers.SetDepositGilAmount;
         P.TaskManager.Enqueue(NewYesAlreadyManager.WaitForYesAlreadyDisabledTask);
-        if (C.RetainerMenuDelay > 0)
+        if(C.RetainerMenuDelay > 0)
         {
             TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
         }

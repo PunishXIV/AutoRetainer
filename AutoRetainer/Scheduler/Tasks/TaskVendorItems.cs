@@ -15,13 +15,13 @@ public static class TaskVendorItems
 
     public static void EnqueueImmediateAllItems()
     {
-        if (InventorySpaceManager.SellSlotTasks.Count == 0)
+        if(InventorySpaceManager.SellSlotTasks.Count == 0)
         {
             return;
         }
         else
         {
-            foreach (var x in InventorySpaceManager.SellSlotTasks)
+            foreach(var x in InventorySpaceManager.SellSlotTasks)
             {
                 P.TaskManager.EnqueueImmediate(() => InventorySpaceManager.SafeSellSlot(x), $"InventorySpaceManager.SafeSellSlot({x})");
             }
@@ -43,7 +43,7 @@ public static class TaskVendorItems
 
     public static bool? SelectEntrustItems()
     {
-        if (InventorySpaceManager.SellSlotTasks.Count == 0)
+        if(InventorySpaceManager.SellSlotTasks.Count == 0)
         {
             return true;
         }
@@ -55,11 +55,11 @@ public static class TaskVendorItems
 
     public static bool? WaitUntilInventoryLoaded()
     {
-        if (InventorySpaceManager.SellSlotTasks.Count == 0)
+        if(InventorySpaceManager.SellSlotTasks.Count == 0)
         {
             return true;
         }
-        else if (InventorySpaceManager.IsRetainerInventoryLoaded())
+        else if(InventorySpaceManager.IsRetainerInventoryLoaded())
         {
             return true;
         }

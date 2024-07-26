@@ -22,47 +22,47 @@ internal static unsafe class MultiModeUI
         var shouldExpand = false;
         var doExpand = JustRelogged && !C.NoCurrentCharaOnTop;
         JustRelogged = false;
-        if (C.NoCurrentCharaOnTop)
+        if(C.NoCurrentCharaOnTop)
         {
             sortedData = C.OfflineData;
         }
         else
         {
-            if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var cdata))
+            if(C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var cdata))
             {
                 sortedData.Add(cdata);
                 shouldExpand = true;
             }
-            foreach (var x in C.OfflineData)
+            foreach(var x in C.OfflineData)
             {
-                if (x.CID != Svc.ClientState.LocalContentId)
+                if(x.CID != Svc.ClientState.LocalContentId)
                 {
                     sortedData.Add(x);
                 }
             }
         }
-        for (var index = 0; index < sortedData.Count; index++)
+        for(var index = 0; index < sortedData.Count; index++)
         {
             var data = sortedData[index];
-            if (data.World.IsNullOrEmpty() || data.ExcludeRetainer) continue;
+            if(data.World.IsNullOrEmpty() || data.ExcludeRetainer) continue;
             ImGui.PushID(data.CID.ToString());
             var rCurPos = ImGui.GetCursorPos();
             var colen = false;
-            if (data.Enabled)
+            if(data.Enabled)
             {
                 ImGui.PushStyleColor(ImGuiCol.Button, 0xFF097000);
                 colen = true;
             }
-            if (ImGuiEx.IconButton(Lang.IconMultiMode))
+            if(ImGuiEx.IconButton(Lang.IconMultiMode))
             {
                 data.Enabled = !data.Enabled;
             }
-            if (colen) ImGui.PopStyleColor();
+            if(colen) ImGui.PopStyleColor();
             ImGuiEx.Tooltip($"Enable multi-mode for this character");
             ImGui.SameLine(0, 3);
-            if (ImGuiEx.IconButton(FontAwesomeIcon.DoorOpen))
+            if(ImGuiEx.IconButton(FontAwesomeIcon.DoorOpen))
             {
-                if (MultiMode.Relog(data, out var error, RelogReason.ConfigGUI))
+                if(MultiMode.Relog(data, out var error, RelogReason.ConfigGUI))
                 {
                     Notify.Success("Relogging...");
                 }
@@ -71,30 +71,30 @@ internal static unsafe class MultiModeUI
                     Notify.Error(error);
                 }
             }
-            if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+            if(ImGui.IsItemClicked(ImGuiMouseButton.Right))
             {
                 Copy($"/ays relog {data.Name}@{data.World}");
             }
             ImGuiEx.Tooltip($"Left click - relog to this character\nRight click - copy relog command into clipboard");
             ImGui.SameLine(0, 3);
-            if (ImGuiEx.IconButton(FontAwesomeIcon.Cog))
+            if(ImGuiEx.IconButton(FontAwesomeIcon.Cog))
             {
                 ImGui.OpenPopup($"popup{data.CID}");
             }
             ImGuiEx.Tooltip($"Configure Character");
             ImGui.SameLine(0, 3);
 
-            if (ImGui.BeginPopup($"popup{data.CID}"))
+            if(ImGui.BeginPopup($"popup{data.CID}"))
             {
                 SharedUI.DrawMultiModeHeader(data);
-                if (ImGuiGroup.BeginGroupBox("General Character Specific Settings"))
+                if(ImGuiGroup.BeginGroupBox("General Character Specific Settings"))
                 {
                     SharedUI.DrawServiceAccSelector(data);
                     SharedUI.DrawPreferredCharacterUI(data);
                     ImGui.Checkbox("List & Process Retainers in Display Order", ref data.ShowRetainersInDisplayOrder);
 
                     ImGuiEx.Text($"Automatic Grand Company Expert Delivery:");
-                    if (!AutoGCHandin.Operation)
+                    if(!AutoGCHandin.Operation)
                     {
                         ImGuiEx.SetNextItemWidthScaled(200f);
                         ImGuiEx.EnumCombo("##gcHandin", ref data.GCDeliveryType);
@@ -103,7 +103,7 @@ internal static unsafe class MultiModeUI
                     {
                         ImGuiEx.Text($"Can't change this now");
                     }
-                    if (ImGui.Button("Entrust Duplicates Exclusions"))
+                    if(ImGui.Button("Entrust Duplicates Exclusions"))
                     {
                         P.DuplicateBlacklistSelector.IsOpen = true;
                         P.DuplicateBlacklistSelector.SelectedData = data;
@@ -112,7 +112,7 @@ internal static unsafe class MultiModeUI
                 }
 
 
-                if (ImGuiGroup.BeginGroupBox("Estate entrance override"))
+                if(ImGuiGroup.BeginGroupBox("Estate entrance override"))
                 {
                     data.DrawEntranceConfig(ref data.FreeCompanyHouseEntrance);
                     ImGuiGroup.EndGroupBox();
@@ -123,7 +123,7 @@ internal static unsafe class MultiModeUI
 
             var initCurpos = ImGui.GetCursorPos();
             var lowestRetainer = C.MultiModeRetainerConfiguration.MultiWaitForAll ? data.GetEnabledRetainers().OrderBy(z => z.GetVentureSecondsRemaining()).LastOrDefault() : data.GetEnabledRetainers().OrderBy(z => z.GetVentureSecondsRemaining()).FirstOrDefault();
-            if (lowestRetainer != default)
+            if(lowestRetainer != default)
             {
                 var prog = Math.Max(0, (3600 - lowestRetainer.GetVentureSecondsRemaining(false)) / 3600f);
                 var pcol = prog == 1f ? GradientColor.Get(0xbb500000.ToVector4(), 0xbb005000.ToVector4()) : 0xbb500000.ToVector4();
@@ -133,18 +133,18 @@ internal static unsafe class MultiModeUI
                 ImGui.SetCursorPos(initCurpos);
             }
             var col = data.Preferred;
-            if (col)
+            if(col)
             {
                 ImGui.PushStyleColor(ImGuiCol.Text, GradientColor.Get(ImGui.GetStyle().Colors[(int)ImGuiCol.Text], ImGuiColors.ParsedGreen));
             }
-            if (shouldExpand && doExpand)
+            if(shouldExpand && doExpand)
             {
                 ImGui.SetNextItemOpen(index == 0);
             }
-            if (ImGui.CollapsingHeader($"{(data.WorldOverride == null ? "" : $"{Lang.StrDCV} ")}" + Censor.Character(data.Name, data.World) + $"###chara{data.CID}"))
+            if(ImGui.CollapsingHeader($"{(data.WorldOverride == null ? "" : $"{Lang.StrDCV} ")}" + Censor.Character(data.Name, data.World) + $"###chara{data.CID}"))
             {
                 SetAsPreferred(data);
-                if (col)
+                if(col)
                 {
                     ImGui.PopStyleColor();
                     col = false;
@@ -154,16 +154,16 @@ internal static unsafe class MultiModeUI
 
                 var storePos = ImGui.GetCursorPos();
                 var retainerData = data.RetainerData;
-                if (data.ShowRetainersInDisplayOrder)
+                if(data.ShowRetainersInDisplayOrder)
                 {
                     retainerData = retainerData.OrderBy(x => x.DisplayOrder).ToList();
                 }
-                for (var i = 0; i < retainerData.Count; i++)
+                for(var i = 0; i < retainerData.Count; i++)
                 {
-                    if (bars.TryGetValue($"{data.CID}{retainerData[i].Name}", out var v))
+                    if(bars.TryGetValue($"{data.CID}{retainerData[i].Name}", out var v))
                     {
                         var ret = retainerData[i];
-                        if (!ret.HasVenture || ret.Level == 0 || ret.Name.ToString().IsNullOrEmpty()) continue;
+                        if(!ret.HasVenture || ret.Level == 0 || ret.Name.ToString().IsNullOrEmpty()) continue;
                         ImGui.SetCursorPos(v.start - ImGui.GetStyle().CellPadding with { Y = 0 });
                         ImGui.PushStyleColor(ImGuiCol.PlotHistogram, 0xbb500000);
                         ImGui.PushStyleColor(ImGuiCol.FrameBg, 0);
@@ -173,7 +173,7 @@ internal static unsafe class MultiModeUI
                     }
                 }
                 ImGui.SetCursorPos(storePos);
-                if (ImGui.BeginTable("##retainertable", 4, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Borders))
+                if(ImGui.BeginTable("##retainertable", 4, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Borders))
                 {
                     ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
                     ImGui.TableSetupColumn("Job");
@@ -181,19 +181,19 @@ internal static unsafe class MultiModeUI
                     ImGui.TableSetupColumn("");
                     ImGui.TableHeadersRow();
                     var retainers = P.GetSelectedRetainers(data.CID);
-                    for (var i = 0; i < retainerData.Count; i++)
+                    for(var i = 0; i < retainerData.Count; i++)
                     {
                         var ret = retainerData[i];
-                        if (ret.Level == 0 || ret.Name.ToString().IsNullOrEmpty()) continue;
+                        if(ret.Level == 0 || ret.Name.ToString().IsNullOrEmpty()) continue;
                         var adata = Utils.GetAdditionalData(data.CID, ret.Name);
                         ImGui.TableNextRow();
                         ImGui.TableNextColumn();
                         ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
                         var start = ImGui.GetCursorPos();
                         var selected = retainers.Contains(ret.Name.ToString());
-                        if (ImGui.Checkbox($"{Censor.Retainer(ret.Name)}", ref selected))
+                        if(ImGui.Checkbox($"{Censor.Retainer(ret.Name)}", ref selected))
                         {
-                            if (selected)
+                            if(selected)
                             {
                                 retainers.Add(ret.Name.ToString());
                             }
@@ -202,14 +202,14 @@ internal static unsafe class MultiModeUI
                                 retainers.Remove(ret.Name.ToString());
                             }
                         }
-                        if (adata.EntrustDuplicates)
+                        if(adata.EntrustDuplicates)
                         {
                             ImGui.SameLine();
                             ImGui.PushFont(UiBuilder.IconFont);
                             ImGuiEx.Text(Lang.IconDuplicate);
                             ImGui.PopFont();
                         }
-                        if (adata.WithdrawGil)
+                        if(adata.WithdrawGil)
                         {
                             ImGui.SameLine();
                             ImGui.PushFont(UiBuilder.IconFont);
@@ -217,13 +217,13 @@ internal static unsafe class MultiModeUI
                             ImGui.PopFont();
                         }
                         Svc.PluginInterface.GetIpcProvider<ulong, string, object>(ApiConsts.OnRetainerPostVentureTaskDraw).SendMessage(data.CID, ret.Name);
-                        if (adata.IsVenturePlannerActive())
+                        if(adata.IsVenturePlannerActive())
                         {
                             ImGui.SameLine();
                             ImGui.PushFont(UiBuilder.IconFont);
                             ImGuiEx.Text(Lang.IconPlanner);
                             ImGui.PopFont();
-                            if (ImGui.IsItemHovered())
+                            if(ImGui.IsItemHovered())
                             {
                                 ImGui.BeginTooltip();
                                 VentureUtils.BuildUnwrappedList(adata, data, ret);
@@ -235,7 +235,7 @@ internal static unsafe class MultiModeUI
                         ImGui.TableNextColumn();
                         ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
 
-                        if (ThreadLoadImageHandler.TryGetIconTextureWrap(ret.Job == 0 ? 62143 : 062100 + ret.Job, true, out var t))
+                        if(ThreadLoadImageHandler.TryGetIconTextureWrap(ret.Job == 0 ? 62143 : 062100 + ret.Job, true, out var t))
                         {
                             ImGui.Image(t.ImGuiHandle, new(24, 24));
                         }
@@ -243,24 +243,24 @@ internal static unsafe class MultiModeUI
                         {
                             ImGui.Dummy(new(24, 24));
                         }
-                        if (ret.Level > 0)
+                        if(ret.Level > 0)
                         {
                             ImGui.SameLine(0, 2);
                             var level = $"{Lang.CharLevel}{ret.Level}";
                             var add = "";
-                            if (adata.Ilvl > -1 && !VentureUtils.IsDoL(ret.Job))
+                            if(adata.Ilvl > -1 && !VentureUtils.IsDoL(ret.Job))
                             {
                                 add += $"{Lang.CharItemLevel}{adata.Ilvl}";
                             }
-                            if ((adata.Gathering > -1 || adata.Perception > -1) && VentureUtils.IsDoL(ret.Job))
+                            if((adata.Gathering > -1 || adata.Perception > -1) && VentureUtils.IsDoL(ret.Job))
                             {
                                 add += $"{Lang.CharPlant}{adata.Gathering}/{adata.Perception}";
                             }
                             var cap = ret.Level < Player.MaxLevel && data.GetJobLevel(ret.Job) == ret.Level;
-                            if (cap) ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
+                            if(cap) ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
                             ImGuiEx.TextV(level.ReplaceByChar(Lang.Digits.Normal, Lang.Digits.GameFont));
-                            if (cap) ImGui.PopStyleColor();
-                            if (C.ShowAdditionalInfo && add != "")
+                            if(cap) ImGui.PopStyleColor();
+                            if(C.ShowAdditionalInfo && add != "")
                             {
                                 ImGui.SameLine();
                                 ImGuiEx.Text(add);
@@ -268,10 +268,10 @@ internal static unsafe class MultiModeUI
                         }
                         ImGui.TableNextColumn();
                         ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
-                        if (ret.VentureID != 0 && C.ShowAdditionalInfo)
+                        if(ret.VentureID != 0 && C.ShowAdditionalInfo)
                         {
                             var parts = VentureUtils.GetVentureById(ret.VentureID).GetFancyVentureNameParts(data, ret, out _);
-                            if (!parts.Name.IsNullOrEmpty())
+                            if(!parts.Name.IsNullOrEmpty())
                             {
                                 var c = parts.YieldRate == 4 ? ImGuiColors.ParsedGreen : ImGui.GetStyle().Colors[(int)ImGuiCol.Text];
                                 ImGuiEx.Text(c, $"{(parts.Level != 0 ? $"{Lang.CharLevel}{parts.Level} " : "")}{parts.Name}");
@@ -282,32 +282,32 @@ internal static unsafe class MultiModeUI
                         ImGui.TableNextColumn();
                         ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
                         var n = $"{data.CID} {ret.Name} settings";
-                        if (ImGuiEx.IconButton(FontAwesomeIcon.Cogs, $"{data.CID} {ret.Name}"))
+                        if(ImGuiEx.IconButton(FontAwesomeIcon.Cogs, $"{data.CID} {ret.Name}"))
                         {
                             ImGui.OpenPopup(n);
                         }
-                        if (ImGuiEx.BeginPopupNextToElement(n))
+                        if(ImGuiEx.BeginPopupNextToElement(n))
                         {
                             ImGui.CollapsingHeader($"{Censor.Retainer(ret.Name)} - {Censor.Character(data.Name)} Configuration  ##conf", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.Bullet | ImGuiTreeNodeFlags.OpenOnArrow);
                             ImGuiEx.Text($"Additional Post-venture Tasks:");
                             ImGui.Checkbox($"Entrust Duplicates", ref adata.EntrustDuplicates);
                             ImGui.Checkbox($"Withdraw/Deposit Gil", ref adata.WithdrawGil);
-                            if (adata.WithdrawGil)
+                            if(adata.WithdrawGil)
                             {
-                                if (ImGui.RadioButton("Withdraw", !adata.Deposit)) adata.Deposit = false;
-                                if (ImGui.RadioButton("Deposit", adata.Deposit)) adata.Deposit = true;
+                                if(ImGui.RadioButton("Withdraw", !adata.Deposit)) adata.Deposit = false;
+                                if(ImGui.RadioButton("Deposit", adata.Deposit)) adata.Deposit = true;
                                 ImGuiEx.SetNextItemWidthScaled(200f);
                                 ImGui.InputInt($"Amount, %", ref adata.WithdrawGilPercent.ValidateRange(1, 100), 1, 10);
                             }
                             ImGui.Separator();
                             Svc.PluginInterface.GetIpcProvider<ulong, string, object>(ApiConsts.OnRetainerSettingsDraw).SendMessage(data.CID, ret.Name);
-                            if (C.Verbose)
+                            if(C.Verbose)
                             {
-                                if (ImGui.Button("Fake ready"))
+                                if(ImGui.Button("Fake ready"))
                                 {
                                     ret.VentureEndsAt = 1;
                                 }
-                                if (ImGui.Button("Fake unready"))
+                                if(ImGui.Button("Fake unready"))
                                 {
                                     ret.VentureEndsAt = P.Time + 60 * 60;
                                 }
@@ -315,7 +315,7 @@ internal static unsafe class MultiModeUI
                             ImGui.EndPopup();
                         }
                         ImGui.SameLine();
-                        if (ImGuiEx.IconButton(Lang.IconPlanner, $"{data.CID} {ret.Name} planner"))
+                        if(ImGuiEx.IconButton(Lang.IconPlanner, $"{data.CID} {ret.Name} planner"))
                         {
                             P.VenturePlanner.Open(data, ret);
                         }
@@ -328,7 +328,7 @@ internal static unsafe class MultiModeUI
             else
             {
                 SetAsPreferred(data);
-                if (col)
+                if(col)
                 {
                     ImGui.PopStyleColor();
                     col = false;
@@ -336,7 +336,7 @@ internal static unsafe class MultiModeUI
             }
             ImGui.SameLine(0, 0);
             List<(bool, string)> texts = [(data.Ventures < C.UIWarningRetVentureNum, $"V: {data.Ventures}"), (data.InventorySpace < C.UIWarningRetSlotNum, $"I: {data.InventorySpace}")];
-            if (C.CharEqualize && MultiMode.Enabled)
+            if(C.CharEqualize && MultiMode.Enabled)
             {
                 texts.Insert(0, (false, $"C: {MultiMode.CharaCnt.GetOrDefault(data.CID)}"));
             }
@@ -347,7 +347,7 @@ internal static unsafe class MultiModeUI
 
         UIUtils.DrawOverlayTexts(overlayTexts);
 
-        if (C.Verbose && ImGui.CollapsingHeader("Debug"))
+        if(C.Verbose && ImGui.CollapsingHeader("Debug"))
         {
             ImGuiEx.Text($"GetCurrentTargetCharacter: {MultiMode.GetCurrentTargetCharacter()}");
             //ImGuiEx.Text($"Yes Already: {YesAlready.IsEnabled()}");
@@ -364,7 +364,7 @@ internal static unsafe class MultiModeUI
             ImGuiEx.Text($"AnyRetainersAvailable: {MultiMode.AnyRetainersAvailable()}");
             ImGuiEx.Text($"IsAnySelectedRetainerFinishesWithin, 60: {MultiMode.IsAnySelectedRetainerFinishesWithin(60)}");
             ImGuiEx.Text($"IsAnySelectedRetainerFinishesWithin, 5*60: {MultiMode.IsAnySelectedRetainerFinishesWithin(5 * 60)}");
-            foreach (var data in C.OfflineData)
+            foreach(var data in C.OfflineData)
             {
                 ImGuiEx.Text($"Chatacter {data}\n  GetNeededVentureAmount: {data.GetNeededVentureAmount()}");
             }
@@ -373,9 +373,9 @@ internal static unsafe class MultiModeUI
 
     internal static void SetAsPreferred(OfflineCharacterData x)
     {
-        if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+        if(ImGui.IsItemClicked(ImGuiMouseButton.Right))
         {
-            if (x.Preferred)
+            if(x.Preferred)
             {
                 x.Preferred = false;
             }

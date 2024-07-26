@@ -12,7 +12,7 @@ internal static class TaskPostprocessRetainerIPC
         P.TaskManager.Enqueue(() =>
         {
             DebugLog($"SchedulerMain.RetainerPostprocess contains: {SchedulerMain.RetainerPostprocess.Print()}, pluginToProcess = {pluginToProcess}");
-            foreach (var x in SchedulerMain.RetainerPostprocess.Where(x => pluginToProcess == null || x == pluginToProcess))
+            foreach(var x in SchedulerMain.RetainerPostprocess.Where(x => pluginToProcess == null || x == pluginToProcess))
             {
                 P.TaskManager.EnqueueImmediate(() =>
                 {

@@ -17,10 +17,10 @@ internal static unsafe class Safety
         try
         {
             var reg = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default).OpenSubKey("Software")?.OpenSubKey("AutoRetainer")?.GetValue(Value);
-            if (reg == null) return false;
+            if(reg == null) return false;
             return (int)reg == 1;
         }
-        catch (Exception e)
+        catch(Exception e)
         {
             InternalLog.Verbose($"{e.Message}\n{e.StackTrace}");
         }
@@ -29,11 +29,11 @@ internal static unsafe class Safety
 
     internal static void Check()
     {
-        if (C.UnsafeProtection || Get())
+        if(C.UnsafeProtection || Get())
         {
-            foreach (var x in C.OfflineData)
+            foreach(var x in C.OfflineData)
             {
-                if (x.GCDeliveryType == GCDeliveryType.Show_All_Items)
+                if(x.GCDeliveryType == GCDeliveryType.Show_All_Items)
                 {
                     x.GCDeliveryType = GCDeliveryType.Hide_Armoury_Chest_Items;
                     Notify.Info($"Unsafe option removed: character {Censor.Character(x.Name)} - {nameof(GCDeliveryType.Show_All_Items)}");

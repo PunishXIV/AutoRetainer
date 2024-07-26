@@ -29,11 +29,11 @@ internal unsafe class SubmarinePointPlanUI : Window
         C.SubmarinePointPlans.RemoveAll(x => x.Delete);
         ImGuiEx.InputWithRightButtonsArea("SUPSelector", () =>
         {
-            if (ImGui.BeginCombo("##supsel", SelectedPlanName))
+            if(ImGui.BeginCombo("##supsel", SelectedPlanName))
             {
-                foreach (var x in C.SubmarinePointPlans)
+                foreach(var x in C.SubmarinePointPlans)
                 {
-                    if (ImGui.Selectable(x.GetPointPlanName() + $"##{x.GUID}"))
+                    if(ImGui.Selectable(x.GetPointPlanName() + $"##{x.GUID}"))
                     {
                         SelectedPlanGuid = x.GUID;
                     }
@@ -42,7 +42,7 @@ internal unsafe class SubmarinePointPlanUI : Window
             }
         }, () =>
         {
-            if (ImGui.Button("New plan"))
+            if(ImGui.Button("New plan"))
             {
                 var x = new SubmarinePointPlan
                 {
@@ -53,19 +53,19 @@ internal unsafe class SubmarinePointPlanUI : Window
             }
         });
         ImGui.Separator();
-        if (SelectedPlan == null)
+        if(SelectedPlan == null)
         {
             ImGuiEx.Text($"No or unknown plan is selected");
         }
         else
         {
-            if (Data != null)
+            if(Data != null)
             {
                 var users = GetAmountOfOtherPlanUsers(SelectedPlanGuid);
                 var my = Data.AdditionalSubmarineData.Where(x => x.Value.SelectedPointPlan == SelectedPlanGuid);
-                if (users == 0)
+                if(users == 0)
                 {
-                    if (!my.Any())
+                    if(!my.Any())
                     {
                         ImGuiEx.TextWrapped($"This plan is not used by any submersibles.");
                     }
@@ -76,7 +76,7 @@ internal unsafe class SubmarinePointPlanUI : Window
                 }
                 else
                 {
-                    if (!my.Any())
+                    if(!my.Any())
                     {
                         ImGuiEx.TextWrapped($"This plan is used by {users} submersibles of your other characters.");
                     }
@@ -94,42 +94,42 @@ internal unsafe class SubmarinePointPlanUI : Window
             {
                 ImGuiEx.TextV($"Apply this plan to:");
                 ImGui.SameLine();
-                if (ImGui.Button("ALL submersibles"))
+                if(ImGui.Button("ALL submersibles"))
                 {
                     C.OfflineData.Each(x => x.AdditionalSubmarineData.Each(s => s.Value.SelectedPointPlan = SelectedPlanGuid));
                 }
                 ImGui.SameLine();
-                if (ImGui.Button("Current character's submersibles"))
+                if(ImGui.Button("Current character's submersibles"))
                 {
                     Data.AdditionalSubmarineData.Each(s => s.Value.SelectedPointPlan = SelectedPlanGuid);
                 }
                 ImGui.SameLine();
-                if (ImGui.Button("No submersibles"))
+                if(ImGui.Button("No submersibles"))
                 {
                     C.OfflineData.Each(x => x.AdditionalSubmarineData.Where(s => s.Value.SelectedPointPlan == SelectedPlanGuid).Each(s => s.Value.SelectedPointPlan = Guid.Empty.ToString()));
                 }
             });
             ImGuiEx.ImGuiLineCentered($"planbuttons2", () =>
             {
-                if (ImGui.Button($"Copy plan settings"))
+                if(ImGui.Button($"Copy plan settings"))
                 {
                     Copy(JsonConvert.SerializeObject(SelectedPlan));
                 }
                 ImGui.SameLine();
-                if (ImGui.Button($"Paste plan settings"))
+                if(ImGui.Button($"Paste plan settings"))
                 {
                     try
                     {
                         SelectedPlan.CopyFrom(JsonConvert.DeserializeObject<SubmarinePointPlan>(Paste()));
                     }
-                    catch (Exception ex)
+                    catch(Exception ex)
                     {
                         DuoLog.Error($"Could not import plan: {ex.Message}");
                         ex.Log();
                     }
                 }
                 ImGui.SameLine();
-                if (ImGuiEx.ButtonCtrl("Delete this plan"))
+                if(ImGuiEx.ButtonCtrl("Delete this plan"))
                 {
                     SelectedPlan.Delete = true;
                 }

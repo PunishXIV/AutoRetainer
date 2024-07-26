@@ -21,7 +21,7 @@ public sealed unsafe class FCPointsUpdater
 
     public bool IsFCChestReady()
     {
-        if (TryGetAddonByName<AtkUnitBase>("FreeCompanyChest", out var addon) && IsAddonReady(addon))
+        if(TryGetAddonByName<AtkUnitBase>("FreeCompanyChest", out var addon) && IsAddonReady(addon))
         {
             var reader = new ReaderFreeCompanyChest(addon);
             return reader.Ready;
@@ -36,12 +36,12 @@ public sealed unsafe class FCPointsUpdater
 
     public void ScheduleUpdateIfNeeded(bool force = false)
     {
-        if (!Player.Available) return;
-        if (!C.UpdateStaleFCData) return;
-        if (!Player.IsInHomeWorld) return;
-        if (Data != null && Data.FCID != 0 && C.FCData.TryGetValue(Data.FCID, out var fcdata))
+        if(!Player.Available) return;
+        if(!C.UpdateStaleFCData) return;
+        if(!Player.IsInHomeWorld) return;
+        if(Data != null && Data.FCID != 0 && C.FCData.TryGetValue(Data.FCID, out var fcdata))
         {
-            if (force || DateTimeOffset.Now.ToUnixTimeMilliseconds() > fcdata.FCPointsLastUpdate + 30 * 60 * 60 * 1000)
+            if(force || DateTimeOffset.Now.ToUnixTimeMilliseconds() > fcdata.FCPointsLastUpdate + 30 * 60 * 60 * 1000)
             {
                 OldFCPoints = Utils.FCPoints;
                 TaskManager.Abort();
@@ -49,7 +49,7 @@ public sealed unsafe class FCPointsUpdater
                 TaskManager.Enqueue(() => IsScreenReady() && Player.Interactable);
                 TaskManager.Enqueue(() =>
                 {
-                    if (TryGetAddonByName<AtkUnitBase>("FreeCompany", out var addon))
+                    if(TryGetAddonByName<AtkUnitBase>("FreeCompany", out var addon))
                     {
                         addon->Close(true);
                         TaskManager.InsertDelay(10, true);
@@ -70,7 +70,7 @@ public sealed unsafe class FCPointsUpdater
 								});*/
                 TaskManager.Enqueue(() =>
                 {
-                    if (TryGetAddonByName<AtkUnitBase>("FreeCompany", out var addon))
+                    if(TryGetAddonByName<AtkUnitBase>("FreeCompany", out var addon))
                     {
                         addon->Close(true);
                         return true;

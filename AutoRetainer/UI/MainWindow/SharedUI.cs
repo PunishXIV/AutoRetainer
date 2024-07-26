@@ -9,21 +9,21 @@ internal static class SharedUI
 {
     internal static void DrawExcludedNotification(bool retainer, bool workshop)
     {
-        if (Player.CID == 0) return;
+        if(Player.CID == 0) return;
         var col = GradientColor.Get(ImGuiColors.DalamudYellow, ImGuiColors.DalamudRed, 750);
-        if (C.Blacklist.Any(x => x.CID == Player.CID))
+        if(C.Blacklist.Any(x => x.CID == Player.CID))
         {
             ImGuiEx.ImGuiLineCentered("ExclWarning1", () => ImGuiEx.Text(col, "Your current character is excluded from AutoRetainer!"));
             ImGuiEx.ImGuiLineCentered("ExclWarning2", () => ImGuiEx.Text(col, "Go to settings - exclusions to change it."));
         }
         else
         {
-            if (retainer && Data.ExcludeRetainer)
+            if(retainer && Data.ExcludeRetainer)
             {
                 ImGuiEx.ImGuiLineCentered("ExclWarning1", () => ImGuiEx.Text(col, "Your current character is excluded from retainer list!"));
                 ImGuiEx.ImGuiLineCentered("ExclWarning2", () => ImGuiEx.Text(col, "Go to settings - exclusions to change it."));
             }
-            if (workshop && Data.ExcludeWorkshop)
+            if(workshop && Data.ExcludeWorkshop)
             {
                 ImGuiEx.ImGuiLineCentered("ExclWarning3", () => ImGuiEx.Text(col, "Your current character is excluded from deployable list!"));
                 ImGuiEx.ImGuiLineCentered("ExclWarning2", () => ImGuiEx.Text(col, "Go to settings - exclusions to change it."));
@@ -33,16 +33,16 @@ internal static class SharedUI
 
     internal static void DrawEntranceConfig(this OfflineCharacterData data, ref HouseEntrance entrance)
     {
-        if (ImGui.Button("Register Entrance"))
+        if(ImGui.Button("Register Entrance"))
         {
-            if (data != Data)
+            if(data != Data)
             {
                 Notify.Error("You are not logged in on this character");
             }
             else
             {
                 var door = Utils.GetNearestEntrance(out _, true);
-                if (HousingUtils.TryGetCurrentDescriptor(out var d) && door != null)
+                if(HousingUtils.TryGetCurrentDescriptor(out var d) && door != null)
                 {
                     entrance = new()
                     {
@@ -57,10 +57,10 @@ internal static class SharedUI
             }
         }
         ImGuiComponents.HelpMarker("If your estate entrance is not the closest to the teleport destination you can override it manually here by standing next to the door and clicking the register button.");
-        if (entrance != null)
+        if(entrance != null)
         {
             ImGui.SameLine();
-            if (ImGuiEx.IconButton(FontAwesomeIcon.Trash))
+            if(ImGuiEx.IconButton(FontAwesomeIcon.Trash))
             {
                 entrance = null;
             }
@@ -72,7 +72,7 @@ internal static class SharedUI
     {
         var b = true;
         ImGui.CollapsingHeader($"{Censor.Character(data.Name)} {overrideTitle ?? "Configuration"}##conf", ref b, ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.Bullet | ImGuiTreeNodeFlags.OpenOnArrow);
-        if (b == false)
+        if(b == false)
         {
             ImGui.CloseCurrentPopup();
         }
@@ -83,11 +83,11 @@ internal static class SharedUI
     {
         ImGuiEx.Text($"Service Account Selection");
         ImGuiEx.SetNextItemWidthScaled(150);
-        if (ImGui.BeginCombo("##Service Account Selection", $"Service Account {data.ServiceAccount + 1}"))
+        if(ImGui.BeginCombo("##Service Account Selection", $"Service Account {data.ServiceAccount + 1}"))
         {
-            for (var i = 1; i <= 10; i++)
+            for(var i = 1; i <= 10; i++)
             {
-                if (ImGui.Selectable($"Service Account {i}"))
+                if(ImGui.Selectable($"Service Account {i}"))
                 {
                     data.ServiceAccount = i - 1;
                 }
@@ -98,11 +98,11 @@ internal static class SharedUI
 
     internal static void DrawPreferredCharacterUI(OfflineCharacterData data)
     {
-        if (ImGui.Checkbox("Preferred Character", ref data.Preferred))
+        if(ImGui.Checkbox("Preferred Character", ref data.Preferred))
         {
-            foreach (var z in C.OfflineData)
+            foreach(var z in C.OfflineData)
             {
-                if (z.CID != data.CID)
+                if(z.CID != data.CID)
                 {
                     z.Preferred = false;
                 }
@@ -113,14 +113,14 @@ internal static class SharedUI
 
     internal static void DrawExcludeReset(OfflineCharacterData data)
     {
-        if (ImGuiGroup.BeginGroupBox("Character Data Expunge/Reset"))
+        if(ImGuiGroup.BeginGroupBox("Character Data Expunge/Reset"))
         {
-            if (ImGuiEx.ButtonCtrl("Exclude Character"))
+            if(ImGuiEx.ButtonCtrl("Exclude Character"))
             {
                 C.Blacklist.Add((data.CID, data.Name));
             }
             ImGuiComponents.HelpMarker("Excluding this character will immediately reset it's settings, remove it from this list and exclude all retainers from being processed. You can still run manual tasks on it's retainers. You can cancel this action in settings.");
-            if (ImGuiEx.ButtonCtrl("Reset character data"))
+            if(ImGuiEx.ButtonCtrl("Reset character data"))
             {
                 new TickScheduler(() => C.OfflineData.RemoveAll(x => x.CID == data.CID));
             }

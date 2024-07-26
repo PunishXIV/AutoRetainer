@@ -42,7 +42,7 @@ internal unsafe class Memory : IDisposable
     {
         Svc.Hook.InitializeFromAttributes(this);
         EzSignatureHelper.Initialize(this);
-        if (C.MarketCooldownOverlay) OnReceiveMarketPricePacketHook?.Enable();
+        if(C.MarketCooldownOverlay) OnReceiveMarketPricePacketHook?.Enable();
         ReceiveRetainerVentureListUpdateHook?.Enable();
         RetainerItemCommandHook = new("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 48 83 EC 30 48 8B 6C 24", RetainerItemCommandDetour, false);
     }
@@ -53,7 +53,7 @@ internal unsafe class Memory : IDisposable
         {
             PluginLog.Debug($"RetainerItemCommandDetour: {AgentRetainerItemCommandModule:X16}, slot={slot}, type={inventoryType}, a4={a4}, command={command}");
         }
-        catch (Exception e)
+        catch(Exception e)
         {
             e.Log();
         }
@@ -93,7 +93,7 @@ internal unsafe class Memory : IDisposable
 
     internal void SelectRoutePointUnsafe(int which)
     {
-        if (TryGetAddonByName<AtkUnitBase>("AirShipExploration", out var addon) && IsAddonReady(addon))
+        if(TryGetAddonByName<AtkUnitBase>("AirShipExploration", out var addon) && IsAddonReady(addon))
         {
             var dummyEvent = stackalloc AtkEvent[] { new() };
             var str3 = stackalloc AirshipExplorationInputData3[] { new() { Unk0 = 0x0FFFFFFF } };
@@ -122,12 +122,12 @@ internal unsafe class Memory : IDisposable
 
     public void SellItemToShop(InventoryType type, int slot)
     {
-        if (TryGetAddonByName<AtkUnitBase>("Shop", out var addon) && IsAddonReady(addon))
+        if(TryGetAddonByName<AtkUnitBase>("Shop", out var addon) && IsAddonReady(addon))
         {
             var slotPtr = InventoryManager.Instance()->GetInventoryContainer(type)->GetInventorySlot(slot);
-            if (slotPtr->ItemId != 0)
+            if(slotPtr->ItemId != 0)
             {
-                if (C.IMProtectList.Contains(slotPtr->ItemId)) throw new InvalidOperationException($"Attempted to sell protected item: {ExcelItemHelper.GetName(slotPtr->ItemId)}");
+                if(C.IMProtectList.Contains(slotPtr->ItemId)) throw new InvalidOperationException($"Attempted to sell protected item: {ExcelItemHelper.GetName(slotPtr->ItemId)}");
                 SellItemDetour((uint)slot, type);
             }
             else

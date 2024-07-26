@@ -29,9 +29,9 @@ public class ExpertTab : NeoUIEntry
         .Checkbox($"Do not error check venture planner", () => ref C.NoErrorCheckPlanner2)
         .Widget("Market Cooldown Overlay", (x) =>
         {
-            if (ImGui.Checkbox(x, ref C.MarketCooldownOverlay))
+            if(ImGui.Checkbox(x, ref C.MarketCooldownOverlay))
             {
-                if (C.MarketCooldownOverlay)
+                if(C.MarketCooldownOverlay)
                 {
                     P.Memory.OnReceiveMarketPricePacketHook?.Enable();
                 }
@@ -54,10 +54,10 @@ public class ExpertTab : NeoUIEntry
         .Section("Utility")
         .Widget("Cleanup ghost retainers", (x) =>
         {
-            if (ImGui.Button(x))
+            if(ImGui.Button(x))
             {
                 var i = 0;
-                foreach (var d in C.OfflineData)
+                foreach(var d in C.OfflineData)
                 {
                     i += d.RetainerData.RemoveAll(x => x.Name == "");
                 }

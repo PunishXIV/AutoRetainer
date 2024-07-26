@@ -15,12 +15,12 @@ internal unsafe class DebugMulti : DebugSectionBase
     public override void Draw()
     {
         ImGuiEx.Text($"Expected: {TaskChangeCharacter.Expected}");
-        if (ImGui.Button("Force mismatch")) TaskChangeCharacter.Expected = ("AAAAAAAA", "BBBBBBB");
-        if (ImGui.Button("Simulate nothing left"))
+        if(ImGui.Button("Force mismatch")) TaskChangeCharacter.Expected = ("AAAAAAAA", "BBBBBBB");
+        if(ImGui.Button("Simulate nothing left"))
         {
             MultiMode.Relog(null, out var error, RelogReason.MultiMode);
         }
-        if (ImGui.Button($"Simulate autostart"))
+        if(ImGui.Button($"Simulate autostart"))
         {
             MultiMode.PerformAutoStart();
         }
@@ -31,15 +31,15 @@ internal unsafe class DebugMulti : DebugSectionBase
         ImGuiEx.Text($"{Svc.Data.GetExcelSheet<Addon>()?.GetRow(115)?.Text.ToDalamudString().ExtractText()}");
         ImGuiEx.Text($"Server time: {CSFramework.GetServerTime()}");
         ImGuiEx.Text($"PC time: {DateTimeOffset.Now.ToUnixTimeSeconds()}");
-        if (ImGui.CollapsingHeader("HET"))
+        if(ImGui.CollapsingHeader("HET"))
         {
             ImGuiEx.Text($"Nearest entrance: {Utils.GetNearestEntrance(out var d)}, d={d}");
-            if (ImGui.Button("Enter house"))
+            if(ImGui.Button("Enter house"))
             {
                 HouseEnterTask.EnqueueTask();
             }
         }
-        if (ImGui.CollapsingHeader("Estate territories"))
+        if(ImGui.CollapsingHeader("Estate territories"))
         {
             ImGuiEx.Text(ResidentalAreas.List.Select(x => GenericHelpers.GetTerritoryName(x)).Join("\n"));
             ImGuiEx.Text($"In residental area: {ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType)}");
@@ -47,15 +47,15 @@ internal unsafe class DebugMulti : DebugSectionBase
         ImGuiEx.Text($"Is in sanctuary: {GameMain.IsInSanctuary()}");
         ImGuiEx.Text($"Is in sanctuary ExcelTerritoryHelper: {ExcelTerritoryHelper.IsSanctuary(Svc.ClientState.TerritoryType)}");
         ImGui.Checkbox($"Bypass sanctuary check", ref C.BypassSanctuaryCheck);
-        if (Svc.ClientState.LocalPlayer != null && Svc.Targets.Target != null)
+        if(Svc.ClientState.LocalPlayer != null && Svc.Targets.Target != null)
         {
             ImGuiEx.Text($"Distance to target: {Vector3.Distance(Svc.ClientState.LocalPlayer.Position, Svc.Targets.Target.Position)}");
             ImGuiEx.Text($"Target hitbox: {Svc.Targets.Target.HitboxRadius}");
             ImGuiEx.Text($"Distance to target's hitbox: {Vector3.Distance(Svc.ClientState.LocalPlayer.Position, Svc.Targets.Target.Position) - Svc.Targets.Target.HitboxRadius}");
         }
-        if (ImGui.CollapsingHeader("CharaSelect"))
+        if(ImGui.CollapsingHeader("CharaSelect"))
         {
-            foreach (var x in Utils.GetCharacterNames())
+            foreach(var x in Utils.GetCharacterNames())
             {
                 ImGuiEx.Text($"{x.Name}@{x.World}");
             }

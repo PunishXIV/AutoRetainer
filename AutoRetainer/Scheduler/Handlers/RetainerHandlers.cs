@@ -19,15 +19,15 @@ internal static unsafe class RetainerHandlers
     internal static bool? ConfirmCantBuyback()
     {
         var yesno = Utils.GetSpecificYesno(Lang.WillBeUnableToProcessBuyback);
-        if (yesno != null)
+        if(yesno != null)
         {
-            if (Utils.GenericThrottle && EzThrottler.Throttle("WillBeUnableToProcessBuyback"))
+            if(Utils.GenericThrottle && EzThrottler.Throttle("WillBeUnableToProcessBuyback"))
             {
                 new AddonMaster.SelectYesno((nint)yesno).Yes();
                 return true;
             }
         }
-        if (TryGetAddonByName<AtkUnitBase>("RetainerList", out _))
+        if(TryGetAddonByName<AtkUnitBase>("RetainerList", out _))
         {
             return true;
         }
@@ -36,7 +36,7 @@ internal static unsafe class RetainerHandlers
 
     internal static bool? WaitForVentureListUpdate()
     {
-        if (P.ListUpdateFrame > CSFramework.Instance()->FrameCounter - 10) return true;
+        if(P.ListUpdateFrame > CSFramework.Instance()->FrameCounter - 10) return true;
         return false;
     }
 
@@ -48,10 +48,10 @@ internal static unsafe class RetainerHandlers
 
     internal static bool? SelectQuit()
     {
-        if (BailoutManager.SimulateStuckOnQuit) return false;
-        if (TryGetAddonByName<AtkUnitBase>("RetainerTaskSupply", out var addon))
+        if(BailoutManager.SimulateStuckOnQuit) return false;
+        if(TryGetAddonByName<AtkUnitBase>("RetainerTaskSupply", out var addon))
         {
-            if (Utils.GenericThrottle)
+            if(Utils.GenericThrottle)
             {
                 addon->Close(true);
             }
@@ -72,11 +72,11 @@ internal static unsafe class RetainerHandlers
 
     internal static bool? EnforceSelectString(Func<bool?> Action)
     {
-        if (!(TryGetAddonByName<AtkUnitBase>("SelectString", out var a) && a->IsVisible))
+        if(!(TryGetAddonByName<AtkUnitBase>("SelectString", out var a) && a->IsVisible))
         {
             return true;
         }
-        if (EzThrottler.Throttle("EnforceSelectString", 3000))
+        if(EzThrottler.Throttle("EnforceSelectString", 3000))
         {
             PluginLog.Warning($"Enforcing {Action.GetType().FullName} ");
             Action();
@@ -86,14 +86,14 @@ internal static unsafe class RetainerHandlers
 
     internal static bool? ClickResultReassign()
     {
-        if (TryGetAddonByName<AddonRetainerTaskResult>("RetainerTaskResult", out var addon) && IsAddonReady(&addon->AtkUnitBase))
+        if(TryGetAddonByName<AddonRetainerTaskResult>("RetainerTaskResult", out var addon) && IsAddonReady(&addon->AtkUnitBase))
         {
             const string thrName = "ClickResultReassign.WaitForButtonEnabled";
-            if (!addon->ReassignButton->IsEnabled)
+            if(!addon->ReassignButton->IsEnabled)
             {
                 FrameThrottler.Throttle(thrName, 5, true);
             }
-            if (FrameThrottler.Check(thrName) && addon->ReassignButton->IsEnabled && Utils.GenericThrottle)
+            if(FrameThrottler.Check(thrName) && addon->ReassignButton->IsEnabled && Utils.GenericThrottle)
             {
                 new AddonMaster.RetainerTaskResult(addon).Reassign();
                 DebugLog($"Clicked reassign");
@@ -109,14 +109,14 @@ internal static unsafe class RetainerHandlers
 
     internal static bool? ClickResultConfirm()
     {
-        if (TryGetAddonByName<AddonRetainerTaskResult>("RetainerTaskResult", out var addon) && IsAddonReady(&addon->AtkUnitBase))
+        if(TryGetAddonByName<AddonRetainerTaskResult>("RetainerTaskResult", out var addon) && IsAddonReady(&addon->AtkUnitBase))
         {
             const string thrName = "RetainerTaskResult.WaitForButtonEnabled";
-            if (!addon->ConfirmButton->IsEnabled)
+            if(!addon->ConfirmButton->IsEnabled)
             {
                 FrameThrottler.Throttle(thrName, 5, true);
             }
-            if (FrameThrottler.Check(thrName) && addon->ConfirmButton->IsEnabled && Utils.GenericThrottle)
+            if(FrameThrottler.Check(thrName) && addon->ConfirmButton->IsEnabled && Utils.GenericThrottle)
             {
                 new AddonMaster.RetainerTaskResult(addon).Confirm();
                 DebugLog($"Clicked confirm");
@@ -132,14 +132,14 @@ internal static unsafe class RetainerHandlers
 
     internal static bool? ClickAskAssign()
     {
-        if (TryGetAddonByName<AddonRetainerTaskAsk>("RetainerTaskAsk", out var addon) && IsAddonReady(&addon->AtkUnitBase))
+        if(TryGetAddonByName<AddonRetainerTaskAsk>("RetainerTaskAsk", out var addon) && IsAddonReady(&addon->AtkUnitBase))
         {
             const string thrName = "ClickAskAssign.WaitForButtonEnabled";
-            if (!addon->AssignButton->IsEnabled)
+            if(!addon->AssignButton->IsEnabled)
             {
                 FrameThrottler.Throttle(thrName, 5, true);
             }
-            if (FrameThrottler.Check(thrName) && addon->AssignButton->IsEnabled && Utils.GenericThrottle)
+            if(FrameThrottler.Check(thrName) && addon->AssignButton->IsEnabled && Utils.GenericThrottle)
             {
                 new AddonMaster.RetainerTaskAsk((IntPtr)addon).Assign();
                 DebugLog("Clicked assign");
@@ -155,14 +155,14 @@ internal static unsafe class RetainerHandlers
 
     internal static bool? ClickAskReturn()
     {
-        if (TryGetAddonByName<AddonRetainerTaskAsk>("RetainerTaskAsk", out var addon) && IsAddonReady(&addon->AtkUnitBase))
+        if(TryGetAddonByName<AddonRetainerTaskAsk>("RetainerTaskAsk", out var addon) && IsAddonReady(&addon->AtkUnitBase))
         {
             const string thrName = "ClickAskReturn.WaitForButtonEnabled";
-            if (!addon->ReturnButton->IsEnabled)
+            if(!addon->ReturnButton->IsEnabled)
             {
                 FrameThrottler.Throttle(thrName, 5, true);
             }
-            if (FrameThrottler.Check(thrName) && addon->ReturnButton->IsEnabled && Utils.GenericThrottle)
+            if(FrameThrottler.Check(thrName) && addon->ReturnButton->IsEnabled && Utils.GenericThrottle)
             {
                 new AddonMaster.RetainerTaskAsk((IntPtr)addon).Return();
                 DebugLog("Clicked return");
@@ -198,10 +198,10 @@ internal static unsafe class RetainerHandlers
     internal static bool? ClickEntrustDuplicates()
     {
         var invName = Utils.GetActiveRetainerInventoryName();
-        if (TryGetAddonByName<AtkUnitBase>(invName.Name, out var addon) && IsAddonReady(addon))
+        if(TryGetAddonByName<AtkUnitBase>(invName.Name, out var addon) && IsAddonReady(addon))
         {
             var button = (AtkComponentButton*)addon->UldManager.NodeList[invName.EntrustDuplicatesIndex]->GetComponent();
-            if (addon->UldManager.NodeList[invName.EntrustDuplicatesIndex]->IsVisible() && button->IsEnabled && Utils.GenericThrottle)
+            if(addon->UldManager.NodeList[invName.EntrustDuplicatesIndex]->IsVisible() && button->IsEnabled && Utils.GenericThrottle)
             {
                 //new ClickButtonGeneric(addon, invName.Name).Click(button);
                 Callback.Fire(addon, false, (int)0);
@@ -218,10 +218,10 @@ internal static unsafe class RetainerHandlers
 
     internal static bool? ClickEntrustDuplicatesConfirm()
     {
-        if (TryGetAddonByName<AtkUnitBase>("RetainerItemTransferList", out var addon) && IsAddonReady(addon))
+        if(TryGetAddonByName<AtkUnitBase>("RetainerItemTransferList", out var addon) && IsAddonReady(addon))
         {
             var button = (AtkComponentButton*)addon->UldManager.NodeList[3]->GetComponent();
-            if (addon->UldManager.NodeList[3]->IsVisible() && button->IsEnabled && Utils.GenericThrottle)
+            if(addon->UldManager.NodeList[3]->IsVisible() && button->IsEnabled && Utils.GenericThrottle)
             {
                 button->ClickAddonButton(addon);
                 DebugLog($"Clicked duplicates confirm");
@@ -239,11 +239,11 @@ internal static unsafe class RetainerHandlers
     {
         //13530	Close Window
         var text = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(13530).Text.ToDalamudString().ExtractText();
-        if (TryGetAddonByName<AtkUnitBase>("RetainerItemTransferProgress", out var addon) && IsAddonReady(addon))
+        if(TryGetAddonByName<AtkUnitBase>("RetainerItemTransferProgress", out var addon) && IsAddonReady(addon))
         {
             var button = (AtkComponentButton*)addon->UldManager.NodeList[2]->GetComponent();
             var nodetext = MemoryHelper.ReadSeString(&addon->UldManager.NodeList[2]->GetComponent()->UldManager.NodeList[2]->GetAsAtkTextNode()->NodeText).ExtractText();
-            if (nodetext == text && addon->UldManager.NodeList[2]->IsVisible() && button->IsEnabled && Utils.GenericThrottle)
+            if(nodetext == text && addon->UldManager.NodeList[2]->IsVisible() && button->IsEnabled && Utils.GenericThrottle)
             {
                 button->ClickAddonButton(addon);
                 DebugLog($"Clicked transfer progress close");
@@ -260,7 +260,7 @@ internal static unsafe class RetainerHandlers
     internal static bool? CloseAgentRetainer()
     {
         var a = Framework.Instance()->UIModule->GetAgentModule()->GetAgentByInternalId(AgentId.Retainer);
-        if (a->IsAgentActive())
+        if(a->IsAgentActive())
         {
             a->Hide();
             return true;
@@ -270,16 +270,16 @@ internal static unsafe class RetainerHandlers
 
     internal static bool? SetWithdrawGilAmount(int percent)
     {
-        if (TryGetAddonByName<AtkUnitBase>("Bank", out var addon) && IsAddonReady(addon) && Utils.TryGetCurrentRetainer(out var name) && Utils.TryGetRetainerByName(name, out var retainer))
+        if(TryGetAddonByName<AtkUnitBase>("Bank", out var addon) && IsAddonReady(addon) && Utils.TryGetCurrentRetainer(out var name) && Utils.TryGetRetainerByName(name, out var retainer))
         {
-            if (percent < 1 || percent > 100) throw new ArgumentOutOfRangeException(nameof(percent), percent, "Percent must be between 1 and 100");
-            if (uint.TryParse(MemoryHelper.ReadSeString(&addon->UldManager.NodeList[27]->GetAsAtkTextNode()->NodeText).ExtractText().RemoveOtherChars("0123456789"), out var numGil))
+            if(percent < 1 || percent > 100) throw new ArgumentOutOfRangeException(nameof(percent), percent, "Percent must be between 1 and 100");
+            if(uint.TryParse(MemoryHelper.ReadSeString(&addon->UldManager.NodeList[27]->GetAsAtkTextNode()->NodeText).ExtractText().RemoveOtherChars("0123456789"), out var numGil))
             {
                 DebugLog($"Gil: {numGil}");
                 var gilToWithdraw = (uint)(percent == 100 ? numGil : numGil / 100f * percent);
-                if (gilToWithdraw > 0 && gilToWithdraw <= numGil)
+                if(gilToWithdraw > 0 && gilToWithdraw <= numGil)
                 {
-                    if (Utils.GenericThrottle)
+                    if(Utils.GenericThrottle)
                     {
                         var v = stackalloc AtkValue[]
                         {
@@ -310,15 +310,15 @@ internal static unsafe class RetainerHandlers
 
     internal static bool? SetDepositGilAmount(int percent)
     {
-        if (TryGetAddonByName<AtkUnitBase>("Bank", out var addon) && IsAddonReady(addon))
+        if(TryGetAddonByName<AtkUnitBase>("Bank", out var addon) && IsAddonReady(addon))
         {
-            if (percent < 1 || percent > 100) throw new ArgumentOutOfRangeException(nameof(percent), percent, "Percent must be between 1 and 100");
+            if(percent < 1 || percent > 100) throw new ArgumentOutOfRangeException(nameof(percent), percent, "Percent must be between 1 and 100");
             var numGil = TaskDepositGil.Gil;
             DebugLog($"Gil: {numGil}");
             var gilToDeposit = (uint)(percent == 100 ? numGil : numGil / 100f * percent);
-            if (gilToDeposit > 0 && gilToDeposit <= numGil)
+            if(gilToDeposit > 0 && gilToDeposit <= numGil)
             {
-                if (Utils.GenericThrottle)
+                if(Utils.GenericThrottle)
                 {
                     var v = stackalloc AtkValue[]
                     {
@@ -344,15 +344,15 @@ internal static unsafe class RetainerHandlers
 
     internal static bool? SetDepositGilAmountExact(int amount)
     {
-        if (TryGetAddonByName<AtkUnitBase>("Bank", out var addon) && IsAddonReady(addon))
+        if(TryGetAddonByName<AtkUnitBase>("Bank", out var addon) && IsAddonReady(addon))
         {
-            if (amount < 1) throw new ArgumentOutOfRangeException(nameof(amount), amount, "Amount must be 1 or higher");
+            if(amount < 1) throw new ArgumentOutOfRangeException(nameof(amount), amount, "Amount must be 1 or higher");
             var numGil = TaskDepositGil.Gil;
             DebugLog($"Gil: {numGil}");
             var gilToDeposit = (uint)numGil;
-            if (gilToDeposit > 0 && gilToDeposit <= numGil)
+            if(gilToDeposit > 0 && gilToDeposit <= numGil)
             {
-                if (Utils.GenericThrottle)
+                if(Utils.GenericThrottle)
                 {
                     var v = stackalloc AtkValue[]
                     {
@@ -378,9 +378,9 @@ internal static unsafe class RetainerHandlers
 
     internal static bool? SwapBankMode()
     {
-        if (TryGetAddonByName<AtkUnitBase>("Bank", out var addon) && IsAddonReady(addon))
+        if(TryGetAddonByName<AtkUnitBase>("Bank", out var addon) && IsAddonReady(addon))
         {
-            if (Utils.GenericThrottle)
+            if(Utils.GenericThrottle)
             {
                 var v = stackalloc AtkValue[]
                 {
@@ -406,12 +406,12 @@ internal static unsafe class RetainerHandlers
 
     internal static bool? ProcessBankOrCancel(bool forceCancel = false)
     {
-        if (TryGetAddonByName<AtkUnitBase>("Bank", out var addon) && IsAddonReady(addon))
+        if(TryGetAddonByName<AtkUnitBase>("Bank", out var addon) && IsAddonReady(addon))
         {
             var withdraw = (AtkComponentButton*)addon->UldManager.NodeList[3]->GetComponent();
-            if (addon->UldManager.NodeList[3]->IsVisible() && withdraw->IsEnabled && !forceCancel)
+            if(addon->UldManager.NodeList[3]->IsVisible() && withdraw->IsEnabled && !forceCancel)
             {
-                if (Utils.GenericThrottle)
+                if(Utils.GenericThrottle)
                 {
                     var v = stackalloc AtkValue[]
                     {
@@ -429,9 +429,9 @@ internal static unsafe class RetainerHandlers
             else
             {
                 var cancel = (AtkComponentButton*)addon->UldManager.NodeList[2]->GetComponent();
-                if (addon->UldManager.NodeList[2]->IsVisible() && cancel->IsEnabled)
+                if(addon->UldManager.NodeList[2]->IsVisible() && cancel->IsEnabled)
                 {
-                    if (Utils.GenericThrottle)
+                    if(Utils.GenericThrottle)
                     {
                         var v = stackalloc AtkValue[]
                     {
@@ -461,13 +461,13 @@ internal static unsafe class RetainerHandlers
 
     public static bool? SelectSpecificVenture(uint VentureID)
     {
-        if (TryGetAddonByName<AtkUnitBase>("RetainerTaskList", out var addon) && IsAddonReady(addon))
+        if(TryGetAddonByName<AtkUnitBase>("RetainerTaskList", out var addon) && IsAddonReady(addon))
         {
             var ventureData = Svc.Data.GetExcelSheet<RetainerTask>().GetRow(VentureID);
             var ventureName = ventureData.GetVentureName();
-            if (Utils.GenericThrottle && EzThrottler.Throttle("AssignSpecificVenture", 1000))
+            if(Utils.GenericThrottle && EzThrottler.Throttle("AssignSpecificVenture", 1000))
             {
-                if (VentureUtils.GetAvailableVentureNames().Contains(ventureName))
+                if(VentureUtils.GetAvailableVentureNames().Contains(ventureName))
                 {
                     Callback.Fire(addon, false, (int)11, (int)VentureID);
                     return true;
@@ -487,9 +487,9 @@ internal static unsafe class RetainerHandlers
 
     internal static bool? CheckForErrorAssignedVenture(uint ventureID)
     {
-        if (TryGetAddonByName<AddonRetainerTaskAsk>("RetainerTaskAsk", out var addon) && IsAddonReady(&addon->AtkUnitBase))
+        if(TryGetAddonByName<AddonRetainerTaskAsk>("RetainerTaskAsk", out var addon) && IsAddonReady(&addon->AtkUnitBase))
         {
-            if (addon->AtkUnitBase.UldManager.NodeList[6]->IsVisible())
+            if(addon->AtkUnitBase.UldManager.NodeList[6]->IsVisible())
             {
                 //An Error is on screen.
                 new AddonMaster.RetainerTaskAsk((IntPtr)addon).Return();
@@ -528,28 +528,28 @@ internal static unsafe class RetainerHandlers
 
     public static bool? SelectSpecificVentureByName(string name)
     {
-        if (TryGetAddonByName<AtkUnitBase>("RetainerTaskSupply", out var addon) && IsAddonReady(addon) && addon->AtkValuesCount > 2)
+        if(TryGetAddonByName<AtkUnitBase>("RetainerTaskSupply", out var addon) && IsAddonReady(addon) && addon->AtkValuesCount > 2)
         {
             var state = addon->AtkValues[3];
-            if (state.Type == 0)
+            if(state.Type == 0)
             {
                 FrameThrottler.Throttle("RetainerTaskSupply.InitWait", 10, true);
                 PluginLog.Debug($"RetainerTaskSupply waiting (2)...");
                 return false;
             }
 
-            if (FrameThrottler.Check("RetainerTaskSupply.InitWait") && Utils.GenericThrottle)
+            if(FrameThrottler.Check("RetainerTaskSupply.InitWait") && Utils.GenericThrottle)
             {
-                if (addon->UldManager.NodeList[3]->IsVisible())
+                if(addon->UldManager.NodeList[3]->IsVisible())
                 {
                     var list = addon->UldManager.NodeList[3]->GetAsAtkComponentList();
                     PluginLog.Debug($"Cnt: {list->ListLength}");
-                    for (var i = 0; i < Math.Min(list->ListLength, 16); i++)
+                    for(var i = 0; i < Math.Min(list->ListLength, 16); i++)
                     {
                         var el = list->AtkComponentBase.UldManager.NodeList[2 + i];
                         var text = MemoryHelper.ReadSeString(&el->GetAsAtkComponentNode()->Component->UldManager.NodeList[9]->GetAsAtkTextNode()->NodeText).ExtractText();
                         PluginLog.Debug($"Text: {text}, name: {name}");
-                        if (text == name)
+                        if(text == name)
                         {
                             PluginLog.Debug($"Match");
                             Callback.Fire(addon, true, 5, i, new AtkValue() { Type = 0, Int = 0 });
@@ -578,17 +578,17 @@ internal static unsafe class RetainerHandlers
 
     public static bool? ForceSearchVentureByName(string name)
     {
-        if (TryGetAddonByName<AtkUnitBase>("RetainerTaskSupply", out var addon) && IsAddonReady(addon) && addon->AtkValuesCount > 2)
+        if(TryGetAddonByName<AtkUnitBase>("RetainerTaskSupply", out var addon) && IsAddonReady(addon) && addon->AtkValuesCount > 2)
         {
             var state = addon->AtkValues[3];
-            if (state.Type == 0)
+            if(state.Type == 0)
             {
                 FrameThrottler.Throttle("RetainerTaskSupply.InitWait", 10, true);
                 PluginLog.Debug($"RetainerTaskSupply waiting (2)...");
                 return false;
             }
 
-            if (FrameThrottler.Check("RetainerTaskSupply.InitWait") && Utils.GenericThrottle)
+            if(FrameThrottler.Check("RetainerTaskSupply.InitWait") && Utils.GenericThrottle)
             {
                 Callback.Fire(addon, true, 2, new AtkValue() { Type = 0, Int = 0 }, name);
                 Utils.RethrottleGeneric();
@@ -605,9 +605,9 @@ internal static unsafe class RetainerHandlers
 
     internal static bool? ClearTaskSupplylist()
     {
-        if (TryGetAddonByName<AtkUnitBase>("RetainerTaskSupply", out var addon) && IsAddonReady(addon))
+        if(TryGetAddonByName<AtkUnitBase>("RetainerTaskSupply", out var addon) && IsAddonReady(addon))
         {
-            if (Utils.GenericThrottle)
+            if(Utils.GenericThrottle)
             {
                 Callback.Fire(addon, true, 1);
                 return true;

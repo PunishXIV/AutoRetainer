@@ -8,7 +8,7 @@ internal static class PriorityManager
 
     internal static void HighPriority()
     {
-        if (Process.GetCurrentProcess().PriorityClass != ProcessPriorityClass.High)
+        if(Process.GetCurrentProcess().PriorityClass != ProcessPriorityClass.High)
         {
             PriorityChanged = true;
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
@@ -18,7 +18,7 @@ internal static class PriorityManager
 
     internal static void RestorePriority()
     {
-        if (PriorityChanged)
+        if(PriorityChanged)
         {
             PriorityChanged = false;
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Normal;
@@ -28,9 +28,9 @@ internal static class PriorityManager
 
     internal static void Tick()
     {
-        if (C.ManipulatePriority)
+        if(C.ManipulatePriority)
         {
-            if (Utils.IsBusy)
+            if(Utils.IsBusy)
             {
                 HighPriority();
             }

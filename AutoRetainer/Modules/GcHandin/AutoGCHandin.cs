@@ -23,7 +23,7 @@ internal static unsafe class AutoGCHandin
 
     internal static bool IsEnabled()
     {
-        if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var d))
+        if(C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var d))
         {
             return d.GCDeliveryType != GCDeliveryType.Disabled;
         }
@@ -31,7 +31,7 @@ internal static unsafe class AutoGCHandin
     }
     internal static bool IsArmoryChestEnabled()
     {
-        if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var d))
+        if(C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var d))
         {
             return d.GCDeliveryType.EqualsAny(GCDeliveryType.Hide_Gear_Set_Items, GCDeliveryType.Show_All_Items);
         }
@@ -41,7 +41,7 @@ internal static unsafe class AutoGCHandin
     internal static bool IsAllItemsEnabled()
     {
         Safety.Check();
-        if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var d))
+        if(C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var d))
         {
             return d.GCDeliveryType == GCDeliveryType.Show_All_Items;
         }
@@ -56,21 +56,21 @@ internal static unsafe class AutoGCHandin
 
     internal static void Tick()
     {
-        if (Svc.Condition[ConditionFlag.OccupiedInQuestEvent] && TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon))
+        if(Svc.Condition[ConditionFlag.OccupiedInQuestEvent] && TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon))
         {
-            if (addon->X != 0 || addon->Y != 0)
+            if(addon->X != 0 || addon->Y != 0)
             {
                 Overlay.Position = new(addon->X, addon->Y - Overlay.height);
             }
         }
-        if (Svc.Condition[ConditionFlag.OccupiedInQuestEvent] && IsEnabled())
+        if(Svc.Condition[ConditionFlag.OccupiedInQuestEvent] && IsEnabled())
         {
             Safety.Check();
-            if (Operation && HandleConfirmation())
+            if(Operation && HandleConfirmation())
             {
                 //
             }
-            else if (Operation && HandleYesno())
+            else if(Operation && HandleYesno())
             {
                 //
             }
@@ -81,17 +81,17 @@ internal static unsafe class AutoGCHandin
         }
         else
         {
-            if (Overlay.Allowed) Overlay.Allowed = false;
-            if (Operation) Operation = false;
+            if(Overlay.Allowed) Overlay.Allowed = false;
+            if(Operation) Operation = false;
         }
     }
 
     private static bool HandleConfirmation()
     {
         const string Throttler = "Handin.HandleConfirmation";
-        if (TryGetAddonByName<AddonGrandCompanySupplyReward>("GrandCompanySupplyReward", out var addon) && IsAddonReady(&addon->AtkUnitBase))
+        if(TryGetAddonByName<AddonGrandCompanySupplyReward>("GrandCompanySupplyReward", out var addon) && IsAddonReady(&addon->AtkUnitBase))
         {
-            if (addon->DeliverButton->IsEnabled && FrameThrottler.Throttle(Throttler, 10))
+            if(addon->DeliverButton->IsEnabled && FrameThrottler.Throttle(Throttler, 10))
             {
                 new AddonMaster.GrandCompanySupplyReward(addon).Deliver();
                 DebugLog($"Delivering Item");
@@ -108,16 +108,16 @@ internal static unsafe class AutoGCHandin
     private static bool HandleYesno()
     {
         const string Throttler = "Handin.Yesno";
-        if (TryGetAddonByName<AddonSelectYesno>("SelectYesno", out var addon) && IsAddonReady(&addon->AtkUnitBase) && Operation)
+        if(TryGetAddonByName<AddonSelectYesno>("SelectYesno", out var addon) && IsAddonReady(&addon->AtkUnitBase) && Operation)
         {
-            if (addon->YesButton->IsEnabled)
+            if(addon->YesButton->IsEnabled)
             {
                 var str = MemoryHelper.ReadSeString(&addon->PromptText->NodeText).ExtractText().Replace(" ", "");
                 DebugLog($"SelectYesno encountered: {str}");
                 //102434	Do you really want to trade a high-quality item?
-                if (str.Equals(Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(102434).Text.ExtractText().Replace(" ", "")))
+                if(str.Equals(Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(102434).Text.ExtractText().Replace(" ", "")))
                 {
-                    if (FrameThrottler.Throttle(Throttler, 10))
+                    if(FrameThrottler.Throttle(Throttler, 10))
                     {
                         new AddonMaster.SelectYesno((IntPtr)addon).Yes();
                         DebugLog($"Selecting yes");
@@ -138,15 +138,15 @@ internal static unsafe class AutoGCHandin
 
     private static void HandleGCList()
     {
-        if (TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon) && IsReadyToOperate(addon))
+        if(TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon) && IsReadyToOperate(addon))
         {
-            if (Operation)
+            if(Operation)
             {
-                if (IsDone(addon))
+                if(IsDone(addon))
                 {
                     var s = $"Automatic handin has been completed";
                     DuoLog.Information(s);
-                    if (C.GCHandinNotify)
+                    if(C.GCHandinNotify)
                     {
                         Utils.TryNotify(s);
                     }
@@ -156,21 +156,21 @@ internal static unsafe class AutoGCHandin
                 else
                 {
                     Overlay.Allowed = true;
-                    if (FrameThrottler.Check("Handin.HandleConfirmation"))
+                    if(FrameThrottler.Check("Handin.HandleConfirmation"))
                     {
                         try
                         {
                             var reader = new ReaderGrandCompanySupplyList(addon);
 
                             var nextItem = FindNextHandinItem();
-                            if (reader.NumItems == GetHandinItems().Count)
+                            if(reader.NumItems == GetHandinItems().Count)
                             {
-                                if (nextItem != null)
+                                if(nextItem != null)
                                 {
                                     var has = AutoGCHandin.HasInInventory(nextItem.Value.ItemID);
                                     var itemName = ExcelItemHelper.GetName(nextItem.Value.ItemID);
                                     DebugLog($"Seals: {GetSeals()}/{GetMaxSeals()}, for item {nextItem.Value.Seals} | {ExcelItemHelper.GetName(nextItem.Value.ItemID)}: {has}");
-                                    if (!has)
+                                    if(!has)
                                     {
                                         throw new GCHandinInterruptedException($"Item {itemName} was not found in inventory");
                                     }
@@ -179,7 +179,7 @@ internal static unsafe class AutoGCHandin
                                 }
                                 else
                                 {
-                                    if (FindNextHandinItem(false) == null)
+                                    if(FindNextHandinItem(false) == null)
                                     {
                                         GCContinuation.EnqueueDeliveryClose();
                                         throw new GCHandinInterruptedException("Auto GC handin completed");
@@ -187,7 +187,7 @@ internal static unsafe class AutoGCHandin
                                     else
                                     {
                                         GCContinuation.EnqueueDeliveryClose();
-                                        if (C.AutoGCContinuation)
+                                        if(C.AutoGCContinuation)
                                         {
                                             GCContinuation.EnqueueInitiation();
                                         }
@@ -196,20 +196,20 @@ internal static unsafe class AutoGCHandin
                                 }
                             }
                         }
-                        catch (FormatException e)
+                        catch(FormatException e)
                         {
                             PluginLog.Verbose($"{e.Message}");
                         }
-                        catch (GCHandinInterruptedException e)
+                        catch(GCHandinInterruptedException e)
                         {
                             Operation = false;
                             DuoLog.Information($"{e.Message}");
-                            if (C.GCHandinNotify)
+                            if(C.GCHandinNotify)
                             {
                                 Utils.TryNotify(e.Message);
                             }
                         }
-                        catch (Exception e)
+                        catch(Exception e)
                         {
                             Operation = false;
                             e.Log();
@@ -239,7 +239,7 @@ internal static unsafe class AutoGCHandin
                 && GCSupplyListAddon->UldManager.NodeList[5]->IsVisible()
                 && IsSelectedFilterValid(GCSupplyListAddon);
         }
-        catch (Exception)
+        catch(Exception)
         {
             return false;
         }
@@ -260,19 +260,19 @@ internal static unsafe class AutoGCHandin
         var hideArmory = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(4619).Text.ToDalamudString().ExtractText();
         var hideGearSet = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(4618).Text.ToDalamudString().ExtractText();
         var showAll = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(4617).Text.ToDalamudString().ExtractText();
-        if (text.Equals(hideArmory))
+        if(text.Equals(hideArmory))
         {
             return true;
         }
         else
         {
-            if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
+            if(C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
             {
-                if (text.EqualsAny(hideGearSet))
+                if(text.EqualsAny(hideGearSet))
                 {
                     return IsArmoryChestEnabled() || IsAllItemsEnabled();
                 }
-                if (text.EqualsAny(showAll))
+                if(text.EqualsAny(showAll))
                 {
                     return IsAllItemsEnabled();
                 }
@@ -283,7 +283,7 @@ internal static unsafe class AutoGCHandin
 
     internal static void InvokeHandin(AtkUnitBase* addon, int which)
     {
-        if (FrameThrottler.Throttle("AutoGCHandinCallback", 10)) Callback.Fire(addon, true, 1, which, Callback.ZeroAtkValue);
+        if(FrameThrottler.Throttle("AutoGCHandinCallback", 10)) Callback.Fire(addon, true, 1, which, Callback.ZeroAtkValue);
     }
 
     internal static bool HasInInventory(uint itemID)
@@ -293,7 +293,7 @@ internal static unsafe class AutoGCHandin
 
     public static bool IsListReady()
     {
-        if (TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon) && IsAddonReady(addon))
+        if(TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon) && IsAddonReady(addon))
         {
             return !addon->GetComponentListById(23)->IsUpdatePending;
         }
@@ -304,12 +304,12 @@ internal static unsafe class AutoGCHandin
     {
         var sealsRemaining = GetMaxSeals() - GetSeals();
         var items = GetHandinItems();
-        for (var i = 0; i < items.Count; i++)
+        for(var i = 0; i < items.Count; i++)
         {
             var item = items[i];
-            if (C.IMProtectList.Contains(item.ItemID)) continue;
+            if(C.IMProtectList.Contains(item.ItemID)) continue;
             var seals = (uint)(item.Seals * Utils.GetGCSealMultiplier());
-            if (!checkSealCap || sealsRemaining > seals) return (item.ItemID, seals, i);
+            if(!checkSealCap || sealsRemaining > seals) return (item.ItemID, seals, i);
         }
         return null;
     }
@@ -317,13 +317,13 @@ internal static unsafe class AutoGCHandin
     public static List<(uint ItemID, uint Seals)> GetHandinItems()
     {
         var ret = new List<(uint ItemID, uint Seals)>();
-        if (TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon) && IsAddonReady(addon))
+        if(TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon) && IsAddonReady(addon))
         {
             var reader = new ReaderGrandCompanySupplyList(addon);
-            if (IsListReady())
+            if(IsListReady())
             {
                 var ptr = (GCExpectEntry*)*(nint*)((nint)(addon) + 640);
-                for (var i = 0; i < reader.NumItems; i++)
+                for(var i = 0; i < reader.NumItems; i++)
                 {
                     var entry = ptr[i];
                     ret.Add((entry.ItemID, entry.Seals));
@@ -341,17 +341,17 @@ internal static unsafe class AutoGCHandin
 
     public static byte GetRank()
     {
-        if (GetGC() == 1) return PlayerState.Instance()->GCRankMaelstrom;
-        if (GetGC() == 2) return PlayerState.Instance()->GCRankTwinAdders;
-        if (GetGC() == 3) return PlayerState.Instance()->GCRankImmortalFlames;
+        if(GetGC() == 1) return PlayerState.Instance()->GCRankMaelstrom;
+        if(GetGC() == 2) return PlayerState.Instance()->GCRankTwinAdders;
+        if(GetGC() == 3) return PlayerState.Instance()->GCRankImmortalFlames;
         return 0;
     }
 
     public static bool IsValidGCTerritory()
     {
-        if (GetGC() == 1) return Svc.ClientState.TerritoryType == MainCities.Limsa_Lominsa_Upper_Decks;
-        if (GetGC() == 2) return Svc.ClientState.TerritoryType == MainCities.New_Gridania;
-        if (GetGC() == 3) return Svc.ClientState.TerritoryType == MainCities.Uldah_Steps_of_Nald;
+        if(GetGC() == 1) return Svc.ClientState.TerritoryType == MainCities.Limsa_Lominsa_Upper_Decks;
+        if(GetGC() == 2) return Svc.ClientState.TerritoryType == MainCities.New_Gridania;
+        if(GetGC() == 3) return Svc.ClientState.TerritoryType == MainCities.Uldah_Steps_of_Nald;
         return false;
     }
 }

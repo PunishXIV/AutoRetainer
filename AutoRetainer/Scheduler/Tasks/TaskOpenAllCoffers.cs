@@ -15,17 +15,17 @@ public static unsafe class TaskOpenAllCoffers
     public static bool? RecursivelyOpenCoffers()
     {
         var invManager = InventoryManager.Instance();
-        if (invManager->GetInventoryItemCount(32161) == 0)
+        if(invManager->GetInventoryItemCount(32161) == 0)
         {
             return true;
         }
-        if (Utils.GetInventoryFreeSlotCount() < Math.Max(5, C.UIWarningRetSlotNum))
+        if(Utils.GetInventoryFreeSlotCount() < Math.Max(5, C.UIWarningRetSlotNum))
         {
             return true;
         }
-        if (ActionManager.Instance()->GetActionStatus(ActionType.Item, 32161) == 0 && Utils.AnimationLock == 0)
+        if(ActionManager.Instance()->GetActionStatus(ActionType.Item, 32161) == 0 && Utils.AnimationLock == 0)
         {
-            if (Utils.GenericThrottle && EzThrottler.Throttle("AutoOpenCoffers", 1000))
+            if(Utils.GenericThrottle && EzThrottler.Throttle("AutoOpenCoffers", 1000))
             {
                 OpenCoffer();
             }

@@ -39,10 +39,10 @@ internal static unsafe class Utils
 
     public static bool IsItemSellableByHardList(uint item, uint quantity)
     {
-        if (C.IMProtectList.Contains(item)) return false;
-        if (C.IMAutoVendorHard.Contains(item))
+        if(C.IMProtectList.Contains(item)) return false;
+        if(C.IMAutoVendorHard.Contains(item))
         {
-            if (C.IMAutoVendorHardIgnoreStack.Contains(item)) return true;
+            if(C.IMAutoVendorHardIgnoreStack.Contains(item)) return true;
             return quantity < C.IMAutoVendorHardStackLimit;
         }
         else
@@ -55,7 +55,7 @@ internal static unsafe class Utils
 
     public static bool IsPublic(this World w)
     {
-        if (w.IsPublic) return true;
+        if(w.IsPublic) return true;
         return w.RowId.EqualsAny<uint>(408, 409, 410, 411);
     }
 
@@ -63,7 +63,7 @@ internal static unsafe class Utils
 
     internal static void ExtraLog(string s)
     {
-        if (C.ExtraDebug) PluginLog.Debug(s);
+        if(C.ExtraDebug) PluginLog.Debug(s);
     }
 
     internal static bool ContainsAllItems<T>(this IEnumerable<T> a, IEnumerable<T> b)
@@ -89,7 +89,7 @@ internal static unsafe class Utils
 
     internal static IEnumerable<string> GetEObjNames(params uint[] values)
     {
-        foreach (var x in values)
+        foreach(var x in values)
         {
             yield return Svc.Data.GetExcelSheet<EObjName>().GetRow(x).Singular.ToDalamudString().ExtractText();
         }
@@ -98,10 +98,10 @@ internal static unsafe class Utils
     internal static float GetGCSealMultiplier()
     {
         var ret = 1f;
-        if (Player.Available)
+        if(Player.Available)
         {
-            if (Player.Object.StatusList.TryGetFirst(x => x.StatusId == 414, out var s)) ret = 1f + (float)s.StackCount / 100f;
-            if (Player.Object.StatusList.Any(x => x.StatusId == 1078)) ret = 1.15f;
+            if(Player.Object.StatusList.TryGetFirst(x => x.StatusId == 414, out var s)) ret = 1f + (float)s.StackCount / 100f;
+            if(Player.Object.StatusList.Any(x => x.StatusId == 1078)) ret = 1.15f;
         }
         return ret > 1f ? ret : 1f;
     }
@@ -131,10 +131,10 @@ internal static unsafe class Utils
             }
         }*/
         var agent = AgentLobby.Instance();
-        if (agent->AgentInterface.IsAgentActive())
+        if(agent->AgentInterface.IsAgentActive())
         {
             var charaSpan = agent->LobbyData.CharaSelectEntries.AsSpan();
-            for (var i = 0; i < charaSpan.Length; i++)
+            for(var i = 0; i < charaSpan.Length; i++)
             {
                 var s = charaSpan[i];
                 ret.Add(($"{s.Value->Name.Read()}", s.Value->HomeWorldId));
@@ -151,13 +151,13 @@ internal static unsafe class Utils
     internal static int GetJobLevel(this OfflineCharacterData data, uint job)
     {
         var d = Svc.Data.GetExcelSheet<ClassJob>().GetRow(job);
-        if (d != null)
+        if(d != null)
         {
             try
             {
                 return data.ClassJobLevelArray[d.ExpArrayIndex];
             }
-            catch (Exception) { }
+            catch(Exception) { }
         }
         return 0;
     }
@@ -199,7 +199,7 @@ internal static unsafe class Utils
     internal static uint GetNextPlannedVenture(this AdditionalRetainerData data)
     {
         var index = data.GetNextPlannedVentureIndex();
-        if (index == -1)
+        if(index == -1)
         {
             return 0;
         }
@@ -211,15 +211,15 @@ internal static unsafe class Utils
 
     internal static int GetNextPlannedVentureIndex(this AdditionalRetainerData data)
     {
-        if (data.VenturePlan.ListUnwrapped.Count == 0)
+        if(data.VenturePlan.ListUnwrapped.Count == 0)
         {
             return -1;
         }
         else
         {
-            if (data.VenturePlanIndex >= data.VenturePlan.ListUnwrapped.Count)
+            if(data.VenturePlanIndex >= data.VenturePlan.ListUnwrapped.Count)
             {
-                if (data.VenturePlan.PlanCompleteBehavior == PlanCompleteBehavior.Restart_plan)
+                if(data.VenturePlan.PlanCompleteBehavior == PlanCompleteBehavior.Restart_plan)
                 {
                     return 0;
                 }
@@ -255,8 +255,8 @@ internal static unsafe class Utils
 
     internal static bool IsAnyRetainersCompletedVenture()
     {
-        if (!ProperOnLogin.PlayerPresent) return false;
-        if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
+        if(!ProperOnLogin.PlayerPresent) return false;
+        if(C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
         {
             var selectedRetainers = data.GetEnabledRetainers().Where(z => z.HasVenture);
             return selectedRetainers.Any(z => z.GetVentureSecondsRemaining() <= 10);
@@ -266,11 +266,11 @@ internal static unsafe class Utils
 
     internal static bool IsAllCurrentCharacterRetainersHaveMoreThan5Mins()
     {
-        if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
+        if(C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
         {
-            foreach (var z in data.GetEnabledRetainers())
+            foreach(var z in data.GetEnabledRetainers())
             {
-                if (z.GetVentureSecondsRemaining() < 5 * 60) return false;
+                if(z.GetVentureSecondsRemaining() < 5 * 60) return false;
             }
         }
         return true;
@@ -279,13 +279,13 @@ internal static unsafe class Utils
     internal static string GetActivePlayerInventoryName()
     {
         {
-            if (TryGetAddonByName<AtkUnitBase>("InventoryLarge", out var addon) && addon->IsVisible)
+            if(TryGetAddonByName<AtkUnitBase>("InventoryLarge", out var addon) && addon->IsVisible)
             {
                 return "InventoryLarge";
             }
         }
         {
-            if (TryGetAddonByName<AtkUnitBase>("InventoryExpansion", out var addon) && addon->IsVisible)
+            if(TryGetAddonByName<AtkUnitBase>("InventoryExpansion", out var addon) && addon->IsVisible)
             {
                 return "InventoryExpansion";
             }
@@ -294,7 +294,7 @@ internal static unsafe class Utils
     }
     internal static (string Name, int EntrustDuplicatesIndex) GetActiveRetainerInventoryName()
     {
-        if (TryGetAddonByName<AtkUnitBase>("InventoryRetainerLarge", out var addon) && addon->IsVisible)
+        if(TryGetAddonByName<AtkUnitBase>("InventoryRetainerLarge", out var addon) && addon->IsVisible)
         {
             return ("InventoryRetainerLarge", 8);
         }
@@ -305,12 +305,12 @@ internal static unsafe class Utils
     {
         var currentDistance = float.MaxValue;
         IGameObject currentObject = null;
-        foreach (var x in Svc.Objects)
+        foreach(var x in Svc.Objects)
         {
-            if (x.IsTargetable && (x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName))
+            if(x.IsTargetable && (x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName))
             {
                 var distance = Vector3.Distance(Svc.ClientState.LocalPlayer.Position, x.Position);
-                if (distance < currentDistance)
+                if(distance < currentDistance)
                 {
                     currentDistance = distance;
                     currentObject = x;
@@ -323,14 +323,14 @@ internal static unsafe class Utils
 
     internal static IGameObject GetReachableRetainerBell(bool extend)
     {
-        if (Player.Object is null) return null;
+        if(Player.Object is null) return null;
 
-        foreach (var x in Svc.Objects)
+        foreach(var x in Svc.Objects)
         {
-            if ((x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName))
+            if((x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName))
             {
                 var distance = extend && VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType) ? 20f : GetValidInteractionDistance(x);
-                if (Vector3.Distance(x.Position, Svc.ClientState.LocalPlayer.Position) < distance && x.IsTargetable)
+                if(Vector3.Distance(x.Position, Svc.ClientState.LocalPlayer.Position) < distance && x.IsTargetable)
                 {
                     return x;
                 }
@@ -343,7 +343,7 @@ internal static unsafe class Utils
 
     internal static bool AnyRetainersAvailableCurrentChara()
     {
-        if (C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
+        if(C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
         {
             return data.GetEnabledRetainers().Any(z => z.GetVentureSecondsRemaining() <= C.UnsyncCompensation);
         }
@@ -359,7 +359,7 @@ internal static unsafe class Utils
     internal static string GetAdditionalDataKey(ulong cid, string name, bool create = true)
     {
         var key = $"#{cid:X16} {name}";
-        if (create && !C.AdditionalData.ContainsKey(key))
+        if(create && !C.AdditionalData.ContainsKey(key))
         {
             C.AdditionalData[key] = new();
         }
@@ -368,18 +368,18 @@ internal static unsafe class Utils
 
     public static string UpperCaseStr(Lumina.Text.SeString s, sbyte article = 0)
     {
-        if (article == 1)
+        if(article == 1)
             return s.ToDalamudString().ToString();
 
         var sb = new StringBuilder(s.ToDalamudString().ToString());
         var lastSpace = true;
-        for (var i = 0; i < sb.Length; ++i)
+        for(var i = 0; i < sb.Length; ++i)
         {
-            if (sb[i] == ' ')
+            if(sb[i] == ' ')
             {
                 lastSpace = true;
             }
-            else if (lastSpace)
+            else if(lastSpace)
             {
                 lastSpace = false;
                 sb[i] = char.ToUpperInvariant(sb[i]);
@@ -392,7 +392,7 @@ internal static unsafe class Utils
     internal static bool GenericThrottle => C.UseFrameDelay ? FrameThrottler.Throttle("AutoRetainerGenericThrottle", C.FrameDelay) : EzThrottler.Throttle("AutoRetainerGenericThrottle", C.Delay);
     internal static void RethrottleGeneric(int num)
     {
-        if (C.UseFrameDelay)
+        if(C.UseFrameDelay)
         {
             FrameThrottler.Throttle("AutoRetainerGenericThrottle", num, true);
         }
@@ -403,7 +403,7 @@ internal static unsafe class Utils
     }
     internal static void RethrottleGeneric()
     {
-        if (C.UseFrameDelay)
+        if(C.UseFrameDelay)
         {
             FrameThrottler.Throttle("AutoRetainerGenericThrottle", C.FrameDelay, true);
         }
@@ -444,11 +444,11 @@ internal static unsafe class Utils
 
     internal static bool TrySelectSpecificEntry(Func<string, bool> inputTextTest, Func<bool> Throttler = null)
     {
-        if (TryGetAddonByName<AddonSelectString>("SelectString", out var addon) && IsAddonReady(&addon->AtkUnitBase))
+        if(TryGetAddonByName<AddonSelectString>("SelectString", out var addon) && IsAddonReady(&addon->AtkUnitBase))
         {
-            if (new AddonMaster.SelectString(addon).Entries.TryGetFirst(x => inputTextTest(x.Text), out var entry))
+            if(new AddonMaster.SelectString(addon).Entries.TryGetFirst(x => inputTextTest(x.Text), out var entry))
             {
-                if (IsSelectItemEnabled(addon, entry.Index) && (Throttler?.Invoke() ?? GenericThrottle))
+                if(IsSelectItemEnabled(addon, entry.Index) && (Throttler?.Invoke() ?? GenericThrottle))
                 {
                     entry.Select();
                     DebugLog($"TrySelectSpecificEntry: selecting {entry}");
@@ -475,7 +475,7 @@ internal static unsafe class Utils
     internal static List<string> GetEntries(AddonSelectString* addon)
     {
         var list = new List<string>();
-        for (var i = 0; i < addon->PopupMenu.PopupMenu.EntryCount; i++)
+        for(var i = 0; i < addon->PopupMenu.PopupMenu.EntryCount; i++)
         {
             list.Add(MemoryHelper.ReadSeStringNullTerminated((nint)addon->PopupMenu.PopupMenu.EntryNames[i]).ExtractText());
         }
@@ -484,7 +484,7 @@ internal static unsafe class Utils
 
     internal static void TryNotify(string s)
     {
-        if (DalamudReflector.TryGetDalamudPlugin("NotificationMaster", out var instance, true, true))
+        if(DalamudReflector.TryGetDalamudPlugin("NotificationMaster", out var instance, true, true))
         {
             Safe(delegate
             {
@@ -495,11 +495,11 @@ internal static unsafe class Utils
 
     internal static float GetValidInteractionDistance(IGameObject bell)
     {
-        if (bell.ObjectKind == ObjectKind.Housing)
+        if(bell.ObjectKind == ObjectKind.Housing)
         {
             return 6.5f;
         }
-        else if (Inns.List.Contains(Svc.ClientState.TerritoryType))
+        else if(Inns.List.Contains(Svc.ClientState.TerritoryType))
         {
             return 4.75f;
         }
@@ -526,18 +526,18 @@ internal static unsafe class Utils
 
         var fcOverride = Data.FreeCompanyHouseEntrance == null ? null : GetEntranceAtLocation(Data.FreeCompanyHouseEntrance.Entrance);
 
-        if (fcOverride != null)
+        if(fcOverride != null)
         {
             Distance = Vector3.Distance(Player.Object.Position, fcOverride.Position);
             return fcOverride;
         }
 
-        foreach (var x in Svc.Objects)
+        foreach(var x in Svc.Objects)
         {
-            if (x.IsTargetable && x.Name.ToString().EqualsIgnoreCaseAny([.. Lang.Entrance, Lang.ApartmentEntrance]))
+            if(x.IsTargetable && x.Name.ToString().EqualsIgnoreCaseAny([.. Lang.Entrance, Lang.ApartmentEntrance]))
             {
                 var distance = Vector3.Distance(Svc.ClientState.LocalPlayer.Position, x.Position);
-                if (distance < currentDistance)
+                if(distance < currentDistance)
                 {
                     currentDistance = distance;
                     currentObject = x;
@@ -550,12 +550,12 @@ internal static unsafe class Utils
 
     internal static IGameObject GetEntranceAtLocation(Vector3 pos)
     {
-        foreach (var x in Svc.Objects)
+        foreach(var x in Svc.Objects)
         {
-            if (x.IsTargetable && x.Name.ToString().EqualsIgnoreCaseAny(Lang.Entrance))
+            if(x.IsTargetable && x.Name.ToString().EqualsIgnoreCaseAny(Lang.Entrance))
             {
                 var distance = Vector3.Distance(pos, x.Position);
-                if (distance < 1f)
+                if(distance < 1f)
                 {
                     return x;
                 }
@@ -566,24 +566,24 @@ internal static unsafe class Utils
 
     internal static AtkUnitBase* GetSpecificYesno(Predicate<string> compare)
     {
-        for (var i = 1; i < 100; i++)
+        for(var i = 1; i < 100; i++)
         {
             try
             {
                 var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("SelectYesno", i);
-                if (addon == null) return null;
-                if (IsAddonReady(addon))
+                if(addon == null) return null;
+                if(IsAddonReady(addon))
                 {
                     var textNode = addon->UldManager.NodeList[15]->GetAsAtkTextNode();
                     var text = MemoryHelper.ReadSeString(&textNode->NodeText).ExtractText();
-                    if (compare(text))
+                    if(compare(text))
                     {
                         PluginLog.Verbose($"SelectYesno {text} addon {i} by predicate");
                         return addon;
                     }
                 }
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 e.Log();
                 return null;
@@ -594,24 +594,24 @@ internal static unsafe class Utils
 
     internal static AtkUnitBase* GetSpecificYesno(params string[] s)
     {
-        for (var i = 1; i < 100; i++)
+        for(var i = 1; i < 100; i++)
         {
             try
             {
                 var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("SelectYesno", i);
-                if (addon == null) return null;
-                if (IsAddonReady(addon))
+                if(addon == null) return null;
+                if(IsAddonReady(addon))
                 {
                     var textNode = addon->UldManager.NodeList[15]->GetAsAtkTextNode();
                     var text = MemoryHelper.ReadSeString(&textNode->NodeText).ExtractText().Replace(" ", "").Replace("\n", "");
-                    if (text.ContainsAny(s.Select(x => x.Replace(" ", "").Replace("\n", ""))))
+                    if(text.ContainsAny(s.Select(x => x.Replace(" ", "").Replace("\n", ""))))
                     {
                         PluginLog.Verbose($"SelectYesno {s.Print()} addon {i}");
                         return addon;
                     }
                 }
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 e.Log();
                 return null;
@@ -623,7 +623,7 @@ internal static unsafe class Utils
     internal static bool TryMatch(this string s, string pattern, out Match match)
     {
         var m = Regex.Match(s, pattern);
-        if (m.Success)
+        if(m.Success)
         {
             match = m;
             return true;
@@ -642,7 +642,7 @@ internal static unsafe class Utils
 
     internal static bool TryGetCurrentRetainer(out string name)
     {
-        if (Svc.Condition[ConditionFlag.OccupiedSummoningBell] && ProperOnLogin.PlayerPresent && Svc.Objects.Where(x => x.ObjectKind == ObjectKind.Retainer).OrderBy(x => Vector3.Distance(Svc.ClientState.LocalPlayer.Position, x.Position)).TryGetFirst(out var obj))
+        if(Svc.Condition[ConditionFlag.OccupiedSummoningBell] && ProperOnLogin.PlayerPresent && Svc.Objects.Where(x => x.ObjectKind == ObjectKind.Retainer).OrderBy(x => Vector3.Distance(Svc.ClientState.LocalPlayer.Position, x.Position)).TryGetFirst(out var obj))
         {
             name = obj.Name.ToString();
             return true;
@@ -705,15 +705,15 @@ internal static unsafe class Utils
 
     internal static bool TryGetRetainerByName(string name, out GameRetainerManager.Retainer retainer)
     {
-        if (!GameRetainerManager.Ready)
+        if(!GameRetainerManager.Ready)
         {
             retainer = default;
             return false;
         }
-        for (var i = 0; i < GameRetainerManager.Count; i++)
+        for(var i = 0; i < GameRetainerManager.Count; i++)
         {
             var r = GameRetainerManager.Retainers[i];
-            if (r.Name.ToString() == name)
+            if(r.Name.ToString() == name)
             {
                 retainer = r;
                 return true;
@@ -728,12 +728,12 @@ internal static unsafe class Utils
         InventoryType[] types = [InventoryType.Inventory1, InventoryType.Inventory2, InventoryType.Inventory3, InventoryType.Inventory4];
         var c = InventoryManager.Instance();
         var slots = 0;
-        foreach (var x in types)
+        foreach(var x in types)
         {
             var inv = c->GetInventoryContainer(x);
-            for (var i = 0; i < inv->Size; i++)
+            for(var i = 0; i < inv->Size; i++)
             {
-                if (inv->Items[i].ItemId == 0)
+                if(inv->Items[i].ItemId == 0)
                 {
                     slots++;
                 }
@@ -747,15 +747,15 @@ internal static unsafe class Utils
     internal static bool TryParseRetainerName(string s, out string retainer)
     {
         retainer = default;
-        if (!GameRetainerManager.Ready)
+        if(!GameRetainerManager.Ready)
         {
             return false;
         }
-        for (var i = 0; i < GameRetainerManager.Count; i++)
+        for(var i = 0; i < GameRetainerManager.Count; i++)
         {
             var r = GameRetainerManager.Retainers[i];
             var rname = r.Name.ToString();
-            if (s.Contains(rname) && (retainer == null || rname.Length > retainer.Length))
+            if(s.Contains(rname) && (retainer == null || rname.Length > retainer.Length))
             {
                 retainer = rname;
             }
@@ -765,15 +765,15 @@ internal static unsafe class Utils
 
     private static bool PopupContains(string source, string name)
     {
-        if (Svc.Data.Language == ClientLanguage.Japanese)
+        if(Svc.Data.Language == ClientLanguage.Japanese)
         {
             return source.Contains($"（{name}）");
         }
-        else if (Svc.Data.Language == ClientLanguage.French)
+        else if(Svc.Data.Language == ClientLanguage.French)
         {
             return source.Contains($"Menu de {name}");
         }
-        else if (Svc.Data.Language == ClientLanguage.German)
+        else if(Svc.Data.Language == ClientLanguage.German)
         {
             return source.Contains($"Du hast {name}");
         }
@@ -788,14 +788,14 @@ internal static unsafe class Utils
         Utils.ExtraLog($"GetNearestWorkshopEntrance: Begin");
         var currentDistance = float.MaxValue;
         IGameObject currentObject = null;
-        foreach (var x in Svc.Objects)
+        foreach(var x in Svc.Objects)
         {
             Utils.ExtraLog($"GetNearestWorkshopEntrance: Scanning object table: object={x}, targetable={x.IsTargetable}");
-            if (x.IsTargetable && x.Name.ToString().EqualsIgnoreCaseAny(Lang.AdditionalChambersEntrance))
+            if(x.IsTargetable && x.Name.ToString().EqualsIgnoreCaseAny(Lang.AdditionalChambersEntrance))
             {
                 var distance = Vector3.Distance(Svc.ClientState.LocalPlayer.Position, x.Position);
                 Utils.ExtraLog($"GetNearestWorkshopEntrance: check passed, object={x}, targetable={x.IsTargetable}, distance={distance}");
-                if (distance < currentDistance)
+                if(distance < currentDistance)
                 {
                     Utils.ExtraLog($"GetNearestWorkshopEntrance: distance is less than current {currentDistance}, assigning from {currentObject}, object={x}, targetable={x.IsTargetable}, distance={distance}");
                     currentDistance = distance;

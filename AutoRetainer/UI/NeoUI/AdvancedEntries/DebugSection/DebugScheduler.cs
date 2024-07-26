@@ -16,161 +16,161 @@ internal unsafe class DebugScheduler : DebugSectionBase
         ImGuiEx.Text($"Gil: {TaskDepositGil.Gil}");
         ImGui.Checkbox($"TaskWithdrawGil.forceCheck", ref TaskWithdrawGil.forceCheck);
         ImGuiEx.Text($"{Svc.Data.GetExcelSheet<LogMessage>().GetRow(4578).Text.ToDalamudString().ExtractText(true)}");
-        if (ImGui.Button("Close retainer"))
+        if(ImGui.Button("Close retainer"))
         {
             DuoLog.Information($"{RetainerHandlers.CloseAgentRetainer()}");
         }
         ImGuiEx.Text($"Utils.AnyRetainersAvailableCurrentChara(): {Utils.AnyRetainersAvailableCurrentChara()}");
-        if (ImGui.Button($"SelectAssignVenture"))
+        if(ImGui.Button($"SelectAssignVenture"))
         {
             DuoLog.Information($"{RetainerHandlers.SelectAssignVenture()}");
         }
-        if (ImGui.Button($"SelectQuit"))
+        if(ImGui.Button($"SelectQuit"))
         {
             DuoLog.Information($"{RetainerHandlers.SelectQuit()}");
         }
-        if (ImGui.Button($"SelectViewVentureReport"))
+        if(ImGui.Button($"SelectViewVentureReport"))
         {
             DuoLog.Information($"{RetainerHandlers.SelectViewVentureReport()}");
         }
-        if (ImGui.Button($"ClickResultReassign"))
+        if(ImGui.Button($"ClickResultReassign"))
         {
             DuoLog.Information($"{RetainerHandlers.ClickResultReassign()}");
         }
-        if (ImGui.Button($"ClickResultConfirm"))
+        if(ImGui.Button($"ClickResultConfirm"))
         {
             DuoLog.Information($"{RetainerHandlers.ClickResultConfirm()}");
         }
-        if (ImGui.Button($"ClickAskAssign"))
+        if(ImGui.Button($"ClickAskAssign"))
         {
             DuoLog.Information($"{RetainerHandlers.ClickAskAssign()}");
         }
-        if (ImGui.Button($"SelectQuickExploration"))
+        if(ImGui.Button($"SelectQuickExploration"))
         {
             DuoLog.Information($"{RetainerHandlers.SelectQuickExploration()}");
         }
-        if (ImGui.Button($"SelectEntrustItems"))
+        if(ImGui.Button($"SelectEntrustItems"))
         {
             DuoLog.Information($"{RetainerHandlers.SelectEntrustItems()}");
         }
-        if (ImGui.Button($"SelectEntrustGil"))
+        if(ImGui.Button($"SelectEntrustGil"))
         {
             DuoLog.Information($"{RetainerHandlers.SelectEntrustGil()}");
         }
-        if (ImGui.Button($"ClickEntrustDuplicates"))
+        if(ImGui.Button($"ClickEntrustDuplicates"))
         {
             DuoLog.Information($"{RetainerHandlers.ClickEntrustDuplicates()}");
         }
-        if (ImGui.Button($"ClickEntrustDuplicatesConfirm"))
+        if(ImGui.Button($"ClickEntrustDuplicatesConfirm"))
         {
             DuoLog.Information($"{RetainerHandlers.ClickEntrustDuplicatesConfirm()}");
         }
-        if (ImGui.Button($"ClickCloseEntrustWindow"))
+        if(ImGui.Button($"ClickCloseEntrustWindow"))
         {
             DuoLog.Information($"{RetainerHandlers.ClickCloseEntrustWindow()}");
         }
-        if (ImGui.Button($"CloseRetainerInventory"))
+        if(ImGui.Button($"CloseRetainerInventory"))
         {
             DuoLog.Information($"{RetainerHandlers.CloseAgentRetainer()}");
         }
-        if (ImGui.Button($"CloseRetainerInventory"))
+        if(ImGui.Button($"CloseRetainerInventory"))
         {
             DuoLog.Information($"{RetainerHandlers.CloseAgentRetainer()}");
         }
-        if (ImGui.Button($"SetWithdrawGilAmount (1%)"))
+        if(ImGui.Button($"SetWithdrawGilAmount (1%)"))
         {
             DuoLog.Information($"{RetainerHandlers.SetWithdrawGilAmount(1)}");
         }
-        if (ImGui.Button($"SetWithdrawGilAmount (50%)"))
+        if(ImGui.Button($"SetWithdrawGilAmount (50%)"))
         {
             DuoLog.Information($"{RetainerHandlers.SetWithdrawGilAmount(50)}");
         }
-        if (ImGui.Button($"SetWithdrawGilAmount (99%)"))
+        if(ImGui.Button($"SetWithdrawGilAmount (99%)"))
         {
             DuoLog.Information($"{RetainerHandlers.SetWithdrawGilAmount(99)}");
         }
-        if (ImGui.Button($"SetWithdrawGilAmount (100%)"))
+        if(ImGui.Button($"SetWithdrawGilAmount (100%)"))
         {
             DuoLog.Information($"{RetainerHandlers.SetWithdrawGilAmount(100)}");
         }
-        if (ImGui.Button($"WithdrawGilOrCancel"))
+        if(ImGui.Button($"WithdrawGilOrCancel"))
         {
             DuoLog.Information($"{RetainerHandlers.ProcessBankOrCancel()}");
         }
-        if (ImGui.Button($"WithdrawGilOrCancel (force cancel)"))
+        if(ImGui.Button($"WithdrawGilOrCancel (force cancel)"))
         {
             DuoLog.Information($"{RetainerHandlers.ProcessBankOrCancel(true)}");
         }
-        if (ImGui.Button($"SwapBankMode"))
+        if(ImGui.Button($"SwapBankMode"))
         {
             DuoLog.Information($"{RetainerHandlers.SwapBankMode()}");
         }
-        if (ImGui.Button($"SetDepositGilAmount (1%)"))
+        if(ImGui.Button($"SetDepositGilAmount (1%)"))
         {
             DuoLog.Information($"{RetainerHandlers.SetDepositGilAmount(1)}");
         }
-        if (ImGui.Button($"SetDepositGilAmount (50%)"))
+        if(ImGui.Button($"SetDepositGilAmount (50%)"))
         {
             DuoLog.Information($"{RetainerHandlers.SetDepositGilAmount(50)}");
         }
-        if (ImGui.Button($"SetDepositGilAmount (99%)"))
+        if(ImGui.Button($"SetDepositGilAmount (99%)"))
         {
             DuoLog.Information($"{RetainerHandlers.SetDepositGilAmount(99)}");
         }
-        if (ImGui.Button($"SetDepositGilAmount (100%)"))
+        if(ImGui.Button($"SetDepositGilAmount (100%)"))
         {
             DuoLog.Information($"{RetainerHandlers.SetDepositGilAmount(100)}");
         }
 
         ImGui.Separator();
 
-        if (ImGui.Button($"TaskEntrustDuplicates"))
+        if(ImGui.Button($"TaskEntrustDuplicates"))
         {
             TaskEntrustDuplicates.Enqueue();
         }
-        if (ImGui.Button($"TaskAssignQuickVenture"))
+        if(ImGui.Button($"TaskAssignQuickVenture"))
         {
             TaskAssignQuickVenture.Enqueue();
         }
-        if (ImGui.Button($"TaskReassignVenture"))
+        if(ImGui.Button($"TaskReassignVenture"))
         {
             TaskReassignVenture.Enqueue();
         }
-        if (ImGui.Button($"TaskWithdrawGil (50%)"))
+        if(ImGui.Button($"TaskWithdrawGil (50%)"))
         {
             TaskWithdrawGil.Enqueue(50);
         }
 
         ImGuiEx.Text($"Free inventory slots: {Utils.GetInventoryFreeSlotCount()}");
         ImGui.InputText("Retainer name", ref dbgRetName, 50);
-        if (ImGui.Button("Select retainer by name"))
+        if(ImGui.Button("Select retainer by name"))
         {
             DuoLog.Information($"{RetainerListHandlers.SelectRetainerByName(dbgRetName)}");
         }
 
-        if (ImGui.Button("AtkStage get focus"))
+        if(ImGui.Button("AtkStage get focus"))
         {
             var ptr = (nint)AtkStage.Instance()->GetFocus();
             Svc.Chat.Print($"Stage focus: {ptr}");
         }
-        if (ImGui.Button("AtkStage clear focus"))
+        if(ImGui.Button("AtkStage clear focus"))
         {
             AtkStage.Instance()->ClearFocus();
         }
-        if (ImGui.Button("Try retrieve current retainer name"))
+        if(ImGui.Button("Try retrieve current retainer name"))
         {
-            if (TryGetAddonByName<AddonSelectString>("SelectString", out var select) && IsAddonReady(&select->AtkUnitBase))
+            if(TryGetAddonByName<AddonSelectString>("SelectString", out var select) && IsAddonReady(&select->AtkUnitBase))
             {
                 var textNode = (AtkTextNode*)select->AtkUnitBase.UldManager.NodeList[3];
                 var text = MemoryHelper.ReadSeString(&textNode->NodeText);
-                foreach (var x in text.Payloads)
+                foreach(var x in text.Payloads)
                 {
                     PluginLog.Information($"{x.Type}: {x.ToString()}");
                 }
             }
         }
         {
-            if (ImGui.Button("Try close") && TryGetAddonByName<AtkUnitBase>("RetainerList", out var addon))
+            if(ImGui.Button("Try close") && TryGetAddonByName<AtkUnitBase>("RetainerList", out var addon))
             {
                 var v = stackalloc AtkValue[1]
                 {
@@ -185,9 +185,9 @@ internal unsafe class DebugScheduler : DebugSectionBase
             }
         }
         {
-            if (TryGetAddonByName<AtkUnitBase>("Bank", out var addon) && IsAddonReady(addon))
+            if(TryGetAddonByName<AtkUnitBase>("Bank", out var addon) && IsAddonReady(addon))
             {
-                if (ImGui.Button("test bank"))
+                if(ImGui.Button("test bank"))
                 {
                     var values = stackalloc AtkValue[2]
                     {
@@ -201,7 +201,7 @@ internal unsafe class DebugScheduler : DebugSectionBase
 
         ImGui.Separator();
 
-        if (ImGui.Button("TaskDesynthItems"))
+        if(ImGui.Button("TaskDesynthItems"))
             TaskDesynthItems.Enqueue();
     }
 }

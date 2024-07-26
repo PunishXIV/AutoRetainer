@@ -17,11 +17,11 @@ public sealed class VentureStatsManager
 
     internal void DrawVentures()
     {
-        if (Data.Count == 0)
+        if(Data.Count == 0)
         {
             Load();
         }
-        if (ImGui.Button("Reload"))
+        if(ImGui.Button("Reload"))
         {
             Load();
         }
@@ -31,30 +31,30 @@ public sealed class VentureStatsManager
         ImGuiEx.SetNextItemFullWidth();
         ImGui.InputTextWithHint("##search", "Filter items...", ref Filter, 100);
         var cindex = 0;
-        foreach (var cData in Data)
+        foreach(var cData in Data)
         {
             var rindex = 0;
             var display = false;
-            if (CharTotal[cData.Key] != 0)
+            if(CharTotal[cData.Key] != 0)
             {
-                if (ImGui.CollapsingHeader($"{Censor.Character(cData.Key)} | Total Ventures: {CharTotal.GetSafe(cData.Key)}###chara{cData.Key}"))
+                if(ImGui.CollapsingHeader($"{Censor.Character(cData.Key)} | Total Ventures: {CharTotal.GetSafe(cData.Key)}###chara{cData.Key}"))
                 {
                     display = true;
                 }
             }
             CharTotal[cData.Key] = 0;
-            foreach (var x in cData.Value)
+            foreach(var x in cData.Value)
             {
                 var array = x.Value.Where(c => Filter == string.Empty || $"{Svc.Data.GetExcelSheet<Item>().GetRow(c.Key).Name}".Contains(Filter, StringComparison.OrdinalIgnoreCase));
                 var num = (uint)GetVentureCount(cData.Key, x.Key);
                 CharTotal[cData.Key] += num;
-                if (display && num != 0)
+                if(display && num != 0)
                 {
                     ImGui.Dummy(new(10, 1));
                     ImGui.SameLine();
-                    if (ImGui.CollapsingHeader($"{Censor.Retainer(x.Key)} | Ventures: {num}###{cData.Key}ret{x.Key}"))
+                    if(ImGui.CollapsingHeader($"{Censor.Retainer(x.Key)} | Ventures: {num}###{cData.Key}ret{x.Key}"))
                     {
-                        foreach (var c in array)
+                        foreach(var c in array)
                         {
                             var iName = $"{Svc.Data.GetExcelSheet<Item>().GetRow(c.Key).Name}";
                             ImGuiEx.Text($"             {iName}: {(C.StatsUnifyHQ ? c.Value.Amount + c.Value.AmountHQ : $"{c.Value.Amount}/{c.Value.AmountHQ}")}");
@@ -71,24 +71,24 @@ public sealed class VentureStatsManager
         VentureTimestamps.Clear();
         try
         {
-            foreach (var x in Directory.GetFiles(Svc.PluginInterface.GetPluginConfigDirectory()))
+            foreach(var x in Directory.GetFiles(Svc.PluginInterface.GetPluginConfigDirectory()))
             {
-                if (x.EndsWith(".statistic.json"))
+                if(x.EndsWith(".statistic.json"))
                 {
                     var file = EzConfig.LoadConfiguration<StatisticsFile>(x);
-                    foreach (var z in file.Records)
+                    foreach(var z in file.Records)
                     {
                         AddData(file.PlayerName, file.RetainerName, z.ItemId, z.IsHQ, z.Amount, z.Timestamp);
                     }
                 }
             }
-            foreach (var x in Data)
+            foreach(var x in Data)
             {
                 uint ctotal = 0;
-                foreach (var z in x.Value)
+                foreach(var z in x.Value)
                 {
                     uint cnt = 0;
-                    foreach (var c in z.Value.Values)
+                    foreach(var c in z.Value.Values)
                     {
                         cnt += c.Amount + c.AmountHQ;
                     }
@@ -98,7 +98,7 @@ public sealed class VentureStatsManager
                 CharTotal[x.Key] = ctotal;
             }
         }
-        catch (Exception e)
+        catch(Exception e)
         {
             e.Log();
             Notify.Error($"Error: {e.Message}");
@@ -108,9 +108,9 @@ public sealed class VentureStatsManager
     private int GetVentureCount(string character)
     {
         var ret = 0;
-        foreach (var x in VentureTimestamps)
+        foreach(var x in VentureTimestamps)
         {
-            if (x.Key.Char == character)
+            if(x.Key.Char == character)
             {
                 ret += x.Value.Count;
             }
@@ -120,7 +120,7 @@ public sealed class VentureStatsManager
 
     private int GetVentureCount(string character, string retainer)
     {
-        if (VentureTimestamps.TryGetValue((character, retainer), out var h))
+        if(VentureTimestamps.TryGetValue((character, retainer), out var h))
         {
             return h.Count;
         }
@@ -129,27 +129,27 @@ public sealed class VentureStatsManager
 
     private void AddData(string character, string retainer, uint item, bool hq, uint amount, long timestamp)
     {
-        if (!Data.TryGetValue(character, out var cData))
+        if(!Data.TryGetValue(character, out var cData))
         {
             cData = [];
             Data.Add(character, cData);
         }
-        if (!cData.TryGetValue(retainer, out var rData))
+        if(!cData.TryGetValue(retainer, out var rData))
         {
             rData = [];
             cData.Add(retainer, rData);
         }
-        if (!rData.TryGetValue(item, out var iData))
+        if(!rData.TryGetValue(item, out var iData))
         {
             iData = new();
             rData.Add(item, iData);
         }
-        if (!VentureTimestamps.ContainsKey((character, retainer)))
+        if(!VentureTimestamps.ContainsKey((character, retainer)))
         {
             VentureTimestamps[(character, retainer)] = [];
         }
         VentureTimestamps[(character, retainer)].Add(timestamp);
-        if (hq)
+        if(hq)
         {
             iData.AmountHQ += amount;
         }

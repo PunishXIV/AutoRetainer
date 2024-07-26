@@ -10,12 +10,12 @@ internal static unsafe class PlayerWorldHandlers
 {
     internal static bool? SelectNearestBell()
     {
-        if (!IsOccupied())
+        if(!IsOccupied())
         {
             var x = Utils.GetReachableRetainerBell(false);
-            if (x != null)
+            if(x != null)
             {
-                if (Utils.GenericThrottle)
+                if(Utils.GenericThrottle)
                 {
                     Svc.Targets.SetTarget(x);
                     DebugLog($"Set target to {x}");
@@ -29,11 +29,11 @@ internal static unsafe class PlayerWorldHandlers
     internal static bool? InteractWithTargetedBell()
     {
         var x = Svc.Targets.Target;
-        if (x != null && (x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName) && !IsOccupied())
+        if(x != null && (x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName) && !IsOccupied())
         {
-            if (Vector3.Distance(x.Position, Svc.ClientState.LocalPlayer.Position) < Utils.GetValidInteractionDistance(x) && x.IsTargetable)
+            if(Vector3.Distance(x.Position, Svc.ClientState.LocalPlayer.Position) < Utils.GetValidInteractionDistance(x) && x.IsTargetable)
             {
-                if (Utils.GenericThrottle && EzThrottler.Throttle("InteractWithBell", 5000))
+                if(Utils.GenericThrottle && EzThrottler.Throttle("InteractWithBell", 5000))
                 {
                     TargetSystem.Instance()->InteractWithObject((GameObject*)x.Address, false);
                     DebugLog($"Interacted with {x}");

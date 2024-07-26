@@ -22,8 +22,8 @@ internal unsafe class RetainerListOverlay : Window
 
     public override bool DrawConditions()
     {
-        if (!C.UIBar) return false;
-        if (Svc.Condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.OccupiedSummoningBell] && TryGetAddonByName<AtkUnitBase>("RetainerList", out var addon) && IsAddonReady(addon))
+        if(!C.UIBar) return false;
+        if(Svc.Condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.OccupiedSummoningBell] && TryGetAddonByName<AtkUnitBase>("RetainerList", out var addon) && IsAddonReady(addon))
         {
             Position = new(addon->X, addon->Y - height);
             return true;
@@ -40,14 +40,14 @@ internal unsafe class RetainerListOverlay : Window
     {
         var e = SchedulerMain.PluginEnabled;
         var disabled = MultiMode.Active && !ImGui.GetIO().KeyCtrl;
-        if (disabled)
+        if(disabled)
         {
             ImGui.BeginDisabled();
         }
-        if (ImGui.Checkbox("Enable AutoRetainer", ref e))
+        if(ImGui.Checkbox("Enable AutoRetainer", ref e))
         {
             P.WasEnabled = false;
-            if (e)
+            if(e)
             {
                 SchedulerMain.EnablePlugin(PluginEnableReason.Manual);
             }
@@ -56,23 +56,23 @@ internal unsafe class RetainerListOverlay : Window
                 SchedulerMain.DisablePlugin();
             }
         }
-        if (disabled)
+        if(disabled)
         {
             ImGui.EndDisabled();
             ImGuiComponents.HelpMarker($"MultiMode controls this option. Hold CTRL to override.");
         }
-        if (P.WasEnabled)
+        if(P.WasEnabled)
         {
             ImGui.SameLine();
             ImGuiEx.Text(GradientColor.Get(ImGuiColors.DalamudGrey, ImGuiColors.DalamudGrey3, 500), $"Paused");
         }
-        if (C.MultiModeUIBar)
+        if(C.MultiModeUIBar)
         {
             ImGui.SameLine();
-            if (ImGui.Checkbox("MultiMode", ref MultiMode.Enabled))
+            if(ImGui.Checkbox("MultiMode", ref MultiMode.Enabled))
             {
                 MultiMode.OnMultiModeEnabled();
-                if (MultiMode.Active)
+                if(MultiMode.Active)
                 {
                     SchedulerMain.EnablePlugin(PluginEnableReason.MultiMode);
                 }
@@ -83,25 +83,25 @@ internal unsafe class RetainerListOverlay : Window
 
         ImGui.SameLine();
 
-        if (ImGuiEx.IconButton($"{Lang.IconSettings}##Open plugin interface"))
+        if(ImGuiEx.IconButton($"{Lang.IconSettings}##Open plugin interface"))
         {
             Svc.Commands.ProcessCommand("/ays");
         }
         ImGuiEx.Tooltip("Open Plugin Settings");
-        if (!P.TaskManager.IsBusy)
+        if(!P.TaskManager.IsBusy)
         {
             ImGui.SameLine();
-            if (ImGuiEx.IconButton($"{Lang.IconDuplicate}##Entrust all duplicates"))
+            if(ImGuiEx.IconButton($"{Lang.IconDuplicate}##Entrust all duplicates"))
             {
-                for (var i = 0; i < GameRetainerManager.Count; i++)
+                for(var i = 0; i < GameRetainerManager.Count; i++)
                 {
                     var ret = GameRetainerManager.Retainers[i];
-                    if (ret.Available)
+                    if(ret.Available)
                     {
                         P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
                         TaskEntrustDuplicates.Enqueue();
 
-                        if (C.RetainerMenuDelay > 0)
+                        if(C.RetainerMenuDelay > 0)
                         {
                             TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
                         }
@@ -112,17 +112,17 @@ internal unsafe class RetainerListOverlay : Window
             ImGuiEx.Tooltip("Quick Entrust Duplicates");
 
             ImGui.SameLine();
-            if (ImGuiEx.IconButton($"{Lang.IconGil}##WithdrawGil"))
+            if(ImGuiEx.IconButton($"{Lang.IconGil}##WithdrawGil"))
             {
-                for (var i = 0; i < GameRetainerManager.Count; i++)
+                for(var i = 0; i < GameRetainerManager.Count; i++)
                 {
                     var ret = GameRetainerManager.Retainers[i];
-                    if (ret.Available)
+                    if(ret.Available)
                     {
                         P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
                         TaskWithdrawGil.Enqueue(100);
 
-                        if (C.RetainerMenuDelay > 0)
+                        if(C.RetainerMenuDelay > 0)
                         {
                             TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
                         }
@@ -134,17 +134,17 @@ internal unsafe class RetainerListOverlay : Window
 
             {
                 ImGui.SameLine();
-                if (ImGuiEx.IconButton($"{Lang.IconFire}##vendoritems"))
+                if(ImGuiEx.IconButton($"{Lang.IconFire}##vendoritems"))
                 {
-                    for (var i = 0; i < GameRetainerManager.Count; i++)
+                    for(var i = 0; i < GameRetainerManager.Count; i++)
                     {
                         var ret = GameRetainerManager.Retainers[i];
-                        if (ret.Available)
+                        if(ret.Available)
                         {
                             P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
                             TaskVendorItems.Enqueue();
 
-                            if (C.RetainerMenuDelay > 0)
+                            if(C.RetainerMenuDelay > 0)
                             {
                                 TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
                             }
@@ -159,17 +159,17 @@ internal unsafe class RetainerListOverlay : Window
 
             PluginToProcess = null;
             Svc.PluginInterface.GetIpcProvider<object>(ApiConsts.OnRetainerListTaskButtonsDraw).SendMessage();
-            if (PluginToProcess != null)
+            if(PluginToProcess != null)
             {
-                for (var i = 0; i < GameRetainerManager.Count; i++)
+                for(var i = 0; i < GameRetainerManager.Count; i++)
                 {
                     var ret = GameRetainerManager.Retainers[i];
-                    if (ret.Available)
+                    if(ret.Available)
                     {
                         P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
                         TaskPostprocessRetainerIPC.Enqueue(ret.Name.ToString(), PluginToProcess);
 
-                        if (C.RetainerMenuDelay > 0)
+                        if(C.RetainerMenuDelay > 0)
                         {
                             TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
                         }

@@ -15,11 +15,11 @@ internal static unsafe class Shutdown
 
     internal static void Tick()
     {
-        if (ShutdownAt != 0)
+        if(ShutdownAt != 0)
         {
-            if (Environment.TickCount64 > ShutdownAt && Player.Available)
+            if(Environment.TickCount64 > ShutdownAt && Player.Available)
             {
-                if (C.ShutdownMakesNightMode)
+                if(C.ShutdownMakesNightMode)
                 {
                     C.NightMode = true;
                     ShutdownAt = 0;
@@ -27,17 +27,17 @@ internal static unsafe class Shutdown
                 }
                 else
                 {
-                    if (MultiMode.Enabled)
+                    if(MultiMode.Enabled)
                     {
                         MultiMode.Enabled = false;
                     }
 
-                    if (!VoyageScheduler.Enabled && !SchedulerMain.PluginEnabled && !P.TaskManager.IsBusy)
+                    if(!VoyageScheduler.Enabled && !SchedulerMain.PluginEnabled && !P.TaskManager.IsBusy)
                     {
                         ShutdownAt = 0;
                         P.TaskManager.Enqueue(() =>
                         {
-                            if (EzThrottler.Throttle("SendChat"))
+                            if(EzThrottler.Throttle("SendChat"))
                             {
                                 Chat.Instance.ExecuteCommand("/shutdown");
                                 return true;
@@ -47,9 +47,9 @@ internal static unsafe class Shutdown
                         P.TaskManager.Enqueue(() =>
                         {
                             var yesno = Utils.GetSpecificYesno(Lang.LogOutAndExitGame);
-                            if (yesno != null)
+                            if(yesno != null)
                             {
-                                if (EzThrottler.Throttle("ClickExit"))
+                                if(EzThrottler.Throttle("ClickExit"))
                                 {
                                     new AddonMaster.SelectYesno((nint)yesno).Yes();
                                     return true;
@@ -59,9 +59,9 @@ internal static unsafe class Shutdown
                         });
                     }
 
-                    if (ForceShutdownAt != 0)
+                    if(ForceShutdownAt != 0)
                     {
-                        if (Environment.TickCount64 > ForceShutdownAt)
+                        if(Environment.TickCount64 > ForceShutdownAt)
                         {
                             Environment.Exit(0);
                         }

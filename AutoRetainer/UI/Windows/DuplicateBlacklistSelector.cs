@@ -18,11 +18,11 @@ internal class DuplicateBlacklistSelector : Window
 
     public override void Draw()
     {
-        if (ImGui.BeginCombo("##ocdsel", SelectedData == null ? "Select..." : $"{Censor.Character(SelectedData.Name, SelectedData.World)}"))
+        if(ImGui.BeginCombo("##ocdsel", SelectedData == null ? "Select..." : $"{Censor.Character(SelectedData.Name, SelectedData.World)}"))
         {
             C.OfflineData.Where(x => !x.ExcludeRetainer).Each((x) =>
             {
-                if (ImGui.Selectable($"{Censor.Character(x.Name, x.World)}"))
+                if(ImGui.Selectable($"{Censor.Character(x.Name, x.World)}"))
                 {
                     SelectedData = x;
                 }

@@ -15,25 +15,25 @@ internal static unsafe class ItemLevel
         gathering = 0;
         perception = 0;
         var container = InventoryManager.Instance()->GetInventoryContainer(InventoryType.RetainerEquippedItems);
-        if (container == null) return null;
+        if(container == null) return null;
         var sum = 0U;
         var c = 12;
-        for (var i = 0; i < 13; i++)
+        for(var i = 0; i < 13; i++)
         {
-            if (i == 5) continue;
+            if(i == 5) continue;
             var slot = container->GetInventorySlot(i);
-            if (slot == null) continue;
+            if(slot == null) continue;
             var id = slot->ItemId;
             var item = Svc.Data.Excel.GetSheet<ECommons.ExcelServices.Sheets.ExtendedItem>()?.GetRow(id);
-            if (item == null) continue;
-            if (ignoreCategory.Contains(item.ItemUICategory.Row))
+            if(item == null) continue;
+            if(ignoreCategory.Contains(item.ItemUICategory.Row))
             {
-                if (i == 0) c -= 1;
+                if(i == 0) c -= 1;
                 c -= 1;
                 continue;
             }
 
-            if (i == 0 && !canHaveOffhand.Contains(item.ItemUICategory.Row))
+            if(i == 0 && !canHaveOffhand.Contains(item.ItemUICategory.Row))
             {
                 sum += item.LevelItem.Row;
                 i++;
@@ -43,45 +43,45 @@ internal static unsafe class ItemLevel
 
             var bonusPerception = 0;
 
-            for (var j = 0; j < item.BaseParam.Length; j++)
+            for(var j = 0; j < item.BaseParam.Length; j++)
             {
                 var baseParam = item.BaseParam[j];
-                if (baseParam.BaseParam.Value?.RowId == 72)
+                if(baseParam.BaseParam.Value?.RowId == 72)
                 {
                     bonusGathering += baseParam.Value;
                 }
-                if (baseParam.BaseParam.Value?.RowId == 73)
+                if(baseParam.BaseParam.Value?.RowId == 73)
                 {
                     bonusPerception += baseParam.Value;
                 }
             }
-            if (slot->Flags.HasFlag(InventoryItem.ItemFlags.HighQuality))
+            if(slot->Flags.HasFlag(InventoryItem.ItemFlags.HighQuality))
             {
-                for (var j = 0; j < item.BaseParamSpecial.Length; j++)
+                for(var j = 0; j < item.BaseParamSpecial.Length; j++)
                 {
                     var baseParam = item.BaseParamSpecial[j];
-                    if (baseParam.BaseParam.Value?.RowId == 72)
+                    if(baseParam.BaseParam.Value?.RowId == 72)
                     {
                         bonusGathering += baseParam.Value;
                     }
-                    if (baseParam.BaseParam.Value?.RowId == 73)
+                    if(baseParam.BaseParam.Value?.RowId == 73)
                     {
                         bonusPerception += baseParam.Value;
                     }
                 }
             }
-            for (var j = 0; j < 5; j++)
+            for(var j = 0; j < 5; j++)
             {
                 var materia = slot->Materia[j];
                 var materiag = slot->MateriaGrades[j];
-                if (materia != 0)
+                if(materia != 0)
                 {
                     var m = Svc.Data.GetExcelSheet<Materia>().GetRow(materia);
-                    if (m != null && m.BaseParam.Value?.RowId == 72)
+                    if(m != null && m.BaseParam.Value?.RowId == 72)
                     {
                         bonusGathering += m.Value[materiag];
                     }
-                    if (m != null && m.BaseParam.Value?.RowId == 73)
+                    if(m != null && m.BaseParam.Value?.RowId == 73)
                     {
                         bonusPerception += m.Value[materiag];
                     }

@@ -30,10 +30,10 @@ public class DeployablesTab : NeoUIEntry
         .Checkbox($"Enabled vessel isn't deployed", () => ref C.AlertNotDeployed)
         .Widget("Unoptimal submersible configuration alerts:", (z) =>
         {
-            foreach (var x in C.UnoptimalVesselConfigurations)
+            foreach(var x in C.UnoptimalVesselConfigurations)
             {
                 ImGuiEx.Text($"Rank {x.MinRank}-{x.MaxRank}, {(x.ConfigurationsInvert ? "NOT " : "")} {x.Configurations.Print()}");
-                if (ImGuiEx.HoveredAndClicked("Ctrl+click to delete", default, true))
+                if(ImGuiEx.HoveredAndClicked("Ctrl+click to delete", default, true))
                 {
                     var t = x.GUID;
                     new TickScheduler(() => C.UnoptimalVesselConfigurations.RemoveAll(x => x.GUID == t));
@@ -56,7 +56,7 @@ public class DeployablesTab : NeoUIEntry
             ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - 100f.Scale());
             ImGui.InputText($"##conf", ref Conf, 3000);
             ImGui.SameLine();
-            if (ImGui.Button("Add"))
+            if(ImGui.Button("Add"))
             {
                 C.UnoptimalVesselConfigurations.Add(new()
                 {
@@ -83,16 +83,16 @@ public class DeployablesTab : NeoUIEntry
     {
         ImGuiEx.Text($"Select submersibles:");
         ImGuiEx.SetNextItemFullWidth();
-        if (ImGui.BeginCombo($"##sel", $"Selected {SelectedVessels.Count}"))
+        if(ImGui.BeginCombo($"##sel", $"Selected {SelectedVessels.Count}"))
         {
-            foreach (var x in C.OfflineData)
+            foreach(var x in C.OfflineData)
             {
-                if (x.OfflineSubmarineData.Count > 0)
+                if(x.OfflineSubmarineData.Count > 0)
                 {
                     ImGuiEx.Text(Censor.Character(x.Name, x.World));
                     ImGui.Indent();
                     ImGui.PushID(x.CID.ToString());
-                    foreach (var v in x.OfflineSubmarineData)
+                    foreach(var v in x.OfflineSubmarineData)
                     {
                         ImGuiEx.CollectionCheckbox($"{v.Name}", (x.CID, v.Name), SelectedVessels);
                     }
@@ -102,15 +102,15 @@ public class DeployablesTab : NeoUIEntry
             }
             ImGui.EndCombo();
         }
-        if (ImGuiEx.IconButtonWithText((FontAwesomeIcon)'\uf057', "Deselect All"))
+        if(ImGuiEx.IconButtonWithText((FontAwesomeIcon)'\uf057', "Deselect All"))
         {
             SelectedVessels.Clear();
         }
         ImGui.SameLine();
-        if (ImGuiEx.IconButtonWithText((FontAwesomeIcon)'\uf055', "Select All"))
+        if(ImGuiEx.IconButtonWithText((FontAwesomeIcon)'\uf055', "Select All"))
         {
             SelectedVessels.Clear();
-            foreach (var x in C.OfflineData) foreach (var v in x.OfflineSubmarineData) SelectedVessels.Add((x.CID, v.Name));
+            foreach(var x in C.OfflineData) foreach(var v in x.OfflineSubmarineData) SelectedVessels.Add((x.CID, v.Name));
         }
         ImGui.Separator();
         ImGuiEx.TextV("By level:");
@@ -120,14 +120,14 @@ public class DeployablesTab : NeoUIEntry
         ImGui.SameLine();
         ImGui.SetNextItemWidth(100f);
         ImGui.DragInt("##maxlevel", ref MassMaxLevel, 0.1f);
-        if (ImGuiEx.IconButtonWithText(FontAwesomeIcon.Plus, "Add vessels by level to selection"))
+        if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Plus, "Add vessels by level to selection"))
         {
-            foreach (var x in C.OfflineData)
+            foreach(var x in C.OfflineData)
             {
-                foreach (var v in x.OfflineSubmarineData)
+                foreach(var v in x.OfflineSubmarineData)
                 {
                     var adata = x.GetAdditionalVesselData(v.Name, VoyageType.Submersible);
-                    if (adata.Level.InRange(MassMinLevel, MassMaxLevel, true))
+                    if(adata.Level.InRange(MassMinLevel, MassMaxLevel, true))
                     {
                         SelectedVessels.Add((x.CID, v.Name));
                     }
@@ -140,13 +140,13 @@ public class DeployablesTab : NeoUIEntry
         ImGui.Separator();
         ImGui.SetNextItemWidth(150f);
         ImGuiEx.EnumCombo("##behavior", ref MassBehavior);
-        if (ImGuiEx.IconButtonWithText((FontAwesomeIcon)'\uf018', "Set behavior"))
+        if(ImGuiEx.IconButtonWithText((FontAwesomeIcon)'\uf018', "Set behavior"))
         {
             var num = 0;
-            foreach (var x in SelectedVessels)
+            foreach(var x in SelectedVessels)
             {
                 var odata = C.OfflineData.FirstOrDefault(z => z.CID == x.CID);
-                if (odata != null)
+                if(odata != null)
                 {
                     var vdata = odata.GetOfflineVesselData(x.VesselName, VoyageType.Submersible);
                     var adata = odata.GetAdditionalVesselData(x.VesselName, VoyageType.Submersible);
@@ -160,13 +160,13 @@ public class DeployablesTab : NeoUIEntry
         ImGui.Separator();
         ImGui.SetNextItemWidth(150f);
         ImGuiEx.EnumCombo("##unlockmode", ref MassUnlockMode, Lang.UnlockModeNames);
-        if (ImGuiEx.IconButtonWithText((FontAwesomeIcon)'\uf09c', "Set unlock mode"))
+        if(ImGuiEx.IconButtonWithText((FontAwesomeIcon)'\uf09c', "Set unlock mode"))
         {
             var num = 0;
-            foreach (var x in SelectedVessels)
+            foreach(var x in SelectedVessels)
             {
                 var odata = C.OfflineData.FirstOrDefault(z => z.CID == x.CID);
-                if (odata != null)
+                if(odata != null)
                 {
                     var vdata = odata.GetOfflineVesselData(x.VesselName, VoyageType.Submersible);
                     var adata = odata.GetAdditionalVesselData(x.VesselName, VoyageType.Submersible);
@@ -180,24 +180,24 @@ public class DeployablesTab : NeoUIEntry
         ImGui.Separator();
 
         ImGui.SetNextItemWidth(150f);
-        if (ImGui.BeginCombo("##uplan", "Unlock plan: " + (SelectedUnlockPlan?.Name ?? "not selected")))
+        if(ImGui.BeginCombo("##uplan", "Unlock plan: " + (SelectedUnlockPlan?.Name ?? "not selected")))
         {
-            foreach (var plan in C.SubmarineUnlockPlans)
+            foreach(var plan in C.SubmarineUnlockPlans)
             {
-                if (ImGui.Selectable($"{plan.Name}##{plan.GUID}"))
+                if(ImGui.Selectable($"{plan.Name}##{plan.GUID}"))
                 {
                     SelectedUnlockPlan = plan;
                 }
             }
             ImGui.EndCombo();
         }
-        if (ImGuiEx.IconButtonWithText((FontAwesomeIcon)'\uf3c1', "Set unlock plan", SelectedUnlockPlan != null))
+        if(ImGuiEx.IconButtonWithText((FontAwesomeIcon)'\uf3c1', "Set unlock plan", SelectedUnlockPlan != null))
         {
             var num = 0;
-            foreach (var x in SelectedVessels)
+            foreach(var x in SelectedVessels)
             {
                 var odata = C.OfflineData.FirstOrDefault(z => z.CID == x.CID);
-                if (odata != null)
+                if(odata != null)
                 {
                     var vdata = odata.GetOfflineVesselData(x.VesselName, VoyageType.Submersible);
                     var adata = odata.GetAdditionalVesselData(x.VesselName, VoyageType.Submersible);
@@ -210,24 +210,24 @@ public class DeployablesTab : NeoUIEntry
         ImGui.Separator();
 
         ImGui.SetNextItemWidth(150f);
-        if (ImGui.BeginCombo("##uplan", "Point plan: " + (SelectedPointPlan?.Name ?? "not selected")))
+        if(ImGui.BeginCombo("##uplan", "Point plan: " + (SelectedPointPlan?.Name ?? "not selected")))
         {
-            foreach (var plan in C.SubmarinePointPlans)
+            foreach(var plan in C.SubmarinePointPlans)
             {
-                if (ImGui.Selectable($"{plan.Name}##{plan.GUID}"))
+                if(ImGui.Selectable($"{plan.Name}##{plan.GUID}"))
                 {
                     SelectedPointPlan = plan;
                 }
             }
             ImGui.EndCombo();
         }
-        if (ImGuiEx.IconButtonWithText((FontAwesomeIcon)'\uf55b', "Set point plan", SelectedPointPlan != null))
+        if(ImGuiEx.IconButtonWithText((FontAwesomeIcon)'\uf55b', "Set point plan", SelectedPointPlan != null))
         {
             var num = 0;
-            foreach (var x in SelectedVessels)
+            foreach(var x in SelectedVessels)
             {
                 var odata = C.OfflineData.FirstOrDefault(z => z.CID == x.CID);
-                if (odata != null)
+                if(odata != null)
                 {
                     var vdata = odata.GetOfflineVesselData(x.VesselName, VoyageType.Submersible);
                     var adata = odata.GetAdditionalVesselData(x.VesselName, VoyageType.Submersible);

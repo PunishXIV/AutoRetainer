@@ -15,9 +15,9 @@ internal static unsafe class TaskContinueHET
         P.TaskManager.Enqueue(() => !IsOccupied(), 180 * 1000, "WaitUntilNotOccupied1");
         P.TaskManager.Enqueue(() =>
         {
-            if (VoyageUtils.ShouldEnterWorkshop())
+            if(VoyageUtils.ShouldEnterWorkshop())
             {
-                if (Utils.GetNearestWorkshopEntrance(out _) != null)
+                if(Utils.GetNearestWorkshopEntrance(out _) != null)
                 {
                     EnqueueImmediateEnterWorkshop();
                 }
@@ -55,7 +55,7 @@ internal static unsafe class TaskContinueHET
 
     internal static bool? SelectEnterWorkshop()
     {
-        if (Utils.TrySelectSpecificEntry(Lang.EnterWorkshop, () => EzThrottler.Throttle("HET.SelectEnterWorkshop")))
+        if(Utils.TrySelectSpecificEntry(Lang.EnterWorkshop, () => EzThrottler.Throttle("HET.SelectEnterWorkshop")))
         {
             DebugLog("Confirmed going to workhop");
             return true;
@@ -66,7 +66,7 @@ internal static unsafe class TaskContinueHET
     internal static bool? InteractAdd()
     {
         var entrance = Utils.GetNearestWorkshopEntrance(out var d);
-        if (entrance != null && Svc.Targets.Target?.Address == entrance.Address && EzThrottler.Throttle("HET.InteractAdd", 1000))
+        if(entrance != null && Svc.Targets.Target?.Address == entrance.Address && EzThrottler.Throttle("HET.InteractAdd", 1000))
         {
             DebugLog($"Interacting with entrance");
             TargetSystem.Instance()->InteractWithObject((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)entrance.Address, false);
@@ -77,7 +77,7 @@ internal static unsafe class TaskContinueHET
     internal static bool? AutorunOffAdd()
     {
         var entrance = Utils.GetNearestWorkshopEntrance(out var d);
-        if (entrance != null && d < 3f + Utils.Random && EzThrottler.Throttle("HET.DisableAutomoveAdd"))
+        if(entrance != null && d < 3f + Utils.Random && EzThrottler.Throttle("HET.DisableAutomoveAdd"))
         {
             DebugLog($"Disabling automove");
             Chat.Instance.ExecuteCommand("/automove off");
@@ -89,11 +89,11 @@ internal static unsafe class TaskContinueHET
     internal static bool? LockonAdditionalChambers()
     {
         var entrance = Utils.GetNearestWorkshopEntrance(out _);
-        if (entrance != null)
+        if(entrance != null)
         {
-            if (Svc.Targets.Target?.Address == entrance.Address)
+            if(Svc.Targets.Target?.Address == entrance.Address)
             {
-                if (EzThrottler.Throttle("HET.LockonAdd"))
+                if(EzThrottler.Throttle("HET.LockonAdd"))
                 {
                     Chat.Instance.ExecuteCommand("/lockon");
                     return true;
@@ -101,7 +101,7 @@ internal static unsafe class TaskContinueHET
             }
             else
             {
-                if (EzThrottler.Throttle("HET.SetTargetAdd", 200))
+                if(EzThrottler.Throttle("HET.SetTargetAdd", 200))
                 {
                     DebugLog($"Setting entrance target ({entrance})");
                     Svc.Targets.Target = entrance;

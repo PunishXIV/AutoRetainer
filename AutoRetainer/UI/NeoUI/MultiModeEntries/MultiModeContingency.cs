@@ -25,7 +25,7 @@ public class MultiModeContingency : NeoUIEntry
         {
             ImGui.BeginDisabled();
             ImGuiEx.SetNextItemFullWidth();
-            if (ImGui.BeginCombo("##jailsel", "Terminate the game")) { ImGui.EndCombo(); }
+            if(ImGui.BeginCombo("##jailsel", "Terminate the game")) { ImGui.EndCombo(); }
             ImGui.EndDisabled();
         }, "Applies selected fallback action in the case if you got jailed by the GM while plugin is running. Good luck!");
 }

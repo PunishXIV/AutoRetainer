@@ -86,7 +86,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             PunishLibMain.Init(pi, Name, PunishOption.DefaultKoFi); // Default button
             var cnt = FFXIVInstanceMonitor.GetFFXIVCNT();
             PluginLog.Information($"FFXIV instances: {cnt}");
-            if (FFXIVInstanceMonitor.AcquireLock() || cnt <= 1)
+            if(FFXIVInstanceMonitor.AcquireLock() || cnt <= 1)
             {
                 new TickScheduler(Load);
             }
@@ -103,7 +103,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     private void OnEvent(AddonEvent type, AddonArgs args)
     {
         return;
-        if (args is AddonReceiveEventArgs a)
+        if(args is AddonReceiveEventArgs a)
         {
             PluginLog.Information($"""
 								RL Event:
@@ -174,10 +174,10 @@ public unsafe class AutoRetainer : IDalamudPlugin
         Svc.PluginInterface.UiBuilder.Draw += FPSLimiter.FPSLimit;
         AutoCutsceneSkipper.Init(MiniTA.ProcessCutsceneSkip);
         EzSharedData.TryGet("AutoRetainer.Started", out TimeLaunched, CreationMode.CreateAndKeep, [DateTimeOffset.Now.ToUnixTimeMilliseconds()]);
-        if (!C.NightModePersistent) C.NightMode = false;
+        if(!C.NightModePersistent) C.NightMode = false;
         ContextMenuManager = new();
         PluginLog.Information($"AutoRetainer v{P.GetType().Assembly.GetName().Version} is ready.");
-        if (!EzSharedData.TryGet<object>("AutoRetainer.WasLoaded", out _) && C.MultiAutoStart)
+        if(!EzSharedData.TryGet<object>("AutoRetainer.WasLoaded", out _) && C.MultiAutoStart)
         {
             MultiMode.PerformAutoStart();
         }
@@ -186,13 +186,13 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
     private void Toasts_Toast(ref Dalamud.Game.Text.SeStringHandling.SeString message, ref Dalamud.Game.Gui.Toast.ToastOptions options, ref bool isHandled)
     {
-        if (Svc.Condition[ConditionFlag.OccupiedSummoningBell] && ProperOnLogin.PlayerPresent)
+        if(Svc.Condition[ConditionFlag.OccupiedSummoningBell] && ProperOnLogin.PlayerPresent)
         {
             var text = message.ToString();
             //4330	57	33	0	False	リテイナーベンチャー「<Value>IntegerParameter(2)</Value> <Sheet(Item,IntegerParameter(1),0)/>」を依頼しました。
             //4330	57	33	0	False	Du hast deinen Gehilfen mit der Beschaffung von <SheetDe(Item,1,IntegerParameter(1),IntegerParameter(3),3,1)/> ( <Value>IntegerParameter(2)</Value>) beauftragt.
             //4330	57	33	0	False	Vous avez confié la tâche “<SheetFr(Item,12,IntegerParameter(1),2,1)/> ( <Value>IntegerParameter(2)</Value>)” à votre servant.
-            if (text.StartsWithAny("You assign your retainer", "リテイナーベンチャー", "Du hast deinen Gehilfen mit", "Vous avez confié la tâche")
+            if(text.StartsWithAny("You assign your retainer", "リテイナーベンチャー", "Du hast deinen Gehilfen mit", "Vous avez confié la tâche")
                 && Utils.TryGetCurrentRetainer(out var ret)
                 && C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var offlineData)
                 && offlineData.RetainerData.TryGetFirst(x => x.Name == ret, out var offlineRetainerData))
@@ -202,7 +202,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             }
             //4578	57	33	0	False	Gil earned from market sales has been entrusted to your retainer.<If(Equal(IntegerParameter(1),1))>
             //The amount earned exceeded your retainer's gil limit. Excess gil has been discarded.<Else/></If>
-            if (text.StartsWith(Svc.Data.GetExcelSheet<LogMessage>().GetRow(4578).Text.ToDalamudString().ExtractText(true)))
+            if(text.StartsWith(Svc.Data.GetExcelSheet<LogMessage>().GetRow(4578).Text.ToDalamudString().ExtractText(true)))
             {
                 TaskWithdrawGil.forceCheck = true;
                 DebugLog($"Forcing to check for gil");
@@ -212,67 +212,67 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
     private void CommandHandler(string command, string arguments)
     {
-        if (arguments.EqualsIgnoreCase("debug"))
+        if(arguments.EqualsIgnoreCase("debug"))
         {
             config.Verbose = !config.Verbose;
             DuoLog.Information($"Debug mode {(config.Verbose ? "enabled" : "disabled")}");
             S.NeoWindow.Reload();
         }
-        else if (arguments.EqualsIgnoreCase("expert"))
+        else if(arguments.EqualsIgnoreCase("expert"))
         {
             config.Expert = !config.Expert;
             DuoLog.Information($"Expert mode {(config.Expert ? "enabled" : "disabled")}");
             S.NeoWindow.Reload();
         }
-        else if (arguments.EqualsIgnoreCaseAny("e", "enable"))
+        else if(arguments.EqualsIgnoreCaseAny("e", "enable"))
         {
             SchedulerMain.EnablePlugin(PluginEnableReason.Auto);
         }
-        else if (arguments.EqualsIgnoreCaseAny("d", "disable"))
+        else if(arguments.EqualsIgnoreCaseAny("d", "disable"))
         {
             SchedulerMain.DisablePlugin();
         }
-        else if (arguments.EqualsIgnoreCaseAny("t", "toggle"))
+        else if(arguments.EqualsIgnoreCaseAny("t", "toggle"))
         {
             Svc.Commands.ProcessCommand(SchedulerMain.PluginEnabled ? "/ays d" : "/ays e");
         }
-        else if (arguments.EqualsIgnoreCaseAny("m", "multi"))
+        else if(arguments.EqualsIgnoreCaseAny("m", "multi"))
         {
             MultiMode.Enabled = !MultiMode.Enabled;
             MultiMode.OnMultiModeEnabled();
         }
-        else if (arguments.StartsWithAny(StringComparison.OrdinalIgnoreCase, "m ", "multi "))
+        else if(arguments.StartsWithAny(StringComparison.OrdinalIgnoreCase, "m ", "multi "))
         {
             var arg2 = arguments.Split(" ")[1];
-            if (arg2.EqualsIgnoreCaseAny("d", "disable"))
+            if(arg2.EqualsIgnoreCaseAny("d", "disable"))
             {
-                if (MultiMode.Enabled) MultiMode.Enabled = false;
+                if(MultiMode.Enabled) MultiMode.Enabled = false;
             }
-            else if (arg2.EqualsIgnoreCaseAny("e", "enable"))
+            else if(arg2.EqualsIgnoreCaseAny("e", "enable"))
             {
-                if (!MultiMode.Enabled)
+                if(!MultiMode.Enabled)
                 {
                     MultiMode.Enabled = true;
                     MultiMode.OnMultiModeEnabled();
                 }
             }
         }
-        else if (arguments.EqualsIgnoreCaseAny("s", "settings"))
+        else if(arguments.EqualsIgnoreCaseAny("s", "settings"))
         {
             S.NeoWindow.IsOpen = true;
         }
-        else if (arguments.EqualsIgnoreCaseAny("b", "browser"))
+        else if(arguments.EqualsIgnoreCaseAny("b", "browser"))
         {
             VentureBrowser.IsOpen = !VentureBrowser.IsOpen;
         }
-        else if (arguments.EqualsIgnoreCaseAny("l", "log"))
+        else if(arguments.EqualsIgnoreCaseAny("l", "log"))
         {
             LogWindow.IsOpen = !LogWindow.IsOpen;
         }
-        else if (arguments.StartsWith("relog "))
+        else if(arguments.StartsWith("relog "))
         {
             var target = C.OfflineData.Where(x => $"{x.Name}@{x.World}" == arguments[6..]).FirstOrDefault();
-            if (target != null)
+            if(target != null)
             {
                 MultiMode.Relog(target, out _, RelogReason.Command);
             }
@@ -281,18 +281,18 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 Notify.Error($"Could not find target character");
             }
         }
-        else if (arguments.EqualsIgnoreCase("het"))
+        else if(arguments.EqualsIgnoreCase("het"))
         {
             HouseEnterTask.EnqueueTask();
         }
-        else if (arguments.EqualsIgnoreCaseAny("deliver"))
+        else if(arguments.EqualsIgnoreCaseAny("deliver"))
         {
             GCContinuation.EnableDeliveringIfPossible();
         }
-        else if (arguments.StartsWith("shutdown"))
+        else if(arguments.StartsWith("shutdown"))
         {
             var str = arguments.Split((char[])[' ', ',', ':', '-', '/', '.'], StringSplitOptions.RemoveEmptyEntries);
-            if (str.Length <= 1)
+            if(str.Length <= 1)
             {
                 Shutdown.ShutdownAt = 0;
                 Shutdown.ForceShutdownAt = 0;
@@ -304,9 +304,9 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 {
                     var time = new TimeSpan();
                     time = time.Add(TimeSpan.FromHours(int.Parse(str[1])));
-                    if (str.Length > 2) time = time.Add(TimeSpan.FromMinutes(int.Parse(str[2])));
-                    if (str.Length > 3) time = time.Add(TimeSpan.FromSeconds(int.Parse(str[3])));
-                    if (time.TotalSeconds < 10)
+                    if(str.Length > 2) time = time.Add(TimeSpan.FromMinutes(int.Parse(str[2])));
+                    if(str.Length > 3) time = time.Add(TimeSpan.FromSeconds(int.Parse(str[3])));
+                    if(time.TotalSeconds < 10)
                     {
                         DuoLog.Error("Timer can't be less than 10 seconds");
                     }
@@ -317,30 +317,30 @@ public unsafe class AutoRetainer : IDalamudPlugin
                         Shutdown.ForceShutdownAt = Environment.TickCount64 + (long)time.TotalMilliseconds + 10 * 60 * 1000;
                     }
                 }
-                catch (Exception e)
+                catch(Exception e)
                 {
                     DuoLog.Error($"{e.Message}");
                     PluginLog.Error($"{e.StackTrace}");
                 }
             }
         }
-        else if (arguments.StartsWith("modifySoftVendorList"))
+        else if(arguments.StartsWith("modifySoftVendorList"))
         {
-            if (int.TryParse(arguments.Split(" ")[1], out var num))
+            if(int.TryParse(arguments.Split(" ")[1], out var num))
             {
-                if (num > 0)
+                if(num > 0)
                 {
                     var id = (uint)num;
-                    if (!C.IMAutoVendorSoft.Contains(id))
+                    if(!C.IMAutoVendorSoft.Contains(id))
                     {
                         C.IMAutoVendorSoft.Add(id);
                         PluginLog.Warning($"External addition to soft vendor list: {ExcelItemHelper.GetName(id)}");
                     }
                 }
-                else if (num < 0)
+                else if(num < 0)
                 {
                     var id = (uint)-num;
-                    if (C.IMAutoVendorSoft.Contains(id))
+                    if(C.IMAutoVendorSoft.Contains(id))
                     {
                         C.IMAutoVendorSoft.Remove(id);
                         PluginLog.Warning($"External removal from soft vendor list: {ExcelItemHelper.GetName(id)}");
@@ -348,59 +348,59 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 }
             }
         }
-        else if (arguments.StartsWith("set"))
+        else if(arguments.StartsWith("set"))
         {
             try
             {
                 var field = arguments.Split(" ")[1];
                 var value = arguments.Split(" ")[2];
-                if (C.GetFoP(field).GetType() == typeof(bool))
+                if(C.GetFoP(field).GetType() == typeof(bool))
                 {
                     C.SetFoP(field, bool.Parse(value));
                     DuoLog.Information($"Set bool {field}={value}");
                 }
-                else if (C.GetFoP(field).GetType() == typeof(int))
+                else if(C.GetFoP(field).GetType() == typeof(int))
                 {
                     C.SetFoP(field, int.Parse(value));
                     DuoLog.Information($"Set int {field}={value}");
                 }
-                else if (C.GetFoP(field).GetType() == typeof(uint))
+                else if(C.GetFoP(field).GetType() == typeof(uint))
                 {
                     C.SetFoP(field, uint.Parse(value));
                     DuoLog.Information($"Set uint {field}={value}");
                 }
-                else if (C.GetFoP(field).GetType() == typeof(float))
+                else if(C.GetFoP(field).GetType() == typeof(float))
                 {
                     C.SetFoP(field, float.Parse(value));
                     DuoLog.Information($"Set float {field}={value}");
                 }
-                else if (C.GetFoP(field).GetType() == typeof(double))
+                else if(C.GetFoP(field).GetType() == typeof(double))
                 {
                     C.SetFoP(field, double.Parse(value));
                     DuoLog.Information($"Set double {field}={value}");
                 }
-                else if (C.GetFoP(field).GetType() == typeof(nint))
+                else if(C.GetFoP(field).GetType() == typeof(nint))
                 {
                     C.SetFoP(field, nint.Parse(value));
                     DuoLog.Information($"Set nint {field}={value}");
                 }
-                else if (C.GetFoP(field).GetType() == typeof(long))
+                else if(C.GetFoP(field).GetType() == typeof(long))
                 {
                     C.SetFoP(field, long.Parse(value));
                     DuoLog.Information($"Set long {field}={value}");
                 }
-                else if (C.GetFoP(field).GetType() == typeof(ulong))
+                else if(C.GetFoP(field).GetType() == typeof(ulong))
                 {
                     C.SetFoP(field, ulong.Parse(value));
                     DuoLog.Information($"Set ulong {field}={value}");
                 }
-                else if (C.GetFoP(field).GetType() == typeof(string))
+                else if(C.GetFoP(field).GetType() == typeof(string))
                 {
                     C.SetFoP(field, value);
                     DuoLog.Information($"Set string {field}={value}");
                 }
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 e.LogDuo();
             }
@@ -413,12 +413,12 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
     private void Tick(object _)
     {
-        if (!IPC.Suppressed)
+        if(!IPC.Suppressed)
         {
-            if (SchedulerMain.PluginEnabled && Svc.ClientState.LocalPlayer != null)
+            if(SchedulerMain.PluginEnabled && Svc.ClientState.LocalPlayer != null)
             {
                 SchedulerMain.Tick();
-                if (!C.SelectedRetainers.ContainsKey(Svc.ClientState.LocalContentId))
+                if(!C.SelectedRetainers.ContainsKey(Svc.ClientState.LocalContentId))
                 {
                     C.SelectedRetainers[Svc.ClientState.LocalContentId] = [];
                 }
@@ -436,9 +436,9 @@ public unsafe class AutoRetainer : IDalamudPlugin
         TextAdvanceManager.Tick();
         Shutdown.Tick();
         BailoutManager.Tick();
-        if (Svc.Condition[ConditionFlag.OccupiedSummoningBell] && Utils.TryGetCurrentRetainer(out var name) && Utils.TryGetRetainerByName(name, out var retainer))
+        if(Svc.Condition[ConditionFlag.OccupiedSummoningBell] && Utils.TryGetCurrentRetainer(out var name) && Utils.TryGetRetainerByName(name, out var retainer))
         {
-            if (!retainer.VentureID.EqualsAny(0u, LastVentureID))
+            if(!retainer.VentureID.EqualsAny(0u, LastVentureID))
             {
                 LastVentureID = retainer.VentureID;
                 PluginLog.Debug($"Retainer {retainer.Name} current venture={LastVentureID}");
@@ -446,22 +446,22 @@ public unsafe class AutoRetainer : IDalamudPlugin
         }
         else
         {
-            if (LastVentureID != 0)
+            if(LastVentureID != 0)
             {
                 LastVentureID = 0;
                 PluginLog.Debug($"Last venture ID reset");
             }
         }
         //if(C.RetryItemSearch) RetryItemSearch.Tick();
-        if (SchedulerMain.PluginEnabled || MultiMode.Enabled || TaskManager.IsBusy)
+        if(SchedulerMain.PluginEnabled || MultiMode.Enabled || TaskManager.IsBusy)
         {
-            if (Svc.ClientState.TerritoryType == Prisons.Mordion_Gaol)
+            if(Svc.ClientState.TerritoryType == Prisons.Mordion_Gaol)
             {
                 Process.GetCurrentProcess().Kill();
             }
-            if (Svc.Condition[ConditionFlag.OccupiedSummoningBell])
+            if(Svc.Condition[ConditionFlag.OccupiedSummoningBell])
             {
-                if (!ConditionWasEnabled)
+                if(!ConditionWasEnabled)
                 {
                     ConditionWasEnabled = true;
                     DebugLog($"ConditionWasEnabled = true");
@@ -469,26 +469,26 @@ public unsafe class AutoRetainer : IDalamudPlugin
             }
         }
         IsNextToBell = false;
-        if (C.RetainerSense && Svc.ClientState.LocalPlayer != null && Svc.ClientState.LocalPlayer.HomeWorld.Id == Svc.ClientState.LocalPlayer.CurrentWorld.Id)
+        if(C.RetainerSense && Svc.ClientState.LocalPlayer != null && Svc.ClientState.LocalPlayer.HomeWorld.Id == Svc.ClientState.LocalPlayer.CurrentWorld.Id)
         {
-            if (!IPC.Suppressed && !IsOccupied() && !C.OldRetainerSense && !TaskManager.IsBusy && !Utils.MultiModeOrArtisan && !Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BoundByDuty] && Utils.IsAnyRetainersCompletedVenture())
+            if(!IPC.Suppressed && !IsOccupied() && !C.OldRetainerSense && !TaskManager.IsBusy && !Utils.MultiModeOrArtisan && !Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BoundByDuty] && Utils.IsAnyRetainersCompletedVenture())
             {
                 var bell = Utils.GetReachableRetainerBell(true);
-                if (bell == null || LastPosition != Svc.ClientState.LocalPlayer.Position)
+                if(bell == null || LastPosition != Svc.ClientState.LocalPlayer.Position)
                 {
                     LastPosition = Svc.ClientState.LocalPlayer.Position;
                     LastMovementAt = Environment.TickCount64;
                 }
-                if (bell != null)
+                if(bell != null)
                 {
                     IsNextToBell = true;
                 }
-                if (Environment.TickCount64 - LastMovementAt > C.RetainerSenseThreshold)
+                if(Environment.TickCount64 - LastMovementAt > C.RetainerSenseThreshold)
                 {
-                    if (bell != null)
+                    if(bell != null)
                     {
                         IsNextToBell = true;
-                        if (EzThrottler.Throttle("RetainerSense", 30000))
+                        if(EzThrottler.Throttle("RetainerSense", 30000))
                         {
                             TaskInteractWithNearestBell.Enqueue();
                             TaskManager.Enqueue(() => { SchedulerMain.EnablePlugin(PluginEnableReason.Auto); return true; });
@@ -501,21 +501,21 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
     private void Toasts_ErrorToast(ref Dalamud.Game.Text.SeStringHandling.SeString message, ref bool isHandled)
     {
-        if (P.TaskManager.IsBusy)
+        if(P.TaskManager.IsBusy)
         {
             var text = message.ExtractText();
-            if (text == Svc.Data.GetExcelSheet<LogMessage>().GetRow(10350).Text.ToDalamudString().ExtractText())
+            if(text == Svc.Data.GetExcelSheet<LogMessage>().GetRow(10350).Text.ToDalamudString().ExtractText())
             {
                 TaskEntrustDuplicates.NoDuplicates = true;
             }
         }
-        if (!Svc.ClientState.IsLoggedIn)
+        if(!Svc.ClientState.IsLoggedIn)
         {
             //5800	60	8	0	False	Unable to execute command. Character is currently visiting the <Highlight>StringParameter(1)</Highlight> data center.
             //5800	60	8	0	False	他のデータセンター<Highlight>StringParameter(1)</Highlight>へ遊びに行っているため操作できません。
             //5800	60	8	0	False	Der Vorgang kann nicht ausgeführt werden, da der Charakter gerade das Datenzentrum <Highlight>StringParameter(1)</Highlight> bereist.
             //5800	60	8	0	False	Impossible d'exécuter cette commande. Le personnage se trouve dans un autre centre de traitement de données (<Highlight>StringParameter(1)</Highlight>).
-            if (message.ToString().StartsWithAny(Lang.UnableToVisitWorld))
+            if(message.ToString().StartsWithAny(Lang.UnableToVisitWorld))
             {
 
                 MultiMode.Enabled = false;
@@ -556,10 +556,10 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
     private void AddVenture(string name, uint ventureId)
     {
-        if (API.Ready && API.GetOfflineCharacterData(Player.CID).RetainerData.TryGetFirst(x => x.Name == name, out var rdata))
+        if(API.Ready && API.GetOfflineCharacterData(Player.CID).RetainerData.TryGetFirst(x => x.Name == name, out var rdata))
         {
             var adata = API.GetAdditionalRetainerData(Player.CID, rdata.Name);
-            if (adata.VenturePlan.List.TryGetFirst(x => x.ID == ventureId, out var v))
+            if(adata.VenturePlan.List.TryGetFirst(x => x.ID == ventureId, out var v))
             {
                 v.Num += 1;
             }
@@ -573,9 +573,9 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
     private IEnumerable<string> ListRetainers()
     {
-        if (API.Ready)
+        if(API.Ready)
         {
-            foreach (var x in API.GetOfflineCharacterData(Player.CID).RetainerData)
+            foreach(var x in API.GetOfflineCharacterData(Player.CID).RetainerData)
             {
                 yield return x.Name;
             }
@@ -584,7 +584,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
     internal HashSet<string> GetSelectedRetainers(ulong cid)
     {
-        if (!config.SelectedRetainers.ContainsKey(cid))
+        if(!config.SelectedRetainers.ContainsKey(cid))
         {
             config.SelectedRetainers.Add(cid, []);
         }
@@ -602,22 +602,22 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
     private void ConditionChange(ConditionFlag flag, bool value)
     {
-        if (flag == ConditionFlag.OccupiedSummoningBell)
+        if(flag == ConditionFlag.OccupiedSummoningBell)
         {
             OfflineDataManager.WriteOfflineData(true, true);
-            if (!value)
+            if(!value)
             {
                 ConditionWasEnabled = false;
                 DebugLog("ConditionWasEnabled = false;");
             }
-            if (Svc.Targets.Target.IsRetainerBell())
+            if(Svc.Targets.Target.IsRetainerBell())
             {
-                if (value)
+                if(value)
                 {
-                    if (Utils.MultiModeOrArtisan)
+                    if(Utils.MultiModeOrArtisan)
                     {
                         WasEnabled = false;
-                        if (IsInteractionAutomatic)
+                        if(IsInteractionAutomatic)
                         {
                             IsInteractionAutomatic = false;
                             SchedulerMain.EnablePlugin(MultiMode.Enabled ? PluginEnableReason.MultiMode : PluginEnableReason.Artisan);
@@ -626,28 +626,28 @@ public unsafe class AutoRetainer : IDalamudPlugin
                     else
                     {
                         var bellBehavior = Utils.IsAnyRetainersCompletedVenture() ? C.OpenBellBehaviorWithVentures : C.OpenBellBehaviorNoVentures;
-                        if (bellBehavior != OpenBellBehavior.Pause_AutoRetainer && IsKeyPressed(C.Suppress) && !CSFramework.Instance()->WindowInactive)
+                        if(bellBehavior != OpenBellBehavior.Pause_AutoRetainer && IsKeyPressed(C.Suppress) && !CSFramework.Instance()->WindowInactive)
                         {
                             bellBehavior = OpenBellBehavior.Do_nothing;
                             Notify.Info($"Open bell action cancelled");
                         }
-                        if (SchedulerMain.PluginEnabled && bellBehavior == OpenBellBehavior.Pause_AutoRetainer)
+                        if(SchedulerMain.PluginEnabled && bellBehavior == OpenBellBehavior.Pause_AutoRetainer)
                         {
                             WasEnabled = true;
                             SchedulerMain.DisablePlugin();
                         }
-                        if (IsInteractionAutomatic)
+                        if(IsInteractionAutomatic)
                         {
                             IsInteractionAutomatic = false;
                             SchedulerMain.EnablePlugin(PluginEnableReason.Auto);
                         }
                         else
                         {
-                            if (bellBehavior == OpenBellBehavior.Enable_AutoRetainer)
+                            if(bellBehavior == OpenBellBehavior.Enable_AutoRetainer)
                             {
                                 SchedulerMain.EnablePlugin(PluginEnableReason.Access);
                             }
-                            else if (bellBehavior == OpenBellBehavior.Disable_AutoRetainer)
+                            else if(bellBehavior == OpenBellBehavior.Disable_AutoRetainer)
                             {
                                 SchedulerMain.DisablePlugin();
                             }
@@ -657,15 +657,15 @@ public unsafe class AutoRetainer : IDalamudPlugin
             }
             else
             {
-                if (Svc.Targets.Target.IsRetainerBell() || Svc.Targets.PreviousTarget.IsRetainerBell())
+                if(Svc.Targets.Target.IsRetainerBell() || Svc.Targets.PreviousTarget.IsRetainerBell())
                 {
-                    if (WasEnabled)
+                    if(WasEnabled)
                     {
                         DebugLog($"Enabling plugin because WasEnabled is true");
                         SchedulerMain.EnablePlugin(PluginEnableReason.Auto);
                         WasEnabled = false;
                     }
-                    else if (!IsCloseActionAutomatic && C.AutoDisable && !Utils.MultiModeOrArtisan)
+                    else if(!IsCloseActionAutomatic && C.AutoDisable && !Utils.MultiModeOrArtisan)
                     {
                         DebugLog($"Disabling plugin because AutoDisable is on");
                         SchedulerMain.DisablePlugin();
@@ -674,7 +674,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             }
             IsCloseActionAutomatic = false;
         }
-        if (flag == ConditionFlag.Gathering)
+        if(flag == ConditionFlag.Gathering)
         {
             VentureBrowser.Reset();
             OfflineDataManager.WriteOfflineData(true, true);
@@ -683,14 +683,14 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
     private void Logout()
     {
-        if (Player.Available)
+        if(Player.Available)
         {
             PluginLog.Verbose($"Writing logout offline data...");
             OfflineDataManager.WriteOfflineData(true, true);
         }
         SchedulerMain.DisablePlugin();
 
-        if (!P.TaskManager.IsBusy)
+        if(!P.TaskManager.IsBusy)
         {
             MultiMode.LastLogin = 0;
         }

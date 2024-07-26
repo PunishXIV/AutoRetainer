@@ -32,7 +32,7 @@ namespace AutoRetainer.UI
             ImGuiHelpers.ScaledDummy(10f);
             ImGuiEx.LineCentered("About2", delegate
             {
-                if (ThreadLoadImageHandler.TryGetTextureWrap(GetImageURL(), out var texture))
+                if(ThreadLoadImageHandler.TryGetTextureWrap(GetImageURL(), out var texture))
                 {
                     ImGui.Image(texture.ImGuiHandle, new(200f, 200f));
                 }
@@ -44,7 +44,7 @@ namespace AutoRetainer.UI
             });
             ImGuiEx.LineCentered("About4", delegate
             {
-                if (ImGui.Button("Discord"))
+                if(ImGui.Button("Discord"))
                 {
                     Process.Start(new ProcessStartInfo()
                     {
@@ -53,13 +53,13 @@ namespace AutoRetainer.UI
                     });
                 }
                 ImGui.SameLine();
-                if (ImGui.Button("Repository"))
+                if(ImGui.Button("Repository"))
                 {
                     ImGui.SetClipboardText("https://love.puni.sh/ment.json");
                     Notify.Success("Link copied to clipboard");
                 }
                 ImGui.SameLine();
-                if (ImGui.Button("Source Code"))
+                if(ImGui.Button("Source Code"))
                 {
                     Process.Start(new ProcessStartInfo()
                     {
@@ -68,7 +68,7 @@ namespace AutoRetainer.UI
                     });
                 }
                 ImGui.SameLine();
-                if (ImGui.Button("Donate to Puni.sh platform"))
+                if(ImGui.Button("Donate to Puni.sh platform"))
                 {
                     Process.Start(new ProcessStartInfo()
                     {

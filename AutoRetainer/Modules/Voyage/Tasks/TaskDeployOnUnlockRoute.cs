@@ -29,7 +29,7 @@ internal static unsafe class TaskDeployOnUnlockRoute
         var subLevel = CurrentSubmarine.Get()->RankId;
         var adjustedPoints = points.Where(x => subLevel >= VoyageUtils.GetSubmarineExploration(x.point).RankReq).Take(numPoints);
         VoyageUtils.Log($"Adjusted points: {adjustedPoints.Select(x => $"{x.point}/{x.justification}").Join("\n")}");
-        if (adjustedPoints.Any())
+        if(adjustedPoints.Any())
         {
             TaskCalculateAndPickBestExpRoute.Stop = true;
             TaskPickSubmarineRoute.EnqueueImmediate(VoyageUtils.GetSubmarineExploration(adjustedPoints.First().point).Map.Row, adjustedPoints.Select(x => x.point).ToArray());

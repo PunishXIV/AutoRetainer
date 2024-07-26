@@ -21,18 +21,18 @@ internal static unsafe class VoyageScheduler
 
     internal static bool? CloseRepair()
     {
-        if (TryGetAddonByName<AtkUnitBase>("CompanyCraftSupply", out var addon) && IsAddonReady(addon))
+        if(TryGetAddonByName<AtkUnitBase>("CompanyCraftSupply", out var addon) && IsAddonReady(addon))
         {
-            if (Utils.GenericThrottle)
+            if(Utils.GenericThrottle)
             {
                 Log("Closing repair window (CompanyCraftSupply)");
                 Callback.Fire(addon, true, 5);
                 return true;
             }
         }
-        else if (TryGetAddonByName<AtkUnitBase>("AirShipPartsMenu", out var addon2) && IsAddonReady(addon2))
+        else if(TryGetAddonByName<AtkUnitBase>("AirShipPartsMenu", out var addon2) && IsAddonReady(addon2))
         {
-            if (Utils.GenericThrottle)
+            if(Utils.GenericThrottle)
             {
                 Log("Closing repair window (AirShipPartsMenu)");
                 Callback.Fire(addon2, true, 5);
@@ -44,18 +44,18 @@ internal static unsafe class VoyageScheduler
 
     internal static bool? TryRepair(int slot)
     {
-        if (TaskRepairAll.Abort) return true;
+        if(TaskRepairAll.Abort) return true;
         var t = $"VoyageScheduler.TryRepair{slot}";
-        if (TryGetAddonByName<AtkUnitBase>("SelectYesno", out var _))
+        if(TryGetAddonByName<AtkUnitBase>("SelectYesno", out var _))
         {
             Log("Found yesno, repair request success");
             return true;
         }
-        if (EzThrottler.Check(t))
+        if(EzThrottler.Check(t))
         {
-            if (TryGetAddonByName<AtkUnitBase>("CompanyCraftSupply", out var addon) && IsAddonReady(addon))
+            if(TryGetAddonByName<AtkUnitBase>("CompanyCraftSupply", out var addon) && IsAddonReady(addon))
             {
-                if (Utils.GenericThrottle)
+                if(Utils.GenericThrottle)
                 {
                     Callback.Fire(addon, true, (int)3, Utils.ZeroAtkValue, (int)slot, Utils.ZeroAtkValue, Utils.ZeroAtkValue, Utils.ZeroAtkValue);
                     EzThrottler.Throttle(t, 1000, true);
@@ -63,9 +63,9 @@ internal static unsafe class VoyageScheduler
                     return false;
                 }
             }
-            else if (TryGetAddonByName<AtkUnitBase>("AirShipPartsMenu", out var addon2) && IsAddonReady(addon2))
+            else if(TryGetAddonByName<AtkUnitBase>("AirShipPartsMenu", out var addon2) && IsAddonReady(addon2))
             {
-                if (Utils.GenericThrottle)
+                if(Utils.GenericThrottle)
                 {
                     Callback.Fire(addon2, true, (int)3, Utils.ZeroAtkValue, (int)slot, Utils.ZeroAtkValue, Utils.ZeroAtkValue, Utils.ZeroAtkValue);
                     EzThrottler.Throttle(t, 1000, true);
@@ -101,11 +101,11 @@ internal static unsafe class VoyageScheduler
 
     internal static bool? Lockon()
     {
-        if (VoyageUtils.TryGetNearestVoyagePanel(out var obj))
+        if(VoyageUtils.TryGetNearestVoyagePanel(out var obj))
         {
-            if (Svc.Targets.Target?.Address != obj.Address)
+            if(Svc.Targets.Target?.Address != obj.Address)
             {
-                if (Utils.GenericThrottle)
+                if(Utils.GenericThrottle)
                 {
                     Log("Targeting workshop CP");
                     Svc.Targets.Target = obj;
@@ -113,7 +113,7 @@ internal static unsafe class VoyageScheduler
             }
             else
             {
-                if (Utils.GenericThrottle)
+                if(Utils.GenericThrottle)
                 {
                     Log("Locking on workshop CP");
                     Chat.Instance.ExecuteCommand("/lockon");
@@ -126,9 +126,9 @@ internal static unsafe class VoyageScheduler
 
     internal static bool? Approach()
     {
-        if (VoyageUtils.TryGetNearestVoyagePanel(out var obj) && Svc.Targets.Target?.Address == obj.Address)
+        if(VoyageUtils.TryGetNearestVoyagePanel(out var obj) && Svc.Targets.Target?.Address == obj.Address)
         {
-            if (Utils.GenericThrottle)
+            if(Utils.GenericThrottle)
             {
                 Chat.Instance.ExecuteCommand("/automove on");
                 Utils.RegenerateRandom();
@@ -140,11 +140,11 @@ internal static unsafe class VoyageScheduler
 
     internal static bool? AutomoveOffPanel()
     {
-        if (VoyageUtils.TryGetNearestVoyagePanel(out var obj) && Svc.Targets.Target?.Address == obj.Address)
+        if(VoyageUtils.TryGetNearestVoyagePanel(out var obj) && Svc.Targets.Target?.Address == obj.Address)
         {
-            if (Vector3.Distance(obj.Position, Player.Object.Position) < 4f + Utils.Random * 0.25f)
+            if(Vector3.Distance(obj.Position, Player.Object.Position) < 4f + Utils.Random * 0.25f)
             {
-                if (Utils.GenericThrottle)
+                if(Utils.GenericThrottle)
                 {
                     Chat.Instance.ExecuteCommand("/automove off");
                     return true;
@@ -156,11 +156,11 @@ internal static unsafe class VoyageScheduler
 
     internal static bool? InteractWithVoyagePanel()
     {
-        if (VoyageUtils.TryGetNearestVoyagePanel(out var obj))
+        if(VoyageUtils.TryGetNearestVoyagePanel(out var obj))
         {
-            if (Svc.Targets.Target?.Address == obj.Address)
+            if(Svc.Targets.Target?.Address == obj.Address)
             {
-                if (Utils.GenericThrottle && EzThrottler.Throttle("Voyage.Interact", 2000))
+                if(Utils.GenericThrottle && EzThrottler.Throttle("Voyage.Interact", 2000))
                 {
                     Log("Interacting with workshop CP");
                     TargetSystem.Instance()->InteractWithObject(obj.Struct(), false);
@@ -169,7 +169,7 @@ internal static unsafe class VoyageScheduler
             }
             else
             {
-                if (obj.IsTargetable && Utils.GenericThrottle)
+                if(obj.IsTargetable && Utils.GenericThrottle)
                 {
                     Svc.Targets.Target = obj;
                 }
@@ -196,14 +196,14 @@ internal static unsafe class VoyageScheduler
     internal static bool? SelectVesselByName(string name, VoyageType type)
     {
         var index = VoyageUtils.GetVesselIndex(name, type);
-        if (index != null)
+        if(index != null)
         {
-            if (TryGetAddonByName<AddonSelectString>("SelectString", out var addon) && IsAddonReady(&addon->AtkUnitBase))
+            if(TryGetAddonByName<AddonSelectString>("SelectString", out var addon) && IsAddonReady(&addon->AtkUnitBase))
             {
                 var entries = Utils.GetEntries(addon);
-                if (index.Value < entries.Count && entries[index.Value].Contains(name))
+                if(index.Value < entries.Count && entries[index.Value].Contains(name))
                 {
-                    if (index >= 0 && Utils.IsSelectItemEnabled(addon, index.Value) && Utils.GenericThrottle && EzThrottler.Throttle("SelectVesselByName"))
+                    if(index >= 0 && Utils.IsSelectItemEnabled(addon, index.Value) && Utils.GenericThrottle && EzThrottler.Throttle("SelectVesselByName"))
                     {
                         DebugLog($"Selecting vessel {name}/{type}/{entries[index.Value]}/{index}");
                         new AddonMaster.SelectString(addon).Entries[index.Value].Select();
@@ -227,17 +227,17 @@ internal static unsafe class VoyageScheduler
 
     internal static bool? RedeployVessel()
     {
-        if (TryGetAddonByName<AtkUnitBase>("AirShipExplorationResult", out var addon) && IsAddonReady(addon))
+        if(TryGetAddonByName<AtkUnitBase>("AirShipExplorationResult", out var addon) && IsAddonReady(addon))
         {
             var button = addon->UldManager.NodeList[3]->GetAsAtkComponentButton();
-            if (!button->IsEnabled)
+            if(!button->IsEnabled)
             {
                 EzThrottler.Throttle("Voyage.Redeploy", 500, true);
                 return false;
             }
             else
             {
-                if (Utils.GenericThrottle && EzThrottler.Throttle("Voyage.Redeploy"))
+                if(Utils.GenericThrottle && EzThrottler.Throttle("Voyage.Redeploy"))
                 {
                     Callback.Fire(addon, true, 1);
                     return true;
@@ -253,9 +253,9 @@ internal static unsafe class VoyageScheduler
 
     internal static bool? FinalizeVessel()
     {
-        if (TryGetAddonByName<AtkUnitBase>("AirShipExplorationResult", out var addon) && IsAddonReady(addon))
+        if(TryGetAddonByName<AtkUnitBase>("AirShipExplorationResult", out var addon) && IsAddonReady(addon))
         {
-            if (Utils.GenericThrottle && EzThrottler.Throttle("Voyage.Redeploy"))
+            if(Utils.GenericThrottle && EzThrottler.Throttle("Voyage.Redeploy"))
             {
                 Callback.Fire(addon, true, 0);
                 return true;
@@ -270,9 +270,9 @@ internal static unsafe class VoyageScheduler
 
     internal static bool? DeployVessel()
     {
-        if (TryGetAddonByName<AtkUnitBase>("AirShipExplorationDetail", out var addon) && IsAddonReady(addon))
+        if(TryGetAddonByName<AtkUnitBase>("AirShipExplorationDetail", out var addon) && IsAddonReady(addon))
         {
-            if (Utils.GenericThrottle && EzThrottler.Throttle("Voyage.Deploy"))
+            if(Utils.GenericThrottle && EzThrottler.Throttle("Voyage.Deploy"))
             {
                 Callback.Fire(addon, true, 0);
                 return true;
@@ -287,9 +287,9 @@ internal static unsafe class VoyageScheduler
 
     internal static bool? CancelDeployVessel()
     {
-        if (TryGetAddonByName<AtkUnitBase>("AirShipExplorationDetail", out var addon) && IsAddonReady(addon))
+        if(TryGetAddonByName<AtkUnitBase>("AirShipExplorationDetail", out var addon) && IsAddonReady(addon))
         {
-            if (Utils.GenericThrottle && EzThrottler.Throttle("Voyage.CancelDeploy"))
+            if(Utils.GenericThrottle && EzThrottler.Throttle("Voyage.CancelDeploy"))
             {
                 Callback.Fire(addon, true, -1);
                 return true;

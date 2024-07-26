@@ -47,13 +47,13 @@ internal class VentureBrowser : Window
     public override void Draw()
     {
         ImGuiEx.SetNextItemFullWidth();
-        if (ImGui.BeginCombo("##selectRet", SelectedCharacter != null ? $"{Censor.Character(SelectedCharacter.Name, SelectedCharacter.World)} - {Censor.Retainer(SelectedRetainer.Name)} - {SelectedRetainer.Level} {ExcelJobHelper.GetJobNameById(SelectedRetainer.Job)}" : "Select a retainer..."))
+        if(ImGui.BeginCombo("##selectRet", SelectedCharacter != null ? $"{Censor.Character(SelectedCharacter.Name, SelectedCharacter.World)} - {Censor.Retainer(SelectedRetainer.Name)} - {SelectedRetainer.Level} {ExcelJobHelper.GetJobNameById(SelectedRetainer.Job)}" : "Select a retainer..."))
         {
-            foreach (var x in C.OfflineData.OrderBy(x => !C.NoCurrentCharaOnTop && x.CID == Player.CID ? 0 : 1))
+            foreach(var x in C.OfflineData.OrderBy(x => !C.NoCurrentCharaOnTop && x.CID == Player.CID ? 0 : 1))
             {
-                foreach (var r in x.RetainerData)
+                foreach(var r in x.RetainerData)
                 {
-                    if (ImGui.Selectable($"{Censor.Character(x.Name, x.World)} - {Censor.Retainer(r.Name)} - Lv{r.Level} {ExcelJobHelper.GetJobNameById(r.Job)}"))
+                    if(ImGui.Selectable($"{Censor.Character(x.Name, x.World)} - {Censor.Retainer(r.Name)} - Lv{r.Level} {ExcelJobHelper.GetJobNameById(r.Job)}"))
                     {
                         SelectedRetainer = r;
                         SelectedCharacter = x;
@@ -64,10 +64,10 @@ internal class VentureBrowser : Window
             ImGui.EndCombo();
         }
 
-        if (SelectedRetainer != null && SelectedCharacter != null)
+        if(SelectedRetainer != null && SelectedCharacter != null)
         {
             var adata = Utils.GetAdditionalData(SelectedCharacter.CID, SelectedRetainer.Name);
-            if (VentureUtils.IsDoL(SelectedRetainer.Job))
+            if(VentureUtils.IsDoL(SelectedRetainer.Job))
             {
                 ImGuiEx.TextCentered($"{Lang.CharLevel}{SelectedRetainer.Level} {ExcelJobHelper.GetJobNameById(SelectedRetainer.Job)} | Gathering: {adata.Gathering} ({adata.Gathering / (float)MaxGathering:P0}) | Perception: {adata.Perception} ({adata.Perception / (float)MaxPerception:P0})");
             }
@@ -90,15 +90,15 @@ internal class VentureBrowser : Window
                 ImGuiEx.SetNextItemWidthScaled(50f);
                 ImGui.DragInt("##maxL", ref maxLevel, 1, 1, Player.MaxLevel);
             });
-            if (adata.Gathering == -1 || adata.Perception == -1 || adata.Ilvl == -1 || SelectedRetainer.Level == 0)
+            if(adata.Gathering == -1 || adata.Perception == -1 || adata.Ilvl == -1 || SelectedRetainer.Level == 0)
             {
                 ImGuiEx.TextWrapped($"Data is absent for this retainer. Access retainer bell and select that retainer to populate data.");
             }
             else
             {
-                if (Data.Count == 0)
+                if(Data.Count == 0)
                 {
-                    foreach (var v in VentureUtils.GetHunts(SelectedRetainer.Job))
+                    foreach(var v in VentureUtils.GetHunts(SelectedRetainer.Job))
                     {
                         var parts = v.GetFancyVentureNameParts(SelectedCharacter, SelectedRetainer, out var avail);
                         VentureBrowserData ventureBrowserData = new()
@@ -115,13 +115,13 @@ internal class VentureBrowser : Window
                             ItemID = v.GetVentureItemId()
                         };
                         (ventureBrowserData.Requirements, ventureBrowserData.Amounts) = v.GetVentureAmounts(SelectedRetainer);
-                        if (v.RequiredGathering > MaxGathering) MaxGathering = v.RequiredGathering;
-                        if (v.RequiredItemLevel > MaxIlvl) MaxIlvl = v.RequiredItemLevel;
-                        if (ventureBrowserData.Requirements[4] > MaxPerception) MaxPerception = ventureBrowserData.Requirements[4];
+                        if(v.RequiredGathering > MaxGathering) MaxGathering = v.RequiredGathering;
+                        if(v.RequiredItemLevel > MaxIlvl) MaxIlvl = v.RequiredItemLevel;
+                        if(ventureBrowserData.Requirements[4] > MaxPerception) MaxPerception = ventureBrowserData.Requirements[4];
                         Data.Add(ventureBrowserData);
                     }
                 }
-                if (ImGui.BeginTable("##VentureBrowserTable", 9, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY))
+                if(ImGui.BeginTable("##VentureBrowserTable", 9, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY))
                 {
                     ImGui.TableSetupScrollFreeze(0, 1);
                     ImGui.TableSetupColumn(Lang.CharLevel);
@@ -135,7 +135,7 @@ internal class VentureBrowser : Window
                     ImGui.TableSetupColumn("Unlocked");
                     ImGui.TableHeadersRow();
 
-                    foreach (var x in Data.Where(x => x.VentureName.Contains(search, StringComparison.OrdinalIgnoreCase) && x.VentureLevel >= minLevel && x.VentureLevel <= maxLevel))
+                    foreach(var x in Data.Where(x => x.VentureName.Contains(search, StringComparison.OrdinalIgnoreCase) && x.VentureLevel >= minLevel && x.VentureLevel <= maxLevel))
                     {
                         var n = x.IsDol ? Lang.CharP : Lang.CharItemLevel;
                         ImGui.TableNextRow();
@@ -143,12 +143,12 @@ internal class VentureBrowser : Window
                         ImGuiEx.TextCentered(SelectedRetainer.Level >= x.VentureLevel ? ImGuiColors.ParsedGreen : ImGuiColors.DalamudRed, $"{x.VentureLevel}");
                         ImGui.TableNextColumn();
                         ImGuiEx.Text($"{x.VentureName}");
-                        if (ImGui.SmallButton($"To planner##{x.ID}"))
+                        if(ImGui.SmallButton($"To planner##{x.ID}"))
                         {
                             adata.VenturePlan.List.Add(new(x.ID));
                         }
                         ImGui.SameLine();
-                        if (ImGui.SmallButton($"Check price##{x.ID}"))
+                        if(ImGui.SmallButton($"Check price##{x.ID}"))
                         {
                             Svc.Commands.ProcessCommand($"/pmb {x.ItemID}");
                         }
@@ -181,12 +181,12 @@ internal class VentureBrowser : Window
                         ImGuiEx.TextCentered(col, $"  {x.Amounts[4].FancyDigits()}  ");
                         ImGui.TableNextColumn();
 
-                        if (x.IsDol)
+                        if(x.IsDol)
                         {
                             ImGuiEx.Text(x.Gathered ? ImGuiColors.ParsedGreen : ImGuiColors.DalamudRed, x.Gathered ? "Yes" : "No");
-                            if (!x.Gathered && GatherBuddyPresent)
+                            if(!x.Gathered && GatherBuddyPresent)
                             {
-                                if (ImGui.SmallButton($"Gather##{x.ID}"))
+                                if(ImGui.SmallButton($"Gather##{x.ID}"))
                                 {
                                     Svc.Commands.ProcessCommand($"/gather {x.VentureName}");
                                 }

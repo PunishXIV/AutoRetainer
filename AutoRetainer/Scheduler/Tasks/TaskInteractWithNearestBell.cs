@@ -10,10 +10,10 @@ internal static unsafe class TaskInteractWithNearestBell
         P.TaskManager.Enqueue(NewYesAlreadyManager.WaitForYesAlreadyDisabledTask);
         P.TaskManager.Enqueue(() =>
         {
-            if (VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType) && Utils.GetReachableRetainerBell(false) == null)
+            if(VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType) && Utils.GetReachableRetainerBell(false) == null)
             {
                 var bell = Utils.GetNearestRetainerBell(out var distance);
-                if (distance < 20f)
+                if(distance < 20f)
                 {
                     P.TaskManager.EnqueueImmediate(HouseEnterTask.LockonBell);
                     P.TaskManager.EnqueueImmediate(HouseEnterTask.Approach);
@@ -22,7 +22,7 @@ internal static unsafe class TaskInteractWithNearestBell
             }
         }, "ApproachWorkshopBell");
         P.TaskManager.Enqueue(PlayerWorldHandlers.SelectNearestBell);
-        if (interact)
+        if(interact)
         {
             P.TaskManager.Enqueue(() => { P.IsInteractionAutomatic = true; }, "Mark interaction as automatic");
             P.TaskManager.Enqueue(PlayerWorldHandlers.InteractWithTargetedBell);

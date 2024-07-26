@@ -133,13 +133,13 @@ public static class Sectors
     public static Breakpoint CalculateBreakpoint(List<uint> points)
     {
         // more than 5 points isn't allowed ingame
-        if (points.Count is 0 or > 5)
+        if(points.Count is 0 or > 5)
             return Breakpoint.Empty;
 
         var breakpoints = new List<Breakpoint>();
-        foreach (var point in points)
+        foreach(var point in points)
         {
-            if (!MapBreakpoints.TryGetValue(point, out var br))
+            if(!MapBreakpoints.TryGetValue(point, out var br))
                 return Breakpoint.Empty;
             breakpoints.Add(br);
         }
@@ -157,7 +157,7 @@ public static class Sectors
     public static List<(int Guaranteed, int Max)> PredictBonusExp(List<uint> sectors, Build.SubmarineBuild build)
     {
         var predictedExp = new List<(int, int)>();
-        foreach (var sector in sectors)
+        foreach(var sector in sectors)
             predictedExp.Add(PredictBonusExp(sector, build));
 
         return predictedExp;
@@ -165,7 +165,7 @@ public static class Sectors
 
     public static (int Guaranteed, int Maximum) PredictBonusExp(uint sector, Build.SubmarineBuild build)
     {
-        if (!MapBreakpoints.TryGetValue(sector, out var br))
+        if(!MapBreakpoints.TryGetValue(sector, out var br))
             return (0, 0);
 
         var guaranteed = 0;
@@ -175,7 +175,7 @@ public static class Sectors
         maximum += br.T2 <= build.Surveillance ? 1 : 0;
         maximum += br.T3 <= build.Surveillance ? 1 : 0;
 
-        if (br.Favor <= build.Favor)
+        if(br.Favor <= build.Favor)
         {
             maximum += 1;
             maximum += br.T2 <= build.Surveillance ? 1 : 0;
@@ -188,11 +188,11 @@ public static class Sectors
     public static uint CalculateExpForSectors(List<SubmarineExplorationPretty> sectors, Build.SubmarineBuild build)
     {
         var bonusEachSector = PredictBonusExp(sectors.Select(s => s.RowId).ToList(), build);
-        if (!bonusEachSector.Any())
+        if(!bonusEachSector.Any())
             return 0u;
 
         var expGain = 0u;
-        foreach (var (bonus, sector) in bonusEachSector.Zip(sectors))
+        foreach(var (bonus, sector) in bonusEachSector.Zip(sectors))
             expGain += CalculateBonusExp(bonus.Guaranteed, sector.ExpReward);
 
         return expGain;

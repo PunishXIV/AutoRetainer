@@ -13,19 +13,19 @@ public static unsafe class NpcSaleManager
 {
     public static void EnqueueIfItemsPresent()
     {
-        if (GetValidNPC() == null) return;
-        if (!C.IMEnableNpcSell) return;
-        foreach (var type in InventorySpaceManager.GetAllowedToSellInventoryTypes())
+        if(GetValidNPC() == null) return;
+        if(!C.IMEnableNpcSell) return;
+        foreach(var type in InventorySpaceManager.GetAllowedToSellInventoryTypes())
         {
             var inv = InventoryManager.Instance()->GetInventoryContainer(type);
-            if (inv != null)
+            if(inv != null)
             {
-                for (var i = 0; i < inv->Size; i++)
+                for(var i = 0; i < inv->Size; i++)
                 {
                     var slot = inv->GetInventorySlot(i);
-                    if (slot != null && slot->ItemId != 0)
+                    if(slot != null && slot->ItemId != 0)
                     {
-                        if (Utils.IsItemSellableByHardList(slot->ItemId, slot->Quantity))
+                        if(Utils.IsItemSellableByHardList(slot->ItemId, slot->Quantity))
                         {
                             P.TaskManager.EnqueueImmediate(Utils.WaitForScreen);
                             P.TaskManager.EnqueueImmediate(InteractWithNPC);
@@ -44,19 +44,19 @@ public static unsafe class NpcSaleManager
     public static bool? SellHardListItemsTask()
     {
         List<(InventoryType Type, int Slot)> Processed = [];
-        foreach (var type in InventorySpaceManager.GetAllowedToSellInventoryTypes())
+        foreach(var type in InventorySpaceManager.GetAllowedToSellInventoryTypes())
         {
             var inv = InventoryManager.Instance()->GetInventoryContainer(type);
-            if (inv != null)
+            if(inv != null)
             {
-                for (var i = 0; i < inv->Size; i++)
+                for(var i = 0; i < inv->Size; i++)
                 {
                     var slot = inv->GetInventorySlot(i);
-                    if (!Processed.Contains((type, i)) && slot != null && slot->ItemId != 0)
+                    if(!Processed.Contains((type, i)) && slot != null && slot->ItemId != 0)
                     {
-                        if (Utils.IsItemSellableByHardList(slot->ItemId, slot->Quantity))
+                        if(Utils.IsItemSellableByHardList(slot->ItemId, slot->Quantity))
                         {
-                            if (EzThrottler.Throttle("VendorItem", 500))
+                            if(EzThrottler.Throttle("VendorItem", 500))
                             {
                                 Processed.Add((type, i));
                                 P.Memory.SellItemToShop(type, i);
@@ -84,11 +84,11 @@ public static unsafe class NpcSaleManager
 
     public static bool? InteractWithNPC()
     {
-        if (TryGetAddonByName<AtkUnitBase>("SelectIconString", out _)) return true;
+        if(TryGetAddonByName<AtkUnitBase>("SelectIconString", out _)) return true;
         var npc = GetValidNPC() ?? throw new InvalidOperationException("Could not find housing NPC");
-        if (Svc.Targets.Target?.Address != npc.Address)
+        if(Svc.Targets.Target?.Address != npc.Address)
         {
-            if (EzThrottler.Throttle("TargetNPC"))
+            if(EzThrottler.Throttle("TargetNPC"))
             {
                 Svc.Targets.Target = npc;
             }
@@ -96,7 +96,7 @@ public static unsafe class NpcSaleManager
         }
         else
         {
-            if (EzThrottler.Throttle("InteractWithNPC", 2000))
+            if(EzThrottler.Throttle("InteractWithNPC", 2000))
             {
                 TargetSystem.Instance()->InteractWithObject(npc.Struct(), false);
             }
@@ -106,14 +106,14 @@ public static unsafe class NpcSaleManager
 
     public static bool? SelectPurchase()
     {
-        if (TryGetAddonByName<AtkUnitBase>("Shop", out var addon) && IsAddonReady(addon)) return true;
-        if (TryGetAddonMaster<AddonMaster.SelectIconString>(out var m))
+        if(TryGetAddonByName<AtkUnitBase>("Shop", out var addon) && IsAddonReady(addon)) return true;
+        if(TryGetAddonMaster<AddonMaster.SelectIconString>(out var m))
         {
-            foreach (var entry in m.Entries)
+            foreach(var entry in m.Entries)
             {
-                if (Svc.Data.GetExcelSheet<GilShop>().Select(x => x.Name.ExtractText()).Contains(entry.Text))
+                if(Svc.Data.GetExcelSheet<GilShop>().Select(x => x.Name.ExtractText()).Contains(entry.Text))
                 {
-                    if (EzThrottler.Throttle("SelectStringSell", 2000))
+                    if(EzThrottler.Throttle("SelectStringSell", 2000))
                     {
                         entry.Select();
                     }
@@ -126,9 +126,9 @@ public static unsafe class NpcSaleManager
 
     public static bool? CloseShop()
     {
-        if (TryGetAddonByName<AtkUnitBase>("Shop", out var addon) && IsAddonReady(addon))
+        if(TryGetAddonByName<AtkUnitBase>("Shop", out var addon) && IsAddonReady(addon))
         {
-            if (EzThrottler.Throttle("CloseShop", 2000))
+            if(EzThrottler.Throttle("CloseShop", 2000))
             {
                 addon->Close(true);
             }

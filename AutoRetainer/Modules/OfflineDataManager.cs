@@ -23,7 +23,7 @@ internal static unsafe class OfflineDataManager
         P.ODMTaskManager.Abort();
         P.ODMTaskManager.Enqueue(() =>
         {
-            if (!Player.Available) return false;
+            if(!Player.Available) return false;
             WriteOfflineData(false, false);
             return true;
         });
@@ -31,17 +31,17 @@ internal static unsafe class OfflineDataManager
 
     internal static void Tick()
     {
-        if (Svc.Condition[ConditionFlag.OccupiedSummoningBell])
+        if(Svc.Condition[ConditionFlag.OccupiedSummoningBell])
         {
-            if (GameRetainerManager.Ready)
+            if(GameRetainerManager.Ready)
             {
                 WriteOfflineData(false, false);
             }
-            if (EzThrottler.Throttle("Periodic.CalculateItemLevel") && Utils.TryGetCurrentRetainer(out var ret))
+            if(EzThrottler.Throttle("Periodic.CalculateItemLevel") && Utils.TryGetCurrentRetainer(out var ret))
             {
                 var adata = Utils.GetAdditionalData(Player.CID, ret);
                 var result = Helpers.ItemLevel.Calculate(out var g, out var p);
-                if (result != null)
+                if(result != null)
                 {
                     adata.Ilvl = result.Value;
                     adata.Gathering = g;
@@ -49,7 +49,7 @@ internal static unsafe class OfflineDataManager
                 }
             }
         }
-        if ((MultiMode.Active || AutoGCHandin.Operation || Utils.IsBusy || P.ConfigGui.IsOpen || Svc.Condition[ConditionFlag.LoggingOut] || Svc.Condition[ConditionFlag.OccupiedSummoningBell]) && EzThrottler.Throttle("Periodic.WriteOfflineData", 1000))
+        if((MultiMode.Active || AutoGCHandin.Operation || Utils.IsBusy || P.ConfigGui.IsOpen || Svc.Condition[ConditionFlag.LoggingOut] || Svc.Condition[ConditionFlag.OccupiedSummoningBell]) && EzThrottler.Throttle("Periodic.WriteOfflineData", 1000))
         {
             WriteOfflineData(false, EzThrottler.Throttle("Periodic.SaveData", 1000 * 60 * 5));
         }
@@ -57,9 +57,9 @@ internal static unsafe class OfflineDataManager
 
     internal static void WriteOfflineData(bool writeGatherables, bool saveConfig)
     {
-        if (!ProperOnLogin.PlayerPresent) return;
-        if (C.Blacklist.Any(x => x.CID == Svc.ClientState.LocalContentId)) return;
-        if (!C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
+        if(!ProperOnLogin.PlayerPresent) return;
+        if(C.Blacklist.Any(x => x.CID == Svc.ClientState.LocalContentId)) return;
+        if(!C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
         {
             data = new()
             {
@@ -69,7 +69,7 @@ internal static unsafe class OfflineDataManager
         }
         data.World = ExcelWorldHelper.GetName(Svc.ClientState.LocalPlayer.HomeWorld.Id);
         data.Name = Svc.ClientState.LocalPlayer.Name.ToString();
-        if (Player.Object.CurrentWorld.GameData.DataCenter.Row != Player.Object.HomeWorld.GameData.DataCenter.Row)
+        if(Player.Object.CurrentWorld.GameData.DataCenter.Row != Player.Object.HomeWorld.GameData.DataCenter.Row)
         {
             data.WorldOverride = Player.CurrentWorld;
         }
@@ -78,37 +78,37 @@ internal static unsafe class OfflineDataManager
             data.WorldOverride = null;
         }
         data.Gil = (uint)InventoryManager.Instance()->GetInventoryItemCount(1);
-        for (var i = 0; i < 30; i++)
+        for(var i = 0; i < 30; i++)
         {
             data.ClassJobLevelArray[i] = UIState.Instance()->PlayerState.ClassJobLevels[i];
         }
-        if (writeGatherables)
+        if(writeGatherables)
         {
             try
             {
                 data.UnlockedGatheringItems.Clear();
-                foreach (var x in Svc.Data.GetExcelSheet<GatheringItem>())
+                foreach(var x in Svc.Data.GetExcelSheet<GatheringItem>())
                 {
-                    if (P.Memory.IsGatheringItemGathered(x.RowId))
+                    if(P.Memory.IsGatheringItemGathered(x.RowId))
                     {
                         data.UnlockedGatheringItems.Add(x.RowId);
                     }
                 }
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 e.Log();
             }
         }
-        if (GameRetainerManager.Ready && GameRetainerManager.Count > 0 && Player.IsInHomeWorld)
+        if(GameRetainerManager.Ready && GameRetainerManager.Count > 0 && Player.IsInHomeWorld)
         {
             var cleared = false;
-            for (var i = 0; i < GameRetainerManager.Count; i++)
+            for(var i = 0; i < GameRetainerManager.Count; i++)
             {
                 var ret = GameRetainerManager.Retainers[i];
-                if (ret.RetainerID == 0) continue;
-                if (!ret.Available) continue;
-                if (ret.RetainerID != 0 && !cleared)
+                if(ret.RetainerID == 0) continue;
+                if(!ret.Available) continue;
+                if(ret.RetainerID != 0 && !cleared)
                 {
                     data.RetainerData.Clear();
                     cleared = true;
@@ -126,9 +126,9 @@ internal static unsafe class OfflineDataManager
                     MBItems = ret.MarkerItemCount,
                 });
 
-                for (var p = 0; p < GameRetainerManager.Count; p++)
+                for(var p = 0; p < GameRetainerManager.Count; p++)
                 {
-                    if (RetainerManager.Instance()->DisplayOrder[p] == i)
+                    if(RetainerManager.Instance()->DisplayOrder[p] == i)
                     {
                         data.RetainerData[i].DisplayOrder = p;
                         break;
@@ -136,23 +136,23 @@ internal static unsafe class OfflineDataManager
                 }
             }
         }
-        if (Player.IsInHomeWorld)
+        if(Player.IsInHomeWorld)
         {
             var fc = InfoModule.Instance()->GetInfoProxyFreeCompany();
             data.FCID = fc->Id;
-            if (!C.FCData.ContainsKey(fc->Id)) C.FCData[fc->Id] = new();
+            if(!C.FCData.ContainsKey(fc->Id)) C.FCData[fc->Id] = new();
             C.FCData[fc->Id].Name = fc->Name.Read();
             var numArray = UIModule.Instance()->GetRaptureAtkModule()->AtkModule.GetNumberArrayData(58);
-            if (numArray != null)
+            if(numArray != null)
             {
                 var gil = numArray->IntArray[354];
-                if (gil != 0 || S.FCPointsUpdater?.IsFCChestReady() == true)
+                if(gil != 0 || S.FCPointsUpdater?.IsFCChestReady() == true)
                 {
                     C.FCData[fc->Id].Gil = gil;
                     C.FCData[fc->Id].LastGilUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                 }
             }
-            if (Utils.FCPoints != 0)
+            if(Utils.FCPoints != 0)
             {
                 C.FCData[fc->Id].FCPoints = Utils.FCPoints;
                 C.FCData[fc->Id].FCPointsLastUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
@@ -160,7 +160,7 @@ internal static unsafe class OfflineDataManager
         }
         data.WriteOfflineInventoryData();
         C.OfflineData.RemoveAll(x => x.World == "" && x.Name == "Unknown");
-        if (saveConfig) EzConfig.Save();
+        if(saveConfig) EzConfig.Save();
     }
 
     internal static void WriteOfflineInventoryData(this OfflineCharacterData data)
@@ -176,7 +176,7 @@ internal static unsafe class OfflineDataManager
     internal static OfflineRetainerData GetData(string name, ulong? CID = null)
     {
         var cid = CID ?? Svc.ClientState.LocalContentId;
-        if (C.OfflineData.TryGetFirst(x => x.CID == cid, out var data) && data.RetainerData.TryGetFirst(x => x.Name == name, out var rdata))
+        if(C.OfflineData.TryGetFirst(x => x.CID == cid, out var data) && data.RetainerData.TryGetFirst(x => x.Name == name, out var rdata))
         {
             return rdata;
         }

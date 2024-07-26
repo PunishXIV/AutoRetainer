@@ -7,7 +7,7 @@ internal static class TaskAssignHuntingVenture
     internal static void Enqueue(uint VentureID)
     {
         P.TaskManager.Enqueue(NewYesAlreadyManager.WaitForYesAlreadyDisabledTask);
-        if (C.RetainerMenuDelay > 0)
+        if(C.RetainerMenuDelay > 0)
         {
             TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
         }
@@ -19,7 +19,7 @@ internal static class TaskAssignHuntingVenture
         P.TaskManager.Enqueue(RetainerHandlers.WaitForVentureListUpdate);
         P.TaskManager.DelayNext(C.FrameDelay, true);
         P.TaskManager.Enqueue(RetainerHandlers.ClearTaskSupplylist);
-        for (var i = 0; i < 20; i++)
+        for(var i = 0; i < 20; i++)
         {
             P.TaskManager.Enqueue(() => RetainerHandlers.ForceSearchVentureByName(VentureID), $"ForceSearchVentureByName({VentureID})/{i}");
             P.TaskManager.DelayNext(C.FrameDelay, true);

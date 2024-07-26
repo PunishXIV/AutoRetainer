@@ -14,55 +14,55 @@ public class CharaOrder : NeoUIEntry
                         ImGuiEx.TextWrapped($"Here you can sort your characters. This will affect order in which they will be processed by Multi Mode as well as how they will appear in plugin interface and login overlay.");
                         ImGui.SetNextItemWidth(150f);
                         ImGui.InputText($"Search", ref Search, 50);
-                        for (var index = 0; index < C.OfflineData.Count; index++)
+                        for(var index = 0; index < C.OfflineData.Count; index++)
                         {
-                            if (C.OfflineData[index].World.IsNullOrEmpty()) continue;
+                            if(C.OfflineData[index].World.IsNullOrEmpty()) continue;
                             ImGui.PushID($"c{index}");
-                            if (ImGui.ArrowButton("##up", ImGuiDir.Up) && index > 0)
+                            if(ImGui.ArrowButton("##up", ImGuiDir.Up) && index > 0)
                             {
                                 try
                                 {
                                     (C.OfflineData[index - 1], C.OfflineData[index]) = (C.OfflineData[index], C.OfflineData[index - 1]);
                                 }
-                                catch (Exception e)
+                                catch(Exception e)
                                 {
                                     e.Log();
                                 }
                             }
                             ImGui.SameLine();
-                            if (ImGui.ArrowButton("##down", ImGuiDir.Down) && index < C.OfflineData.Count - 1)
+                            if(ImGui.ArrowButton("##down", ImGuiDir.Down) && index < C.OfflineData.Count - 1)
                             {
                                 try
                                 {
                                     (C.OfflineData[index + 1], C.OfflineData[index]) = (C.OfflineData[index], C.OfflineData[index + 1]);
                                 }
-                                catch (Exception e)
+                                catch(Exception e)
                                 {
                                     e.Log();
                                 }
                             }
                             ImGui.SameLine();
-                            if (ImGuiEx.IconButton(FontAwesomeIcon.AngleDoubleDown))
+                            if(ImGuiEx.IconButton(FontAwesomeIcon.AngleDoubleDown))
                             {
                                 try
                                 {
                                     var moveIndex = index;
                                     MoveItemToPosition(C.OfflineData, (x) => x == C.OfflineData[moveIndex], C.OfflineData.Count - 1);
                                 }
-                                catch (Exception e)
+                                catch(Exception e)
                                 {
                                     e.Log();
                                 }
                             }
                             ImGui.SameLine();
-                            if (ImGuiEx.IconButton(FontAwesomeIcon.AngleDoubleUp))
+                            if(ImGuiEx.IconButton(FontAwesomeIcon.AngleDoubleUp))
                             {
                                 try
                                 {
                                     var moveIndex = index;
                                     MoveItemToPosition(C.OfflineData, (x) => x == C.OfflineData[moveIndex], 0);
                                 }
-                                catch (Exception e)
+                                catch(Exception e)
                                 {
                                     e.Log();
                                 }

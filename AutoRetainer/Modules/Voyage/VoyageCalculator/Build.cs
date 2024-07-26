@@ -60,7 +60,7 @@ public static class Build
         {
             var identifier = $"{HullIdentifier}{SternIdentifier}{BowIdentifier}{BridgeIdentifier}";
 
-            if (identifier.Count(l => l == '+') == 4)
+            if(identifier.Count(l => l == '+') == 4)
                 identifier = $"{identifier.Replace("+", "")}++";
 
             return identifier;
@@ -167,12 +167,12 @@ public static class Build
         public int CalculateUntilRepair()
         {
             var dmg = VoyageDamage();
-            if (dmg == 1)
+            if(dmg == 1)
                 return -1;
 
             var voyages = 0;
             var health = 30000;
-            while (health > 0)
+            while(health > 0)
             {
                 voyages += 1;
                 health -= dmg;
@@ -184,13 +184,13 @@ public static class Build
         public int VoyageDamage()
         {
             var highestDamage = 1;
-            foreach (var part in PartArray)
+            foreach(var part in PartArray)
             {
                 var damaged = 0;
-                foreach (var sector in OptimizedRoute)
+                foreach(var sector in OptimizedRoute)
                     damaged += (335 + sector.RankReq - PartSheet.GetRow((uint)part)!.Rank) * 7;
 
-                if (highestDamage < damaged)
+                if(highestDamage < damaged)
                     highestDamage = damaged;
             }
 
@@ -208,7 +208,7 @@ public static class Build
         {
             var identifier = $"{HullIdentifier}{SternIdentifier}{BowIdentifier}{BridgeIdentifier}";
 
-            if (identifier.Count(l => l == '+') == 4)
+            if(identifier.Count(l => l == '+') == 4)
                 identifier = $"{identifier.Replace("+", "")}++";
 
             return identifier;
@@ -216,17 +216,17 @@ public static class Build
 
         public static explicit operator RouteBuild(string s)
         {
-            if (s.Length < 4)
+            if(s.Length < 4)
                 return new RouteBuild();
 
             var allMod = s.EndsWith("++");
             var parts = s.Replace("+", "").ToCharArray().Select(t => t.ToString()).ToList();
 
-            for (var i = 0; i < parts.Count; i++)
+            for(var i = 0; i < parts.Count; i++)
             {
                 var t = parts[i];
                 var k = string.Join("", parts.Take(i + 1)).Length;
-                if ((k >= k + 1 && s[k + 1] == '+') || allMod)
+                if((k >= k + 1 && s[k + 1] == '+') || allMod)
                     parts[i] = t + "+";
             }
 
@@ -243,7 +243,7 @@ public static class Build
 
         public override bool Equals(object? obj)
         {
-            if (obj is RouteBuild other)
+            if(obj is RouteBuild other)
                 return other.SameBuildWithoutRank(this);
             return false;
         }
@@ -284,9 +284,9 @@ public static class Build
             var curParts = ToString().Replace("+", "").ToCharArray();
             var otherParts = other.ToString().Replace("+", "").ToCharArray();
 
-            for (var i = 0; i < curParts.Length; i++)
+            for(var i = 0; i < curParts.Length; i++)
             {
-                if (curParts[i] != otherParts[i] && curParts[i] != 'S')
+                if(curParts[i] != otherParts[i] && curParts[i] != 'S')
                     return false;
             }
 
@@ -295,21 +295,21 @@ public static class Build
 
         public bool IsValidSubBuild(RouteBuild original, bool ignoreShark, bool ignoreUnmodded)
         {
-            for (var i = 0; i < 4; i++)
+            for(var i = 0; i < 4; i++)
             {
                 var cur = PartArray[i];
                 var org = original.PartArray[i];
 
                 // current is shark part and always valid
-                if (!ignoreShark && cur <= 3)
+                if(!ignoreShark && cur <= 3)
                     continue;
 
                 // current is same
-                if (cur == org)
+                if(cur == org)
                     continue;
 
                 // original is modded, so we try unmodded part
-                if (!ignoreUnmodded && org > 20 && cur == org - 20)
+                if(!ignoreUnmodded && org > 20 && cur == org - 20)
                     continue;
 
                 return false;
@@ -350,7 +350,7 @@ public static class Build
             _ => 0
         };
 
-        if (s[^1] == '+')
+        if(s[^1] == '+')
             k += 5;
 
         return k * 4;

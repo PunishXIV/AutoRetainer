@@ -12,7 +12,7 @@ internal class NightMode : ExperimentUIEntry
                 $"- It may look like game hung up, but let it up to 5 seconds to wake up after you reactivate game window.\n" +
                 $"- By default, only Deployables are enabled in Night mode\n" +
                 $"- After disabling Night mode, Bailout manager will activate to relog you back to the game.");
-        if (ImGui.Checkbox("Activate night mode", ref C.NightMode)) MultiMode.BailoutNightMode();
+        if(ImGui.Checkbox("Activate night mode", ref C.NightMode)) MultiMode.BailoutNightMode();
         ImGui.Checkbox("Show Night mode checkbox", ref C.ShowNightMode);
         ImGui.Checkbox("Do retainers in Night mode", ref C.NightModeRetainers);
         ImGui.Checkbox("Do deployables in Night mode", ref C.NightModeDeployables);

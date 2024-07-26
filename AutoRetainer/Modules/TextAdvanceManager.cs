@@ -10,9 +10,9 @@ internal static class TextAdvanceManager
     private static bool IsBusy => Utils.IsBusy || VoyageScheduler.Enabled;
     internal static void Tick()
     {
-        if (WasChanged)
+        if(WasChanged)
         {
-            if (!IsBusy)
+            if(!IsBusy)
             {
                 WasChanged = false;
                 UnlockTA();
@@ -21,7 +21,7 @@ internal static class TextAdvanceManager
         }
         else
         {
-            if (IsBusy)
+            if(IsBusy)
             {
                 WasChanged = true;
                 LockTA();
@@ -31,7 +31,7 @@ internal static class TextAdvanceManager
     }
     internal static void LockTA()
     {
-        if (EzSharedData.TryGet<HashSet<string>>("TextAdvance.StopRequests", out var data))
+        if(EzSharedData.TryGet<HashSet<string>>("TextAdvance.StopRequests", out var data))
         {
             data.Add(P.Name);
         }
@@ -39,7 +39,7 @@ internal static class TextAdvanceManager
 
     internal static void UnlockTA()
     {
-        if (EzSharedData.TryGet<HashSet<string>>("TextAdvance.StopRequests", out var data))
+        if(EzSharedData.TryGet<HashSet<string>>("TextAdvance.StopRequests", out var data))
         {
             data.Remove(P.Name);
         }

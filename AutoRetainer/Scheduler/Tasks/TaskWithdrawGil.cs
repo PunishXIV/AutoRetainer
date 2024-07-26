@@ -15,14 +15,14 @@ internal static class TaskWithdrawGil
         P.TaskManager.Enqueue(() =>
         {
             var g = CurrentRetainerHasGil();
-            if (g != null)
+            if(g != null)
             {
                 hasGilInt = g.Value;
                 return true;
             }
             return false;
         });
-        if (C.RetainerMenuDelay > 0)
+        if(C.RetainerMenuDelay > 0)
         {
             TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
         }
@@ -36,7 +36,7 @@ internal static class TaskWithdrawGil
 
     private static bool? CurrentRetainerHasGil()
     {
-        if (Utils.TryGetCurrentRetainer(out var name) && Utils.TryGetRetainerByName(name, out var ret))
+        if(Utils.TryGetCurrentRetainer(out var name) && Utils.TryGetRetainerByName(name, out var ret))
         {
             return ret.Gil > 0;
         }

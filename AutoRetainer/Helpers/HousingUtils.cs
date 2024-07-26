@@ -13,7 +13,7 @@ public static unsafe class HousingUtils
             Descriptor = new(Svc.ClientState.TerritoryType, h->GetCurrentWard(), h->GetCurrentPlot());
             return true;
         }
-        catch (ArgumentOutOfRangeException)
+        catch(ArgumentOutOfRangeException)
         {
             Descriptor = default;
             return false;
@@ -29,7 +29,7 @@ public static unsafe class HousingUtils
 
     public static bool IsInThisHouse(this HouseDescriptor Descriptor)
     {
-        if (TryGetCurrentDescriptor(out var d) && d == Descriptor) return true;
+        if(TryGetCurrentDescriptor(out var d) && d == Descriptor) return true;
         return false;
     }
 }

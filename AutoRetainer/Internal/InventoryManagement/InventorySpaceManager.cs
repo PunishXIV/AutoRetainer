@@ -23,36 +23,36 @@ public static unsafe class InventorySpaceManager
 
     public static bool? SafeSellSlot(SellSlotTask Task)
     {
-        if (Utils.GenericThrottle && EzThrottler.Throttle("SellSlot", 333))
+        if(Utils.GenericThrottle && EzThrottler.Throttle("SellSlot", 333))
         {
             var inv = InventoryManager.Instance()->GetInventoryContainer(Task.InventoryType);
-            if (inv == null)
+            if(inv == null)
             {
                 DuoLog.Warning($"Inventory {Task.InventoryType} is null");
                 return true;
             }
-            if (C.IMProtectList.Contains(Task.ItemID))
+            if(C.IMProtectList.Contains(Task.ItemID))
             {
                 DuoLog.Warning($"Item {Task} is protected and won't be sold.");
                 return true;
             }
             var slot = inv->Items[Task.Slot];
-            if (Task.ItemID != slot.ItemId || slot.ItemId == 0 || slot.Quantity != Task.Quantity)
+            if(Task.ItemID != slot.ItemId || slot.ItemId == 0 || slot.Quantity != Task.Quantity)
             {
                 DuoLog.Warning($"Slot contains different item {ExcelItemHelper.GetName(slot.ItemId)}x{slot.Quantity}, should be {Task}");
                 return true;
             }
-            if (!IsRetainerInventoryLoaded())
+            if(!IsRetainerInventoryLoaded())
             {
                 DuoLog.Warning($"Could not find retainer inventory");
                 return true;
             }
-            if (!IsAgentRetainerActive)
+            if(!IsAgentRetainerActive)
             {
                 DuoLog.Warning($"AgentRetainer is not active");
                 return true;
             }
-            if (!C.IMDry)
+            if(!C.IMDry)
             {
                 P.Memory.RetainerItemCommandDetour(AgentRetainerItemCommandModule, Task.Slot, Task.InventoryType, 0, RetainerItemCommand.HaveRetainerSellItem);
                 PluginLog.Debug($"Sold slot {Task}");
@@ -69,9 +69,9 @@ public static unsafe class InventorySpaceManager
 
     public static bool IsRetainerInventoryLoaded()
     {
-        foreach (var addonCheck in Addons)
+        foreach(var addonCheck in Addons)
         {
-            if (TryGetAddonByName<AtkUnitBase>(addonCheck, out var addon) && IsAddonReady(addon))
+            if(TryGetAddonByName<AtkUnitBase>(addonCheck, out var addon) && IsAddonReady(addon))
             {
                 return true;
             }
@@ -87,15 +87,15 @@ public static unsafe class InventorySpaceManager
     public static void EnqueueSoftItemIfAllowed(uint ItemId, uint Quantity)
     {
         var im = InventoryManager.Instance();
-        foreach (var invType in InventorySpaceManager.GetAllowedToSellInventoryTypes())
+        foreach(var invType in InventorySpaceManager.GetAllowedToSellInventoryTypes())
         {
             var inv = im->GetInventoryContainer(invType);
-            for (var i = 0; i < inv->Size; i++)
+            for(var i = 0; i < inv->Size; i++)
             {
                 var item = inv->Items[i];
-                if (item.ItemId != 0 && item.ItemId == ItemId && item.Quantity == Quantity)
+                if(item.ItemId != 0 && item.ItemId == ItemId && item.Quantity == Quantity)
                 {
-                    if (C.IMAutoVendorSoft.Contains(item.ItemId))
+                    if(C.IMAutoVendorSoft.Contains(item.ItemId))
                     {
                         var task = new SellSlotTask(invType, (uint)i, item.ItemId, item.Quantity);
                         PluginLog.Information($"Enqueueing {task} for soft sale");
@@ -110,15 +110,15 @@ public static unsafe class InventorySpaceManager
     public static void EnqueueAllHardItems()
     {
         var im = InventoryManager.Instance();
-        foreach (var invType in InventorySpaceManager.GetAllowedToSellInventoryTypes())
+        foreach(var invType in InventorySpaceManager.GetAllowedToSellInventoryTypes())
         {
             var inv = im->GetInventoryContainer(invType);
-            for (var i = 0; i < inv->Size; i++)
+            for(var i = 0; i < inv->Size; i++)
             {
                 var item = inv->Items[i];
-                if (item.ItemId != 0 && (item.Quantity < C.IMAutoVendorHardStackLimit || C.IMAutoVendorHardIgnoreStack.Contains(item.ItemId)))
+                if(item.ItemId != 0 && (item.Quantity < C.IMAutoVendorHardStackLimit || C.IMAutoVendorHardIgnoreStack.Contains(item.ItemId)))
                 {
-                    if (C.IMAutoVendorHard.Contains(item.ItemId) && !TaskDesynthItems.DesynthEligible(item.ItemId))
+                    if(C.IMAutoVendorHard.Contains(item.ItemId) && !TaskDesynthItems.DesynthEligible(item.ItemId))
                     {
                         var task = new SellSlotTask(invType, (uint)i, item.ItemId, item.Quantity);
                         PluginLog.Information($"Enqueueing {task} for hard sale");

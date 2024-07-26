@@ -8,11 +8,11 @@ public class Exclusions : NeoUIEntry
     public override void Draw()
     {
         C.OfflineData.RemoveAll(x => C.Blacklist.Any(z => z.CID == x.CID));
-        if (ImGuiGroup.BeginGroupBox("Configure exclusions"))
+        if(ImGuiGroup.BeginGroupBox("Configure exclusions"))
         {
-            foreach (var x in C.OfflineData)
+            foreach(var x in C.OfflineData)
             {
-                if (ImGui.BeginTable("##excl", 5, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.BordersInnerH))
+                if(ImGui.BeginTable("##excl", 5, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.BordersInnerH))
                 {
                     ImGui.TableSetupColumn("1", ImGuiTableColumnFlags.WidthStretch);
                     ImGui.TableSetupColumn("2");
@@ -23,13 +23,13 @@ public class Exclusions : NeoUIEntry
                     ImGui.TableNextColumn();
                     ImGuiEx.TextV($"{Censor.Character(x.Name, x.World)}:");
                     ImGui.TableNextColumn();
-                    if (ImGui.Checkbox("Retainers", ref x.ExcludeRetainer))
+                    if(ImGui.Checkbox("Retainers", ref x.ExcludeRetainer))
                     {
                         x.Enabled = false;
                         C.SelectedRetainers.Remove(x.CID);
                     }
                     ImGui.TableNextColumn();
-                    if (ImGui.Checkbox("Deployables", ref x.ExcludeWorkshop))
+                    if(ImGui.Checkbox("Deployables", ref x.ExcludeWorkshop))
                     {
                         x.WorkshopEnabled = false;
                         x.EnabledSubs.Clear();
@@ -38,7 +38,7 @@ public class Exclusions : NeoUIEntry
                     ImGui.TableNextColumn();
                     ImGui.Checkbox("Login overlay", ref x.ExcludeOverlay);
                     ImGui.TableNextColumn();
-                    if (ImGuiEx.IconButton("\uf057"))
+                    if(ImGuiEx.IconButton("\uf057"))
                     {
                         C.Blacklist.Add((x.CID, x.Name));
                     }
@@ -50,16 +50,16 @@ public class Exclusions : NeoUIEntry
             }
             ImGuiGroup.EndGroupBox();
         }
-        if (C.Blacklist.Any())
+        if(C.Blacklist.Any())
         {
-            if (ImGuiGroup.BeginGroupBox("Excluded Characters"))
+            if(ImGuiGroup.BeginGroupBox("Excluded Characters"))
             {
-                for (var i = 0; i < C.Blacklist.Count; i++)
+                for(var i = 0; i < C.Blacklist.Count; i++)
                 {
                     var d = C.Blacklist[i];
                     ImGuiEx.TextV($"{d.Name} ({d.CID:X16})");
                     ImGui.SameLine();
-                    if (ImGui.Button($"Delete##bl{i}"))
+                    if(ImGui.Button($"Delete##bl{i}"))
                     {
                         C.Blacklist.RemoveAt(i);
                         C.SelectedRetainers.Remove(d.CID);

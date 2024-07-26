@@ -31,16 +31,16 @@ internal static unsafe class StatisticsManager
 
     private static void Chat_ChatMessage(XivChatType type, int time, ref SeString sender, ref SeString message, ref bool isHandled)
     {
-        if (Svc.Condition[ConditionFlag.OccupiedSummoningBell] && ProperOnLogin.PlayerPresent && (ushort)type == 2110 && Svc.Targets.Target.IsRetainerBell() && Utils.TryGetCurrentRetainer(out var retName))
+        if(Svc.Condition[ConditionFlag.OccupiedSummoningBell] && ProperOnLogin.PlayerPresent && (ushort)type == 2110 && Svc.Targets.Target.IsRetainerBell() && Utils.TryGetCurrentRetainer(out var retName))
         {
             var textProcessed = false;
             uint amount = 1;
-            foreach (var x in message.Payloads)
+            foreach(var x in message.Payloads)
             {
                 {
-                    if (!textProcessed && x.Type == PayloadType.RawText)
+                    if(!textProcessed && x.Type == PayloadType.RawText)
                     {
-                        if (x.ToString().TryMatch(@"([0-9]+)", out var match) && uint.TryParse(match.Groups[1].ToString(), out var amt))
+                        if(x.ToString().TryMatch(@"([0-9]+)", out var match) && uint.TryParse(match.Groups[1].ToString(), out var amt))
                         {
                             DebugLog($"Amount parsed: {amt}");
                             amount = amt;
@@ -53,9 +53,9 @@ internal static unsafe class StatisticsManager
                     }
                 }
                 {
-                    if (x is ItemPayload p)
+                    if(x is ItemPayload p)
                     {
-                        if (C.RecordStats)
+                        if(C.RecordStats)
                         {
                             GetWrapper(Svc.ClientState.LocalContentId, retName).Add(new()
                             {
@@ -66,7 +66,7 @@ internal static unsafe class StatisticsManager
                                 VentureID = P.LastVentureID
                             });
                         }
-                        if (C.IMEnableAutoVendor && P.LastVentureID == 395)
+                        if(C.IMEnableAutoVendor && P.LastVentureID == 395)
                         {
                             InventorySpaceManager.EnqueueSoftItemIfAllowed(p.ItemId, amount);
                         }
@@ -79,7 +79,7 @@ internal static unsafe class StatisticsManager
 
     internal static StatisticsFileWrapper GetWrapper(ulong CID, string Name)
     {
-        if (Files.TryGetFirst(x => x.CID == CID && x.RetainerName == Name, out var data))
+        if(Files.TryGetFirst(x => x.CID == CID && x.RetainerName == Name, out var data))
         {
             return data;
         }

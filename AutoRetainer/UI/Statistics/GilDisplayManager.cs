@@ -15,11 +15,11 @@ public sealed class GilDisplayManager
         ImGuiComponents.HelpMarker($"Ignored retainer gil still contributes to character/DC total. Character is ignored if their gil AND all retainers' gil is less than this value. Ignored characters do not contribute to DC total.");
         ImGui.Checkbox("Only display character total", ref C.GilOnlyChars);
         Dictionary<ExcelWorldHelper.Region, List<OfflineCharacterData>> data = [];
-        foreach (var x in C.OfflineData)
+        foreach(var x in C.OfflineData)
         {
-            if (ExcelWorldHelper.TryGet(x.World, out var world))
+            if(ExcelWorldHelper.TryGet(x.World, out var world))
             {
-                if (!data.ContainsKey((ExcelWorldHelper.Region)world.DataCenter.Value.Region))
+                if(!data.ContainsKey((ExcelWorldHelper.Region)world.DataCenter.Value.Region))
                 {
                     data[(ExcelWorldHelper.Region)world.DataCenter.Value.Region] = [];
                 }
@@ -27,36 +27,36 @@ public sealed class GilDisplayManager
             }
         }
         var globalTotal = 0L;
-        foreach (var x in data)
+        foreach(var x in data)
         {
             ImGuiEx.Text($"{x.Key}:");
             var dcTotal = 0L;
-            foreach (var c in x.Value)
+            foreach(var c in x.Value)
             {
                 FCData fcdata = null;
                 var charTotal = c.Gil + c.RetainerData.Sum(s => s.Gil);
-                foreach (var fc in C.FCData)
+                foreach(var fc in C.FCData)
                 {
-                    if (S.FCData.GetHolderChara(fc.Key, fc.Value) == c && fc.Value.GilCountsTowardsChara)
+                    if(S.FCData.GetHolderChara(fc.Key, fc.Value) == c && fc.Value.GilCountsTowardsChara)
                     {
                         fcdata = fc.Value;
                         charTotal += fcdata.Gil;
                         break;
                     }
                 }
-                if (charTotal > C.MinGilDisplay)
+                if(charTotal > C.MinGilDisplay)
                 {
-                    if (!C.GilOnlyChars)
+                    if(!C.GilOnlyChars)
                     {
                         ImGuiEx.Text($"    {Censor.Character(c.Name, c.World)}: {c.Gil:N0}");
-                        foreach (var r in c.RetainerData)
+                        foreach(var r in c.RetainerData)
                         {
-                            if (r.Gil > C.MinGilDisplay)
+                            if(r.Gil > C.MinGilDisplay)
                             {
                                 ImGuiEx.Text($"        {Censor.Retainer(r.Name)}: {r.Gil:N0}");
                             }
                         }
-                        if (fcdata != null && fcdata.Gil > 0)
+                        if(fcdata != null && fcdata.Gil > 0)
                         {
                             ImGuiEx.Text(ImGuiColors.DalamudYellow, $"        Free Company {fcdata.Name}: {fcdata.Gil:N0}");
                         }

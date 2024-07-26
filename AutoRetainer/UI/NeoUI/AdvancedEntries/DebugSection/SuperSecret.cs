@@ -13,7 +13,7 @@ internal class SuperSecret : DebugSectionBase
         ImGui.Separator();
         ImGui.Checkbox($"Unsafe options protection", ref C.UnsafeProtection);
         ImGui.SameLine();
-        if (ImGui.Button($"Write to registry"))
+        if(ImGui.Button($"Write to registry"))
         {
             Safety.Set(C.UnsafeProtection);
         }
