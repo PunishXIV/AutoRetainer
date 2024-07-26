@@ -15,7 +15,7 @@ public class GeneralSettings : InventoryManagemenrBase
 
     private GeneralSettings()
     {
-        this.Builder = new NuiBuilder()
+        Builder = new NuiBuilder()
             .Section(Name)
             .Checkbox($"Auto-open venture coffers", () => ref C.IMEnableCofferAutoOpen, "Multi Mode only. Before logging out, all coffers will be open unless your inventory space is too low.")
             .Checkbox($"Enable selling items to retainer", () => ref C.IMEnableAutoVendor)
@@ -24,7 +24,7 @@ public class GeneralSettings : InventoryManagemenrBase
             .Indent()
             .Widget("Sell now", (x) =>
             {
-                if(ImGuiEx.Button(x, Player.Interactable && C.IMEnableNpcSell && NpcSaleManager.GetValidNPC() != null && !IsOccupied() && !P.TaskManager.IsBusy))
+                if (ImGuiEx.Button(x, Player.Interactable && C.IMEnableNpcSell && NpcSaleManager.GetValidNPC() != null && !IsOccupied() && !P.TaskManager.IsBusy))
                 {
                     NpcSaleManager.EnqueueIfItemsPresent();
                 }

@@ -14,7 +14,7 @@ public class HardList : InventoryManagemenrBase
 
     private HardList()
     {
-        this.Builder = new NuiBuilder()
+        Builder = new NuiBuilder()
             .Section(Name)
             .TextWrapped("These items will always be sold, regardless of their source, as long as their stack count does not exceeds specified amount that you can specify below. Additionally, only these items will ever be sold to an NPC.")
             .InputInt(150f, $"Maximum stack size to be sold", () => ref C.IMAutoVendorHardStackLimit)

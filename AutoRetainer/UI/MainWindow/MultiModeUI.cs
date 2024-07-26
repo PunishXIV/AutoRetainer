@@ -334,9 +334,9 @@ internal static unsafe class MultiModeUI
                     col = false;
                 }
             }
-            ImGui.SameLine(0,0);
+            ImGui.SameLine(0, 0);
             List<(bool, string)> texts = [(data.Ventures < C.UIWarningRetVentureNum, $"V: {data.Ventures}"), (data.InventorySpace < C.UIWarningRetSlotNum, $"I: {data.InventorySpace}")];
-            if(C.CharEqualize && MultiMode.Enabled)
+            if (C.CharEqualize && MultiMode.Enabled)
             {
                 texts.Insert(0, (false, $"C: {MultiMode.CharaCnt.GetOrDefault(data.CID)}"));
             }

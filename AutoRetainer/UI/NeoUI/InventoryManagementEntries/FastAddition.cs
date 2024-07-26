@@ -12,8 +12,8 @@ public class FastAddition : InventoryManagemenrBase
 
     private FastAddition()
     {
-        this.NoFrame = false;
-        this.DisplayPriority = -10;
+        NoFrame = false;
+        DisplayPriority = -10;
     }
 
     public override void Draw()

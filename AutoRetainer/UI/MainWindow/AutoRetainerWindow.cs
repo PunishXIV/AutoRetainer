@@ -197,7 +197,7 @@ internal unsafe class AutoRetainerWindow : Window
         }
 
         PatreonBanner.DrawRight();
-        ImGuiEx.EzTabBar("tabbar", PatreonBanner.Text, 
+        ImGuiEx.EzTabBar("tabbar", PatreonBanner.Text,
                         ("Retainers", MultiModeUI.Draw, null, true),
                         ("Deployables", WorkshopUI.Draw, null, true),
                         ("Statistics", DrawStats, null, true),

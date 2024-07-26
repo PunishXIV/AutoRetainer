@@ -19,7 +19,7 @@ internal static unsafe class RetainerListHandlers
         if (TryGetAddonByName<AtkUnitBase>("RetainerList", out var retainerList) && IsAddonReady(retainerList))
         {
             var list = new AddonMaster.RetainerList(retainerList);
-            foreach(var retainer in list.Retainers)
+            foreach (var retainer in list.Retainers)
             {
                 if (retainer.Name == name)
                 {

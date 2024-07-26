@@ -6,7 +6,7 @@ namespace AutoRetainer.UI
 {
     public static class CustomAboutTab
     {
-        static string GetImageURL()
+        private static string GetImageURL()
         {
             return Svc.PluginInterface.Manifest.IconUrl ?? "";
         }
@@ -28,7 +28,7 @@ namespace AutoRetainer.UI
                 ImGui.SameLine(0, 0);
                 ImGuiEx.Text($" by Puni.sh and NightmareXIV");
             });
-            
+
             ImGuiHelpers.ScaledDummy(10f);
             ImGuiEx.LineCentered("About2", delegate
             {

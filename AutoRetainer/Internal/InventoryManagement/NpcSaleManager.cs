@@ -20,7 +20,7 @@ public static unsafe class NpcSaleManager
             var inv = InventoryManager.Instance()->GetInventoryContainer(type);
             if (inv != null)
             {
-                for (int i = 0; i < inv->Size; i++)
+                for (var i = 0; i < inv->Size; i++)
                 {
                     var slot = inv->GetInventorySlot(i);
                     if (slot != null && slot->ItemId != 0)
@@ -47,9 +47,9 @@ public static unsafe class NpcSaleManager
         foreach (var type in InventorySpaceManager.GetAllowedToSellInventoryTypes())
         {
             var inv = InventoryManager.Instance()->GetInventoryContainer(type);
-            if(inv != null)
+            if (inv != null)
             {
-                for (int i = 0; i < inv->Size; i++)
+                for (var i = 0; i < inv->Size; i++)
                 {
                     var slot = inv->GetInventorySlot(i);
                     if (!Processed.Contains((type, i)) && slot != null && slot->ItemId != 0)
@@ -75,8 +75,8 @@ public static unsafe class NpcSaleManager
     public static IGameObject GetValidNPC()
     {
         return Svc.Objects.OrderBy(x => Vector3.Distance(Player.Position, x.Position))
-            .Where(x => 
-            x.DataId.EqualsAny(VendorDataID) 
+            .Where(x =>
+            x.DataId.EqualsAny(VendorDataID)
             && x.ObjectKind == Dalamud.Game.ClientState.Objects.Enums.ObjectKind.EventNpc
             && Vector3.Distance(Player.Position, x.Position) < 7f
             ).FirstOrDefault();
@@ -107,13 +107,13 @@ public static unsafe class NpcSaleManager
     public static bool? SelectPurchase()
     {
         if (TryGetAddonByName<AtkUnitBase>("Shop", out var addon) && IsAddonReady(addon)) return true;
-        if(TryGetAddonMaster<AddonMaster.SelectIconString>(out var m))
+        if (TryGetAddonMaster<AddonMaster.SelectIconString>(out var m))
         {
-            foreach(var entry in m.Entries)
+            foreach (var entry in m.Entries)
             {
                 if (Svc.Data.GetExcelSheet<GilShop>().Select(x => x.Name.ExtractText()).Contains(entry.Text))
                 {
-                    if(EzThrottler.Throttle("SelectStringSell", 2000))
+                    if (EzThrottler.Throttle("SelectStringSell", 2000))
                     {
                         entry.Select();
                     }
@@ -128,7 +128,7 @@ public static unsafe class NpcSaleManager
     {
         if (TryGetAddonByName<AtkUnitBase>("Shop", out var addon) && IsAddonReady(addon))
         {
-            if(EzThrottler.Throttle("CloseShop", 2000))
+            if (EzThrottler.Throttle("CloseShop", 2000))
             {
                 addon->Close(true);
             }

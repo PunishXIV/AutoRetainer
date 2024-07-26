@@ -7,9 +7,9 @@ internal unsafe class DebugGCAuto : DebugSectionBase
 {
     public override void Draw()
     {
-        if(ImGui.CollapsingHeader("Expert items"))
+        if (ImGui.CollapsingHeader("Expert items"))
         {
-            foreach(var x in AutoGCHandin.GetHandinItems())
+            foreach (var x in AutoGCHandin.GetHandinItems())
             {
                 ImGuiEx.Text(x.ToString() + "/" + ExcelItemHelper.GetName(x.ItemID));
             }

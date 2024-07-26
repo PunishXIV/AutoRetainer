@@ -65,16 +65,16 @@ public static unsafe class InventoryManagementCommon
                 var result = EzConfig.DefaultSerializationFactory.Deserialize<List<uint>>(Paste());
                 if (result != null)
                 {
-                    foreach(var x in result)
+                    foreach (var x in result)
                     {
-                        if(ExcelItemHelper.Get(x) != null && !list.Contains(x))
+                        if (ExcelItemHelper.Get(x) != null && !list.Contains(x))
                         {
                             list.Add(x);
                         }
                     }
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Notify.Error(e.Message);
                 e.Log();

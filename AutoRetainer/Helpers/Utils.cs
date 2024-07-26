@@ -42,7 +42,7 @@ internal static unsafe class Utils
         if (C.IMProtectList.Contains(item)) return false;
         if (C.IMAutoVendorHard.Contains(item))
         {
-            if(C.IMAutoVendorHardIgnoreStack.Contains(item)) return true;
+            if (C.IMAutoVendorHardIgnoreStack.Contains(item)) return true;
             return quantity < C.IMAutoVendorHardStackLimit;
         }
         else

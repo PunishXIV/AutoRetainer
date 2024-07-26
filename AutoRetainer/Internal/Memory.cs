@@ -110,11 +110,11 @@ internal unsafe class Memory : IDisposable
         }
     }
 
-    delegate void SellItemDelegate(uint a1, InventoryType a2);
+    private delegate void SellItemDelegate(uint a1, InventoryType a2);
     [EzHook("48 89 5C 24 ?? 48 89 6C 24 ?? 56 48 83 EC 20 8B E9", false)]
-    EzHook<SellItemDelegate> SellItemHook;
+    private EzHook<SellItemDelegate> SellItemHook;
 
-    void SellItemDetour(uint inventorySlot, InventoryType a2)
+    private void SellItemDetour(uint inventorySlot, InventoryType a2)
     {
         PluginLog.Debug($"SellItemDetour: {inventorySlot}, {a2}");
         SellItemHook.Original(inventorySlot, a2);

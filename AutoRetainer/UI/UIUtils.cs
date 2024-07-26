@@ -10,14 +10,14 @@ internal static class UIUtils
         if (overlayTexts.Count > 0)
         {
             var maxSizes = new float[overlayTexts[0].Texts.Length];
-            for (int i = 0; i < maxSizes.Length; i++)
+            for (var i = 0; i < maxSizes.Length; i++)
             {
                 maxSizes[i] = overlayTexts.Select(x => ImGui.CalcTextSize(x.Texts[i].Text).X).Max();
             }
             foreach (var x in overlayTexts)
             {
                 var cur = ImGui.GetCursorPos();
-                for (int i = x.Texts.Length - 1; i >= 0; i--)
+                for (var i = x.Texts.Length - 1; i >= 0; i--)
                 {
                     ImGui.SetCursorPos(new(x.Curpos.X - maxSizes[i..].Sum() - (maxSizes[i..].Length - 1) * ImGui.CalcTextSize("      ").X, x.Curpos.Y));
                     ImGuiEx.Text(x.Texts[i].Warning ? ImGuiColors.DalamudOrange : null, x.Texts[i].Text);

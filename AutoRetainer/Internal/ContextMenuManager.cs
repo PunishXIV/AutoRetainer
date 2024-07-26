@@ -32,7 +32,7 @@ internal unsafe class ContextMenuManager
     {
         if (!C.IMEnableContextMenu) return;
         if (args.MenuType == ContextMenuType.Inventory && args.Target is MenuTargetInventory inv && inv.TargetItem != null)
-				{
+        {
             var id = inv.TargetItem.Value.ItemId;
             if (id != 0)
             {

@@ -43,7 +43,7 @@ internal static unsafe class MultiMode
     {
         ProperOnLogin.RegisterInteractable(delegate
         {
-            if(TaskChangeCharacter.Expected != null)
+            if (TaskChangeCharacter.Expected != null)
             {
                 if (MultiMode.Enabled)
                 {
@@ -61,7 +61,7 @@ internal static unsafe class MultiMode
                 DuoLog.Error("Multi mode disabled as it have detected duplicate login.");
                 Enabled = false;
             }
-            LastLogin = MultiMode.Enabled && !C.MultiWaitOnLoginScreen?Svc.ClientState.LocalContentId:0;
+            LastLogin = MultiMode.Enabled && !C.MultiWaitOnLoginScreen ? Svc.ClientState.LocalContentId : 0;
             Interactions.Clear();
             if (CanHET)
             {

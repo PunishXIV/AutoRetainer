@@ -76,10 +76,10 @@ public static unsafe class TaskChangeCharacter
         {
             return true;
         }
-        if(TryGetAddonMaster<AddonMaster.SelectString>(out var m) && m.IsAddonReady)
+        if (TryGetAddonMaster<AddonMaster.SelectString>(out var m) && m.IsAddonReady)
         {
             var compareTo = Svc.Data.GetExcelSheet<Lobby>()?.GetRow(11)?.Text.ExtractText();
-            if(m.Text == compareTo)
+            if (m.Text == compareTo)
             {
                 m.Entries[account].Select();
                 return true;
@@ -94,13 +94,13 @@ public static unsafe class TaskChangeCharacter
 
     public static bool? ClickSelectDataCenter()
     {
-        if(TryGetAddonByName<AtkUnitBase>("TitleDCWorldMap", out var addon) && addon->IsVisible)
+        if (TryGetAddonByName<AtkUnitBase>("TitleDCWorldMap", out var addon) && addon->IsVisible)
         {
             PluginLog.Information($"Visible");
             Utils.RethrottleGeneric();
             return true;
         }
-        if(TryGetAddonMaster<AddonMaster._TitleMenu>(out var m) && m.IsReady)
+        if (TryGetAddonMaster<AddonMaster._TitleMenu>(out var m) && m.IsReady)
         {
             if (Utils.GenericThrottle && EzThrottler.Throttle("ClickTitleMenuStart"))
             {
@@ -117,9 +117,9 @@ public static unsafe class TaskChangeCharacter
 
     public static bool? SelectDataCenter(int dc)
     {
-        if(TryGetAddonMaster<AddonMaster.TitleDCWorldMap>(out var m) && m.IsAddonReady)
+        if (TryGetAddonMaster<AddonMaster.TitleDCWorldMap>(out var m) && m.IsAddonReady)
         {
-            if(Utils.GenericThrottle && EzThrottler.Throttle("ClickDCSelect"))
+            if (Utils.GenericThrottle && EzThrottler.Throttle("ClickDCSelect"))
             {
                 m.Select(dc);
                 return true;
@@ -150,7 +150,7 @@ public static unsafe class TaskChangeCharacter
         if (TryGetAddonMaster<AddonMaster._CharaSelectListMenu>(out var m) && m.IsAddonReady && TryGetAddonMaster<AddonMaster._CharaSelectWorldServer>(out var mw))
         {
             if (m.TemporarilyLocked) return false;
-            if(mw.Worlds.Length == 0) return false;
+            if (mw.Worlds.Length == 0) return false;
             foreach (var c in m.Characters)
             {
                 if (c.Name == name && ExcelWorldHelper.GetName(c.HomeWorld) == world)
@@ -195,11 +195,11 @@ public static unsafe class TaskChangeCharacter
         {
             return true;
         }
-        if(TryGetAddonMaster<AddonMaster.SelectYesno>(out var m) && m.IsAddonReady)
+        if (TryGetAddonMaster<AddonMaster.SelectYesno>(out var m) && m.IsAddonReady)
         {
-            if(m.Text.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.LogInPartialText))
+            if (m.Text.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.LogInPartialText))
             {
-                if(Utils.GenericThrottle && EzThrottler.Throttle("ConfirmLogin"))
+                if (Utils.GenericThrottle && EzThrottler.Throttle("ConfirmLogin"))
                 {
                     m.Yes();
                     return true;

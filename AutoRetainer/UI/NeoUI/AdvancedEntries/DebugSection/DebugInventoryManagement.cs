@@ -15,9 +15,9 @@ using System.Threading.Tasks;
 namespace AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;
 public unsafe class DebugInventoryManagement : DebugSectionBase
 {
-    int slot;
-    InventoryType Type;
-    HashSet<uint> Whitelist = [];
+    private int slot;
+    private InventoryType Type;
+    private HashSet<uint> Whitelist = [];
 
     public override void Draw()
     {
@@ -28,7 +28,7 @@ public unsafe class DebugInventoryManagement : DebugSectionBase
         {
             P.Memory.SellItemToShop(Type, slot);
         }
-        if(ImGui.Button("Enqueue if present"))
+        if (ImGui.Button("Enqueue if present"))
         {
             NpcSaleManager.EnqueueIfItemsPresent();
         }
@@ -36,7 +36,7 @@ public unsafe class DebugInventoryManagement : DebugSectionBase
         if (ImGui.Button("Interact with target")) TargetSystem.Instance()->InteractWithObject(Svc.Targets.Target.Struct(), false);
         if (TryGetAddonMaster<AddonMaster.SelectIconString>(out var m))
         {
-            foreach(var x in m.Entries)
+            foreach (var x in m.Entries)
             {
                 if (ImGui.Selectable(x.Text))
                 {
@@ -45,10 +45,10 @@ public unsafe class DebugInventoryManagement : DebugSectionBase
             }
         }
 
-        foreach(var x in Vendors)
+        foreach (var x in Vendors)
         {
-            ImGuiEx.Text(Whitelist.Contains(x) ? EColor.GreenBright :null,$"{x}: {Svc.Data.GetExcelSheet<ENpcResident>().GetRow(x)?.Plural}");
-            if(ImGui.IsItemHovered())
+            ImGuiEx.Text(Whitelist.Contains(x) ? EColor.GreenBright : null, $"{x}: {Svc.Data.GetExcelSheet<ENpcResident>().GetRow(x)?.Plural}");
+            if (ImGui.IsItemHovered())
             {
                 if (ImGuiEx.Ctrl)
                 {
@@ -66,7 +66,7 @@ public unsafe class DebugInventoryManagement : DebugSectionBase
         {
             foreach (var x in Svc.Data.GetExcelSheet<HousingEmploymentNpcList>())
             {
-                for (int i = 0; i < x.ENpcBase.Length; i++)
+                for (var i = 0; i < x.ENpcBase.Length; i++)
                 {
                     var ret = x.ENpcBase[i];
                     if (ret.Row != 0) yield return ret.Row;

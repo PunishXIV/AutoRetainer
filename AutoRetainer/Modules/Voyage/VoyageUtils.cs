@@ -327,7 +327,7 @@ internal static unsafe class VoyageUtils
             {
                 var vessels = HousingManager.Instance()->WorkshopTerritory->Submersible;
                 var temp = new List<OfflineVesselData>();
-                for (var i = 0; i < Math.Min(4,vessels.DataPointers.Length); i++)
+                for (var i = 0; i < Math.Min(4, vessels.DataPointers.Length); i++)
                 {
                     var vessel = vessels.DataPointers[i].Value;
                     if (vessel == null) continue;

@@ -32,7 +32,7 @@ public unsafe class DebugAddonMaster : DebugSectionBase
 
         if (ImGui.CollapsingHeader("_TitleMenu"))
         {
-            if(TryGetAddonMaster<AddonMaster._TitleMenu>(out var m) && m.IsAddonReady)
+            if (TryGetAddonMaster<AddonMaster._TitleMenu>(out var m) && m.IsAddonReady)
             {
                 ImGuiEx.Text($"Ready: {m.IsReady}");
                 if (ImGui.Button("Start")) m.Start();
@@ -43,9 +43,9 @@ public unsafe class DebugAddonMaster : DebugSectionBase
 
         if (ImGui.CollapsingHeader("TitleDCWorldMap"))
         {
-            if(TryGetAddonMaster<AddonMaster.TitleDCWorldMap>(out var m) && m.IsAddonReady)
+            if (TryGetAddonMaster<AddonMaster.TitleDCWorldMap>(out var m) && m.IsAddonReady)
             {
-                foreach(var x in AddonMaster.TitleDCWorldMap.PublicDC)
+                foreach (var x in AddonMaster.TitleDCWorldMap.PublicDC)
                 {
                     if (ImGui.Button(Svc.Data.GetExcelSheet<WorldDCGroupType>().GetRow((uint)x).Name))
                     {
@@ -57,9 +57,9 @@ public unsafe class DebugAddonMaster : DebugSectionBase
 
         if (ImGui.CollapsingHeader("_CharaSelectWorldServer"))
         {
-            if(TryGetAddonMaster<AddonMaster._CharaSelectWorldServer>(out var m))
+            if (TryGetAddonMaster<AddonMaster._CharaSelectWorldServer>(out var m))
             {
-                foreach(var x in m.Worlds)
+                foreach (var x in m.Worlds)
                 {
                     if (ImGui.Button(x.Name))
                     {

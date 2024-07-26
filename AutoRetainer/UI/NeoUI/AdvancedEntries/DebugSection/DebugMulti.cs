@@ -16,7 +16,7 @@ internal unsafe class DebugMulti : DebugSectionBase
     {
         ImGuiEx.Text($"Expected: {TaskChangeCharacter.Expected}");
         if (ImGui.Button("Force mismatch")) TaskChangeCharacter.Expected = ("AAAAAAAA", "BBBBBBB");
-        if(ImGui.Button("Simulate nothing left"))
+        if (ImGui.Button("Simulate nothing left"))
         {
             MultiMode.Relog(null, out var error, RelogReason.MultiMode);
         }
