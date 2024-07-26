@@ -84,7 +84,7 @@ public static unsafe class InventoryManagementCommon
         ImGuiEx.TreeNodeCollapsingHeader("Mass addition/removal", () =>
         {
             ImGui.SetNextItemWidth(200f);
-            if(ImGui.BeginCombo("Select Categories", SelectedCategories.Count != 0 ? $"{SelectedCategories.Count} selected" : "None selected"))
+            if(ImGui.BeginCombo("Select Categories", SelectedCategories.Count != 0 ? $"{SelectedCategories.Count} selected" : "None selected", ImGuiComboFlags.HeightLarge))
             {
                 if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Plus, "All"))
                 {
@@ -127,7 +127,7 @@ public static unsafe class InventoryManagementCommon
                 ImGui.SetNextItemWidth(200f);
                 Modified |= ImGui.InputText($"Filter by name", ref ItemSearch, 100);
                 ImGui.SetNextItemWidth(200f);
-                if(ImGui.BeginCombo("Select rarity", Rarities.Any() ? $"{Rarities.Print()}" : "Any rarity"))
+                if(ImGui.BeginCombo("Select rarity", Rarities.Any() ? $"{Rarities.Print()}" : "Any rarity", ImGuiComboFlags.HeightLarge))
                 {
                     foreach(var r in Enum.GetValues<ItemRarity>())
                     {

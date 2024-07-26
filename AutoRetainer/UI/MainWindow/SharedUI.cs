@@ -83,7 +83,7 @@ internal static class SharedUI
     {
         ImGuiEx.Text($"Service Account Selection");
         ImGuiEx.SetNextItemWidthScaled(150);
-        if(ImGui.BeginCombo("##Service Account Selection", $"Service Account {data.ServiceAccount + 1}"))
+        if(ImGui.BeginCombo("##Service Account Selection", $"Service Account {data.ServiceAccount + 1}", ImGuiComboFlags.HeightLarge))
         {
             for(var i = 1; i <= 10; i++)
             {

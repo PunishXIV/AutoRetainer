@@ -83,7 +83,7 @@ public class DeployablesTab : NeoUIEntry
     {
         ImGuiEx.Text($"Select submersibles:");
         ImGuiEx.SetNextItemFullWidth();
-        if(ImGui.BeginCombo($"##sel", $"Selected {SelectedVessels.Count}"))
+        if(ImGui.BeginCombo($"##sel", $"Selected {SelectedVessels.Count}", ImGuiComboFlags.HeightLarge))
         {
             foreach(var x in C.OfflineData)
             {
@@ -180,7 +180,7 @@ public class DeployablesTab : NeoUIEntry
         ImGui.Separator();
 
         ImGui.SetNextItemWidth(150f);
-        if(ImGui.BeginCombo("##uplan", "Unlock plan: " + (SelectedUnlockPlan?.Name ?? "not selected")))
+        if(ImGui.BeginCombo("##uplan", "Unlock plan: " + (SelectedUnlockPlan?.Name ?? "not selected", ImGuiComboFlags.HeightLarge)))
         {
             foreach(var plan in C.SubmarineUnlockPlans)
             {
@@ -210,7 +210,7 @@ public class DeployablesTab : NeoUIEntry
         ImGui.Separator();
 
         ImGui.SetNextItemWidth(150f);
-        if(ImGui.BeginCombo("##uplan", "Point plan: " + (SelectedPointPlan?.Name ?? "not selected")))
+        if(ImGui.BeginCombo("##uplan2", "Point plan: " + (SelectedPointPlan?.Name ?? "not selected", ImGuiComboFlags.HeightLarge)))
         {
             foreach(var plan in C.SubmarinePointPlans)
             {

@@ -29,7 +29,7 @@ internal unsafe class SubmarinePointPlanUI : Window
         C.SubmarinePointPlans.RemoveAll(x => x.Delete);
         ImGuiEx.InputWithRightButtonsArea("SUPSelector", () =>
         {
-            if(ImGui.BeginCombo("##supsel", SelectedPlanName))
+            if(ImGui.BeginCombo("##supsel", SelectedPlanName, ImGuiComboFlags.HeightLarge))
             {
                 foreach(var x in C.SubmarinePointPlans)
                 {

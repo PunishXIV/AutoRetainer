@@ -18,7 +18,7 @@ internal class DuplicateBlacklistSelector : Window
 
     public override void Draw()
     {
-        if(ImGui.BeginCombo("##ocdsel", SelectedData == null ? "Select..." : $"{Censor.Character(SelectedData.Name, SelectedData.World)}"))
+        if(ImGui.BeginCombo("##ocdsel", SelectedData == null ? "Select..." : $"{Censor.Character(SelectedData.Name, SelectedData.World)}", ImGuiComboFlags.HeightLarge))
         {
             C.OfflineData.Where(x => !x.ExcludeRetainer).Each((x) =>
             {

@@ -57,7 +57,7 @@ internal static class UIUtils
         ImGui.Dummy(new(20, 1));
         ImGui.SameLine();
         ImGuiEx.SetNextItemWidthScaled(200f);
-        if(ImGui.BeginCombo("##inputKey", $"{key}"))
+        if(ImGui.BeginCombo("##inputKey", $"{key}", ImGuiComboFlags.HeightLarge))
         {
             if(text == KeyInputActive)
             {

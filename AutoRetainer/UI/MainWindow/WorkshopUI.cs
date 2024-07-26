@@ -462,7 +462,7 @@ internal static unsafe class WorkshopUI
                 var currentPlan = VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan) ?? VoyageUtils.GetDefaultSubmarineUnlockPlan(false);
                 var isDefault = VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan) == null;
                 var text = Environment.TickCount64 % 2000 > 1000 ? "Unlocking every point" : "No or unknown plan selected";
-                if(ImGui.BeginCombo("##uplan", (currentPlan?.Name ?? text) + (isDefault ? " (default)" : "")))
+                if(ImGui.BeginCombo("##uplan", (currentPlan?.Name ?? text) + (isDefault ? " (default)" : "", ImGuiComboFlags.HeightLarge)))
                 {
                     if(ImGui.Button("Open editor"))
                     {
@@ -487,7 +487,7 @@ internal static unsafe class WorkshopUI
             if(adata.VesselBehavior == VesselBehavior.Use_plan)
             {
                 var currentPlan = VoyageUtils.GetSubmarinePointPlanByGuid(adata.SelectedPointPlan);
-                if(ImGui.BeginCombo("##uplan", currentPlan.GetPointPlanName()))
+                if(ImGui.BeginCombo("##uplan", currentPlan.GetPointPlanName(), ImGuiComboFlags.HeightLarge))
                 {
                     if(ImGui.Button("Open editor"))
                     {
@@ -515,7 +515,7 @@ internal static unsafe class WorkshopUI
             ImGuiComponents.HelpMarker($"If your vessel order in AutoRetainer is different than in voyage panel menu, you must use this feature to set correct index to incorrectly ordered vessels. Make sure that index is matching order in control panel.");
             if(ImGui.CollapsingHeader("I have recently renamed this vessel"))
             {
-                if(ImGui.BeginCombo("##selprev", "Select previous vessel name"))
+                if(ImGui.BeginCombo("##selprev", "Select previous vessel name", ImGuiComboFlags.HeightLarge))
                 {
                     var datas = ((Func<Dictionary<string, AdditionalVesselData>>)delegate
                     {
