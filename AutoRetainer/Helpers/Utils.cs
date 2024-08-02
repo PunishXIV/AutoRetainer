@@ -180,6 +180,7 @@ internal static unsafe class Utils
         return TryGetAddonByName<AtkUnitBase>("_TitleMenu", out var title)
             && IsAddonReady(title)
             && title->UldManager.NodeListCount > 3
+            && title->UldManager.NodeList[7]->IsVisible()
             && title->UldManager.NodeList[3]->Color.A == 0xFF
             && !TryGetAddonByName<AtkUnitBase>("TitleDCWorldMap", out _)
             && !TryGetAddonByName<AtkUnitBase>("TitleConnect", out _);
