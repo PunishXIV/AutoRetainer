@@ -246,7 +246,8 @@ internal static class Lang
             "reparieren",
             "réparer",
             "要修理下列部件吗",
-            "要修理下列部件嗎"
+            "要修理下列部件嗎",
+            "要修理下列元件嗎"
         ];
 
     //Your retainer will be unable to process item buyback requests once recalled. Are you sure you wish to proceed?
