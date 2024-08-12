@@ -145,6 +145,8 @@ internal static unsafe class WorkshopUI
                 }
             }
 
+            UIUtils.DrawTeleportIcons(data.CID);
+
             var initCurpos = ImGui.GetCursorPos();
             var lst = data.GetVesselData(VoyageType.Airship).Where(s => data.GetEnabledVesselsData(VoyageType.Airship).Contains(s.Name))
                 .Union(data.GetVesselData(VoyageType.Submersible).Where(x => data.GetEnabledVesselsData(VoyageType.Submersible).Contains(x.Name)))
@@ -462,7 +464,7 @@ internal static unsafe class WorkshopUI
                 var currentPlan = VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan) ?? VoyageUtils.GetDefaultSubmarineUnlockPlan(false);
                 var isDefault = VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan) == null;
                 var text = Environment.TickCount64 % 2000 > 1000 ? "Unlocking every point" : "No or unknown plan selected";
-                if(ImGui.BeginCombo("##uplan", (currentPlan?.Name ?? text) + (isDefault ? " (default)" : "", ImGuiComboFlags.HeightLarge)))
+                if(ImGui.BeginCombo("##uplan", (currentPlan?.Name ?? text) + (isDefault ? " (default)" : ""), ImGuiComboFlags.HeightLarge))
                 {
                     if(ImGui.Button("Open editor"))
                     {

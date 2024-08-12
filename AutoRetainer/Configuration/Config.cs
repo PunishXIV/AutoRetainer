@@ -122,6 +122,8 @@ internal unsafe class Config : IEzConfig
 
     public string DefaultSubmarineUnlockPlan = "";
     public bool AcceptedDisclamer = false;
+    public bool AllowPrivateTeleport = false;
+    public bool AllowFcTeleport = false;
 
     internal bool DontReassign
     {

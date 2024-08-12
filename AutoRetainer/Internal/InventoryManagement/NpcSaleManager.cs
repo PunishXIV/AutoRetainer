@@ -130,7 +130,7 @@ public static unsafe class NpcSaleManager
         {
             if(EzThrottler.Throttle("CloseShop", 2000))
             {
-                addon->Close(true);
+                Callback.Fire(addon, true, -1);
             }
             return false;
         }

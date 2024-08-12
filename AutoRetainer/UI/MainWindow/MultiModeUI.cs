@@ -121,6 +121,8 @@ internal static unsafe class MultiModeUI
                 ImGui.EndPopup();
             }
 
+            UIUtils.DrawTeleportIcons(data.CID);
+
             var initCurpos = ImGui.GetCursorPos();
             var lowestRetainer = C.MultiModeRetainerConfiguration.MultiWaitForAll ? data.GetEnabledRetainers().OrderBy(z => z.GetVentureSecondsRemaining()).LastOrDefault() : data.GetEnabledRetainers().OrderBy(z => z.GetVentureSecondsRemaining()).FirstOrDefault();
             if(lowestRetainer != default)

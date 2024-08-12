@@ -116,6 +116,16 @@ public static class Unlocks
     { 103, new UnlockedFrom(98) },                          // Northwest Bellflower                <-       Lilac Sea 1
     { 104, new UnlockedFrom(100) },                         // Corolla Isle                        <-       Bellflower Flood
     { 105, new UnlockedFrom(101) },                         // Southeast Bellflower                <-       Lilac Sea 2
+    { 106, new UnlockedFrom(104) },                         // L    The Floral Reef               <-       Corolla Isle
+        { 107, new UnlockedFrom(105) },                         // M    Wingsreach                    <-       Southeast Bellflower
+
+            { 108, new UnlockedFrom(106) },                         // N    The Floating Standard         <-       The Floral Reef
+        { 109, new UnlockedFrom(107) },                         // O    The Fluttering Bay            <-       Wingsreach
+        { 110, new UnlockedFrom(103) },                         // P    Lilac Sea 4                   <-       Northwest Bellflower
+        { 111, new UnlockedFrom(106) },                         // Q    Proudkeel                     <-       The Floral Reef
+        { 112, new UnlockedFrom(109) },                         // R    East Dodie's Abyss            <-       The Fluttering Bay
+        { 113, new UnlockedFrom(108) },                         // S    Lilac Sea 5                   <-       The Floating Standard
+        { 114, new UnlockedFrom(111) },                         // T    West Dodie's Abyss            <-       Proudkeel
 };
 
     public static List<(uint, UnlockedFrom)> FindUnlockPath(uint finalPoint)

@@ -19,6 +19,12 @@ public class MultiModeCommon : NeoUIEntry
         .InputInt(100f, $"Retainer list: remaining ventures warning", () => ref C.UIWarningRetVentureNum.ValidateRange(2, 1000))
         .InputInt(100f, $"Deployables list: remaining inventory slots warning", () => ref C.UIWarningDepSlotNum.ValidateRange(2, 1000))
         .InputInt(100f, $"Deployables list: remaining fuel warning", () => ref C.UIWarningDepTanksNum.ValidateRange(20, 1000))
-        .InputInt(100f, $"Deployables list: remaining repair kit warning", () => ref C.UIWarningDepRepairNum.ValidateRange(5, 1000));
+        .InputInt(100f, $"Deployables list: remaining repair kit warning", () => ref C.UIWarningDepRepairNum.ValidateRange(5, 1000))
 
+        .Section("Teleportatiopn")
+        .Widget(() => ImGuiEx.Text("Lifestream plugin is required"))
+        .Widget(() => ImGuiEx.PluginAvailabilityIndicator([new("Lifestream", new Version("2.2.0.4"))]))
+        .Widget(() => ImGuiEx.TextWrapped("You must register houses in Lifestream plugin for every character you want this option to work."))
+        .Checkbox("Enable teleport to private house", () => ref C.AllowPrivateTeleport)
+        .Checkbox("Enable teleport to free company house", () => ref C.AllowFcTeleport);
 }

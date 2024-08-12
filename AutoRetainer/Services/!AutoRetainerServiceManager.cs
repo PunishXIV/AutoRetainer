@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.Modules.EzIPCManagers;
+using AutoRetainer.Services.Lifestream;
 using AutoRetainer.UI.NeoUI;
 using AutoRetainer.UI.Statistics;
 

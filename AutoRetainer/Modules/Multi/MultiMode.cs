@@ -248,32 +248,41 @@ internal static unsafe class MultiMode
                         }
                     }
                 }
-                else if(!IsOccupied() && !P.TaskManager.IsBusy)
+                else if(!IsOccupied() && !Utils.IsBusy)
                 {
-                    if(AnyRetainersAvailable() && EnabledRetainers)
-                    {
-                        EnsureCharacterValidity();
-                        RestoreValidityInWorkshop();
-                        if(C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data) && data.Enabled)
-                        {
-                            DebugLog($"Enqueueing interaction with bell");
-                            TaskInteractWithNearestBell.Enqueue();
-                            P.TaskManager.Enqueue(() => { SchedulerMain.EnablePlugin(PluginEnableReason.MultiMode); return true; });
-                            BlockInteraction(10);
-                            Interactions.PushBack(Environment.TickCount64);
-                            DebugLog($"Added interaction because of interacting (state: {Interactions.Print()})");
-                        }
-                    }
-                    else if(Data.WorkshopEnabled && Data.AnyEnabledVesselsAvailable() && MultiMode.EnabledSubmarines)
+                    if(Data.WorkshopEnabled && Data.AnyEnabledVesselsAvailable() && MultiMode.EnabledSubmarines)
                     {
                         if(!C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn || Data.AreAnyEnabledVesselsReturnInNext(0, true))
                         {
-                            DebugLog($"Enqueueing interaction with panel");
-                            BlockInteraction(10);
-                            TaskInteractWithNearestPanel.Enqueue();
-                            P.TaskManager.Enqueue(() => { VoyageScheduler.Enabled = true; });
-                            Interactions.PushBack(Environment.TickCount64);
-                            DebugLog($"Added interaction because of interacting (state: {Interactions.Print()})");
+                            if(!TaskTeleportToProperty.EnqueueIfNeededAndPossible(true))
+                            {
+                                DebugLog($"Enqueueing interaction with panel");
+                                BlockInteraction(10);
+                                TaskInteractWithNearestPanel.Enqueue();
+                                P.TaskManager.Enqueue(() => { VoyageScheduler.Enabled = true; });
+                                Interactions.PushBack(Environment.TickCount64);
+                                DebugLog($"Added interaction because of interacting (state: {Interactions.Print()})");
+                            }
+                        }
+                    }
+                    else if(AnyRetainersAvailable() && EnabledRetainers)
+                    {
+                        if(C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
+                        {
+                            if(Player.Territory.EqualsAny(VoyageUtils.Workshops) || !TaskTeleportToProperty.EnqueueIfNeededAndPossible(false))
+                            {
+                                EnsureCharacterValidity();
+                                RestoreValidityInWorkshop();
+                                if(data.Enabled)
+                                {
+                                    DebugLog($"Enqueueing interaction with bell");
+                                    TaskInteractWithNearestBell.Enqueue();
+                                    P.TaskManager.Enqueue(() => { SchedulerMain.EnablePlugin(PluginEnableReason.MultiMode); return true; });
+                                    BlockInteraction(10);
+                                    Interactions.PushBack(Environment.TickCount64);
+                                    DebugLog($"Added interaction because of interacting (state: {Interactions.Print()})");
+                                }
+                            }
                         }
                     }
                 }

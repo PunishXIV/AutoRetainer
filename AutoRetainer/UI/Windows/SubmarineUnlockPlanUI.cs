@@ -151,7 +151,7 @@ internal unsafe class SubmarineUnlockPlanUI : Window
             ImGui.SameLine();
             ImGuiEx.SetNextItemFullWidth();
             ImGui.InputText($"##planname", ref SelectedPlan.Name, 100);
-            ImGuiEx.ImGuiLineCentered($"planbuttons", () =>
+            ImGuiEx.LineCentered($"planbuttons", () =>
             {
                 ImGuiEx.TextV($"Apply this plan to:");
                 ImGui.SameLine();
@@ -170,7 +170,7 @@ internal unsafe class SubmarineUnlockPlanUI : Window
                     C.OfflineData.Each(x => x.AdditionalSubmarineData.Where(s => s.Value.SelectedUnlockPlan == SelectedPlanGuid).Each(s => s.Value.SelectedUnlockPlan = Guid.Empty.ToString()));
                 }
             });
-            ImGuiEx.ImGuiLineCentered($"planbuttons2", () =>
+            ImGuiEx.LineCentered($"planbuttons2", () =>
             {
                 if(ImGui.Button($"Copy plan settings"))
                 {
