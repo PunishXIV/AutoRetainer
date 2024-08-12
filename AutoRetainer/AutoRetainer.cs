@@ -40,7 +40,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal static Config C => P.config;
     private Config config;
     internal WindowSystem WindowSystem;
-    internal AutoRetainerWindow ConfigGui;
+    internal AutoRetainerWindow AutoRetainerWindow;
     internal bool IsInteractionAutomatic = false;
     internal QuickSellItems quickSellItems;
     internal TaskManager TaskManager;
@@ -124,7 +124,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         VenturePlanner = new();
         VentureBrowser = new();
         LogWindow = new();
-        ConfigGui = new();
+        AutoRetainerWindow = new();
         MarketCooldownOverlay = new();
         DuplicateBlacklistSelector = new();
         new MultiModeOverlay();
@@ -138,7 +138,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         Svc.PluginInterface.UiBuilder.Draw += WindowSystem.Draw;
         Svc.PluginInterface.UiBuilder.OpenMainUi += () =>
         {
-            ConfigGui.IsOpen = true;
+            AutoRetainerWindow.IsOpen = true;
         };
         Svc.PluginInterface.UiBuilder.OpenConfigUi += () =>
         {
@@ -177,9 +177,16 @@ public unsafe class AutoRetainer : IDalamudPlugin
         if(!C.NightModePersistent) C.NightMode = false;
         ContextMenuManager = new();
         PluginLog.Information($"AutoRetainer v{P.GetType().Assembly.GetName().Version} is ready.");
-        if(!EzSharedData.TryGet<object>("AutoRetainer.WasLoaded", out _) && C.MultiAutoStart)
+        if(!EzSharedData.TryGet<object>("AutoRetainer.WasLoaded", out _))
         {
-            MultiMode.PerformAutoStart();
+            if(C.MultiAutoStart)
+            {
+                MultiMode.PerformAutoStart();
+            }
+            if(C.DisplayOnStart)
+            {
+                this.AutoRetainerWindow.IsOpen = true;
+            }
         }
         SingletonServiceManager.Initialize(typeof(AutoRetainerServiceManager));
     }
@@ -407,7 +414,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         }
         else
         {
-            ConfigGui.IsOpen = !ConfigGui.IsOpen;
+            AutoRetainerWindow.IsOpen = !AutoRetainerWindow.IsOpen;
         }
     }
 

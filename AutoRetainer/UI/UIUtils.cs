@@ -1,10 +1,35 @@
 ﻿global using OverlayTextData = (System.Numerics.Vector2 Curpos, (bool Warning, string Text)[] Texts);
+using AutoRetainerAPI.Configuration;
+using Dalamud.Plugin.Ipc.Exceptions;
 using ECommons.Interop;
+using Lumina.Excel.GeneratedSheets;
+using NotificationMasterAPI;
 
 namespace AutoRetainer.UI;
 
 internal static class UIUtils
 {
+    public static void DrawSearch()
+    {
+        ImGuiEx.SetNextItemFullWidth();
+        ImGui.InputTextWithHint("##search", "Search characters...", ref Ref<string>.Get("SearchChara"), 50);
+    }
+
+    public static void DrawDCV(this OfflineCharacterData data)
+    {
+        if(data.WorldOverride != null)
+        {
+            ImGui.PushFont(UiBuilder.IconFont);
+            ImGuiEx.Text("\uf0ac");
+            ImGui.PopFont();
+            if(ImGuiEx.HoveredAndClicked("Visiting another data center. Right click to clear this status.", ImGuiMouseButton.Right))
+            {
+                data.WorldOverride = null;
+            }
+            ImGui.SameLine();
+        }
+    }
+
     public static void DrawTeleportIcons(ulong cid)
     {
         var data = S.LifestreamIPC.GetHousePathData(cid);
@@ -44,7 +69,7 @@ internal static class UIUtils
         }
     }
 
-    public static void DrawOverlayTexts(List<OverlayTextData> overlayTexts)
+    public static void DrawOverlayTexts(List<OverlayTextData> overlayTexts, ref float statusTextWidth)
     {
         if(overlayTexts.Count > 0)
         {
@@ -58,12 +83,29 @@ internal static class UIUtils
                 var cur = ImGui.GetCursorPos();
                 for(var i = x.Texts.Length - 1; i >= 0; i--)
                 {
-                    ImGui.SetCursorPos(new(x.Curpos.X - maxSizes[i..].Sum() - (maxSizes[i..].Length - 1) * ImGui.CalcTextSize("      ").X, x.Curpos.Y));
+                    var width = maxSizes[i..].Sum() + (maxSizes[i..].Length - 1) * ImGui.CalcTextSize("      ").X;
+                    ImGui.SetCursorPos(new(x.Curpos.X - width, x.Curpos.Y));
+                    if(statusTextWidth < width) statusTextWidth = width;
                     ImGuiEx.Text(x.Texts[i].Warning ? ImGuiColors.DalamudOrange : null, x.Texts[i].Text);
                 }
                 ImGui.SetCursorPos(cur);
             }
         }
+    }
+
+    public static float CollapsingHeaderSpacingsWidth => ImGui.GetStyle().FramePadding.X * 2f + ImGui.GetStyle().ItemSpacing.X * 2 + ImGui.CalcTextSize("▲...").X;
+
+    public static string GetCutCharaString(this OfflineCharacterData data, float statusTextWidth)
+    {
+        var chstr = Censor.Character(data.Name, data.World);
+        var mod = false;
+        while(ImGui.CalcTextSize(chstr).X > ImGui.GetContentRegionAvail().X - statusTextWidth - UIUtils.CollapsingHeaderSpacingsWidth && chstr.Length > 5)
+        {
+            mod = true;
+            chstr = chstr[0..^1];
+        }
+        if(mod) chstr += "...";
+        return chstr;
     }
 
     internal static void SliderIntFrameTimeAsFPS(string name, ref int frameTime, int min = 1)

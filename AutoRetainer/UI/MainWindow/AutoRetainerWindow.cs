@@ -89,6 +89,7 @@ internal unsafe class AutoRetainerWindow : Window
     }
     public override void Draw()
     {
+        ImGuiEx.Text(GradientColor.Get(EColor.RedBright, EColor.YellowBright), "This version MUST NOT BE RUNNING UNATTENDED.");
         if(!C.AcceptedDisclamer)
         {
             new NuiBuilder()

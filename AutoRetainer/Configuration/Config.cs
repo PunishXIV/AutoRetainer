@@ -202,4 +202,5 @@ internal unsafe class Config : IEzConfig
     public Vector2 WindowSize;
     public Vector2 WindowPos;
     public bool PinWindow = false;
+    public bool DisplayOnStart = false;
 }

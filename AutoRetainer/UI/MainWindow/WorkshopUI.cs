@@ -12,7 +12,8 @@ namespace AutoRetainer.UI.MainWindow;
 
 internal static unsafe class WorkshopUI
 {
-    private static List<(ulong cid, ulong frame, Vector2 start, Vector2 end, float percent)> bars = [];
+    private static float StatusTextWidth = 0;
+    private static List<(ulong cid, ulong frame, Vector2 start, Vector2 end, float percent)> Bars = [];
     internal static void Draw()
     {
         List<OverlayTextData> overlayTexts = [];
@@ -37,8 +38,11 @@ internal static unsafe class WorkshopUI
                 }
             }
         }
+        UIUtils.DrawSearch();
         foreach(var data in sortedData.Where(x => x.OfflineAirshipData.Count + x.OfflineSubmarineData.Count > 0 && !x.ExcludeWorkshop))
         {
+            var search = Ref<string>.Get("SearchChara");
+            if(search != "" && !$"{data.Name}@{data.World}".Contains(search, StringComparison.OrdinalIgnoreCase)) continue;
             ImGui.PushID($"Player{data.CID}");
             var rCurPos = ImGui.GetCursorPos();
             float pad = 0;
@@ -145,6 +149,7 @@ internal static unsafe class WorkshopUI
                 }
             }
 
+            data.DrawDCV();
             UIUtils.DrawTeleportIcons(data.CID);
 
             var initCurpos = ImGui.GetCursorPos();
@@ -170,7 +175,7 @@ internal static unsafe class WorkshopUI
                 ImGui.PushStyleColor(ImGuiCol.Text, GradientColor.Get(ImGui.GetStyle().Colors[(int)ImGuiCol.Text], ImGuiColors.ParsedGreen));
             }
 
-            if(ImGuiEx.CollapsingHeader(Censor.Character(data.Name, data.World)))
+            if(ImGuiEx.CollapsingHeader(data.GetCutCharaString(StatusTextWidth) + $"###workshop{data.CID}"))
             {
                 MultiModeUI.SetAsPreferred(data);
                 if(colpref) ImGui.PopStyleColor();
@@ -190,8 +195,9 @@ internal static unsafe class WorkshopUI
 
             ImGui.PopID();
         }
-        UIUtils.DrawOverlayTexts(overlayTexts);
-        bars.RemoveAll(x => x.frame != Svc.PluginInterface.UiBuilder.FrameCount);
+        StatusTextWidth = 0f;
+        UIUtils.DrawOverlayTexts(overlayTexts, ref StatusTextWidth);
+        Bars.RemoveAll(x => x.frame != Svc.PluginInterface.UiBuilder.FrameCount);
 
         ImGuiEx.LineCentered("WorkshopUI planner button", () =>
         {
@@ -299,7 +305,7 @@ internal static unsafe class WorkshopUI
     private static void DrawTable(OfflineCharacterData data)
     {
         var storePos = ImGui.GetCursorPos();
-        foreach(var v in bars.Where(x => x.cid == data.CID))
+        foreach(var v in Bars.Where(x => x.cid == data.CID))
         {
             ImGui.SetCursorPos(v.start - ImGui.GetStyle().CellPadding with { Y = 0 });
             ImGui.PushStyleColor(ImGuiCol.PlotHistogram, 0xbb500000);
@@ -400,7 +406,7 @@ internal static unsafe class WorkshopUI
         }
         var end = ImGui.GetCursorPos();
         var p = vessel.GetRemainingSeconds() / (60f * 60f * 24f);
-        if(vessel.ReturnTime != 0) bars.Add((data.CID, Svc.PluginInterface.UiBuilder.FrameCount, start, end, vessel.ReturnTime == 0 ? 0 : p.ValidateRange(0f, 1f)));
+        if(vessel.ReturnTime != 0) Bars.Add((data.CID, Svc.PluginInterface.UiBuilder.FrameCount, start, end, vessel.ReturnTime == 0 ? 0 : p.ValidateRange(0f, 1f)));
         ImGui.TableNextColumn();
         ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
         if(adata.Level > 0)

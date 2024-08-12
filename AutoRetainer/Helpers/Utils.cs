@@ -665,7 +665,7 @@ internal static unsafe class Utils
     {
         P.SubmarinePointPlanUI.RespectCloseHotkey = !C.IgnoreEsc;
         P.SubmarineUnlockPlanUI.RespectCloseHotkey = !C.IgnoreEsc;
-        P.ConfigGui.RespectCloseHotkey = !C.IgnoreEsc;
+        P.AutoRetainerWindow.RespectCloseHotkey = !C.IgnoreEsc;
         P.VenturePlanner.RespectCloseHotkey = !C.IgnoreEsc;
         P.VentureBrowser.RespectCloseHotkey = !C.IgnoreEsc;
         P.LogWindow.RespectCloseHotkey = !C.IgnoreEsc;

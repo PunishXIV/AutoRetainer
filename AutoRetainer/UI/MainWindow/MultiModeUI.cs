@@ -3,6 +3,7 @@ using AutoRetainerAPI;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Interface.Components;
 using ECommons;
+using ECommons.ExcelServices;
 using ECommons.GameHelpers;
 using PunishLib.ImGuiMethods;
 using ThreadLoadImageHandler = ECommons.ImGuiMethods.ThreadLoadImageHandler;
@@ -13,6 +14,7 @@ internal static unsafe class MultiModeUI
 {
     internal static bool JustRelogged = false;
     private static Dictionary<string, (Vector2 start, Vector2 end)> bars = [];
+    private static float StatusTextWidth = 0f;
     internal static void Draw()
     {
         List<OverlayTextData> overlayTexts = [];
@@ -41,10 +43,13 @@ internal static unsafe class MultiModeUI
                 }
             }
         }
+        UIUtils.DrawSearch();
         for(var index = 0; index < sortedData.Count; index++)
         {
             var data = sortedData[index];
             if(data.World.IsNullOrEmpty() || data.ExcludeRetainer) continue;
+            var search = Ref<string>.Get("SearchChara");
+            if(search != "" && !$"{data.Name}@{data.World}".Contains(search, StringComparison.OrdinalIgnoreCase)) continue;
             ImGui.PushID(data.CID.ToString());
             var rCurPos = ImGui.GetCursorPos();
             var colen = false;
@@ -120,7 +125,7 @@ internal static unsafe class MultiModeUI
                 SharedUI.DrawExcludeReset(data);
                 ImGui.EndPopup();
             }
-
+            data.DrawDCV();
             UIUtils.DrawTeleportIcons(data.CID);
 
             var initCurpos = ImGui.GetCursorPos();
@@ -143,7 +148,7 @@ internal static unsafe class MultiModeUI
             {
                 ImGui.SetNextItemOpen(index == 0);
             }
-            if(ImGui.CollapsingHeader($"{(data.WorldOverride == null ? "" : $"{Lang.StrDCV} ")}" + Censor.Character(data.Name, data.World) + $"###chara{data.CID}"))
+            if(ImGui.CollapsingHeader(data.GetCutCharaString(StatusTextWidth) + $"###workshop{data.CID}" + $"###chara{data.CID}"))
             {
                 SetAsPreferred(data);
                 if(col)
@@ -160,11 +165,10 @@ internal static unsafe class MultiModeUI
                 {
                     retainerData = retainerData.OrderBy(x => x.DisplayOrder).ToList();
                 }
-                for(var i = 0; i < retainerData.Count; i++)
+                foreach(var ret in retainerData)
                 {
-                    if(bars.TryGetValue($"{data.CID}{retainerData[i].Name}", out var v))
+                    if(bars.TryGetValue($"{data.CID}{ret.Name}", out var v))
                     {
-                        var ret = retainerData[i];
                         if(!ret.HasVenture || ret.Level == 0 || ret.Name.ToString().IsNullOrEmpty()) continue;
                         ImGui.SetCursorPos(v.start - ImGui.GetStyle().CellPadding with { Y = 0 });
                         ImGui.PushStyleColor(ImGuiCol.PlotHistogram, 0xbb500000);
@@ -183,9 +187,8 @@ internal static unsafe class MultiModeUI
                     ImGui.TableSetupColumn("");
                     ImGui.TableHeadersRow();
                     var retainers = P.GetSelectedRetainers(data.CID);
-                    for(var i = 0; i < retainerData.Count; i++)
+                    foreach(var ret in retainerData)
                     {
-                        var ret = retainerData[i];
                         if(ret.Level == 0 || ret.Name.ToString().IsNullOrEmpty()) continue;
                         var adata = Utils.GetAdditionalData(data.CID, ret.Name);
                         ImGui.TableNextRow();
@@ -233,7 +236,7 @@ internal static unsafe class MultiModeUI
                             }
                         }
                         var end = ImGui.GetCursorPos();
-                        bars[$"{data.CID}{retainerData[i].Name}"] = (start, end);
+                        bars[$"{data.CID}{ret.Name}"] = (start, end);
                         ImGui.TableNextColumn();
                         ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);
 
@@ -346,8 +349,8 @@ internal static unsafe class MultiModeUI
             ImGui.NewLine();
             ImGui.PopID();
         }
-
-        UIUtils.DrawOverlayTexts(overlayTexts);
+        StatusTextWidth = 0f;
+        UIUtils.DrawOverlayTexts(overlayTexts, ref StatusTextWidth);
 
         if(C.Verbose && ImGui.CollapsingHeader("Debug"))
         {

@@ -1,4 +1,5 @@
-﻿using ECommons.ExcelServices.TerritoryEnumeration;
+﻿using AutoRetainer.Modules.Voyage;
+using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
 
 namespace AutoRetainer.Scheduler.Tasks;
@@ -6,6 +7,7 @@ public static class TaskTeleportToProperty
 {
     public static bool EnqueueIfNeededAndPossible(bool requireFc)
     {
+        if(Player.Territory.EqualsAny(VoyageUtils.Workshops)) return false;
         var data = S.LifestreamIPC.GetHousePathData(Player.CID);
         var canPrivate = C.AllowPrivateTeleport && data.Private != null && data.Private.PathToEntrance.Count > 0;
         var canFc = C.AllowFcTeleport && data.FC != null && data.FC.PathToEntrance.Count > 0;
@@ -57,4 +59,11 @@ public static class TaskTeleportToProperty
         }
     }
 
+    public static bool HasRegisteredProperty()
+    {
+        var data = S.LifestreamIPC.GetHousePathData(Player.CID);
+        if(data.FC != null && data.FC.PathToEntrance.Count > 0) return true;
+        if(data.Private != null && data.Private.PathToEntrance.Count > 0) return true;
+        return false;
+    }
 }

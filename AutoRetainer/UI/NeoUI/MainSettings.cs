@@ -56,5 +56,6 @@ public class MainSettings : NeoUIEntry
             if(ImGui.Checkbox(x, ref C.IgnoreEsc)) Utils.ResetEscIgnoreByWindows();
         })
         .Checkbox("Display only most significant icon in status bar", () => ref C.StatusBarMSI)
-        .SliderInt(120f, "Status bar icon size", () => ref C.StatusBarIconWidth, 32, 128);
+        .SliderInt(120f, "Status bar icon size", () => ref C.StatusBarIconWidth, 32, 128)
+        .Checkbox("Open AutoRetainer window on game start", () => ref C.DisplayOnStart);
 }

@@ -33,7 +33,6 @@ internal static unsafe class MultiMode
     internal static bool Synchronize = false;
     internal static long NextInteractionAt { get; private set; } = 0;
     internal static ulong LastLogin = 0;
-    internal static bool IsAutoLogin = false;
     internal static CircularBuffer<long> Interactions = new(5);
 
     internal static Dictionary<ulong, int> CharaCnt = [];
@@ -66,7 +65,7 @@ internal static unsafe class MultiMode
             if(CanHET)
             {
                 DebugLog($"ProperOnLogin: {Svc.ClientState.LocalPlayer}, residential area, scheduling HET");
-                HouseEnterTask.EnqueueTask();
+                if(!TaskTeleportToProperty.HasRegisteredProperty()) HouseEnterTask.EnqueueTask();
             }
             MultiModeUI.JustRelogged = true;
         });
@@ -95,13 +94,16 @@ internal static unsafe class MultiMode
             return;
         }
         LastLogin = 0;
-        if(C.MultiHETOnEnable && Player.Available && CanHET)
+        if(!TaskTeleportToProperty.HasRegisteredProperty())
         {
-            HouseEnterTask.EnqueueTask();
-        }
-        if(Utils.GetNearestWorkshopEntrance(out _) != null && Utils.GetReachableRetainerBell(false) == null)
-        {
-            TaskContinueHET.Enqueue();
+            if(C.MultiHETOnEnable && Player.Available && CanHET)
+            {
+                HouseEnterTask.EnqueueTask();
+            }
+            if(Utils.GetNearestWorkshopEntrance(out _) != null && Utils.GetReachableRetainerBell(false) == null)
+            {
+                TaskContinueHET.Enqueue();
+            }
         }
     }
 
@@ -269,7 +271,7 @@ internal static unsafe class MultiMode
                     {
                         if(C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
                         {
-                            if(Player.Territory.EqualsAny(VoyageUtils.Workshops) || !TaskTeleportToProperty.EnqueueIfNeededAndPossible(false))
+                            if(!TaskTeleportToProperty.EnqueueIfNeededAndPossible(false))
                             {
                                 EnsureCharacterValidity();
                                 RestoreValidityInWorkshop();
