@@ -84,6 +84,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Update="res\autoretainer.png">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 	  <None Update="res\bailoutTitleRestart.png">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
