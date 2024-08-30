@@ -48,7 +48,7 @@ internal static class UIUtils
             ImGuiEx.Text(error == null ? null : ImGuiColors.DalamudGrey3, "\uf1ad");
             ImGui.PopFont();
             ImGuiEx.Tooltip(error ?? "Free company house is registered in Lifestream and path is set. You will be teleported to Free company house for resending Deployables. If Private house is not registered, you will be teleported to Free company house for resending retainers as well.");
-            ImGui.SameLine(0,3);
+            ImGui.SameLine(0, 3);
         }
         if(C.AllowPrivateTeleport)
         {
@@ -62,7 +62,7 @@ internal static class UIUtils
                 error = "Private house is registered in Lifestream but path to entrance is not set.";
             }
             ImGui.PushFont(UiBuilder.IconFont);
-            ImGuiEx.Text(error == null ? null:ImGuiColors.DalamudGrey3, "\ue1b0");
+            ImGuiEx.Text(error == null ? null : ImGuiColors.DalamudGrey3, "\ue1b0");
             ImGui.PopFont();
             ImGuiEx.Tooltip(error ?? "Private is registered in Lifestream and path is set. You will be teleported to Private house for resending Retainers.");
             ImGui.SameLine(0, 3);

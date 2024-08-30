@@ -185,7 +185,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             }
             if(C.DisplayOnStart)
             {
-                this.AutoRetainerWindow.IsOpen = true;
+                AutoRetainerWindow.IsOpen = true;
             }
         }
         SingletonServiceManager.Initialize(typeof(AutoRetainerServiceManager));
