@@ -216,8 +216,6 @@ internal static unsafe class MultiMode
                     {
                         DebugLog($"Enqueueing relog");
                         BlockInteraction(20);
-                        EnsureCharacterValidity();
-                        RestoreValidityInWorkshop();
                         if(!Relog(next, out var error, RelogReason.MultiMode))
                         {
                             DuoLog.Error(error);
@@ -235,8 +233,6 @@ internal static unsafe class MultiMode
                         {
                             DebugLog($"Enqueueing logoff");
                             BlockInteraction(20);
-                            EnsureCharacterValidity();
-                            RestoreValidityInWorkshop();
                             if(!Relog(null, out var error, RelogReason.MultiMode))
                             {
                                 DuoLog.Error(error);

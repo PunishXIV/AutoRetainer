@@ -17,6 +17,7 @@ using ECommons.MathHelpers;
 using ECommons.Reflection;
 using ECommons.Throttlers;
 using ECommons.UIHelpers.AddonMasterImplementations;
+using FFXIVClientStructs;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.UI;
@@ -36,6 +37,16 @@ internal static unsafe class Utils
     internal static float AnimationLock => *(float*)((nint)ActionManager.Instance() + 8);
 
     private static bool IsNullOrEmpty(this string s) => GenericHelpers.IsNullOrEmpty(s);
+
+    public static bool GetAllowFcTeleport(this OfflineCharacterData data)
+    {
+        return C.AllowFcTeleport;
+    }
+
+    public static bool GetAllowPrivateTeleport(this OfflineCharacterData data)
+    {
+        return C.AllowPrivateTeleport;
+    }
 
     public static bool IsItemSellableByHardList(uint item, uint quantity)
     {
