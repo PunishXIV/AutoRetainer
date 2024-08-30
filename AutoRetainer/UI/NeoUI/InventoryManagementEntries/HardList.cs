@@ -1,13 +1,4 @@
-﻿using ECommons.Configuration;
-using NightmareUI.PrimaryUI;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries;
+﻿namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries;
 public class HardList : InventoryManagemenrBase
 {
     public override string Name => "Unconditional Sell List";

@@ -1,6 +1,4 @@
-﻿using NightmareUI.PrimaryUI;
-
-namespace AutoRetainer.UI.NeoUI.AdvancedEntries;
+﻿namespace AutoRetainer.UI.NeoUI.AdvancedEntries;
 public class ExpertTab : NeoUIEntry
 {
     public override string Path => "Advanced/Expert Settings";

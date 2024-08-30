@@ -1,5 +1,4 @@
 ﻿using AutoRetainer.Internal;
-using Dalamud.Interface.GameFonts;
 
 namespace AutoRetainer.UI.Overlays;
 

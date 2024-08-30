@@ -1,9 +1,6 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainerAPI;
 using AutoRetainerAPI.Configuration;
-using Dalamud.Interface.Components;
-using ECommons;
-using ECommons.ExcelServices;
 using ECommons.GameHelpers;
 using PunishLib.ImGuiMethods;
 using ThreadLoadImageHandler = ECommons.ImGuiMethods.ThreadLoadImageHandler;

@@ -1,20 +1,11 @@
-﻿using Dalamud.Game.Addon.Lifecycle;
-using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
-using Dalamud.Game.Gui.ContextMenu;
-using Dalamud.Game.Text;
+﻿using Dalamud.Game.Gui.ContextMenu;
 using Dalamud.Game.Text.SeStringHandling;
-using Dalamud.Game.Text.SeStringHandling.Payloads;
-using Dalamud.Memory;
 using ECommons.ChatMethods;
 using ECommons.ExcelServices;
 using ECommons.EzContextMenu;
 using ECommons.Interop;
-using FFXIVClientStructs.FFXIV.Client.UI;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
-using System.Xml.Linq;
 using UIColor = ECommons.ChatMethods.UIColor;
-using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
 
 namespace AutoRetainer.Internal;
 

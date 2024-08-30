@@ -1,15 +1,12 @@
 ﻿using AutoRetainer.Internal.InventoryManagement;
 using Dalamud.Hooking;
-using Dalamud.Memory;
 using Dalamud.Utility.Signatures;
 using ECommons.ExcelServices;
 using ECommons.EzHookManager;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
-using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using System.Linq;
 
 namespace AutoRetainer.Internal;
 

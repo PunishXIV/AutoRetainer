@@ -8,7 +8,6 @@ using Dalamud.Game.Config;
 using Dalamud.Interface.ImGuiNotification;
 using ECommons.CircularBuffers;
 using ECommons.Events;
-using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.EzSharedDataManager;
 using ECommons.GameHelpers;

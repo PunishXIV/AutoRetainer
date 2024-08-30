@@ -1,5 +1,4 @@
 ﻿using AutoRetainerAPI.Configuration;
-using NightmareUI.PrimaryUI;
 using System.Collections.Frozen;
 
 namespace AutoRetainer.UI.NeoUI.MultiModeEntries;

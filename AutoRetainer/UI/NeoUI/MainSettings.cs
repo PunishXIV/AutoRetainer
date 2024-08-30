@@ -1,6 +1,4 @@
-﻿using NightmareUI.PrimaryUI;
-
-namespace AutoRetainer.UI.NeoUI;
+﻿namespace AutoRetainer.UI.NeoUI;
 public class MainSettings : NeoUIEntry
 {
     public override string Path => "General";

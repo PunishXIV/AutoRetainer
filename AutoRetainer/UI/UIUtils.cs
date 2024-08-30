@@ -1,9 +1,6 @@
 ﻿global using OverlayTextData = (System.Numerics.Vector2 Curpos, (bool Warning, string Text)[] Texts);
 using AutoRetainerAPI.Configuration;
-using Dalamud.Plugin.Ipc.Exceptions;
 using ECommons.Interop;
-using Lumina.Excel.GeneratedSheets;
-using NotificationMasterAPI;
 
 namespace AutoRetainer.UI;
 

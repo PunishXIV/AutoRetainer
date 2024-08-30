@@ -1,7 +1,6 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage;
 using ECommons.EzIpcManager;
-using static FFXIVClientStructs.FFXIV.Client.UI.RaptureAtkHistory.Delegates;
 
 namespace AutoRetainer.Modules.EzIPCManagers;
 public class IPC_PluginState
