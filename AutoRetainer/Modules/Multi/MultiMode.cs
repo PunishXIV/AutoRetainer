@@ -404,13 +404,12 @@ internal static unsafe class MultiMode
                     if(MultiMode.Enabled)
                     {
                         CharaCnt.IncrementOrSet(Svc.ClientState.LocalContentId);
+                        TaskPostprocessCharacterIPC.Enqueue();
                     }
                     else
                     {
                         CharaCnt.Clear();
                     }
-
-                    TaskPostprocessCharacterIPC.Enqueue();
                     if(data != null)
                     {
                         TaskChangeCharacter.Enqueue(data.CurrentWorld, data.Name, data.World, data.ServiceAccount);
