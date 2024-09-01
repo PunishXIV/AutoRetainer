@@ -110,10 +110,15 @@ internal static class UIUtils
         var fps = 60;
         if(frameTime != 0)
         {
-            fps = (int)(1000f / frameTime);
+            fps = GetFPSFromMSPT(frameTime);
         }
         ImGuiEx.SliderInt(name, ref fps, min, 60, fps == 60 ? "Unlimited" : null, ImGuiSliderFlags.AlwaysClamp);
         frameTime = fps == 60 ? 0 : (int)(1000f / fps);
+    }
+
+    public static int GetFPSFromMSPT(int frameTime)
+    {
+        return (int)(1000f / frameTime);
     }
 
     internal static void QRA(string text, ref LimitedKeys key)

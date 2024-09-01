@@ -98,14 +98,23 @@ internal unsafe class RetainerListOverlay : Window
                     var ret = GameRetainerManager.Retainers[i];
                     if(ret.Available)
                     {
-                        P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
-                        TaskEntrustDuplicates.Enqueue();
-
-                        if(C.RetainerMenuDelay > 0)
+                        var adata = Utils.GetAdditionalData(Data.CID, ret.Name);
+                        var selectedPlan = C.EntrustPlans.FirstOrDefault(x => x.Guid == adata.EntrustPlan);
+                        if(selectedPlan != null)
                         {
-                            TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
+                            P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
+                            TaskEntrustDuplicates.EnqueueNew(selectedPlan);
+                            if(C.RetainerMenuDelay > 0)
+                            {
+                                TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
+                            }
+                            P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
                         }
-                        P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
+                        else
+                        {
+                            Notify.Error($"No entrust plan found for retainer {ret.Name}");
+                        }
+
                     }
                 }
             }

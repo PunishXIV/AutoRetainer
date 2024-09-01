@@ -12,7 +12,7 @@ public static unsafe class InventorySpaceManager
     public static readonly List<string> Log = [];
     public static readonly string[] Addons = ["InventoryRetainer", "InventoryRetainerLarge"];
 
-    private static nint AgentRetainerItemCommandModule => (nint)AgentModule.Instance()->GetAgentByInternalId(AgentId.Retainer) + 40;
+    public static nint AgentRetainerItemCommandModule => (nint)AgentModule.Instance()->GetAgentByInternalId(AgentId.Retainer) + 40;
 
     private static bool IsAgentRetainerActive => AgentModule.Instance()->GetAgentByInternalId(AgentId.Retainer)->IsAgentActive();
 

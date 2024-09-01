@@ -2,6 +2,7 @@
 using AutoRetainerAPI;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Interface.Components;
+using Dalamud.Support;
 using ECommons.Configuration;
 using ECommons.Funding;
 using NightmareUI;
@@ -199,6 +200,7 @@ internal unsafe class AutoRetainerWindow : Window
         ImGuiEx.EzTabBar("tabbar", PatreonBanner.Text,
                         ("Retainers", MultiModeUI.Draw, null, true),
                         ("Deployables", WorkshopUI.Draw, null, true),
+                        ("Troubleshooting", TroubleshootingUI.Draw, null, true),
                         ("Statistics", DrawStats, null, true),
                         ("About", CustomAboutTab.Draw, null, true)
                         );

@@ -105,18 +105,11 @@ internal static unsafe class MultiModeUI
                     {
                         ImGuiEx.Text($"Can't change this now");
                     }
-                    if(ImGui.Button("Entrust Duplicates Exclusions"))
+                    /*if(ImGui.Button("Entrust Duplicates Exclusions"))
                     {
                         P.DuplicateBlacklistSelector.IsOpen = true;
                         P.DuplicateBlacklistSelector.SelectedData = data;
-                    }
-                    ImGuiGroup.EndGroupBox();
-                }
-
-
-                if(ImGuiGroup.BeginGroupBox("Estate entrance override"))
-                {
-                    data.DrawEntranceConfig(ref data.FreeCompanyHouseEntrance);
+                    }*/
                     ImGuiGroup.EndGroupBox();
                 }
                 SharedUI.DrawExcludeReset(data);
@@ -292,7 +285,26 @@ internal static unsafe class MultiModeUI
                         {
                             ImGui.CollapsingHeader($"{Censor.Retainer(ret.Name)} - {Censor.Character(data.Name)} Configuration  ##conf", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.Bullet | ImGuiTreeNodeFlags.OpenOnArrow);
                             ImGuiEx.Text($"Additional Post-venture Tasks:");
-                            ImGui.Checkbox($"Entrust Duplicates", ref adata.EntrustDuplicates);
+                            //ImGui.Checkbox($"Entrust Duplicates", ref adata.EntrustDuplicates);
+                            var selectedPlan = C.EntrustPlans.FirstOrDefault(x => x.Guid == adata.EntrustPlan);
+                            ImGuiEx.TextV($"Entrust Items:");
+                            ImGui.SameLine();
+                            ImGui.SetNextItemWidth(150f);
+                            if(ImGui.BeginCombo($"##select", selectedPlan?.Name ?? "Disabled", ImGuiComboFlags.HeightLarge))
+                            {
+                                if(ImGui.Selectable("Disabled")) adata.EntrustPlan = Guid.Empty;
+                                for(int i = 0; i < C.EntrustPlans.Count; i++)
+                                {
+                                    var plan = C.EntrustPlans[i];
+                                    ImGui.PushID(plan.Guid.ToString());
+                                    if(ImGui.Selectable(plan.Name, plan == selectedPlan))
+                                    {
+                                        adata.EntrustPlan = plan.Guid;
+                                    }
+                                    ImGui.PopID();
+                                }
+                                ImGui.EndCombo();
+                            }
                             ImGui.Checkbox($"Withdraw/Deposit Gil", ref adata.WithdrawGil);
                             if(adata.WithdrawGil)
                             {

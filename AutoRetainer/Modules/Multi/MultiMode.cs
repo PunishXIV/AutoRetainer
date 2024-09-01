@@ -400,10 +400,13 @@ internal static unsafe class MultiMode
                 }
                 else
                 {
+                    if(reason == RelogReason.MultiMode || C.AllowManualPostprocess)
+                    {
+                        TaskPostprocessCharacterIPC.Enqueue();
+                    }
                     if(MultiMode.Enabled)
                     {
                         CharaCnt.IncrementOrSet(Svc.ClientState.LocalContentId);
-                        TaskPostprocessCharacterIPC.Enqueue();
                     }
                     else
                     {
