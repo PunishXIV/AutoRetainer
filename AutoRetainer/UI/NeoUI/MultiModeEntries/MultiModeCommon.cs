@@ -1,6 +1,4 @@
-﻿using NightmareUI.PrimaryUI;
-
-namespace AutoRetainer.UI.NeoUI.MultiModeEntries;
+﻿namespace AutoRetainer.UI.NeoUI.MultiModeEntries;
 public class MultiModeCommon : NeoUIEntry
 {
     public override string Path => "Multi Mode/Common Settings";
@@ -13,6 +11,7 @@ public class MultiModeCommon : NeoUIEntry
         .Checkbox($"Disable Multi Mode on Manual Login", () => ref C.MultiDisableOnRelog)
         .Checkbox($"Enable Multi Mode on Game Boot", () => ref C.MultiAutoStart)
         .Checkbox($"Do not reset Preferred Character on Manual Login", () => ref C.MultiNoPreferredReset)
+        .Checkbox("Enable Manual relogs character postprocess", () => ref C.AllowManualPostprocess)
 
         .Section("Inventory warnings")
         .InputInt(100f, $"Retainer list: remaining inventory slots warning", () => ref C.UIWarningRetSlotNum.ValidateRange(2, 1000))

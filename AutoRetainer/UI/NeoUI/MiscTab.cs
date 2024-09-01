@@ -1,6 +1,4 @@
-﻿using NightmareUI.PrimaryUI;
-
-namespace AutoRetainer.UI.NeoUI;
+﻿namespace AutoRetainer.UI.NeoUI;
 public class MiscTab : NeoUIEntry
 {
     public override string Path => "Miscellaneous";

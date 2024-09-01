@@ -4,14 +4,8 @@ using ECommons.ExcelServices;
 using ECommons.GameHelpers;
 using ECommons.Throttlers;
 using ECommons.UIHelpers.AddonMasterImplementations;
-using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AutoRetainer.Scheduler.Tasks;
 public static unsafe class TaskChangeCharacter

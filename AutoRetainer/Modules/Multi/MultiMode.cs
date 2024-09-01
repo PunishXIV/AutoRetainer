@@ -8,7 +8,6 @@ using Dalamud.Game.Config;
 using Dalamud.Interface.ImGuiNotification;
 using ECommons.CircularBuffers;
 using ECommons.Events;
-using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.EzSharedDataManager;
 using ECommons.GameHelpers;
@@ -216,8 +215,6 @@ internal static unsafe class MultiMode
                     {
                         DebugLog($"Enqueueing relog");
                         BlockInteraction(20);
-                        EnsureCharacterValidity();
-                        RestoreValidityInWorkshop();
                         if(!Relog(next, out var error, RelogReason.MultiMode))
                         {
                             DuoLog.Error(error);
@@ -235,8 +232,6 @@ internal static unsafe class MultiMode
                         {
                             DebugLog($"Enqueueing logoff");
                             BlockInteraction(20);
-                            EnsureCharacterValidity();
-                            RestoreValidityInWorkshop();
                             if(!Relog(null, out var error, RelogReason.MultiMode))
                             {
                                 DuoLog.Error(error);
@@ -405,10 +400,13 @@ internal static unsafe class MultiMode
                 }
                 else
                 {
+                    if(reason == RelogReason.MultiMode || C.AllowManualPostprocess)
+                    {
+                        TaskPostprocessCharacterIPC.Enqueue();
+                    }
                     if(MultiMode.Enabled)
                     {
                         CharaCnt.IncrementOrSet(Svc.ClientState.LocalContentId);
-                        TaskPostprocessCharacterIPC.Enqueue();
                     }
                     else
                     {

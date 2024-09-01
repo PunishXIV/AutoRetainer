@@ -82,12 +82,6 @@ internal static unsafe class WorkshopUI
                     ImGuiGroup.EndGroupBox();
                 }
 
-                if(ImGuiGroup.BeginGroupBox("Estate entrance override"))
-                {
-                    data.DrawEntranceConfig(ref data.FreeCompanyHouseEntrance);
-                    ImGuiGroup.EndGroupBox();
-                }
-
                 SharedUI.DrawExcludeReset(data);
 
                 ImGui.EndPopup();

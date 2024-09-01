@@ -2,7 +2,6 @@
 using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainer.Modules.Voyage.VoyageCalculator;
-using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using System.Diagnostics;

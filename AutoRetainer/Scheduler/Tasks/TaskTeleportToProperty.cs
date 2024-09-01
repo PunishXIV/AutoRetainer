@@ -40,7 +40,7 @@ public static class TaskTeleportToProperty
                     return true; //already here
                 }
             }
-            P.TaskManager.Enqueue(() => S.LifestreamIPC.EnqueuePropertyShortcut(fc?2:1, 1));
+            P.TaskManager.Enqueue(() => S.LifestreamIPC.EnqueuePropertyShortcut(fc ? 2 : 1, 1));
             P.TaskManager.Enqueue(() =>
             {
                 if(!Svc.ClientState.IsLoggedIn)

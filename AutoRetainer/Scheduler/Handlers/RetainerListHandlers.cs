@@ -1,7 +1,6 @@
 ﻿using AutoRetainer.Internal.InventoryManagement;
 using AutoRetainer.Scheduler.Tasks;
 using ECommons.UIHelpers.AddonMasterImplementations;
-using ECommons.UIHelpers.AtkReaderImplementations;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace AutoRetainer.Scheduler.Handlers;

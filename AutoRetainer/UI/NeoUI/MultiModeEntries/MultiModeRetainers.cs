@@ -1,6 +1,4 @@
-﻿using NightmareUI.PrimaryUI;
-
-namespace AutoRetainer.UI.NeoUI.MultiModeEntries;
+﻿namespace AutoRetainer.UI.NeoUI.MultiModeEntries;
 public class MultiModeRetainers : NeoUIEntry
 {
     public override string Path => "Multi Mode/Retainers";

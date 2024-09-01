@@ -11,7 +11,6 @@ using AutoRetainerAPI.Configuration;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using Dalamud.Game.ClientState.Conditions;
-using Dalamud.Game.Network;
 using Dalamud.Memory;
 using Dalamud.Utility;
 using ECommons.Automation;
@@ -185,7 +184,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             }
             if(C.DisplayOnStart)
             {
-                this.AutoRetainerWindow.IsOpen = true;
+                AutoRetainerWindow.IsOpen = true;
             }
         }
         SingletonServiceManager.Initialize(typeof(AutoRetainerServiceManager));

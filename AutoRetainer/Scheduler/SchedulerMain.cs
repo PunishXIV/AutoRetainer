@@ -163,9 +163,15 @@ internal static unsafe class SchedulerMain
                                     }
 
                                     //entrust duplicates
-                                    if(adata.EntrustDuplicates)
+                                    /*if(adata.EntrustDuplicates)
                                     {
                                         TaskEntrustDuplicates.Enqueue();
+                                    }*/
+
+                                    var selectedPlan = C.EntrustPlans.FirstOrDefault(x => x.Guid == adata.EntrustPlan);
+                                    if(adata != null)
+                                    {
+                                        TaskEntrustDuplicates.EnqueueNew(selectedPlan);
                                     }
 
                                     //withdraw gil

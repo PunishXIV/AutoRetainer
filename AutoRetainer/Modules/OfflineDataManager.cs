@@ -2,7 +2,6 @@
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.Text.SeStringHandling;
-using Dalamud.Memory;
 using ECommons.Configuration;
 using ECommons.Events;
 using ECommons.ExcelServices;

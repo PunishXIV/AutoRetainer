@@ -1,5 +1,4 @@
-﻿using Dalamud.Memory;
-using FFXIVClientStructs.FFXIV.Client.Game;
+﻿using FFXIVClientStructs.FFXIV.Client.Game;
 
 namespace AutoRetainer.Internal;
 public static unsafe class GameRetainerManager

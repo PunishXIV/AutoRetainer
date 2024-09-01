@@ -9,7 +9,7 @@ internal static class SharedUI
 {
     internal static void DrawExcludedNotification(bool retainer, bool workshop)
     {
-        if(Player.CID == 0) return;
+        /*if(Player.CID == 0) return;
         var col = GradientColor.Get(ImGuiColors.DalamudYellow, ImGuiColors.DalamudRed, 750);
         if(C.Blacklist.Any(x => x.CID == Player.CID))
         {
@@ -28,44 +28,7 @@ internal static class SharedUI
                 ImGuiEx.ImGuiLineCentered("ExclWarning3", () => ImGuiEx.Text(col, "Your current character is excluded from deployable list!"));
                 ImGuiEx.ImGuiLineCentered("ExclWarning2", () => ImGuiEx.Text(col, "Go to settings - exclusions to change it."));
             }
-        }
-    }
-
-    internal static void DrawEntranceConfig(this OfflineCharacterData data, ref HouseEntrance entrance)
-    {
-        if(ImGui.Button("Register Entrance"))
-        {
-            if(data != Data)
-            {
-                Notify.Error("You are not logged in on this character");
-            }
-            else
-            {
-                var door = Utils.GetNearestEntrance(out _, true);
-                if(HousingUtils.TryGetCurrentDescriptor(out var d) && door != null)
-                {
-                    entrance = new()
-                    {
-                        Descriptor = d,
-                        Entrance = door.Position,
-                    };
-                }
-                else
-                {
-                    Notify.Error($"Please stand inside your plot and close to the entrance");
-                }
-            }
-        }
-        ImGuiComponents.HelpMarker("If your estate entrance is not the closest to the teleport destination you can override it manually here by standing next to the door and clicking the register button.");
-        if(entrance != null)
-        {
-            ImGui.SameLine();
-            if(ImGuiEx.IconButton(FontAwesomeIcon.Trash))
-            {
-                entrance = null;
-            }
-            ImGuiEx.Tooltip($"Currently registered:\n{entrance}");
-        }
+        }*/
     }
 
     internal static void DrawMultiModeHeader(OfflineCharacterData data, string overrideTitle = null)

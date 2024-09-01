@@ -1,6 +1,4 @@
-﻿using NightmareUI.PrimaryUI;
-
-namespace AutoRetainer.UI.NeoUI;
+﻿namespace AutoRetainer.UI.NeoUI;
 public class MainSettings : NeoUIEntry
 {
     public override string Path => "General";
@@ -14,7 +12,7 @@ public class MainSettings : NeoUIEntry
         .If(() => !C.UseFrameDelay)
         .Widget(100f, "Interaction Delay, seconds", (x) => ImGuiEx.SliderIntAsFloat(x, ref C.Delay.ValidateRange(10, 1000), 20, 1000), delayHelp)
         .Else()
-        .Widget(100f, "Interaction Delay, frames", (x) => ImGuiEx.SliderInt(x, ref C.FrameDelay.ValidateRange(2, 500), 2, 12), delayHelp)
+        .Widget(100f, "Interaction Delay, frames", (x) => ImGuiEx.SliderInt(x, ref C.FrameDelay.ValidateRange(2, 500), 2, 25), delayHelp)
         .EndIf()
         .Widget("Extra Logging", (x) => ImGui.Checkbox(x, ref C.ExtraDebug), "This option enables excessive logging for debugging purposes. It will spam your log and cause performance issues while enabled. This option will disable itself upon plugin reload or game restart.")
 

@@ -1,8 +1,6 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage;
 using AutoRetainerAPI.Configuration;
-
-using Dalamud;
 using Dalamud.Game;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Enums;
@@ -10,21 +8,19 @@ using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Memory;
 using Dalamud.Utility;
 using ECommons.Events;
+using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
-using ECommons.Interop;
 using ECommons.MathHelpers;
 using ECommons.Reflection;
 using ECommons.Throttlers;
 using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.Game;
-using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
 using CharaData = (string Name, ushort World);
 
 namespace AutoRetainer.Helpers;
@@ -36,6 +32,74 @@ internal static unsafe class Utils
     internal static float AnimationLock => *(float*)((nint)ActionManager.Instance() + 8);
 
     private static bool IsNullOrEmpty(this string s) => GenericHelpers.IsNullOrEmpty(s);
+
+    public static List<(uint ID, uint Quantity)> GetCapturedInventoryState(IEnumerable<InventoryType> inventoryTypes)
+    {
+        var ret = new List<(uint ID, uint Quantity)>();
+        foreach(var type in inventoryTypes)
+        {
+            var inv = InventoryManager.Instance()->GetInventoryContainer(type);
+            for(int i = 0; i < inv->Size; i++)
+            {
+                var item = InventoryManager.Instance()->GetInventorySlot(type, i);
+                ret.Add((item->ItemId, item->Quantity));
+            }
+        }
+        return ret;
+    }
+
+    public static int GetItemCount(IEnumerable<InventoryType> inventoryTypes, uint itemId)
+    {
+        int ret = 0;
+        foreach(var type in inventoryTypes)
+        {
+            var inv = InventoryManager.Instance()->GetInventoryContainer(type);
+            for(int i = 0; i < inv->Size; i++)
+            {
+                var item = InventoryManager.Instance()->GetInventorySlot(type, i);
+                if(item->ItemId == itemId)
+                {
+                    ret += (int)item->Quantity;
+                }
+            }
+        }
+        return ret;
+    }
+
+    public static uint GetAmountThatCanFit(IEnumerable<InventoryType> inventoryTypes, uint itemId)
+    {
+        uint ret = 0;
+        var data = ExcelItemHelper.Get(itemId);
+        if(data == null) return 0;
+        foreach(var type in inventoryTypes)
+        {
+            var inv = InventoryManager.Instance()->GetInventoryContainer(type);
+            for(int i = 0; i < inv->Size; i++)
+            {
+                var item = InventoryManager.Instance()->GetInventorySlot(type, i);
+                if(item->ItemId == itemId)
+                {
+                    if(data.IsUnique) return 0;
+                    ret += data.StackSize - item->Quantity;
+                }
+                else if(item->ItemId == 0)
+                {
+                    ret += data.StackSize;
+                }
+            }
+        }
+        return ret;
+    }
+
+    public static bool GetAllowFcTeleport(this OfflineCharacterData data)
+    {
+        return C.AllowFcTeleport;
+    }
+
+    public static bool GetAllowPrivateTeleport(this OfflineCharacterData data)
+    {
+        return C.AllowPrivateTeleport;
+    }
 
     public static bool IsItemSellableByHardList(uint item, uint quantity)
     {

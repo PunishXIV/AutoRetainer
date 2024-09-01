@@ -1,9 +1,6 @@
 ﻿global using OverlayTextData = (System.Numerics.Vector2 Curpos, (bool Warning, string Text)[] Texts);
 using AutoRetainerAPI.Configuration;
-using Dalamud.Plugin.Ipc.Exceptions;
 using ECommons.Interop;
-using Lumina.Excel.GeneratedSheets;
-using NotificationMasterAPI;
 
 namespace AutoRetainer.UI;
 
@@ -48,7 +45,7 @@ internal static class UIUtils
             ImGuiEx.Text(error == null ? null : ImGuiColors.DalamudGrey3, "\uf1ad");
             ImGui.PopFont();
             ImGuiEx.Tooltip(error ?? "Free company house is registered in Lifestream and path is set. You will be teleported to Free company house for resending Deployables. If Private house is not registered, you will be teleported to Free company house for resending retainers as well.");
-            ImGui.SameLine(0,3);
+            ImGui.SameLine(0, 3);
         }
         if(C.AllowPrivateTeleport)
         {
@@ -62,7 +59,7 @@ internal static class UIUtils
                 error = "Private house is registered in Lifestream but path to entrance is not set.";
             }
             ImGui.PushFont(UiBuilder.IconFont);
-            ImGuiEx.Text(error == null ? null:ImGuiColors.DalamudGrey3, "\ue1b0");
+            ImGuiEx.Text(error == null ? null : ImGuiColors.DalamudGrey3, "\ue1b0");
             ImGui.PopFont();
             ImGuiEx.Tooltip(error ?? "Private is registered in Lifestream and path is set. You will be teleported to Private house for resending Retainers.");
             ImGui.SameLine(0, 3);
@@ -113,10 +110,15 @@ internal static class UIUtils
         var fps = 60;
         if(frameTime != 0)
         {
-            fps = (int)(1000f / frameTime);
+            fps = GetFPSFromMSPT(frameTime);
         }
         ImGuiEx.SliderInt(name, ref fps, min, 60, fps == 60 ? "Unlimited" : null, ImGuiSliderFlags.AlwaysClamp);
         frameTime = fps == 60 ? 0 : (int)(1000f / fps);
+    }
+
+    public static int GetFPSFromMSPT(int frameTime)
+    {
+        return (int)(1000f / frameTime);
     }
 
     internal static void QRA(string text, ref LimitedKeys key)

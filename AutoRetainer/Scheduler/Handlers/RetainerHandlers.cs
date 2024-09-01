@@ -1,5 +1,4 @@
-﻿using AutoRetainer.Internal.Clicks;
-using AutoRetainer.Scheduler.Tasks;
+﻿using AutoRetainer.Scheduler.Tasks;
 
 using Dalamud.Memory;
 using Dalamud.Utility;

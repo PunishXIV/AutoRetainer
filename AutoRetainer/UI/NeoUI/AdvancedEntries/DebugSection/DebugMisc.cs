@@ -1,7 +1,5 @@
-﻿using AutoRetainer.UI.Statistics;
-using ECommons.Automation;
+﻿using ECommons.Automation;
 using ECommons.Events;
-using ECommons.ExcelServices;
 using ECommons.MathHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;

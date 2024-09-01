@@ -2,7 +2,6 @@
 using AutoRetainer.Modules.Voyage;
 using AutoRetainerAPI.Configuration;
 using ECommons.MathHelpers;
-using NightmareUI.PrimaryUI;
 using VesselDescriptor = (ulong CID, string VesselName);
 
 namespace AutoRetainer.UI.NeoUI;

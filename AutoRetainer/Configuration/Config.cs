@@ -124,6 +124,9 @@ internal unsafe class Config : IEzConfig
     public bool AcceptedDisclamer = false;
     public bool AllowPrivateTeleport = false;
     public bool AllowFcTeleport = false;
+    public bool AllowManualPostprocess = false;
+
+    public List<EntrustPlan> EntrustPlans = [];
 
     internal bool DontReassign
     {
