@@ -1,11 +1,9 @@
-﻿using AutoRetainer.Internal;
-using AutoRetainer.Internal.InventoryManagement;
+﻿using AutoRetainer.Internal.InventoryManagement;
 using AutoRetainer.Scheduler.Handlers;
 using ECommons.ExcelServices;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using Lumina.Excel.GeneratedSheets;
 
 namespace AutoRetainer.Scheduler.Tasks;
 
@@ -15,22 +13,19 @@ internal static unsafe class TaskEntrustDuplicates
     internal static List<(uint ID, uint Quantity)> CapturedInventoryState = [];
     internal static bool WasOpen = false;
 
-
-    static InventoryType[] RetainerInventories = [InventoryType.RetainerPage1, InventoryType.RetainerPage2, InventoryType.RetainerPage3, InventoryType.RetainerPage4, InventoryType.RetainerPage5, InventoryType.RetainerPage6, InventoryType.RetainerPage7, InventoryType.RetainerCrystals];
-    static InventoryType[] PlayerInvetories = [InventoryType.Inventory1, InventoryType.Inventory2, InventoryType.Inventory3, InventoryType.Inventory4, InventoryType.Crystals];
-
     public static void EnqueueNew(EntrustPlan plan)
     {
-        WasOpen = false;
+        P.TaskManager.Enqueue((Action)(() => WasOpen = false));
         P.TaskManager.Enqueue(() => TryGetAddonByName<AtkUnitBase>("SelectString", out var addon) && IsAddonReady(addon));
-        P.TaskManager.Enqueue(() => RecursivelyEntrustItems(plan), timeLimitMs:60*60*1000);
+        P.TaskManager.Enqueue(() => RecursivelyEntrustItems(plan), timeLimitMs: 60 * 60 * 1000);
         P.TaskManager.Enqueue(() => !WasOpen || TaskVendorItems.CloseInventory() == true);
     }
 
-    static bool? RecursivelyEntrustItems(EntrustPlan plan)
+    private static bool? RecursivelyEntrustItems(EntrustPlan plan)
     {
         try
         {
+            var allowedPlayerInventories = plan.GetAllowedInventories();
             if(TryGetAddonByName<AtkUnitBase>("InputNumeric", out var numeric))
             {
                 if(IsAddonReady(numeric))
@@ -45,7 +40,7 @@ internal static unsafe class TaskEntrustDuplicates
                 }
                 return false;
             }
-            if(!EzThrottler.Check("InventoryTimeout") && Utils.GetCapturedInventoryState(PlayerInvetories).SequenceEqual(CapturedInventoryState))
+            if(!EzThrottler.Check("InventoryTimeout") && Utils.GetCapturedInventoryState(allowedPlayerInventories).SequenceEqual(CapturedInventoryState))
             {
                 return false;
             }
@@ -58,7 +53,7 @@ internal static unsafe class TaskEntrustDuplicates
                     itemList.Add(add);
                     PluginLog.Debug($"[TED] From EntrustItems added item: {ExcelItemHelper.GetName(add.Item1, true)} toKeep={add.Item2}");
                 }
-                foreach(var x in Utils.GetItemsInInventory(PlayerInvetories))
+                foreach(var x in Utils.GetItemsInInventory(allowedPlayerInventories))
                 {
                     var item = ExcelItemHelper.Get(x);
                     if(item == null) continue;
@@ -72,11 +67,11 @@ internal static unsafe class TaskEntrustDuplicates
                 }
                 if(plan.Duplicates && plan.DuplicatesMultiStack)
                 {
-                    foreach(var type in RetainerInventories)
+                    foreach(var type in Utils.RetainerInventoriesWithCrystals)
                     {
                         if(type.EqualsAny(InventoryType.Crystals, InventoryType.RetainerCrystals)) continue;
                         var inv = InventoryManager.Instance()->GetInventoryContainer(type);
-                        for(int i = 0; i < inv->Size; i++)
+                        for(var i = 0; i < inv->Size; i++)
                         {
                             var item = InventoryManager.Instance()->GetInventorySlot(type, i);
                             if(item->ItemId != 0 && item->Quantity > 0)
@@ -90,22 +85,22 @@ internal static unsafe class TaskEntrustDuplicates
                     }
                 }
                 //processing unconditional entrusts
-                foreach(var type in PlayerInvetories)
+                foreach(var type in allowedPlayerInventories)
                 {
                     var inv = InventoryManager.Instance()->GetInventoryContainer(type);
-                    for(int i = 0; i < inv->Size; i++)
+                    for(var i = 0; i < inv->Size; i++)
                     {
                         var item = InventoryManager.Instance()->GetInventorySlot(type, i);
                         if(item->ItemId != 0 && item->Quantity > 0)
                         {
-                            var itemCount = Utils.GetItemCount(PlayerInvetories, item->ItemId);
+                            var itemCount = Utils.GetItemCount(allowedPlayerInventories, item->ItemId);
                             PluginLog.Debug($"[TED] Item count for {ExcelItemHelper.GetName(item->ItemId, true)} = {itemCount}");
                             var data = ExcelItemHelper.Get(item->ItemId);
                             if(itemList.TryGetFirst(s => s.ItemID == item->ItemId, out var entrustInfo))
                             {
                                 var toKeep = entrustInfo.ToKeep;
                                 var toEntrust = itemCount - toKeep;
-                                var canFit = Utils.GetAmountThatCanFit(RetainerInventories, item->ItemId, item->Flags.HasFlag(InventoryItem.ItemFlags.HighQuality));
+                                var canFit = Utils.GetAmountThatCanFit(Utils.RetainerInventoriesWithCrystals, item->ItemId, item->Flags.HasFlag(InventoryItem.ItemFlags.HighQuality));
                                 PluginLog.Debug($"[TED] For {ExcelItemHelper.GetName(item->ItemId, true)} toEntrust={toEntrust}, toKeep={toKeep}, canFit={canFit}");
                                 if(toEntrust > canFit) toEntrust = (int)canFit;
                                 if(toEntrust > 0)
@@ -113,7 +108,7 @@ internal static unsafe class TaskEntrustDuplicates
                                     var toEntrustFromStack = Math.Min(item->Quantity, toEntrust);
                                     if(toEntrustFromStack > 0)
                                     {
-                                        MoveSlotToRetainerInventoryUnsafe(item, (int)toEntrustFromStack, i, type);
+                                        MoveSlotToRetainerInventoryUnsafe(item, (int)toEntrustFromStack, i, type, allowedPlayerInventories);
                                         return false;
                                     }
                                 }
@@ -124,12 +119,12 @@ internal static unsafe class TaskEntrustDuplicates
                 if(plan.Duplicates && !plan.DuplicatesMultiStack)
                 {
                     //and now processing duplicates
-                    foreach(var type in RetainerInventories)
+                    foreach(var type in Utils.RetainerInventoriesWithCrystals)
                     {
                         if(type.EqualsAny(InventoryType.Crystals, InventoryType.RetainerCrystals)) continue;
                         //find incomplete stacks, then query them from player inventory
                         var inv = InventoryManager.Instance()->GetInventoryContainer(type);
-                        for(int i = 0; i < inv->Size; i++)
+                        for(var i = 0; i < inv->Size; i++)
                         {
                             var item = inv->GetInventorySlot(i);
                             if(item->ItemId != 0 && !itemList.Any(s => s.ItemID == item->ItemId))
@@ -139,16 +134,16 @@ internal static unsafe class TaskEntrustDuplicates
                                 var canFit = data.StackSize - item->Quantity;
                                 if(canFit > 0)
                                 {
-                                    foreach(var playerType in PlayerInvetories)
+                                    foreach(var playerType in allowedPlayerInventories)
                                     {
                                         var playerInv = InventoryManager.Instance()->GetInventoryContainer(playerType);
-                                        for(int q = 0; q < playerInv->Size; q++)
+                                        for(var q = 0; q < playerInv->Size; q++)
                                         {
                                             var playerItem = playerInv->GetInventorySlot(q);
                                             if(playerItem->ItemId == item->ItemId && playerItem->Flags.HasFlag(InventoryItem.ItemFlags.HighQuality) == item->Flags.HasFlag(InventoryItem.ItemFlags.HighQuality))
                                             {
                                                 var toEntrustFromStack = Math.Min(canFit, playerItem->Quantity);
-                                                MoveSlotToRetainerInventoryUnsafe(playerItem, (int)toEntrustFromStack, q, playerType);
+                                                MoveSlotToRetainerInventoryUnsafe(playerItem, (int)toEntrustFromStack, q, playerType, allowedPlayerInventories);
                                                 return false;
                                             }
                                         }
@@ -175,7 +170,7 @@ internal static unsafe class TaskEntrustDuplicates
     /// <param name="toEntrustFromStack"></param>
     /// <param name="i">slot id</param>
     /// <param name="type"></param>
-    static void MoveSlotToRetainerInventoryUnsafe(InventoryItem* item, int toEntrustFromStack, int i, InventoryType type)
+    private static void MoveSlotToRetainerInventoryUnsafe(InventoryItem* item, int toEntrustFromStack, int i, InventoryType type, InventoryType[] allowedPlayerInventories)
     {
         if(!InventorySpaceManager.IsRetainerInventoryLoaded())
         {
@@ -191,7 +186,7 @@ internal static unsafe class TaskEntrustDuplicates
             if(type == InventoryType.Crystals)
             {
                 RequestEntrustQuantity = (int)toEntrustFromStack;
-                CapturedInventoryState = Utils.GetCapturedInventoryState(PlayerInvetories);
+                CapturedInventoryState = Utils.GetCapturedInventoryState(allowedPlayerInventories);
                 EzThrottler.Throttle("InventoryTimeout", 5000, true);
                 PluginLog.Information($"Entrusting crystals from slot: {i}/{type} - {ExcelItemHelper.GetName(slot->ItemId, true)} quantuity = {toEntrustFromStack}");
                 P.Memory.RetainerItemCommandDetour(InventorySpaceManager.AgentRetainerItemCommandModule, (uint)i, type, 0, RetainerItemCommand.EntrustToRetainer);
@@ -200,7 +195,7 @@ internal static unsafe class TaskEntrustDuplicates
             {
                 if(item->Quantity <= 1 || item->Quantity == toEntrustFromStack)
                 {
-                    CapturedInventoryState = Utils.GetCapturedInventoryState(PlayerInvetories);
+                    CapturedInventoryState = Utils.GetCapturedInventoryState(allowedPlayerInventories);
                     EzThrottler.Throttle("InventoryTimeout", 5000, true);
                     PluginLog.Information($"Entrusting from slot: {i}/{type} - {ExcelItemHelper.GetName(slot->ItemId, true)} quantuity = all");
                     P.Memory.RetainerItemCommandDetour(InventorySpaceManager.AgentRetainerItemCommandModule, (uint)i, type, 0, RetainerItemCommand.EntrustToRetainer);
@@ -209,7 +204,7 @@ internal static unsafe class TaskEntrustDuplicates
                 {
                     //partial entrust
                     RequestEntrustQuantity = (int)toEntrustFromStack;
-                    CapturedInventoryState = Utils.GetCapturedInventoryState(PlayerInvetories);
+                    CapturedInventoryState = Utils.GetCapturedInventoryState(allowedPlayerInventories);
                     EzThrottler.Throttle("InventoryTimeout", 5000, true);
                     PluginLog.Information($"Entrusting from slot: {i}/{type} - {ExcelItemHelper.GetName(slot->ItemId, true)} quantuity = {toEntrustFromStack}");
                     P.Memory.RetainerItemCommandDetour(InventorySpaceManager.AgentRetainerItemCommandModule, (uint)i, type, 0, RetainerItemCommand.EntrustQuantity);

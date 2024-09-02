@@ -2,6 +2,7 @@
 using AutoRetainerAPI;
 using AutoRetainerAPI.Configuration;
 using ECommons.GameHelpers;
+using Lumina.Excel.GeneratedSheets;
 using PunishLib.ImGuiMethods;
 using ThreadLoadImageHandler = ECommons.ImGuiMethods.ThreadLoadImageHandler;
 
@@ -197,12 +198,15 @@ internal static unsafe class MultiModeUI
                                 retainers.Remove(ret.Name.ToString());
                             }
                         }
-                        if(adata.EntrustDuplicates)
                         {
-                            ImGui.SameLine();
-                            ImGui.PushFont(UiBuilder.IconFont);
-                            ImGuiEx.Text(Lang.IconDuplicate);
-                            ImGui.PopFont();
+                            if(C.EntrustPlans.TryGetFirst(s => s.Guid == adata.EntrustPlan, out var plan))
+                            {
+                                ImGui.SameLine();
+                                ImGui.PushFont(UiBuilder.IconFont);
+                                ImGuiEx.Text(plan.ManualPlan ? ImGuiColors.DalamudOrange : null, Lang.IconDuplicate);
+                                ImGui.PopFont();
+                                ImGuiEx.Tooltip($"Entrust plan \"{plan.Name}\" is active." + (plan.ManualPlan ? "\nThis is manual processing plan" : ""));
+                            }
                         }
                         if(adata.WithdrawGil)
                         {
@@ -304,6 +308,67 @@ internal static unsafe class MultiModeUI
                                     ImGui.PopID();
                                 }
                                 ImGui.EndCombo();
+                            }
+                            if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Copy, "Copy entrust plan to..."))
+                            {
+                                ImGui.OpenPopup($"CopyEntrustPlanTo");
+                            }
+                            if(ImGui.BeginPopup("CopyEntrustPlanTo"))
+                            {
+                                if(ImGui.Selectable("To all other retainers of this character"))
+                                {
+                                    int cnt = 0;
+                                    foreach(var x in data.RetainerData)
+                                    {
+                                        cnt++;
+                                        Utils.GetAdditionalData(data.CID, x.Name).EntrustPlan = adata.EntrustPlan;
+                                    }
+                                    Notify.Info($"Changed {cnt} retainers");
+                                }
+                                if(ImGui.Selectable("To all other retainers without entrust plan of this character"))
+                                {
+                                    foreach(var x in data.RetainerData)
+                                    {
+                                        var cnt = 0;
+                                        if(!C.EntrustPlans.Any(s => s.Guid == adata.EntrustPlan))
+                                        {
+                                            Utils.GetAdditionalData(data.CID, x.Name).EntrustPlan = adata.EntrustPlan;
+                                            cnt++;
+                                        }
+                                        Notify.Info($"Changed {cnt} retainers");
+                                    }
+                                }
+                                if(ImGui.Selectable("To all other retainers of ALL characters"))
+                                {
+                                    var cnt = 0;
+                                    foreach(var offlineData in C.OfflineData)
+                                    {
+                                        foreach(var x in offlineData.RetainerData)
+                                        {
+                                            Utils.GetAdditionalData(offlineData.CID, x.Name).EntrustPlan = adata.EntrustPlan;
+                                            cnt++;
+                                        }
+                                    }
+                                    Notify.Info($"Changed {cnt} retainers");
+                                }
+                                if(ImGui.Selectable("To all other retainers without entrust plan of ALL characters"))
+                                {
+                                    var cnt = 0;
+                                    foreach(var offlineData in C.OfflineData)
+                                    {
+                                        foreach(var x in offlineData.RetainerData)
+                                        {
+                                            var a = Utils.GetAdditionalData(data.CID, x.Name);
+                                            if(!C.EntrustPlans.Any(s => s.Guid == a.EntrustPlan))
+                                            {
+                                                a.EntrustPlan = adata.EntrustPlan;
+                                                cnt++;
+                                            }
+                                        }
+                                    }
+                                    Notify.Info($"Changed {cnt} retainers");
+                                }
+                                ImGui.EndPopup();
                             }
                             ImGui.Checkbox($"Withdraw/Deposit Gil", ref adata.WithdrawGil);
                             if(adata.WithdrawGil)

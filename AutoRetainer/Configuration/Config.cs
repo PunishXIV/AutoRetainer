@@ -127,6 +127,7 @@ internal unsafe class Config : IEzConfig
     public bool AllowManualPostprocess = false;
 
     public List<EntrustPlan> EntrustPlans = [];
+    public bool AllowSellFromArmory = false;
 
     internal bool DontReassign
     {

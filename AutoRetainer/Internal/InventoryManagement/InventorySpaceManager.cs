@@ -17,9 +17,8 @@ public static unsafe class InventorySpaceManager
     private static bool IsAgentRetainerActive => AgentModule.Instance()->GetAgentByInternalId(AgentId.Retainer)->IsAgentActive();
 
     public static readonly List<SellSlotTask> SellSlotTasks = [];
-    private static readonly InventoryType[] NormalInventoryTypes = [InventoryType.Inventory1, InventoryType.Inventory2, InventoryType.Inventory3, InventoryType.Inventory4];
 
-    public static InventoryType[] GetAllowedToSellInventoryTypes() => [.. NormalInventoryTypes];
+    public static InventoryType[] GetAllowedToSellInventoryTypes() => C.AllowSellFromArmory?[..Utils.PlayerInvetories, ..Utils.PlayerArmory]:Utils.PlayerInvetories;
 
     public static bool? SafeSellSlot(SellSlotTask Task)
     {

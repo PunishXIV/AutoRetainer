@@ -15,4 +15,6 @@ public class EntrustPlan
     public List<EntrustCategoryConfiguration> EntrustCategories = [];
     public List<uint> EntrustItems = [];
     public Dictionary<uint, int> EntrustItemsAmountToKeep = [];
+    public bool AllowEntrustFromArmory = false;
+    public bool ManualPlan = false;
 }

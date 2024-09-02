@@ -118,7 +118,7 @@ internal static class UIUtils
 
     public static int GetFPSFromMSPT(int frameTime)
     {
-        return (int)(1000f / frameTime);
+        return frameTime == 0?60:(int)(1000f / frameTime);
     }
 
     internal static void QRA(string text, ref LimitedKeys key)

@@ -1,4 +1,7 @@
-﻿using Lumina.Excel.GeneratedSheets;
+﻿using ECommons.Configuration;
+using ECommons.Reflection;
+using ECommons.Throttlers;
+using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,6 +51,29 @@ public class EntrustManager : InventoryManagemenrBase
                 C.EntrustPlans.Remove(selectedPlan);
             }
             ImGuiEx.Tooltip("Hold CTRL and click");
+            ImGui.SameLine();
+            if(ImGuiEx.IconButton(FontAwesomeIcon.Copy, enabled: selectedPlan != null))
+            {
+                Copy(EzConfig.DefaultSerializationFactory.Serialize(selectedPlan, false));
+            }
+            ImGui.SameLine();
+            if(ImGuiEx.IconButton(FontAwesomeIcon.Paste, enabled:EzThrottler.Check("ImportPlan")))
+            {
+                try
+                {
+                    var plan = EzConfig.DefaultSerializationFactory.Deserialize<EntrustPlan>(Paste()) ?? throw new NullReferenceException();
+                    plan.Guid = Guid.NewGuid();
+                    if(plan.GetType().GetFieldPropertyUnions(ReflectionHelper.AllFlags).Any(x => x.GetValue(plan) == null)) throw new NullReferenceException();
+                    C.EntrustPlans.Add(plan);
+                    SelectedGuid = plan.Guid;
+                    Notify.Success("Imported plan from clipboard");
+                    EzThrottler.Throttle("ImportPlan", 2000, true);
+                }
+                catch(Exception e)
+                {
+                    DuoLog.Error(e.Message);
+                }
+            }
         });
         if(selectedPlan != null)
         {
@@ -59,6 +85,9 @@ public class EntrustManager : InventoryManagemenrBase
             ImGui.Checkbox("Allow going over stack", ref selectedPlan.DuplicatesMultiStack);
             ImGuiEx.HelpMarker("Allows entrust duplicates to create new stacks of items that already exist in the selected retainer.");
             ImGui.Unindent();
+            ImGui.Checkbox("Allow entrusting from Armory Chest", ref selectedPlan.AllowEntrustFromArmory);
+            ImGui.Checkbox("Manual execution only", ref selectedPlan.ManualPlan);
+            ImGuiEx.HelpMarker("Mark this plan for manual execution only. This plan will only be processed upon manual \"Entrust Items\" button click and never automatically.");
             ImGui.Separator();
             ImGuiEx.TreeNodeCollapsingHeader($"Entrust categories ({selectedPlan.EntrustCategories.Count} selected)###ecats", () =>
             {

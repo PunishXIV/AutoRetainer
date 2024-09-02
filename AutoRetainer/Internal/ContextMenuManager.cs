@@ -55,11 +55,11 @@ internal unsafe class ContextMenuManager
                     {
                         args.AddMenuItem(new MenuItem()
                         {
-                            Name = new SeStringBuilder().Append(Prefix).AddUiForeground("- Remove from soft vendor list", (ushort)UIColor.Orange).Build(),
+                            Name = new SeStringBuilder().Append(Prefix).AddUiForeground("- Remove from Quick Venture sell list", (ushort)UIColor.Orange).Build(),
                             OnClicked = (a) =>
                             {
                                 C.IMAutoVendorSoft.Remove(id);
-                                Notify.Info($"Item {ExcelItemHelper.GetName(id)} removed from soft vendor list");
+                                Notify.Info($"Item {ExcelItemHelper.GetName(id)} removed from Quick Venture sell list");
                             }
                         }.RemovePrefix());
                     }
@@ -67,12 +67,12 @@ internal unsafe class ContextMenuManager
                     {
                         args.AddMenuItem(new MenuItem()
                         {
-                            Name = new SeStringBuilder().Append(Prefix).AddUiForeground("+ Add to soft vendor list", (ushort)UIColor.Yellow).Build(),
+                            Name = new SeStringBuilder().Append(Prefix).AddUiForeground("+ Add to Quick Venture sell list", (ushort)UIColor.Yellow).Build(),
                             OnClicked = (a) =>
                             {
                                 C.IMAutoVendorHard.Remove(id);
                                 C.IMAutoVendorSoft.Add(id);
-                                Notify.Success($"Item {ExcelItemHelper.GetName(id)} added to soft vendor list");
+                                Notify.Success($"Item {ExcelItemHelper.GetName(id)} added to Quick Venture sell list");
                             }
                         }.RemovePrefix());
                     }
@@ -81,11 +81,11 @@ internal unsafe class ContextMenuManager
                     {
                         args.AddMenuItem(new MenuItem()
                         {
-                            Name = new SeStringBuilder().Append(Prefix).AddUiForeground("- Remove from hard vendor list", (ushort)UIColor.Orange).Build(),
+                            Name = new SeStringBuilder().Append(Prefix).AddUiForeground("- Remove from Unconditional sell list", (ushort)UIColor.Orange).Build(),
                             OnClicked = (a) =>
                             {
                                 C.IMAutoVendorHard.Remove(id);
-                                Notify.Success($"Item {ExcelItemHelper.GetName(id)} removed from hard vendor list");
+                                Notify.Success($"Item {ExcelItemHelper.GetName(id)} removed from Unconditional sell list");
                             }
                         }.RemovePrefix());
                     }
@@ -93,12 +93,12 @@ internal unsafe class ContextMenuManager
                     {
                         args.AddMenuItem(new MenuItem()
                         {
-                            Name = new SeStringBuilder().Append(Prefix).AddUiForeground("+ Add to hard vendor list", (ushort)UIColor.Yellow).Build(),
+                            Name = new SeStringBuilder().Append(Prefix).AddUiForeground("+ Add to Unconditional sell list", (ushort)UIColor.Yellow).Build(),
                             OnClicked = (a) =>
                             {
                                 C.IMAutoVendorSoft.Remove(id);
                                 C.IMAutoVendorHard.Add(id);
-                                Notify.Success($"Item {ExcelItemHelper.GetName(id)} added to hard vendor list");
+                                Notify.Success($"Item {ExcelItemHelper.GetName(id)} added to Unconditional sell list");
                             }
                         }.RemovePrefix());
                     }

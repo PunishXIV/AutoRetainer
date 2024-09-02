@@ -25,6 +25,7 @@ public class GeneralSettings : InventoryManagemenrBase
             .Unindent()
             .Checkbox($"Auto-desynth items", () => ref C.IMEnableItemDesynthesis)
             .Checkbox($"Enable context menu integration", () => ref C.IMEnableContextMenu)
+            .Checkbox("Allow selling items from Armory Chest", () => ref C.AllowSellFromArmory)
             .Checkbox($"Demo mode", () => ref C.IMDry, "Do not sell items, instead print in chat what would be sold")
             .Unindent()
             ;

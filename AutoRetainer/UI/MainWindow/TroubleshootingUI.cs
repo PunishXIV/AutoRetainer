@@ -151,6 +151,29 @@ public unsafe static class TroubleshootingUI
             Info("Option \"Wait even when already logged in\" is enabled for retainers. This means that AutoRetainer will wait for all ventures from all retainers on a character to be completed before processing them even when you are logged in.");
         }
 
+        {
+            var manualList = new List<string>();
+            var deletedList = new List<string>();
+            foreach(var x in C.OfflineData)
+            {
+                foreach(var ret in x.RetainerData)
+                {
+                    var planId = Utils.GetAdditionalData(x.CID, ret.Name).EntrustPlan;
+                    var plan = C.EntrustPlans.FirstOrDefault(s => s.Guid == planId);
+                    if(plan != null && plan.ManualPlan) manualList.Add($"{Censor.Character(x.Name)} - {Censor.Retainer(ret.Name)}");
+                    if(plan == null && planId != Guid.Empty) deletedList.Add($"{Censor.Character(x.Name)} - {Censor.Retainer(ret.Name)}");
+                }
+            }
+            if(manualList.Count > 0)
+            {
+                Info("Some of your retainers have manual entrust plans set. These plans won't be processed automatically after resending retainer for venture, but only manually upon clicking button in overlay. Hover to see the list.", manualList.Print("\n"));
+            }
+            if(deletedList.Count > 0)
+            {
+                Warning("Some of your retainers' entrust plans were deleted before. Retainers with deleted entrust plans will not entrust anything. Hover to see list.", deletedList.Print("\n"));
+            }
+        }
+
         if(Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "SimpleTweaksPlugin" && x.IsLoaded))
         {
             Info("Simple Tweaks plugin detected. Any tweaks related to retainers or submarines may affect AutoRetainer functions negatively. Please ensure that tweaks are configured in a way to not interfere with AutoRetainer functions.");
@@ -158,7 +181,7 @@ public unsafe static class TroubleshootingUI
 
         if(Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "PandorasBox" && x.IsLoaded))
         {
-            Info("Pandora's Box plugin detected. Functions that automatically use actions and automatically input numeric values may affect AutoRetainer functions negatively. Please ensure that Pandora's Box's functions are configured in a way to not interfere with AutoRetainer functions.");
+            Info("Pandora's Box plugin detected. Functions that automatically use actions may affect AutoRetainer functions negatively. Please ensure that Pandora's Box's functions are configured in a way to not interfere with AutoRetainer functions.");
         }
 
         if(Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "Automaton" && x.IsLoaded))
