@@ -22,3 +22,6 @@ You should now have Puni.sh plugins available in your plugin installer. <br>
 Open plugin installer by typing `/xlplugins` in game chat, go to "Available plugins" section and search for a plugin you would like to install.
 
 ![image](https://github.com/NightmareXIV/MyDalamudPlugins/blob/main/meta/install/installerPunish.png?raw=true)
+
+## Support
+Join [Puni.sh Discord](https://discord.gg/Zzrcc8kmvy) to receive support for the plugin.
