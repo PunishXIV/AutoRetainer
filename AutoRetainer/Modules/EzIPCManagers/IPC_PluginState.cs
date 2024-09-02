@@ -39,4 +39,21 @@ public class IPC_PluginState
         }
         return false;
     }
+
+    [EzIPC] public bool GetOptionRetainerSense() => C.RetainerSense;
+    [EzIPC] public void SetOptionRetainerSense(bool value) => C.RetainerSense = value;
+    [EzIPC] public int GetOptionRetainerSenseThreshold() => C.RetainerSenseThreshold;
+    [EzIPC] public void SetOptionRetainerSenseThreshold(int value) => C.RetainerSenseThreshold = value;
+    [EzIPC] public long? GetClosestRetainerVentureSecondsRemaining(ulong CID)
+    {
+        if(C.SelectedRetainers.TryGetValue(CID, out var enabledRetainers))
+        {
+            if(C.OfflineData.TryGetFirst(x => x.CID == CID, out var data))
+            {
+                var selectedRetainers = data.GetEnabledRetainers().Where(z => z.HasVenture).OrderBy(z => z.GetVentureSecondsRemaining());
+                if(selectedRetainers.Any()) return selectedRetainers.First().GetVentureSecondsRemaining();
+            }
+        }
+        return null;
+    }
 }

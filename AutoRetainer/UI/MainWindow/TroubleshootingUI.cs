@@ -74,6 +74,11 @@ public unsafe static class TroubleshootingUI
             Warning("Your target frame rate when operating is set too low (<20). This may cause issues.");
         }
 
+        if(C.AllowSellFromArmory)
+        {
+            Info("Allow selling items from Armory Chest is enabled. Make sure to add your savage gear and ultimate weapons to protection list.");
+        }
+
         if((C.AllowFcTeleport || C.AllowPrivateTeleport) && !Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "Lifestream" && x.IsLoaded))
         {
             Error("\"Enable teleport to free company/private house\" option is enabled but Lifestream plugin is not installed/loaded.  AutoRetainer can not function in this configuration. Either disable these options or install Lifestream plugin.");

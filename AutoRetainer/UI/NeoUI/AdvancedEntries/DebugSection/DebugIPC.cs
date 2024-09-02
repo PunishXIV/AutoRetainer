@@ -1,4 +1,5 @@
 ﻿
+using ECommons.GameHelpers;
 using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.UI;
 
@@ -8,6 +9,7 @@ internal unsafe class DebugIPC : DebugSectionBase
 {
     public override void Draw()
     {
+        ImGuiEx.Text($"GetClosestRetainerVentureSecondsRemaining {S.EzIPCManager.IPC_PluginState.GetClosestRetainerVentureSecondsRemaining(Player.CID)}");
         ImGui.Checkbox($"API Test", ref ApiTest.Enabled);
         ImGuiEx.Text($"IPC suppressed: {Svc.PluginInterface.GetIpcSubscriber<bool>("AutoRetainer.GetSuppressed").InvokeFunc()}");
         if(ImGui.Button($"Suppress = true"))
