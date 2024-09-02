@@ -11,6 +11,7 @@ using Lumina.Excel.GeneratedSheets;
 namespace AutoRetainer.Internal.InventoryManagement;
 public static unsafe class NpcSaleManager
 {
+    internal static List<(uint ID, uint Quantity)> CapturedInventoryState = [];
     public static void EnqueueIfItemsPresent()
     {
         if(GetValidNPC() == null) return;
@@ -43,6 +44,11 @@ public static unsafe class NpcSaleManager
 
     public static bool? SellHardListItemsTask()
     {
+
+        if(!EzThrottler.Check("NpcInventoryTimeout") && Utils.GetCapturedInventoryState(InventorySpaceManager.GetAllowedToSellInventoryTypes()).SequenceEqual(CapturedInventoryState))
+        {
+            return false;
+        }
         List<(InventoryType Type, int Slot)> Processed = [];
         foreach(var type in InventorySpaceManager.GetAllowedToSellInventoryTypes())
         {
@@ -59,6 +65,7 @@ public static unsafe class NpcSaleManager
                             if(EzThrottler.Throttle("VendorItem", 500))
                             {
                                 Processed.Add((type, i));
+                                EzThrottler.Throttle("NpcInventoryTimeout", 5000, true);
                                 P.Memory.SellItemToShop(type, i);
                             }
                             return false;

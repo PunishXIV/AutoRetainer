@@ -124,10 +124,6 @@ internal unsafe class DebugScheduler : DebugSectionBase
 
         ImGui.Separator();
 
-        if(ImGui.Button($"TaskEntrustDuplicates"))
-        {
-            TaskEntrustDuplicates.Enqueue();
-        }
         if(ImGui.Button($"TaskAssignQuickVenture"))
         {
             TaskAssignQuickVenture.Enqueue();

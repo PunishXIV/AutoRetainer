@@ -29,7 +29,7 @@ internal static unsafe class Utils
 {
     internal static bool IsCN => Svc.ClientState.ClientLanguage == (ClientLanguage)4;
     internal static int FCPoints => *(int*)((nint)AgentModule.Instance()->GetAgentByInternalId(AgentId.FreeCompanyCreditShop) + 256);
-    internal static float AnimationLock => *(float*)((nint)ActionManager.Instance() + 8);
+    internal static float AnimationLock => Player.AnimationLock;
 
     private static bool IsNullOrEmpty(this string s) => GenericHelpers.IsNullOrEmpty(s);
 
@@ -48,6 +48,35 @@ internal static unsafe class Utils
         return ret;
     }
 
+    /// <summary>
+    /// Request all unique items from select inventories
+    /// </summary>
+    /// <param name="inventoryTypes"></param>
+    /// <returns></returns>
+    public static HashSet<uint> GetItemsInInventory(IEnumerable<InventoryType> inventoryTypes)
+    {
+        var ret = new HashSet<uint>();
+        foreach(var type in inventoryTypes)
+        {
+            var inv = InventoryManager.Instance()->GetInventoryContainer(type);
+            for(int i = 0; i < inv->Size; i++)
+            {
+                var item = InventoryManager.Instance()->GetInventorySlot(type, i);
+                if(item->ItemId != 0)
+                {
+                    ret.Add(item->ItemId);
+                }
+            }
+        }
+        return ret;
+    }
+
+    /// <summary>
+    /// Gets total item count of certain item across all inventories
+    /// </summary>
+    /// <param name="inventoryTypes"></param>
+    /// <param name="itemId"></param>
+    /// <returns></returns>
     public static int GetItemCount(IEnumerable<InventoryType> inventoryTypes, uint itemId)
     {
         int ret = 0;
@@ -66,25 +95,53 @@ internal static unsafe class Utils
         return ret;
     }
 
-    public static uint GetAmountThatCanFit(IEnumerable<InventoryType> inventoryTypes, uint itemId)
+    /// <summary>
+    /// Gets amount of items that can fit into inventories
+    /// </summary>
+    /// <param name="inventoryTypes"></param>
+    /// <param name="itemId"></param>
+    /// <param name="isHq"></param>
+    /// <returns></returns>
+    public static uint GetAmountThatCanFit(IEnumerable<InventoryType> inventoryTypes, uint itemId, bool isHq)
     {
         uint ret = 0;
         var data = ExcelItemHelper.Get(itemId);
         if(data == null) return 0;
-        foreach(var type in inventoryTypes)
+        if(data.ItemUICategory.Row == 59)//crystal special handling
         {
-            var inv = InventoryManager.Instance()->GetInventoryContainer(type);
-            for(int i = 0; i < inv->Size; i++)
+            foreach(var type in inventoryTypes)
             {
-                var item = InventoryManager.Instance()->GetInventorySlot(type, i);
-                if(item->ItemId == itemId)
+                var inv = InventoryManager.Instance()->GetInventoryContainer(type);
+                for(int i = 0; i < inv->Size; i++)
                 {
-                    if(data.IsUnique) return 0;
-                    ret += data.StackSize - item->Quantity;
+                    var item = InventoryManager.Instance()->GetInventorySlot(type, i);
+                    if(item->ItemId == itemId)
+                    {
+                        ret += data.StackSize - item->Quantity;
+                        return ret;
+                    }
                 }
-                else if(item->ItemId == 0)
+            }
+            return data.StackSize; 
+        }
+        else
+        {
+            foreach(var type in inventoryTypes)
+            {
+                if(type.EqualsAny(InventoryType.Crystals, InventoryType.RetainerCrystals)) continue;
+                var inv = InventoryManager.Instance()->GetInventoryContainer(type);
+                for(int i = 0; i < inv->Size; i++)
                 {
-                    ret += data.StackSize;
+                    var item = InventoryManager.Instance()->GetInventorySlot(type, i);
+                    if(item->ItemId == itemId)
+                    {
+                        if(data.IsUnique) return 0;
+                        ret += data.StackSize - item->Quantity;
+                    }
+                    else if(item->ItemId == 0 && item->Flags.HasFlag(InventoryItem.ItemFlags.HighQuality) == isHq)
+                    {
+                        ret += data.StackSize;
+                    }
                 }
             }
         }
@@ -117,14 +174,6 @@ internal static unsafe class Utils
 
     public static bool? WaitForScreen() => IsScreenReady();
 
-    public static bool IsPublic(this World w)
-    {
-        if(w.IsPublic) return true;
-        return w.RowId.EqualsAny<uint>(408, 409, 410, 411);
-    }
-
-    internal static int LoadedItems => AtkStage.Instance()->GetNumberArrayData()[36]->IntArray[401];
-
     internal static void ExtraLog(string s)
     {
         if(C.ExtraDebug) PluginLog.Debug(s);
@@ -133,11 +182,6 @@ internal static unsafe class Utils
     internal static bool ContainsAllItems<T>(this IEnumerable<T> a, IEnumerable<T> b)
     {
         return !b.Except(a).Any();
-    }
-
-    internal static string Read(byte* ptr)
-    {
-        return MemoryHelper.ReadStringNullTerminated((nint)ptr);
     }
 
     internal static float Random { get; private set; } = 1f;

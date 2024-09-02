@@ -507,14 +507,6 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
     private void Toasts_ErrorToast(ref Dalamud.Game.Text.SeStringHandling.SeString message, ref bool isHandled)
     {
-        if(P.TaskManager.IsBusy)
-        {
-            var text = message.ExtractText();
-            if(text == Svc.Data.GetExcelSheet<LogMessage>().GetRow(10350).Text.ToDalamudString().ExtractText())
-            {
-                TaskEntrustDuplicates.NoDuplicates = true;
-            }
-        }
         if(!Svc.ClientState.IsLoggedIn)
         {
             //5800	60	8	0	False	Unable to execute command. Character is currently visiting the <Highlight>StringParameter(1)</Highlight> data center.
