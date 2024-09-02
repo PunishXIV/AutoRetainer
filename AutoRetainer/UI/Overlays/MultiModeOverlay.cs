@@ -18,7 +18,7 @@ internal class MultiModeOverlay : Window
 
     public override bool DrawConditions()
     {
-        return !C.HideOverlayIcons && (P.TaskManager.IsBusy || P.IsNextToBell || MultiMode.Enabled || SchedulerMain.PluginEnabled || DisplayNotify || VoyageScheduler.Enabled || Shutdown.Active);
+        return !C.HideOverlayIcons && (P.TaskManager.IsBusy || P.IsNextToBell || MultiMode.Enabled || SchedulerMain.PluginEnabled || DisplayNotify || VoyageScheduler.Enabled || Shutdown.Active || SchedulerMain.CharacterPostProcessLocked);
     }
 
     private Vector2 StatusPanelSize => new(C.StatusBarIconWidth);
@@ -78,6 +78,32 @@ internal class MultiModeOverlay : Window
             else
             {
                 ImGuiEx.Text($"loading timer.png");
+            }
+            ImGui.SameLine();
+        }
+        if(SchedulerMain.CharacterPostProcessLocked && ShouldDisplay())
+        {
+            displayed = true;
+            if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "processing.png"), out var t))
+            {
+                ImGui.Image(t.ImGuiHandle, StatusPanelSize);
+                if(ImGui.IsItemHovered())
+                {
+                    ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+                    if(ImGui.IsItemClicked(ImGuiMouseButton.Left))
+                    {
+                        Svc.Commands.ProcessCommand("/ays");
+                    }
+                    if(ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                    {
+                        SchedulerMain.CharacterPostProcessLocked = false;
+                    }
+                    ImGui.SetTooltip("AutoRetainer is in postprocessing. \nLeft click - open AutoRetainer. \nRight click - abort.");
+                }
+            }
+            else
+            {
+                ImGuiEx.Text($"loading multi.png");
             }
             ImGui.SameLine();
         }

@@ -59,7 +59,12 @@ public sealed class FcDataManager
                 {
                     ImGuiEx.Text($"{x.Value.Gil:N0}");
                     totalGil += x.Value.Gil;
-                    ImGuiEx.Tooltip($"Last updated {UpdatedWhen(x.Value.LastGilUpdate)}");
+                    ImGuiEx.Tooltip($"Last updated {UpdatedWhen(x.Value.LastGilUpdate)}. Ctrl + click to reset");
+                    if(ImGuiEx.HoveredAndClicked() && ImGuiEx.Ctrl)
+                    {
+                        x.Value.LastGilUpdate = -1;
+                        x.Value.Gil = 0;
+                    }
                 }
                 else
                 {
@@ -83,6 +88,13 @@ public sealed class FcDataManager
                 ImGuiEx.ButtonCheckbox($"\uf555##FC{x.Key}", ref x.Value.GilCountsTowardsChara, EColor.Green);
                 ImGui.PopFont();
                 ImGuiEx.Tooltip("Mark this free company as Wallet FC. Gil Display tab will include money of this FC.");
+                ImGui.SameLine();
+                if(ImGuiEx.IconButton(FontAwesomeIcon.Trash, $"{x.Key}Dele", enabled: ImGuiEx.Ctrl))
+                {
+                    new TickScheduler(() => C.FCData.Remove(x));
+                }
+
+                ImGuiEx.Tooltip($"Hold CTRL and click to delete this FC. Note that if you will relog to that FC, it will appear again.");
             }
 
             ImGui.TableNextRow();

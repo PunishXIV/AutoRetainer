@@ -354,6 +354,12 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 }
             }
         }
+        else if(arguments.EqualsIgnoreCase("reset"))
+        {
+            P.TaskManager.Abort();
+            SchedulerMain.CharacterPostProcessLocked = false;
+            Notify.Success("Reset completed");
+        }
         else if(arguments.StartsWith("set"))
         {
             try
