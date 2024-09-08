@@ -68,6 +68,19 @@ internal static unsafe class BailoutManager
                     CharaSelectStuck = long.MaxValue;
                 }
             }
+
+            if(!Svc.ClientState.IsLoggedIn && C.ResolveConnectionErrors && Utils.GetRemainingSessionMiliSeconds() > 10*60*1000 && MultiMode.Enabled)
+            {
+                if(TryGetAddonByName<AtkUnitBase>("Dialogue", out var addon) && IsAddonReady(addon))
+                {
+                    if(EzThrottler.Throttle("ClickDialogueOk", 10000))
+                    {
+                        addon->GetButtonNodeById(4)->ClickAddonButton(addon);
+                        EzThrottler.Throttle("MultiModeAfkOnTitleLogin", 60000, true);
+                        IsLogOnTitleEnabled = true;
+                    }
+                }
+            }
         }
     }
 }

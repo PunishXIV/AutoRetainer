@@ -51,6 +51,7 @@ public static unsafe class TaskChangeCharacter
 
     public static bool? Logout()
     {
+        if(C.DontLogout) return null;
         var addon = Utils.GetSpecificYesno(Svc.Data.GetExcelSheet<Addon>()?.GetRow(115)?.Text.ToDalamudString().ExtractText());
         if(addon != null) return true;
         var isLoggedIn = Svc.Condition.Any();

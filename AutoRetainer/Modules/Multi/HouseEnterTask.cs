@@ -22,7 +22,7 @@ internal static unsafe class HouseEnterTask
             if(Utils.GetReachableRetainerBell(false) == null)
             {
                 var entrance = Utils.GetNearestEntrance(out var d);
-                var validDistance = entrance.IsApartmentEntrance() ? 4.85f : 4f;
+                var validDistance = 4f;
                 if(entrance != null && d > validDistance)
                 {
                     P.TaskManager.EnqueueImmediate(() => SetTarget(40f));
@@ -30,6 +30,10 @@ internal static unsafe class HouseEnterTask
                     P.TaskManager.EnqueueImmediate(Approach);
                     P.TaskManager.EnqueueImmediate(AutorunOff);
                     P.TaskManager.EnqueueImmediate(() => { Chat.Instance.ExecuteCommand("/automove off"); });
+                }
+                else
+                {
+                    return null;
                 }
                 P.TaskManager.EnqueueImmediate(() => SetTarget(5f));
                 P.TaskManager.EnqueueImmediate(Interact);

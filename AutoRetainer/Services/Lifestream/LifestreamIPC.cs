@@ -26,7 +26,7 @@ public class LifestreamIPC
     /// </summary>
     [EzIPC] public Func<uint, int, Vector3?> GetPlotEntrance;
     /// <summary>
-    /// type(home=1, fc=2), mode(enter house=2)
+    /// type(home=1, fc=2, apartment=3), mode(enter house=2)
     /// </summary>
     [EzIPC] public Action<int, int?> EnqueuePropertyShortcut;
     [EzIPC] public Func<(int Kind, int Ward, int Plot)?> GetCurrentPlotInfo;
@@ -41,4 +41,8 @@ public class LifestreamIPC
             Data.WorkshopEnabled = false;
         }
     }
+
+    [EzIPC] public Action<int?> EnqueueInnShortcut;
+    [EzIPC] public Func<bool?> HasApartment;
+    [EzIPC] public Action<bool> EnterApartment;
 }

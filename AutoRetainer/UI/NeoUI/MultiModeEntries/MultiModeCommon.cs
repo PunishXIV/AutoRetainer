@@ -22,8 +22,16 @@ public class MultiModeCommon : NeoUIEntry
 
         .Section("Teleportatiopn")
         .Widget(() => ImGuiEx.Text("Lifestream plugin is required"))
-        .Widget(() => ImGuiEx.PluginAvailabilityIndicator([new("Lifestream", new Version("2.2.0.4"))]))
+        .Widget(() => ImGuiEx.PluginAvailabilityIndicator([new("Lifestream", new Version("2.2.1.1"))]))
         .Widget(() => ImGuiEx.TextWrapped("You must register houses in Lifestream plugin for every character you want this option to work."))
         .Checkbox("Enable teleport to private house", () => ref C.AllowPrivateTeleport)
-        .Checkbox("Enable teleport to free company house", () => ref C.AllowFcTeleport);
+        .Checkbox("Enable teleport to free company house", () => ref C.AllowFcTeleport)
+        .Checkbox("If no private/FC house registered, teleport to apartment or inn", () => ref C.AllowRetireInnApartment)
+        .Indent()
+        .Checkbox("Disable Apartments", () => ref C.DisableApartment)
+        .Unindent()
+
+        .Section("Bailout Module")
+        .Checkbox("Auto-close and retry logging in on connection errors", () => ref C.ResolveConnectionErrors)
+        .Widget(() => ImGuiEx.PluginAvailabilityIndicator([new("NoKillPlugin")]));
 }

@@ -14,6 +14,8 @@ internal unsafe class DebugMulti : DebugSectionBase
 {
     public override void Draw()
     {
+        ImGui.Checkbox("Don't logout", ref C.DontLogout);
+        ImGui.Checkbox("Enabled", ref MultiMode.Enabled);
         ImGuiEx.Text($"Expected: {TaskChangeCharacter.Expected}");
         if(ImGui.Button("Force mismatch")) TaskChangeCharacter.Expected = ("AAAAAAAA", "BBBBBBB");
         if(ImGui.Button("Simulate nothing left"))

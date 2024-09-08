@@ -52,7 +52,7 @@ internal unsafe class AutoRetainerWindow : Window
     public override void PreDraw()
     {
         var prefix = SchedulerMain.PluginEnabled ? $" [{SchedulerMain.Reason}]" : "";
-        var tokenRem = TimeSpan.FromMilliseconds(P.TimeLaunched[0] + 3 * 24 * 60 * 60 * 1000 - DateTimeOffset.Now.ToUnixTimeMilliseconds());
+        var tokenRem = TimeSpan.FromMilliseconds(Utils.GetRemainingSessionMiliSeconds());
         WindowName = $"{P.Name} {P.GetType().Assembly.GetName().Version}{prefix} | {FormatToken(tokenRem)}###AutoRetainer";
         if(C.PinWindow)
         {

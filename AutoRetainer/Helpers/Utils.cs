@@ -32,6 +32,7 @@ internal static unsafe class Utils
     internal static float AnimationLock => Player.AnimationLock;
     private static bool IsNullOrEmpty(this string s) => GenericHelpers.IsNullOrEmpty(s);
 
+    public static long GetRemainingSessionMiliSeconds() => P.TimeLaunched[0] + 3 * 24 * 60 * 60 * 1000 - DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
     public static readonly InventoryType[] RetainerInventories = [InventoryType.RetainerPage1, InventoryType.RetainerPage2, InventoryType.RetainerPage3, InventoryType.RetainerPage4, InventoryType.RetainerPage5, InventoryType.RetainerPage6, InventoryType.RetainerPage7];
     public static readonly InventoryType[] RetainerInventoriesWithCrystals = [InventoryType.RetainerPage1, InventoryType.RetainerPage2, InventoryType.RetainerPage3, InventoryType.RetainerPage4, InventoryType.RetainerPage5, InventoryType.RetainerPage6, InventoryType.RetainerPage7, InventoryType.RetainerCrystals];
@@ -113,10 +114,11 @@ internal static unsafe class Utils
     /// <param name="itemId"></param>
     /// <param name="isHq"></param>
     /// <returns></returns>
-    public static uint GetAmountThatCanFit(IEnumerable<InventoryType> inventoryTypes, uint itemId, bool isHq)
+    public static uint GetAmountThatCanFit(IEnumerable<InventoryType> inventoryTypes, uint itemId, bool isHq, out List<string> debugData)
     {
         uint ret = 0;
         var data = ExcelItemHelper.Get(itemId);
+        debugData = [];
         if(data == null) return 0;
         if(data.ItemUICategory.Row == 59)//crystal special handling
         {
@@ -129,6 +131,7 @@ internal static unsafe class Utils
                     if(item->ItemId == itemId)
                     {
                         ret += data.StackSize - item->Quantity;
+                        debugData.Add($"[TED] [CrystalDebugData] in {type} slot {i} found incomplete stack: {ExcelItemHelper.GetName(itemId, true)} q={item->Quantity} canFit={ret}");
                         return ret;
                     }
                 }
@@ -144,13 +147,15 @@ internal static unsafe class Utils
                 for(int i = 0; i < inv->Size; i++)
                 {
                     var item = InventoryManager.Instance()->GetInventorySlot(type, i);
-                    if(item->ItemId == itemId)
+                    if(item->ItemId == itemId && item->Flags.HasFlag(InventoryItem.ItemFlags.HighQuality) == isHq && !item->Flags.HasFlag(InventoryItem.ItemFlags.Collectable))
                     {
                         if(data.IsUnique) return 0;
+                        debugData.Add($"[TED] [DebugData] in {type} slot {i} found incomplete stack: {ExcelItemHelper.GetName(itemId, true)} q={item->Quantity} canFit={ret}");
                         ret += data.StackSize - item->Quantity;
                     }
-                    else if(item->ItemId == 0 && item->Flags.HasFlag(InventoryItem.ItemFlags.HighQuality) == isHq)
+                    else if(item->ItemId == 0)
                     {
+                        debugData.Add($"[TED] [DebugData] in {type} slot {i} is empty, canFit={data.StackSize}");
                         ret += data.StackSize;
                     }
                 }
@@ -639,22 +644,14 @@ internal static unsafe class Utils
         return obj.Name.ToString().EqualsIgnoreCase(Lang.ApartmentEntrance);
     }
 
-    internal static IGameObject GetNearestEntrance(out float Distance, bool bypassPredefined = false)
+    internal static IGameObject GetNearestEntrance(out float Distance)
     {
         var currentDistance = float.MaxValue;
         IGameObject currentObject = null;
 
-        var fcOverride = Data.FreeCompanyHouseEntrance == null ? null : GetEntranceAtLocation(Data.FreeCompanyHouseEntrance.Entrance);
-
-        if(fcOverride != null)
-        {
-            Distance = Vector3.Distance(Player.Object.Position, fcOverride.Position);
-            return fcOverride;
-        }
-
         foreach(var x in Svc.Objects)
         {
-            if(x.IsTargetable && x.Name.ToString().EqualsIgnoreCaseAny([.. Lang.Entrance, Lang.ApartmentEntrance]))
+            if(x.IsTargetable && x.Name.ToString().EqualsIgnoreCaseAny([.. Lang.Entrance/*, Lang.ApartmentEntrance*/]))
             {
                 var distance = Vector3.Distance(Svc.ClientState.LocalPlayer.Position, x.Position);
                 if(distance < currentDistance)
@@ -665,6 +662,7 @@ internal static unsafe class Utils
             }
         }
         Distance = currentDistance;
+        if(Distance > 20) return null;
         return currentObject;
     }
 

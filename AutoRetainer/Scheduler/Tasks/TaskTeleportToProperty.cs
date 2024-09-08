@@ -1,10 +1,12 @@
 ﻿using AutoRetainer.Modules.Voyage;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
+using System.Drawing.Drawing2D;
 
 namespace AutoRetainer.Scheduler.Tasks;
 public static class TaskTeleportToProperty
 {
+    public static uint[] Apartments = [Houses.Ingleside_Apartment, Houses.Kobai_Goten_Apartment, Houses.Lily_Hills_Apartment, Houses.Sultanas_Breath_Apartment, Houses.Topmast_Apartment];
     public static bool EnqueueIfNeededAndPossible(bool requireFc)
     {
         if(Player.Territory.EqualsAny(VoyageUtils.Workshops)) return false;
@@ -19,6 +21,48 @@ public static class TaskTeleportToProperty
         if(!requireFc && canPrivate)
         {
             return Process(false);
+        }
+        if(!requireFc && C.AllowRetireInnApartment)
+        {
+            //apartment logic
+            if(!C.DisableApartment)
+            {
+                if(S.LifestreamIPC.HasApartment() == true && Apartments.Contains(Player.Territory)) return false;
+                if(S.LifestreamIPC.HasApartment() != false)
+                {
+                    P.TaskManager.Enqueue(() => S.LifestreamIPC.EnterApartment(true));
+                    P.TaskManager.Enqueue(() =>
+                    {
+                        if(!Svc.ClientState.IsLoggedIn)
+                        {
+                            PluginLog.Warning($"Logout while waiting to return to home; expecting DC travel. Aborting and waiting for relogging.");
+                            return null;
+                        }
+                        if(Player.Interactable && S.LifestreamIPC.HasApartment() == false)
+                        {
+                            PluginLog.Warning("Upon returning home, apartment not found. Aborting and retrying.");
+                            return null;
+                        }
+                        return IsScreenReady() && Player.Interactable && Apartments.Contains(Player.Territory) && !S.LifestreamIPC.IsBusy();
+                    }, 5 * 60 * 1000);
+                    return true;
+                }
+            }
+            //inn logic
+            if(!Inns.List.Contains((ushort)Player.Territory))
+            {
+                P.TaskManager.Enqueue(() => S.LifestreamIPC.EnqueueInnShortcut(1));
+                P.TaskManager.Enqueue(() =>
+                {
+                    if(!Svc.ClientState.IsLoggedIn)
+                    {
+                        PluginLog.Warning($"Logout while waiting to return to home; expecting DC travel. Aborting and waiting for relogging.");
+                        return null;
+                    }
+                    return IsScreenReady() && Player.Interactable && Inns.List.Contains((ushort)Player.Territory) && !S.LifestreamIPC.IsBusy();
+                }, 5 * 60 * 1000);
+                return true;
+            }
         }
         return false;
 

@@ -128,6 +128,9 @@ internal unsafe class Config : IEzConfig
 
     public List<EntrustPlan> EntrustPlans = [];
     public bool AllowSellFromArmory = false;
+    public bool AllowRetireInnApartment = false;
+    public bool DisableApartment = false;
+    public bool DontLogout = false;
 
     internal bool DontReassign
     {
@@ -207,4 +210,8 @@ internal unsafe class Config : IEzConfig
     public Vector2 WindowPos;
     public bool PinWindow = false;
     public bool DisplayOnStart = false;
+
+    public bool ResolveConnectionErrors = false;
+    public int ConnectionErrorsRetry = 10;
+    public bool ConnectionErrorsBlacklist = true;
 }

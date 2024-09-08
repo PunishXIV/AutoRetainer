@@ -16,6 +16,11 @@ public unsafe static class TroubleshootingUI
             Error($"Local publisher client detected. AutoRetainer was not tested to work with local publisher's FFXIV clients. Some or all functions may not work. Additionally, keep in mind that ottercorp's Chinese Dalamud fork collects telemetry about your pc, characters, used plugins and Dalamud configuration without your consent and without a possibility to opt-out.");
         }
 
+        if(C.DontLogout)
+        {
+            Error("DontLogout debug option is enabled");
+        }
+
         try
         {
             var x = DalamudReflector.GetService("Dalamud.Configuration.Internal.DalamudConfiguration");

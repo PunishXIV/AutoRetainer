@@ -100,8 +100,8 @@ internal static unsafe class TaskEntrustDuplicates
                             {
                                 var toKeep = entrustInfo.ToKeep;
                                 var toEntrust = itemCount - toKeep;
-                                var canFit = Utils.GetAmountThatCanFit(Utils.RetainerInventoriesWithCrystals, item->ItemId, item->Flags.HasFlag(InventoryItem.ItemFlags.HighQuality));
-                                PluginLog.Debug($"[TED] For {ExcelItemHelper.GetName(item->ItemId, true)} toEntrust={toEntrust}, toKeep={toKeep}, canFit={canFit}");
+                                var canFit = Utils.GetAmountThatCanFit(Utils.RetainerInventoriesWithCrystals, item->ItemId, item->Flags.HasFlag(InventoryItem.ItemFlags.HighQuality), out var debugData);
+                                PluginLog.Debug($"[TED] For {ExcelItemHelper.GetName(item->ItemId, true)} toEntrust={toEntrust}, toKeep={toKeep}, canFit={canFit}\n{debugData.Print("\n")}");
                                 if(toEntrust > canFit) toEntrust = (int)canFit;
                                 if(toEntrust > 0)
                                 {
