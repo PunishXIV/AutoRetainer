@@ -12,7 +12,7 @@ internal static unsafe class TaskContinueHET
         VoyageUtils.Log($"Task enqueued: {nameof(TaskContinueHET)}");
         P.TaskManager.Enqueue(NpcSaleManager.EnqueueIfItemsPresent);
         P.TaskManager.Enqueue(Utils.WaitForScreen);
-        P.TaskManager.Enqueue(() => !IsOccupied(), 180 * 1000, "WaitUntilNotOccupied1");
+        P.TaskManager.Enqueue(() => !IsOccupied(), "WaitUntilNotOccupied1", new(timeLimitMS:180 * 1000));
         P.TaskManager.Enqueue(() =>
         {
             if(VoyageUtils.ShouldEnterWorkshop())
@@ -27,29 +27,31 @@ internal static unsafe class TaskContinueHET
 
     internal static void EnqueueImmediateEnterWorkshop()
     {
-        P.TaskManager.EnqueueImmediate(() => !IsOccupied() && IsScreenReady(), 180 * 1000, "WaitUntilNotOccupied2");
-        P.TaskManager.EnqueueImmediate(LockonAdditionalChambers, 1000, true);
-        P.TaskManager.EnqueueImmediate(HouseEnterTask.Approach);
-        P.TaskManager.EnqueueImmediate(AutorunOffAdd);
-        P.TaskManager.EnqueueImmediate(() => { Chat.Instance.ExecuteCommand("/automove off"); });
-        P.TaskManager.EnqueueImmediate(InteractAdd);
-        P.TaskManager.EnqueueImmediate(SelectEnterWorkshop);
-        P.TaskManager.EnqueueImmediate(() => VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType), "Wait Until entered workshop");
-        P.TaskManager.DelayNextImmediate(60, true);
-        P.TaskManager.EnqueueImmediate(Utils.WaitForScreen);
-    }
-
-    internal static void EnqueueEnterWorkshop()
-    {
-        P.TaskManager.Enqueue(() => !IsOccupied() && IsScreenReady(), 180 * 1000, "WaitUntilNotOccupied2");
-        P.TaskManager.Enqueue(LockonAdditionalChambers, 1000, true);
+        P.TaskManager.BeginStack();
+        P.TaskManager.Enqueue(() => !IsOccupied() && IsScreenReady(), "WaitUntilNotOccupied2", new(timeLimitMS:180 * 1000));
+        P.TaskManager.Enqueue(LockonAdditionalChambers, new(timeLimitMS:1000, abortOnTimeout:true));
         P.TaskManager.Enqueue(HouseEnterTask.Approach);
         P.TaskManager.Enqueue(AutorunOffAdd);
         P.TaskManager.Enqueue(() => { Chat.Instance.ExecuteCommand("/automove off"); });
         P.TaskManager.Enqueue(InteractAdd);
         P.TaskManager.Enqueue(SelectEnterWorkshop);
         P.TaskManager.Enqueue(() => VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType), "Wait Until entered workshop");
-        P.TaskManager.DelayNext(60, true);
+        P.TaskManager.EnqueueDelay(60, true);
+        P.TaskManager.Enqueue(Utils.WaitForScreen);
+        P.TaskManager.InsertStack();
+    }
+
+    internal static void EnqueueEnterWorkshop()
+    {
+        P.TaskManager.Enqueue(() => !IsOccupied() && IsScreenReady(), "WaitUntilNotOccupied2", new(timeLimitMS:180 * 1000));
+        P.TaskManager.Enqueue(LockonAdditionalChambers, new(timeLimitMS:1000, abortOnTimeout:true));
+        P.TaskManager.Enqueue(HouseEnterTask.Approach);
+        P.TaskManager.Enqueue(AutorunOffAdd);
+        P.TaskManager.Enqueue(() => { Chat.Instance.ExecuteCommand("/automove off"); });
+        P.TaskManager.Enqueue(InteractAdd);
+        P.TaskManager.Enqueue(SelectEnterWorkshop);
+        P.TaskManager.Enqueue(() => VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType), "Wait Until entered workshop");
+        P.TaskManager.EnqueueDelay(60, true);
         P.TaskManager.Enqueue(Utils.WaitForScreen);
     }
 

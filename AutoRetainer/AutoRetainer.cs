@@ -14,7 +14,7 @@ using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Memory;
 using Dalamud.Utility;
 using ECommons.Automation;
-using ECommons.Automation.LegacyTaskManager;
+using ECommons.Automation.NeoTaskManager;
 using ECommons.Configuration;
 using ECommons.Events;
 using ECommons.ExcelServices;
@@ -93,24 +93,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
             {
                 new SingletonNotifyWindow();
             }
-            Svc.AddonLifecycle.RegisterListener(AddonEvent.PreReceiveEvent, EventAddon, OnEvent);
         }
         //);
-    }
-
-    private const string EventAddon = "AirShipExploration";
-    private void OnEvent(AddonEvent type, AddonArgs args)
-    {
-        return;
-        if(args is AddonReceiveEventArgs a)
-        {
-            PluginLog.Information($"""
-								RL Event:
-								{a.AtkEvent:X16}/{a.AtkEventType}
-								{a.Data}/{MemoryHelper.ReadRaw(a.Data, 40).ToHexString()}
-								{a.EventParam}
-								""");
-        }
     }
 
     public void Load()
@@ -132,7 +116,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         SubmarineUnlockPlanUI = new();
         SubmarinePointPlanUI = new();
 
-        TaskManager = new() { AbortOnTimeout = true, TimeLimitMS = 20000 };
+        TaskManager = new(new(abortOnTimeout:true, timeLimitMS:20000, showDebug:true));
         Memory = new();
         Svc.PluginInterface.UiBuilder.Draw += WindowSystem.Draw;
         Svc.PluginInterface.UiBuilder.OpenMainUi += () =>
@@ -158,11 +142,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
         MultiMode.Init();
         NotificationMasterApi = new(Svc.PluginInterface);
-        ODMTaskManager = new()
-        {
-            TimeLimitMS = 60 * 1000,
-            AbortOnTimeout = true,
-        };
+        ODMTaskManager = new(new(timeLimitMS: 60 * 1000, abortOnTimeout: true, showDebug: true));
 
         Safety.Check();
 
@@ -532,7 +512,6 @@ public unsafe class AutoRetainer : IDalamudPlugin
     {
         //if (PluginLoader.IsLoaded)
         {
-            Svc.AddonLifecycle.UnregisterListener(AddonEvent.PreReceiveEvent, EventAddon, OnEvent);
             Safe(() => FFXIVInstanceMonitor.ReleaseLock());
             Safe(() => quickSellItems.Disable());
             Safe(() => quickSellItems.Dispose());

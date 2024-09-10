@@ -21,13 +21,19 @@ public static class TaskVendorItems
         }
         else
         {
-            foreach(var x in InventorySpaceManager.SellSlotTasks)
+            P.TaskManager.BeginStack();
+            try
             {
-                P.TaskManager.EnqueueImmediate(() => InventorySpaceManager.SafeSellSlot(x), $"InventorySpaceManager.SafeSellSlot({x})");
+                foreach(var x in InventorySpaceManager.SellSlotTasks)
+                {
+                    P.TaskManager.Enqueue(() => InventorySpaceManager.SafeSellSlot(x), $"InventorySpaceManager.SafeSellSlot({x})");
+                }
+                P.TaskManager.Enqueue(InventorySpaceManager.SellSlotTasks.Clear);
+                P.TaskManager.EnqueueDelay(333);
+                P.TaskManager.Enqueue(CloseInventory);
             }
-            P.TaskManager.EnqueueImmediate(InventorySpaceManager.SellSlotTasks.Clear);
-            P.TaskManager.DelayNextImmediate(333);
-            P.TaskManager.EnqueueImmediate(CloseInventory);
+            catch(Exception e) { e.Log(); }
+            P.TaskManager.InsertStack();
         }
     }
 

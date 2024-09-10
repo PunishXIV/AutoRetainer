@@ -16,32 +16,38 @@ internal static unsafe class HouseEnterTask
     {
         PluginLog.Debug($"Enqueued HouseEnterTask from {new StackTrace().GetFrames().Select(x => x.GetMethod()?.Name).Prepend("      ").Print("\n")}");
         P.TaskManager.Enqueue(NewYesAlreadyManager.WaitForYesAlreadyDisabledTask);
-        P.TaskManager.Enqueue(WaitUntilNotBusy, 180 * 1000);
+        P.TaskManager.Enqueue(WaitUntilNotBusy, new(timeLimitMS:180 * 1000));
         P.TaskManager.Enqueue(() =>
         {
-            if(Utils.GetReachableRetainerBell(false) == null)
+            P.TaskManager.BeginStack();
+            try
             {
-                var entrance = Utils.GetNearestEntrance(out var d);
-                var validDistance = 4f;
-                if(entrance != null && d > validDistance)
+                if(Utils.GetReachableRetainerBell(false) == null)
                 {
-                    P.TaskManager.EnqueueImmediate(() => SetTarget(40f));
-                    P.TaskManager.EnqueueImmediate(Lockon);
-                    P.TaskManager.EnqueueImmediate(Approach);
-                    P.TaskManager.EnqueueImmediate(AutorunOff);
-                    P.TaskManager.EnqueueImmediate(() => { Chat.Instance.ExecuteCommand("/automove off"); });
+                    var entrance = Utils.GetNearestEntrance(out var d);
+                    var validDistance = 4f;
+                    if(entrance != null && d > validDistance)
+                    {
+                        P.TaskManager.Enqueue(() => SetTarget(40f));
+                        P.TaskManager.Enqueue(Lockon);
+                        P.TaskManager.Enqueue(Approach);
+                        P.TaskManager.Enqueue(AutorunOff);
+                        P.TaskManager.Enqueue(() => { Chat.Instance.ExecuteCommand("/automove off"); });
+                    }
+                    else if(entrance == null)
+                    {
+                        return null;
+                    }
+                    P.TaskManager.Enqueue(() => SetTarget(5f));
+                    P.TaskManager.Enqueue(Interact);
+                    P.TaskManager.Enqueue(SelectYesno);
+                    P.TaskManager.Enqueue(WaitUntilLeavingZone);
+                    P.TaskManager.EnqueueDelay(60, true);
+                    P.TaskManager.Enqueue(Utils.WaitForScreen);
                 }
-                else if(entrance == null)
-                {
-                    return null;
-                }
-                P.TaskManager.EnqueueImmediate(() => SetTarget(5f));
-                P.TaskManager.EnqueueImmediate(Interact);
-                P.TaskManager.EnqueueImmediate(SelectYesno);
-                P.TaskManager.EnqueueImmediate(WaitUntilLeavingZone);
-                P.TaskManager.DelayNextImmediate(60, true);
-                P.TaskManager.Enqueue(Utils.WaitForScreen);
             }
+            catch(Exception e) { e.Log(); }
+            P.TaskManager.InsertStack();
             return true;
         }, "Master HET");
         TaskContinueHET.Enqueue();

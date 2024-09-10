@@ -13,7 +13,7 @@ internal static unsafe class TaskRedeployPreviousLog
         TaskIntelligentRepair.Enqueue(name, type);
         P.TaskManager.Enqueue(VoyageScheduler.SelectViewPreviousLog);
         P.TaskManager.Enqueue(VoyageScheduler.RedeployVessel);
-        P.TaskManager.DelayNext(10, true);
+        P.TaskManager.EnqueueDelay(10, true);
         P.TaskManager.Enqueue(CheckForFuel);
         P.TaskManager.Enqueue(VoyageScheduler.DeployVessel);
         P.TaskManager.Enqueue(VoyageScheduler.WaitForCutscene);
@@ -43,11 +43,13 @@ internal static unsafe class TaskRedeployPreviousLog
                             MultiMode.Enabled = false;
                             VoyageScheduler.Enabled = false;
                         }
-                        P.TaskManager.EnqueueImmediate(VoyageScheduler.CancelDeployVessel);
-                        P.TaskManager.EnqueueImmediate(VoyageScheduler.FinalizeVessel);
-                        P.TaskManager.EnqueueImmediate(VoyageScheduler.SelectQuitVesselMenu);
-                        P.TaskManager.EnqueueImmediate(VoyageScheduler.SelectQuitVesselSelectorMenu);
-                        P.TaskManager.EnqueueImmediate(VoyageScheduler.SelectExitMainPanel);
+                        P.TaskManager.BeginStack();
+                        P.TaskManager.Enqueue(VoyageScheduler.CancelDeployVessel);
+                        P.TaskManager.Enqueue(VoyageScheduler.FinalizeVessel);
+                        P.TaskManager.Enqueue(VoyageScheduler.SelectQuitVesselMenu);
+                        P.TaskManager.Enqueue(VoyageScheduler.SelectQuitVesselSelectorMenu);
+                        P.TaskManager.Enqueue(VoyageScheduler.SelectExitMainPanel);
+                        P.TaskManager.InsertStack();
                     }
                     else
                     {

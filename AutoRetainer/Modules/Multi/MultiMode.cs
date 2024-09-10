@@ -598,7 +598,7 @@ internal static unsafe class MultiMode
                 HardExpiry = DateTime.Now.AddSeconds(1),
                 Type = NotificationType.Warning,
             }));
-            P.TaskManager.DelayNext(1000);
+            P.TaskManager.EnqueueDelay(1000);
         }
         P.TaskManager.Enqueue(() =>
         {

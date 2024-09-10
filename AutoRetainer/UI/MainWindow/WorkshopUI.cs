@@ -282,7 +282,7 @@ internal static unsafe class WorkshopUI
                     }
                     else
                     {
-                        ImGuiEx.Text(EColor.RedBright, $"Currently executing: {P.TaskManager.CurrentTaskName}");
+                        ImGuiEx.Text(EColor.RedBright, $"Currently executing: {P.TaskManager.CurrentTask?.Name}");
                     }
                 }
                 catch(Exception e)

@@ -17,7 +17,7 @@ internal static unsafe class TaskEntrustDuplicates
     {
         P.TaskManager.Enqueue((Action)(() => WasOpen = false));
         P.TaskManager.Enqueue(() => TryGetAddonByName<AtkUnitBase>("SelectString", out var addon) && IsAddonReady(addon));
-        P.TaskManager.Enqueue(() => RecursivelyEntrustItems(plan), timeLimitMs: 60 * 60 * 1000);
+        P.TaskManager.Enqueue(() => RecursivelyEntrustItems(plan), new(timeLimitMS: 60 * 60 * 1000));
         P.TaskManager.Enqueue(() => !WasOpen || TaskVendorItems.CloseInventory() == true);
     }
 

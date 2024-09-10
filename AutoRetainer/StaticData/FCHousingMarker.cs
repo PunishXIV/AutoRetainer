@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AutoRetainer.Data;
+namespace AutoRetainer.StaticData;
 /// <summary>
 /// This enum contains markers of free company property owned by it
 /// </summary>

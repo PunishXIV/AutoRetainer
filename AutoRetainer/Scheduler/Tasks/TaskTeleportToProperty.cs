@@ -44,7 +44,7 @@ public static class TaskTeleportToProperty
                             return null;
                         }
                         return IsScreenReady() && Player.Interactable && Apartments.Contains(Player.Territory) && !S.LifestreamIPC.IsBusy();
-                    }, 5 * 60 * 1000);
+                    }, new(timeLimitMS:5 * 60 * 1000));
                     return true;
                 }
             }
@@ -60,7 +60,7 @@ public static class TaskTeleportToProperty
                         return null;
                     }
                     return IsScreenReady() && Player.Interactable && Inns.List.Contains((ushort)Player.Territory) && !S.LifestreamIPC.IsBusy();
-                }, 5 * 60 * 1000);
+                }, new(timeLimitMS:5 * 60 * 1000));
                 return true;
             }
         }
@@ -97,7 +97,7 @@ public static class TaskTeleportToProperty
                 && S.LifestreamIPC.GetCurrentPlotInfo()?.Ward == pathData.Ward
                 && S.LifestreamIPC.GetCurrentPlotInfo()?.Kind == pathData.ResidentialDistrict
                 && !S.LifestreamIPC.IsBusy();
-            }, 5 * 60 * 1000);
+            }, new(timeLimitMS:5 * 60 * 1000));
             HouseEnterTask.EnqueueTask();
             return true;
         }

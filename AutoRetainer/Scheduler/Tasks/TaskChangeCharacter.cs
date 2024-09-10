@@ -22,17 +22,17 @@ public static unsafe class TaskChangeCharacter
     public static void EnqueueLogout()
     {
         P.TaskManager.Enqueue(Logout);
-        P.TaskManager.Enqueue(SelectYesLogout, 100000);
+        P.TaskManager.Enqueue(SelectYesLogout, new(timeLimitMS:100000));
     }
 
     public static void EnqueueLogin(string currentWorld, string charaName, string charaWorld, int account)
     {
         BailoutManager.IsLogOnTitleEnabled = false;
         var dc = (int)ExcelWorldHelper.Get(currentWorld).DataCenter.Row;
-        P.TaskManager.Enqueue(ClickSelectDataCenter, 1000000);
+        P.TaskManager.Enqueue(ClickSelectDataCenter, new(timeLimitMS: 1000000));
         P.TaskManager.Enqueue(() => SelectDataCenter(dc), $"Connect to DC {dc}");
         P.TaskManager.Enqueue(() => SelectServiceAccount(account), $"SelectServiceAccount {account}");
-        P.TaskManager.Enqueue(() => SelectCharacter(charaName, charaWorld), 1000000, $"Select chara {charaName}@{charaWorld}");
+        P.TaskManager.Enqueue(() => SelectCharacter(charaName, charaWorld), $"Select chara {charaName}@{charaWorld}", new(timeLimitMS: 1000000));
         P.TaskManager.Enqueue(ConfirmLogin);
     }
 

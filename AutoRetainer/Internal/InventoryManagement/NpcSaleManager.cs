@@ -28,12 +28,14 @@ public static unsafe class NpcSaleManager
                     {
                         if(Utils.IsItemSellableByHardList(slot->ItemId, slot->Quantity))
                         {
-                            P.TaskManager.EnqueueImmediate(Utils.WaitForScreen);
-                            P.TaskManager.EnqueueImmediate(InteractWithNPC);
-                            P.TaskManager.EnqueueImmediate(SelectPurchase);
-                            P.TaskManager.DelayNextImmediate(500);
-                            P.TaskManager.EnqueueImmediate(SellHardListItemsTask, 1000 * 60 * 5);
-                            P.TaskManager.EnqueueImmediate(CloseShop);
+                            P.TaskManager.BeginStack();
+                            P.TaskManager.Enqueue(Utils.WaitForScreen);
+                            P.TaskManager.Enqueue(InteractWithNPC);
+                            P.TaskManager.Enqueue(SelectPurchase);
+                            P.TaskManager.EnqueueDelay(500);
+                            P.TaskManager.Enqueue(SellHardListItemsTask, new(timeLimitMS:1000 * 60 * 5));
+                            P.TaskManager.Enqueue(CloseShop);
+                            P.TaskManager.InsertStack();
                             return;
                         }
                     }

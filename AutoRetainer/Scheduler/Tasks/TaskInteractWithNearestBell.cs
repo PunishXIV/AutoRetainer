@@ -15,9 +15,11 @@ internal static unsafe class TaskInteractWithNearestBell
                 var bell = Utils.GetNearestRetainerBell(out var distance);
                 if(distance < 20f)
                 {
-                    P.TaskManager.EnqueueImmediate(HouseEnterTask.LockonBell);
-                    P.TaskManager.EnqueueImmediate(HouseEnterTask.Approach);
-                    P.TaskManager.EnqueueImmediate(HouseEnterTask.AutorunOffBell);
+                    P.TaskManager.BeginStack();
+                    P.TaskManager.Enqueue(HouseEnterTask.LockonBell);
+                    P.TaskManager.Enqueue(HouseEnterTask.Approach);
+                    P.TaskManager.Enqueue(HouseEnterTask.AutorunOffBell);
+                    P.TaskManager.InsertStack();
                 }
             }
         }, "ApproachWorkshopBell");

@@ -17,12 +17,12 @@ internal static class TaskAssignHuntingVenture
         //P.TaskManager.Enqueue(() => RetainerHandlers.SelectSpecificVenture(VentureID), $"SelectSpecificVenture({VentureID})");
         //P.TaskManager.Enqueue(() => RetainerHandlers.SearchVentureByName(VentureID));
         P.TaskManager.Enqueue(RetainerHandlers.WaitForVentureListUpdate);
-        P.TaskManager.DelayNext(C.FrameDelay, true);
+        P.TaskManager.EnqueueDelay(C.FrameDelay, true);
         P.TaskManager.Enqueue(RetainerHandlers.ClearTaskSupplylist);
         for(var i = 0; i < 20; i++)
         {
             P.TaskManager.Enqueue(() => RetainerHandlers.ForceSearchVentureByName(VentureID), $"ForceSearchVentureByName({VentureID})/{i}");
-            P.TaskManager.DelayNext(C.FrameDelay, true);
+            P.TaskManager.EnqueueDelay(C.FrameDelay, true);
         }
         P.TaskManager.Enqueue(() => RetainerHandlers.SelectSpecificVentureByName(VentureID), $"SelectSpecificVentureByName({VentureID})");
         /*if (!C.NoErrorCheckPlanner2)

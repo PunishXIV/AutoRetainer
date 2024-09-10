@@ -11,17 +11,23 @@ public class TaskPostprocessCharacterIPC
         }, "TaskCharacterPostprocessIPCEnqueue");
         P.TaskManager.Enqueue(() =>
         {
-            DebugLog($"SchedulerMain.CharacterPostprocess contains: {SchedulerMain.CharacterPostprocess.Print()}, pluginToProcess = {pluginToProcess}");
-            foreach(var x in SchedulerMain.CharacterPostprocess.Where(x => pluginToProcess == null || x == pluginToProcess))
+            P.TaskManager.BeginStack();
+            try
             {
-                P.TaskManager.EnqueueImmediate(() =>
-                    {
-                        SchedulerMain.CharacterPostprocess = SchedulerMain.CharacterPostprocess.Remove(x);
-                        SchedulerMain.CharacterPostProcessLocked = true;
-                        IPC.FireCharacterPostprocessEvent(x);
-                    }, $"Character Postprocess request from {x}");
-                P.TaskManager.EnqueueImmediate(() => !SchedulerMain.CharacterPostProcessLocked, int.MaxValue, $"Character Postprocess task from {x}");
+                DebugLog($"SchedulerMain.CharacterPostprocess contains: {SchedulerMain.CharacterPostprocess.Print()}, pluginToProcess = {pluginToProcess}");
+                foreach(var x in SchedulerMain.CharacterPostprocess.Where(x => pluginToProcess == null || x == pluginToProcess))
+                {
+                    P.TaskManager.Enqueue(() =>
+                        {
+                            SchedulerMain.CharacterPostprocess = SchedulerMain.CharacterPostprocess.Remove(x);
+                            SchedulerMain.CharacterPostProcessLocked = true;
+                            IPC.FireCharacterPostprocessEvent(x);
+                        }, $"Character Postprocess request from {x}");
+                    P.TaskManager.Enqueue(() => !SchedulerMain.CharacterPostProcessLocked, $"Character Postprocess task from {x}", new(timeLimitMS:int.MaxValue));
+                }
             }
+            catch(Exception e) { e.Log(); }
+            P.TaskManager.InsertStack();
         }, "TaskCharacterPostprocessProcessEntries");
     }
 }

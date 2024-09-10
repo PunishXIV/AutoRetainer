@@ -29,7 +29,7 @@ internal static unsafe class GCContinuation
         P.TaskManager.Enqueue(GCContinuation.EnableDeliveringIfPossible);
     }
 
-    public static async void EnqueueExchangeVentures()
+    public static void EnqueueExchangeVentures()
     {
         if(AutoGCHandin.GetSeals() > 1000 && Utils.GetVenturesAmount() < 65000)
         {
