@@ -293,9 +293,13 @@ internal static unsafe class Utils
 
     internal static bool CanAutoLogin()
     {
+        return CanAutoLoginFromTaskManager() && !P.TaskManager.IsBusy;
+    }
+
+    internal static bool CanAutoLoginFromTaskManager()
+    {
         return !Svc.ClientState.IsLoggedIn
             && !Svc.Condition.Any()
-            && !P.TaskManager.IsBusy
             && IsTitleScreenReady();
     }
 

@@ -4,6 +4,7 @@ using Dalamud.Utility;
 using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
+using ECommons.Reflection;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using Lumina.Excel.GeneratedSheets;
@@ -25,6 +26,10 @@ internal unsafe class DebugMulti : DebugSectionBase
         if(ImGui.Button($"Simulate autostart"))
         {
             MultiMode.PerformAutoStart();
+        }
+        if(ImGui.Button("Delete was loaded data"))
+        {
+            DalamudReflector.DeleteSharedData("AutoRetainer.WasLoaded");
         }
         ImGuiEx.Text($"Moving: {AgentMap.Instance()->IsPlayerMoving}");
         ImGuiEx.Text($"Occupied: {IsOccupied()}");

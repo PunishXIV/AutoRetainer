@@ -31,7 +31,7 @@ internal static unsafe class HouseEnterTask
                     P.TaskManager.EnqueueImmediate(AutorunOff);
                     P.TaskManager.EnqueueImmediate(() => { Chat.Instance.ExecuteCommand("/automove off"); });
                 }
-                else
+                else if(entrance == null)
                 {
                     return null;
                 }

@@ -106,7 +106,7 @@ public static unsafe class InventorySpaceManager
         }
     }
 
-    public static void EnqueueAllHardItems()
+    public static void EnqueueAllHardItems(bool softAsHard = false)
     {
         var im = InventoryManager.Instance();
         foreach(var invType in InventorySpaceManager.GetAllowedToSellInventoryTypes())
@@ -117,7 +117,7 @@ public static unsafe class InventorySpaceManager
                 var item = inv->Items[i];
                 if(item.ItemId != 0 && (item.Quantity < C.IMAutoVendorHardStackLimit || C.IMAutoVendorHardIgnoreStack.Contains(item.ItemId)))
                 {
-                    if(C.IMAutoVendorHard.Contains(item.ItemId) && !TaskDesynthItems.DesynthEligible(item.ItemId))
+                    if((C.IMAutoVendorHard.Contains(item.ItemId) || (softAsHard && C.IMAutoVendorSoft.Contains(item.ItemId))) && !TaskDesynthItems.DesynthEligible(item.ItemId))
                     {
                         var task = new SellSlotTask(invType, (uint)i, item.ItemId, item.Quantity);
                         PluginLog.Information($"Enqueueing {task} for hard sale");

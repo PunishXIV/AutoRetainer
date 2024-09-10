@@ -178,7 +178,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         PluginLog.Information($"AutoRetainer v{P.GetType().Assembly.GetName().Version} is ready.");
         if(!EzSharedData.TryGet<object>("AutoRetainer.WasLoaded", out _))
         {
-            if(C.MultiAutoStart)
+            if(C.MultiAutoStart || C.AutoLogin != "")
             {
                 MultiMode.PerformAutoStart();
             }
@@ -366,6 +366,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             {
                 var field = arguments.Split(" ")[1];
                 var value = arguments.Split(" ")[2];
+                DuoLog.Information($"Attempting to set {field}={value}");
                 if(C.GetFoP(field).GetType() == typeof(bool))
                 {
                     C.SetFoP(field, bool.Parse(value));

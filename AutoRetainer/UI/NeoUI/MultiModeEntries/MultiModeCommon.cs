@@ -9,9 +9,20 @@ public class MultiModeCommon : NeoUIEntry
         .Checkbox($"Wait on login screen", () => ref C.MultiWaitOnLoginScreen, "If no character is available for ventures, you will be logged off until any character is available again. Title screen movie will be disabled while this option and MultiMode are enabled.")
         .Checkbox("Synchronise Retainers (one time)", () => ref MultiMode.Synchronize, "AutoRetainer will wait until all enabled retainers have completed their ventures. After that this setting will be disabled automatically and all characters will be processed.")
         .Checkbox($"Disable Multi Mode on Manual Login", () => ref C.MultiDisableOnRelog)
-        .Checkbox($"Enable Multi Mode on Game Boot", () => ref C.MultiAutoStart)
         .Checkbox($"Do not reset Preferred Character on Manual Login", () => ref C.MultiNoPreferredReset)
         .Checkbox("Enable Manual relogs character postprocess", () => ref C.AllowManualPostprocess)
+
+        .Section("Game startup")
+        .Checkbox($"Enable Multi Mode on Game Boot", () => ref C.MultiAutoStart)
+        .Widget("Auto-login on Game Boot", (x) =>
+        {
+            ImGui.SetNextItemWidth(150f);
+            var names = C.OfflineData.Where(s => !s.Name.IsNullOrEmpty()).Select(s => $"{s.Name}@{s.World}");
+            var dict = names.ToDictionary(s => s, s => Censor.Character(s));
+            dict.Add("", "Disabled");
+            ImGuiEx.Combo(x, ref C.AutoLogin, ["", ..names], names: dict);
+        })
+        .SliderInt(150f, "Delay", () => ref C.AutoLoginDelay.ValidateRange(0, 60), 0, 20, "Set appropriate delay to let plugins fully load before logging in and to allow yourself some time to cancel login if needed")
 
         .Section("Inventory warnings")
         .InputInt(100f, $"Retainer list: remaining inventory slots warning", () => ref C.UIWarningRetSlotNum.ValidateRange(2, 1000))

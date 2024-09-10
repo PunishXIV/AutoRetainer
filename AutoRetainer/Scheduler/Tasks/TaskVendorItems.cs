@@ -5,9 +5,9 @@ namespace AutoRetainer.Scheduler.Tasks;
 
 public static class TaskVendorItems
 {
-    public static void Enqueue()
+    public static void Enqueue(bool softAsHard = false)
     {
-        P.TaskManager.Enqueue(AddHardItems);
+        P.TaskManager.Enqueue(() => AddHardItems(softAsHard));
         P.TaskManager.Enqueue(SelectEntrustItems);
         P.TaskManager.Enqueue(WaitUntilInventoryLoaded);
         P.TaskManager.Enqueue(EnqueueImmediateAllItems);
@@ -36,9 +36,9 @@ public static class TaskVendorItems
         return RetainerHandlers.CloseAgentRetainer();
     }
 
-    public static void AddHardItems()
+    public static void AddHardItems(bool softAsHard = false)
     {
-        InventorySpaceManager.EnqueueAllHardItems();
+        InventorySpaceManager.EnqueueAllHardItems(softAsHard);
     }
 
     public static bool? SelectEntrustItems()

@@ -109,6 +109,8 @@ internal unsafe class Config : IEzConfig
     public bool GilOnlyChars = false;
 
     public bool MultiAutoStart = false;
+    public string AutoLogin = "";
+    public int AutoLoginDelay = 10;
     public bool MultiDisableOnRelog = false;
     public bool MultiNoPreferredReset = false;
     public bool MultiPreferredCharLast = true;

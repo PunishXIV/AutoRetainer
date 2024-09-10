@@ -163,7 +163,35 @@ internal unsafe class RetainerListOverlay : Window
                         }
                     }
                 }
+                if(ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                {
+                    ImGui.OpenPopup("QuickVendorPopup");
+                }
                 ImGuiEx.Tooltip("Quick Vendor Items");
+                if(ImGui.BeginPopup("QuickVendorPopup"))
+                {
+                    if(ImGui.Selectable("Sell items from Quick Venture List"))
+                    {
+                        for(var i = 0; i < GameRetainerManager.Count; i++)
+                        {
+                            var ret = GameRetainerManager.Retainers[i];
+                            if(ret.Available)
+                            {
+                                P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
+                                TaskVendorItems.Enqueue(true);
+
+                                if(C.RetainerMenuDelay > 0)
+                                {
+                                    TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
+                                }
+                                P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
+                                P.TaskManager.Enqueue(RetainerHandlers.ConfirmCantBuyback);
+                                break;
+                            }
+                        }
+                    }
+                    ImGui.EndPopup();
+                }
             }
 
             PluginToProcess = null;

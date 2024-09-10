@@ -356,7 +356,7 @@ internal static unsafe class MultiMode
         return Array.Empty<OfflineRetainerData>();
     }
 
-    internal static bool Relog(OfflineCharacterData data, out string ErrorMessage, RelogReason reason)
+    internal static bool Relog(OfflineCharacterData data, out string ErrorMessage, RelogReason reason, bool allowFromTaskManager = false)
     {
         if(reason.EqualsAny(RelogReason.Overlay, RelogReason.Command, RelogReason.ConfigGUI))
         {
@@ -374,7 +374,7 @@ internal static unsafe class MultiMode
             }
         }
         ErrorMessage = string.Empty;
-        if(P.TaskManager.IsBusy)
+        if(P.TaskManager.IsBusy && !allowFromTaskManager)
         {
             ErrorMessage = "AutoRetainer is processing tasks";
         }
@@ -425,7 +425,7 @@ internal static unsafe class MultiMode
             }
             else
             {
-                if(Utils.CanAutoLogin())
+                if(Utils.CanAutoLogin() || (allowFromTaskManager && Utils.CanAutoLoginFromTaskManager()))
                 {
                     TaskChangeCharacter.EnqueueLogin(data.CurrentWorld, data.Name, data.World, data.ServiceAccount);
                     return true;
@@ -588,16 +588,49 @@ internal static unsafe class MultiMode
     internal static void PerformAutoStart()
     {
         EzSharedData.TryGet<object>("AutoRetainer.WasLoaded", out _, CreationMode.CreateAndKeep, new());
-        for(var i = 0; i < 10; i++)
+        for(var i = 0; i < C.AutoLoginDelay; i++)
         {
-            var seconds = 10 - i;
-            P.TaskManager.Enqueue(() => Svc.PluginInterface.UiBuilder.AddNotification($"MultiMode autostarts in {seconds} seconds!", P.Name, NotificationType.Warning, 0));
+            var seconds = C.AutoLoginDelay - i;
+            P.TaskManager.Enqueue(() => Svc.NotificationManager.AddNotification(new()
+            {
+                Content = $"Autostart in {seconds}!",
+                InitialDuration = TimeSpan.FromSeconds(1),
+                HardExpiry = DateTime.Now.AddSeconds(1),
+                Type = NotificationType.Warning,
+            }));
             P.TaskManager.DelayNext(1000);
         }
         P.TaskManager.Enqueue(() =>
         {
-            MultiMode.Enabled = true;
-            BailoutManager.IsLogOnTitleEnabled = true;
+            if(C.AutoLogin != "")
+            {
+                var data = C.OfflineData.First(s => $"{s.Name}@{s.World}" == C.AutoLogin);
+                if(Utils.CanAutoLoginFromTaskManager())
+                {
+                    MultiMode.Relog(data, out var error, RelogReason.Command, true);
+                    if(error == "")
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        DuoLog.Error($"Error during auto login: {error}");
+                    }
+                }
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        });
+        P.TaskManager.Enqueue(() =>
+        {
+            if(C.MultiAutoStart)
+            {
+                MultiMode.Enabled = true;
+                BailoutManager.IsLogOnTitleEnabled = true;
+            }
         });
     }
 }
