@@ -221,7 +221,6 @@ public unsafe static class TroubleshootingUI
         CheckExpertSetting("Show MultiMode checkbox on plugin UI bar", nameof(C.MultiModeUIBar));
         CheckExpertSetting("Retainer menu delay, seconds", nameof(C.RetainerMenuDelay));
         CheckExpertSetting("Do not error check venture planner", nameof(C.NoErrorCheckPlanner2));
-        CheckExpertSetting("Housing Bell Support", nameof(C.ExpertMultiAllowHET));
         CheckExpertSetting("Upon activating Multi Mode, attempt to enter nearby house", nameof(C.MultiHETOnEnable));
         CheckExpertSetting("Artisan integration", nameof(C.ArtisanIntegration));
         CheckExpertSetting("Use server time instead of PC time", nameof(C.UseServerTime));

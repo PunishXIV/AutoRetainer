@@ -9,7 +9,11 @@ internal static class TaskInteractWithNearestPanel
         VoyageUtils.Log($"Task enqueued: {nameof(TaskInteractWithNearestPanel)} interact={interact}");
         if(!VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType))
         {
-            TaskContinueHET.EnqueueEnterWorkshop();
+            TaskNeoHET.TryEnterWorkshop(() =>
+            {
+                Data.WorkshopEnabled = false;
+                DuoLog.Error($"Due to failure to find workshop, character is excluded from processing deployables");
+            });
         }
         P.TaskManager.Enqueue(() =>
         {

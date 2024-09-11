@@ -32,6 +32,7 @@ internal static unsafe class Utils
     internal static float AnimationLock => Player.AnimationLock;
     private static bool IsNullOrEmpty(this string s) => GenericHelpers.IsNullOrEmpty(s);
 
+
     public static long GetRemainingSessionMiliSeconds() => P.TimeLaunched[0] + 3 * 24 * 60 * 60 * 1000 - DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
     public static readonly InventoryType[] RetainerInventories = [InventoryType.RetainerPage1, InventoryType.RetainerPage2, InventoryType.RetainerPage3, InventoryType.RetainerPage4, InventoryType.RetainerPage5, InventoryType.RetainerPage6, InventoryType.RetainerPage7];

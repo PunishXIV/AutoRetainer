@@ -45,4 +45,6 @@ public class LifestreamIPC
     [EzIPC] public Action<int?> EnqueueInnShortcut;
     [EzIPC] public Func<bool?> HasApartment;
     [EzIPC] public Action<bool> EnterApartment;
+    [EzIPC] public Func<bool?> HasPrivateHouse;
+    [EzIPC] public Func<bool?> HasFreeCompanyHouse;
 }

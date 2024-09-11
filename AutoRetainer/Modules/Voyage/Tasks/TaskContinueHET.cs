@@ -7,7 +7,7 @@ namespace AutoRetainer.Modules.Voyage.Tasks;
 
 internal static unsafe class TaskContinueHET
 {
-    internal static void Enqueue()
+    private static void Enqueue()
     {
         VoyageUtils.Log($"Task enqueued: {nameof(TaskContinueHET)}");
         P.TaskManager.Enqueue(NpcSaleManager.EnqueueIfItemsPresent);
@@ -25,7 +25,7 @@ internal static unsafe class TaskContinueHET
         });
     }
 
-    internal static void EnqueueImmediateEnterWorkshop()
+    private static void EnqueueImmediateEnterWorkshop()
     {
         P.TaskManager.BeginStack();
         P.TaskManager.Enqueue(() => !IsOccupied() && IsScreenReady(), "WaitUntilNotOccupied2", new(timeLimitMS:180 * 1000));
@@ -41,7 +41,7 @@ internal static unsafe class TaskContinueHET
         P.TaskManager.InsertStack();
     }
 
-    internal static void EnqueueEnterWorkshop()
+    private static void EnqueueEnterWorkshop()
     {
         P.TaskManager.Enqueue(() => !IsOccupied() && IsScreenReady(), "WaitUntilNotOccupied2", new(timeLimitMS:180 * 1000));
         P.TaskManager.Enqueue(LockonAdditionalChambers, new(timeLimitMS:1000, abortOnTimeout:true));

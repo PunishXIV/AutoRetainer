@@ -35,7 +35,7 @@ internal static unsafe class MultiMode
     internal static CircularBuffer<long> Interactions = new(5);
 
     internal static Dictionary<ulong, int> CharaCnt = [];
-    internal static bool CanHET => Active && C.ExpertMultiAllowHET && (ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType));
+    internal static bool CanHET => Active && ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType);
 
     internal static void Init()
     {
@@ -64,7 +64,7 @@ internal static unsafe class MultiMode
             if(CanHET)
             {
                 DebugLog($"ProperOnLogin: {Svc.ClientState.LocalPlayer}, residential area, scheduling HET");
-                if(!TaskTeleportToProperty.HasRegisteredProperty()) HouseEnterTask.EnqueueTask();
+                if(!TaskTeleportToProperty.HasRegisteredProperty()) TaskNeoHET.Enqueue();
             }
             MultiModeUI.JustRelogged = true;
         });
@@ -97,11 +97,7 @@ internal static unsafe class MultiMode
         {
             if(C.MultiHETOnEnable && Player.Available && CanHET)
             {
-                HouseEnterTask.EnqueueTask();
-            }
-            if(Utils.GetNearestWorkshopEntrance(out _) != null && Utils.GetReachableRetainerBell(false) == null)
-            {
-                TaskContinueHET.Enqueue();
+                TaskNeoHET.Enqueue(null);
             }
         }
     }

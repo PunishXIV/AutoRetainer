@@ -21,7 +21,6 @@ internal unsafe class Config : IEzConfig
     public bool ShouldSerializeEnableAutoGCHandin() => false;
     public bool GCHandinNotify = false;
     internal bool BypassSanctuaryCheck = false;
-    public bool ExpertMultiAllowHET = true;
     public bool MultiHETOnEnable = true;
     public bool UseServerTime = true;
     public bool NoTheme = false;

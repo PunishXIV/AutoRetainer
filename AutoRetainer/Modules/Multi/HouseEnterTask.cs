@@ -12,7 +12,7 @@ namespace AutoRetainer.Modules.Multi;
 
 internal static unsafe class HouseEnterTask
 {
-    internal static void EnqueueTask()
+    private static void EnqueueTask()
     {
         PluginLog.Debug($"Enqueued HouseEnterTask from {new StackTrace().GetFrames().Select(x => x.GetMethod()?.Name).Prepend("      ").Print("\n")}");
         P.TaskManager.Enqueue(NewYesAlreadyManager.WaitForYesAlreadyDisabledTask);
@@ -50,10 +50,10 @@ internal static unsafe class HouseEnterTask
             P.TaskManager.InsertStack();
             return true;
         }, "Master HET");
-        TaskContinueHET.Enqueue();
+        //TaskContinueHET.Enqueue();
     }
 
-    internal static bool? WaitUntilNotBusy()
+    private static bool? WaitUntilNotBusy()
     {
         if(!IsScreenReady()) return false;
         if(!ProperOnLogin.PlayerPresent || !ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType)) return null;
@@ -64,7 +64,7 @@ internal static unsafe class HouseEnterTask
         return false;
     }
 
-    internal static bool? Lockon()
+    private static bool? Lockon()
     {
         var entrance = Utils.GetNearestEntrance(out _);
         if(entrance != null && Svc.Targets.Target?.Address == entrance.Address && EzThrottler.Throttle("HET.Lockon"))

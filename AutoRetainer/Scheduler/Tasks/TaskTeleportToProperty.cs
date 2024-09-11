@@ -80,7 +80,7 @@ public static class TaskTeleportToProperty
                 }
                 else
                 {
-                    HouseEnterTask.EnqueueTask();
+                    TaskNeoHET.Enqueue(null);
                     return true; //already here
                 }
             }
@@ -98,7 +98,7 @@ public static class TaskTeleportToProperty
                 && S.LifestreamIPC.GetCurrentPlotInfo()?.Kind == pathData.ResidentialDistrict
                 && !S.LifestreamIPC.IsBusy();
             }, new(timeLimitMS:5 * 60 * 1000));
-            HouseEnterTask.EnqueueTask();
+            TaskNeoHET.Enqueue(null);
             return true;
         }
     }

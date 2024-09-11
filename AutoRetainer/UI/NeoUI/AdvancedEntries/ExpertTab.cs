@@ -39,9 +39,6 @@ public class ExpertTab : NeoUIEntry
                 }
             }
         })
-        .Checkbox($"Housing Bell Support", () => ref C.ExpertMultiAllowHET)
-        .Widget("", (x) => ImGuiEx.HelpMarker("A Summoning Bell must be within range of the spawn point once the home is entered, or a workshop must be purchased.", ImGuiColors.DalamudOrange, FontAwesomeIcon.ExclamationTriangle.ToIconString()))
-         .Checkbox($"Upon activating Multi Mode, attempt to enter nearby house", () => ref C.MultiHETOnEnable)
 
         .Section("Integrations")
         .Checkbox($"Artisan integration", () => ref C.ArtisanIntegration, "Automatically enables AutoRetainer while Artisan is Pauses Artisan operation when ventures are ready to be collected and a retainer bell is within range. Once ventures have been dealt with Artisan will be enabled and resume whatever it was doing.")

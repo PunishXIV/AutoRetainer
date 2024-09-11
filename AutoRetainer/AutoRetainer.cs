@@ -269,7 +269,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         }
         else if(arguments.EqualsIgnoreCase("het"))
         {
-            HouseEnterTask.EnqueueTask();
+            TaskNeoHET.Enqueue(() => DuoLog.Error("Failed to find suitable house"));
         }
         else if(arguments.EqualsIgnoreCaseAny("deliver"))
         {

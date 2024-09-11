@@ -23,7 +23,7 @@ public class IPC_PluginState
     }
     [EzIPC] public void EnableMultiMode() => Svc.Commands.ProcessCommand("/autoretainer multi enable");
     [EzIPC] public int GetInventoryFreeSlotCount() => Utils.GetInventoryFreeSlotCount();
-    [EzIPC] public void EnqueueHET(bool ignoreTeleportZonecheck, bool noTeleport) => HouseEnterTask.EnqueueTask();
+    [EzIPC] public void EnqueueHET(Action onFailure) => TaskNeoHET.Enqueue(onFailure);
     [EzIPC] public bool CanAutoLogin() => Utils.CanAutoLogin();
     [EzIPC]
     public bool Relog(string charaNameWithWorld)
