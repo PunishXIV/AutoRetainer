@@ -163,7 +163,7 @@ internal static unsafe class SchedulerMain
                                     }
 
                                     var selectedPlan = C.EntrustPlans.FirstOrDefault(x => x.Guid == adata.EntrustPlan && !x.ManualPlan);
-                                    if(selectedPlan != null)
+                                    if(C.EnableEntrustManager && selectedPlan != null)
                                     {
                                         TaskEntrustDuplicates.EnqueueNew(selectedPlan);
                                     }

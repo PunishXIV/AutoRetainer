@@ -216,4 +216,5 @@ internal unsafe class Config : IEzConfig
     public bool ResolveConnectionErrors = false;
     public int ConnectionErrorsRetry = 10;
     public bool ConnectionErrorsBlacklist = true;
+    public bool EnableEntrustManager = true;
 }

@@ -211,7 +211,9 @@ internal static unsafe class MultiModeUI
                             {
                                 ImGui.SameLine();
                                 ImGui.PushFont(UiBuilder.IconFont);
-                                ImGuiEx.Text(plan.ManualPlan ? ImGuiColors.DalamudOrange : null, Lang.IconDuplicate);
+                                Vector4? c = plan.ManualPlan ? ImGuiColors.DalamudOrange : null;
+                                if(!C.EnableEntrustManager) c = ImGuiColors.DalamudRed;
+                                ImGuiEx.Text(c, Lang.IconDuplicate);
                                 ImGui.PopFont();
                                 ImGuiEx.Tooltip($"Entrust plan \"{plan.Name}\" is active." + (plan.ManualPlan ? "\nThis is manual processing plan" : ""));
                             }
@@ -300,6 +302,7 @@ internal static unsafe class MultiModeUI
                             //ImGui.Checkbox($"Entrust Duplicates", ref adata.EntrustDuplicates);
                             var selectedPlan = C.EntrustPlans.FirstOrDefault(x => x.Guid == adata.EntrustPlan);
                             ImGuiEx.TextV($"Entrust Items:");
+                            if(!C.EnableEntrustManager) ImGuiEx.HelpMarker("Globally disabled in settings", EColor.RedBright, FontAwesomeIcon.ExclamationTriangle.ToIconString());
                             ImGui.SameLine();
                             ImGui.SetNextItemWidth(150f);
                             if(ImGui.BeginCombo($"##select", selectedPlan?.Name ?? "Disabled", ImGuiComboFlags.HeightLarge))

@@ -86,6 +86,11 @@ public unsafe static class TroubleshootingUI
             Warning("Simple Teleport option is enabled. It's less reliable than registering your houses with Lifestream. If you are experiencing issues with teleportation, consider disabling this option and registering your property with Lifestream.");
         }
 
+        if(!C.EnableEntrustManager && C.AdditionalData.Any(x => x.Value.EntrustPlan != Guid.Empty))
+        {
+            Warning($"Entrust manager is globally disabled, while some retainers have their entrust plans assigned. Entrust plans will only be processed manually.");
+        }
+
         if(C.ExtraDebug)
         {
             Info("Extra logging option active. It will spam your log. Only use it when collecting debug information.");

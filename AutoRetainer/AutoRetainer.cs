@@ -141,7 +141,6 @@ public unsafe class AutoRetainer : IDalamudPlugin
             /autoretainer debug - toggle debug menu and verbose output
             /autoretainer shutdown <hours> [minutes] [seconds] - schedule a game shutdown in this amount of time
             /autoretainer npcsell - begin selling items to NPC if possible
-            /autoretainer deliver - begin delivering GC items if possible
             /autoretainer het - enter nearby own house or apartment if possible
             /autoretainer reset - reset all pending tasks
             """);
