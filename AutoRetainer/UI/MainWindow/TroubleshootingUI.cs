@@ -54,6 +54,33 @@ public unsafe static class TroubleshootingUI
             }
         }
 
+        if(C.AllowPrivateTeleport)
+        {
+            var list = C.OfflineData.Where(x => x.DisablePrivateHouseTeleport);
+            if(list.Any())
+            {
+                Warning("Some characters are excluded from private house teleportation for retainers. Hover to see the list.", list.Select(x => Censor.Character(x.Name, x.World)).Print("\n"));
+            }
+        }
+
+        if(C.AllowFcTeleport)
+        {
+            var list = C.OfflineData.Where(x => x.DisableFcHouseTeleport);
+            if(list.Any())
+            {
+                Warning("Some characters are excluded from FC house teleportation for retainers. Hover to see the list.", list.Select(x => Censor.Character(x.Name, x.World)).Print("\n"));
+            }
+        }
+
+        if(!C.DisableApartment)
+        {
+            var list = C.OfflineData.Where(x => x.DisableApartmentTeleport);
+            if(list.Any())
+            {
+                Warning("Some characters are excluded from apartment teleportation for retainers. Hover to see the list.", list.Select(x => Censor.Character(x.Name, x.World)).Print("\n"));
+            }
+        }
+
         if(C.AllowSimpleTeleport)
         {
             Warning("Simple Teleport option is enabled. It's less reliable than registering your houses with Lifestream. If you are experiencing issues with teleportation, consider disabling this option and registering your property with Lifestream.");

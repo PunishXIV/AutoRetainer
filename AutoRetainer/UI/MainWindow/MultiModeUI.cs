@@ -119,6 +119,7 @@ internal static unsafe class MultiModeUI
                     ImGui.Checkbox("Disable teleport to FC house", ref data.DisableFcHouseTeleport);
                     ImGui.Checkbox("Disable teleport to private house", ref data.DisablePrivateHouseTeleport);
                     ImGui.Checkbox("Disable teleport to apartment", ref data.DisableApartmentTeleport);
+                    ImGuiGroup.EndGroupBox();
                 }
                 SharedUI.DrawExcludeReset(data);
                 ImGui.EndPopup();
