@@ -12,8 +12,8 @@ public static class TaskTeleportToProperty
         var data = S.LifestreamIPC.GetHousePathData(Player.CID);
         var info = S.LifestreamIPC.GetCurrentPlotInfo();
         {
-            var canPrivate = C.AllowPrivateTeleport && data.Private != null && data.Private.PathToEntrance.Count > 0;
-            var canFc = C.AllowFcTeleport && data.FC != null && data.FC.PathToEntrance.Count > 0;
+            var canPrivate = Data.GetAllowPrivateTeleportForRetainers() && data.Private != null && data.Private.PathToEntrance.Count > 0;
+            var canFc = C.AllowFcTeleport && data.FC != null && data.FC.PathToEntrance.Count > 0 && (requireFc || !Data.DisableFcHouseTeleport);
             if((requireFc || !canPrivate) && canFc)
             {
                 return Process(true);
@@ -26,8 +26,8 @@ public static class TaskTeleportToProperty
 
         if(C.AllowSimpleTeleport)
         {
-            var canFc = S.LifestreamIPC.HasFreeCompanyHouse() != false;
-            var canPrivate = S.LifestreamIPC.HasPrivateHouse() != false;
+            var canFc = C.AllowFcTeleport && S.LifestreamIPC.HasFreeCompanyHouse() != false && (requireFc || !Data.DisableFcHouseTeleport);
+            var canPrivate = Data.GetAllowPrivateTeleportForRetainers() && S.LifestreamIPC.HasPrivateHouse() != false;
             if((requireFc || !canPrivate) && canFc)
             {
                 return ProcessSimple(true);
@@ -41,7 +41,7 @@ public static class TaskTeleportToProperty
         if(!requireFc && C.AllowRetireInnApartment)
         {
             //apartment logic
-            if(!C.DisableApartment)
+            if(Data.GetAllowApartmentTeleportForRetainers())
             {
                 if(S.LifestreamIPC.HasApartment() == true && Apartments.Contains(Player.Territory)) return false;
                 if(S.LifestreamIPC.HasApartment() != false)
@@ -126,7 +126,7 @@ public static class TaskTeleportToProperty
             {
                 return false;
             }
-            if(Player.Territory.EqualsAny([.. Houses.List]))
+            if(Player.Territory.EqualsAny([.. Houses.List]) && (!fc || TaskNeoHET.GetWorkshopEntrance() != null))
             {
                 return false;
             }
@@ -152,11 +152,15 @@ public static class TaskTeleportToProperty
         }
     }
 
-    public static bool HasRegisteredProperty()
+    public static bool ShouldVoidHET()
     {
+        var subsSoon = Data.WorkshopEnabled && Data.AnyEnabledVesselsAvailable() && MultiMode.EnabledSubmarines && (!C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn || Data.AreAnyEnabledVesselsReturnInNext(1, true));
+        var retainersSoon = MultiMode.AnyRetainersAvailable(60) && MultiMode.EnabledRetainers;
+        var blockHet = subsSoon || retainersSoon;
+        if(C.AllowSimpleTeleport && (Data.GetAllowFcTeleportForRetainers() || Data.GetAllowPrivateTeleportForRetainers())) return blockHet;
         var data = S.LifestreamIPC.GetHousePathData(Player.CID);
-        if(C.AllowFcTeleport && data.FC != null && data.FC.PathToEntrance.Count > 0) return true;
-        if(C.AllowPrivateTeleport && data.Private != null && data.Private.PathToEntrance.Count > 0) return true;
+        if(Data.GetAllowFcTeleportForRetainers() && data.FC != null && data.FC.PathToEntrance.Count > 0) return blockHet;
+        if(Data.GetAllowPrivateTeleportForRetainers() && data.Private != null && data.Private.PathToEntrance.Count > 0) return blockHet;
         return false;
     }
 }

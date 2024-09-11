@@ -32,6 +32,9 @@ internal static unsafe class Utils
     internal static float AnimationLock => Player.AnimationLock;
     private static bool IsNullOrEmpty(this string s) => GenericHelpers.IsNullOrEmpty(s);
 
+    public static bool GetAllowFcTeleportForRetainers(this OfflineCharacterData data) => C.AllowFcTeleport && !data.DisableFcHouseTeleport;
+    public static bool GetAllowPrivateTeleportForRetainers(this OfflineCharacterData data) => C.AllowPrivateTeleport && !data.DisablePrivateHouseTeleport;
+    public static bool GetAllowApartmentTeleportForRetainers(this OfflineCharacterData data) => !C.DisableApartment && !data.DisableApartmentTeleport;
 
     public static long GetRemainingSessionMiliSeconds() => P.TimeLaunched[0] + 3 * 24 * 60 * 60 * 1000 - DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
@@ -163,16 +166,6 @@ internal static unsafe class Utils
             }
         }
         return ret;
-    }
-
-    public static bool GetAllowFcTeleport(this OfflineCharacterData data)
-    {
-        return C.AllowFcTeleport;
-    }
-
-    public static bool GetAllowPrivateTeleport(this OfflineCharacterData data)
-    {
-        return C.AllowPrivateTeleport;
     }
 
     public static bool IsItemSellableByHardList(uint item, uint quantity)

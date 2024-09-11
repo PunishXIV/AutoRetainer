@@ -113,6 +113,13 @@ internal static unsafe class MultiModeUI
                     }*/
                     ImGuiGroup.EndGroupBox();
                 }
+                if(ImGuiGroup.BeginGroupBox("Retainer teleport exclusions"))
+                {
+                    ImGuiEx.Text($"This character will not teleport to the \nfollowing locations for retainer processing:");
+                    ImGui.Checkbox("Disable teleport to FC house", ref data.DisableFcHouseTeleport);
+                    ImGui.Checkbox("Disable teleport to private house", ref data.DisablePrivateHouseTeleport);
+                    ImGui.Checkbox("Disable teleport to apartment", ref data.DisableApartmentTeleport);
+                }
                 SharedUI.DrawExcludeReset(data);
                 ImGui.EndPopup();
             }

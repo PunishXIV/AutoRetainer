@@ -64,7 +64,7 @@ internal static unsafe class MultiMode
             if(CanHET)
             {
                 DebugLog($"ProperOnLogin: {Svc.ClientState.LocalPlayer}, residential area, scheduling HET");
-                if(!TaskTeleportToProperty.HasRegisteredProperty()) TaskNeoHET.Enqueue(null);
+                if(!TaskTeleportToProperty.ShouldVoidHET()) TaskNeoHET.Enqueue(null);
             }
             MultiModeUI.JustRelogged = true;
         });
@@ -93,7 +93,7 @@ internal static unsafe class MultiMode
             return;
         }
         LastLogin = 0;
-        if(!TaskTeleportToProperty.HasRegisteredProperty())
+        if(!TaskTeleportToProperty.ShouldVoidHET())
         {
             if(C.MultiHETOnEnable && Player.Available && CanHET)
             {
@@ -307,11 +307,11 @@ internal static unsafe class MultiMode
         return C.OfflineData.Where(x => x.Enabled);
     }
 
-    internal static bool AnyRetainersAvailable()
+    internal static bool AnyRetainersAvailable(int advanceSeconds = 0)
     {
         if(GetEnabledOfflineData().TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
         {
-            return data.GetEnabledRetainers().Any(z => z.GetVentureSecondsRemaining() <= C.UnsyncCompensation);
+            return data.GetEnabledRetainers().Any(z => z.GetVentureSecondsRemaining() <= C.UnsyncCompensation + advanceSeconds);
         }
         return false;
     }

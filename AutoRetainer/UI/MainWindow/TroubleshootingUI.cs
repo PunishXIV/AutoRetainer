@@ -54,6 +54,11 @@ public unsafe static class TroubleshootingUI
             }
         }
 
+        if(C.AllowSimpleTeleport)
+        {
+            Warning("Simple Teleport option is enabled. It's less reliable than registering your houses with Lifestream. If you are experiencing issues with teleportation, consider disabling this option and registering your property with Lifestream.");
+        }
+
         if(C.ExtraDebug)
         {
             Info("Extra logging option active. It will spam your log. Only use it when collecting debug information.");

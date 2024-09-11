@@ -1,6 +1,7 @@
 ﻿global using OverlayTextData = (System.Numerics.Vector2 Curpos, (bool Warning, string Text)[] Texts);
 using AutoRetainerAPI.Configuration;
 using ECommons.Interop;
+using Lumina.Excel.GeneratedSheets;
 
 namespace AutoRetainer.UI;
 
@@ -61,7 +62,7 @@ internal static class UIUtils
             ImGui.PushFont(UiBuilder.IconFont);
             ImGuiEx.Text(error == null ? null : ImGuiColors.DalamudGrey3, "\ue1b0");
             ImGui.PopFont();
-            ImGuiEx.Tooltip(error ?? "Private is registered in Lifestream and path is set. You will be teleported to Private house for resending Retainers.");
+            ImGuiEx.Tooltip(error ?? $"Private house is registered in Lifestream and path is set. You will be teleported to Private house for resending Retainers.\nAddress: {Svc.Data.GetExcelSheet<Aetheryte>().GetRow((uint)data.Private.ResidentialDistrict)?.Territory.Value.PlaceNameRegion.Value.Name}, ward {data.Private.Ward+1}, plot {data.Private.Plot+1}");
             ImGui.SameLine(0, 3);
         }
     }
