@@ -59,7 +59,6 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal MarketCooldownOverlay MarketCooldownOverlay;
     internal SubmarineUnlockPlanUI SubmarineUnlockPlanUI;
     internal SubmarinePointPlanUI SubmarinePointPlanUI;
-    internal DuplicateBlacklistSelector DuplicateBlacklistSelector;
 
     internal long Time => C.UseServerTime ? CSFramework.GetServerTime() : DateTimeOffset.Now.ToUnixTimeSeconds();
 
@@ -109,7 +108,6 @@ public unsafe class AutoRetainer : IDalamudPlugin
         LogWindow = new();
         AutoRetainerWindow = new();
         MarketCooldownOverlay = new();
-        DuplicateBlacklistSelector = new();
         new MultiModeOverlay();
         RetainerListOverlay = new();
         LoginOverlay = new LoginOverlay();

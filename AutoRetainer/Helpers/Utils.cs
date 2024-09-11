@@ -785,7 +785,6 @@ internal static unsafe class Utils
         P.VenturePlanner.RespectCloseHotkey = !C.IgnoreEsc;
         P.VentureBrowser.RespectCloseHotkey = !C.IgnoreEsc;
         P.LogWindow.RespectCloseHotkey = !C.IgnoreEsc;
-        P.DuplicateBlacklistSelector.RespectCloseHotkey = !C.IgnoreEsc;
     }
 
     internal static string ToTimeString(long seconds)
