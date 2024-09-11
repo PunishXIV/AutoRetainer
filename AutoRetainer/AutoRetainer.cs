@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.Internal;
+using AutoRetainer.Internal.InventoryManagement;
 using AutoRetainer.Modules.Statistics;
 using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Scheduler.Tasks;
@@ -127,7 +128,23 @@ public unsafe class AutoRetainer : IDalamudPlugin
         };
         Svc.ClientState.Logout += Logout;
         Svc.Condition.ConditionChange += ConditionChange;
-        EzCmd.Add("/autoretainer", CommandHandler, "Open plugin interface\n/autoretainer e|enable → Enable plugin\n/autoretainer d|disable - Disable plugin\n/autoretainer t|toggle - toggle plugin\n/autoretainer m|multi - toggle MultiMode\n/autoretainer relog Character Name@WorldName - relog to the targeted character if configured\n/autoretainer b|browser - open venture browser\n/autoretainer expert - toggle expert settings\n/autoretainer debug - toggle debug menu and verbose output\n/autoretainer shutdown <hours> [minutes] [seconds] - schedule a game shutdown in this amount of time");
+        EzCmd.Add("/autoretainer", CommandHandler, """
+            Open plugin interface
+            /ays - alias for /autoretainer
+            /autoretainer e|enable → Enable plugin
+            /autoretainer d|disable - Disable plugin
+            /autoretainer t|toggle - toggle plugin
+            /autoretainer m|multi - toggle MultiMode
+            /autoretainer relog Character Name@WorldName - relog to the targeted character if configured
+            /autoretainer b|browser - open venture browser
+            /autoretainer expert - toggle expert settings
+            /autoretainer debug - toggle debug menu and verbose output
+            /autoretainer shutdown <hours> [minutes] [seconds] - schedule a game shutdown in this amount of time
+            /autoretainer npcsell - begin selling items to NPC if possible
+            /autoretainer deliver - begin delivering GC items if possible
+            /autoretainer het - enter nearby own house or apartment if possible
+            /autoretainer reset - reset all pending tasks
+            """);
         EzCmd.Add("/ays", CommandHandler);
         Svc.Toasts.ErrorToast += Toasts_ErrorToast;
         Svc.Toasts.Toast += Toasts_Toast;
@@ -272,6 +289,17 @@ public unsafe class AutoRetainer : IDalamudPlugin
         else if(arguments.EqualsIgnoreCaseAny("deliver"))
         {
             GCContinuation.EnableDeliveringIfPossible();
+        }
+        else if(arguments.EqualsIgnoreCaseAny("npcsell"))
+        {
+            if(C.IMEnableNpcSell && NpcSaleManager.GetValidNPC() != null && !IsOccupied() && !P.TaskManager.IsBusy)
+            {
+                NpcSaleManager.EnqueueIfItemsPresent();
+            }
+            else
+            {
+                DuoLog.Error($"No valid housing NPC was found, or AutoRetainer is busy, or NPC sale function is disabled");
+            }
         }
         else if(arguments.StartsWith("shutdown"))
         {

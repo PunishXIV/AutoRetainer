@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.Packaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,4 +18,5 @@ public class EntrustPlan
     public Dictionary<uint, int> EntrustItemsAmountToKeep = [];
     public bool AllowEntrustFromArmory = false;
     public bool ManualPlan = false;
+    public bool ExcludeProtected = false;
 }

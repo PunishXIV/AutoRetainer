@@ -88,6 +88,7 @@ public class EntrustManager : InventoryManagemenrBase
             ImGui.Checkbox("Allow entrusting from Armory Chest", ref selectedPlan.AllowEntrustFromArmory);
             ImGui.Checkbox("Manual execution only", ref selectedPlan.ManualPlan);
             ImGuiEx.HelpMarker("Mark this plan for manual execution only. This plan will only be processed upon manual \"Entrust Items\" button click and never automatically.");
+            ImGui.Checkbox("Exclude items present in protection list", ref selectedPlan.ExcludeProtected);
             ImGui.Separator();
             ImGuiEx.TreeNodeCollapsingHeader($"Entrust categories ({selectedPlan.EntrustCategories.Count} selected)###ecats", () =>
             {
