@@ -19,7 +19,7 @@ internal unsafe class DebugMulti : DebugSectionBase
     {
         if(ImGui.CollapsingHeader("NeoHET"))
         {
-            if(ImGui.Button("Enqueue HET")) TaskNeoHET.Enqueue();
+            if(ImGui.Button("Enqueue HET")) TaskNeoHET.Enqueue(null);
             if(ImGui.Button("Enqueue workshop")) TaskNeoHET.TryEnterWorkshop(() => DuoLog.Error("Fail"));
         }
         if(ImGui.CollapsingHeader("Tasks"))

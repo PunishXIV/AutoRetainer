@@ -126,6 +126,7 @@ internal unsafe class Config : IEzConfig
     public bool AllowPrivateTeleport = false;
     public bool AllowFcTeleport = false;
     public bool AllowManualPostprocess = false;
+    public bool AllowSimpleTeleport = false;
 
     public List<EntrustPlan> EntrustPlans = [];
     public bool AllowSellFromArmory = false;

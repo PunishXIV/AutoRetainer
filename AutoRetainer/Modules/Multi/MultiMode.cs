@@ -64,7 +64,7 @@ internal static unsafe class MultiMode
             if(CanHET)
             {
                 DebugLog($"ProperOnLogin: {Svc.ClientState.LocalPlayer}, residential area, scheduling HET");
-                if(!TaskTeleportToProperty.HasRegisteredProperty()) TaskNeoHET.Enqueue();
+                if(!TaskTeleportToProperty.HasRegisteredProperty()) TaskNeoHET.Enqueue(null);
             }
             MultiModeUI.JustRelogged = true;
         });
