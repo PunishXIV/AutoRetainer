@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.Modules.Voyage;
+using AutoRetainer.UI.MainWindow.MultiModeTab;
 using AutoRetainerAPI;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Interface.Components;

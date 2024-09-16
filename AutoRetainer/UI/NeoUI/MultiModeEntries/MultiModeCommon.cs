@@ -20,7 +20,7 @@ public class MultiModeCommon : NeoUIEntry
             var names = C.OfflineData.Where(s => !s.Name.IsNullOrEmpty()).Select(s => $"{s.Name}@{s.World}");
             var dict = names.ToDictionary(s => s, s => Censor.Character(s));
             dict.Add("", "Disabled");
-            ImGuiEx.Combo(x, ref C.AutoLogin, ["", ..names], names: dict);
+            ImGuiEx.Combo(x, ref C.AutoLogin, ["", .. names], names: dict);
         })
         .SliderInt(150f, "Delay", () => ref C.AutoLoginDelay.ValidateRange(0, 60), 0, 20, "Set appropriate delay to let plugins fully load before logging in and to allow yourself some time to cancel login if needed")
 
@@ -34,14 +34,27 @@ public class MultiModeCommon : NeoUIEntry
         .Section("Teleportation")
         .Widget(() => ImGuiEx.Text("Lifestream plugin is required"))
         .Widget(() => ImGuiEx.PluginAvailabilityIndicator([new("Lifestream", new Version("2.2.1.1"))]))
-        .Widget(() => ImGuiEx.TextWrapped("You must register houses in Lifestream plugin for every character you want this option to work or enable Simple Teleport."))
-        .Checkbox("Enable teleport to private house", () => ref C.AllowPrivateTeleport)
-        .Checkbox("Enable teleport to free company house", () => ref C.AllowFcTeleport)
-        .Checkbox("If no private/FC house registered, teleport to apartment or inn", () => ref C.AllowRetireInnApartment)
+        .TextWrapped("You must register houses in Lifestream plugin for every character you want this option to work or enable Simple Teleport.")
+        .TextWrapped("You can customize these settings per character in character configuration menu.")
+        .Widget(() =>
+        {
+            if(Data != null && Data.GetAreTeleportSettingsOverriden())
+            {
+                ImGuiEx.TextWrapped(ImGuiColors.DalamudRed, "For current character teleport options are customized.");
+            }
+        })
+        .Checkbox("Enabled", () => ref C.GlobalTeleportOptions.Enabled)
         .Indent()
-        .Checkbox("Disable Apartments", () => ref C.DisableApartment)
+        .Checkbox("Teleport for retainers...", () => ref C.GlobalTeleportOptions.Retainers)
+        .Indent()
+        .Checkbox("...to private house", () => ref C.GlobalTeleportOptions.RetainersPrivate)
+        .Checkbox("...to free company house", () => ref C.GlobalTeleportOptions.RetainersFC)
+        .Checkbox("...to apartment", () => ref C.GlobalTeleportOptions.RetainersApartment)
+        .TextWrapped("If all above are disabled or fail, will be teleported to inn.")
         .Unindent()
+        .Checkbox("Teleport to free company house for deployables", () => ref C.GlobalTeleportOptions.Deployables)
         .Checkbox("Enable Simple Teleport", () => ref C.AllowSimpleTeleport)
+        .Unindent()
         .Widget(() => ImGuiEx.HelpMarker("Allows teleporting to houses without registering them in Lifestream. You still need Lifestream plugin for teleportation to work.\n\nWarning! This option is less reliable than registering your houses in Lifestream. Avoid it if you can.", EColor.RedBright, FontAwesomeIcon.ExclamationTriangle.ToIconString()))
 
         .Section("Bailout Module")

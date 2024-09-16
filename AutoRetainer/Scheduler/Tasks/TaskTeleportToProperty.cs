@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.Modules.Voyage;
+using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
 
@@ -6,19 +7,20 @@ namespace AutoRetainer.Scheduler.Tasks;
 public static class TaskTeleportToProperty
 {
     public static uint[] Apartments = [Houses.Ingleside_Apartment, Houses.Kobai_Goten_Apartment, Houses.Lily_Hills_Apartment, Houses.Sultanas_Breath_Apartment, Houses.Topmast_Apartment];
-    public static bool EnqueueIfNeededAndPossible(bool requireFc)
+    public static bool EnqueueIfNeededAndPossible(bool isSubmersibleOperation)
     {
         if(Player.Territory.EqualsAny(VoyageUtils.Workshops)) return false;
+        var fcTeleportEnabled = (Data.GetAllowFcTeleportForRetainers() && !isSubmersibleOperation) || (Data.GetAllowFcTeleportForSubs() && isSubmersibleOperation);
         var data = S.LifestreamIPC.GetHousePathData(Player.CID);
         var info = S.LifestreamIPC.GetCurrentPlotInfo();
         {
             var canPrivate = Data.GetAllowPrivateTeleportForRetainers() && data.Private != null && data.Private.PathToEntrance.Count > 0;
-            var canFc = C.AllowFcTeleport && data.FC != null && data.FC.PathToEntrance.Count > 0 && (requireFc || !Data.DisableFcHouseTeleport);
-            if((requireFc || !canPrivate) && canFc)
+            var canFc = (fcTeleportEnabled && data.FC != null && data.FC.PathToEntrance.Count > 0);
+            if((isSubmersibleOperation || !canPrivate) && canFc)
             {
                 return Process(true);
             }
-            if(!requireFc && canPrivate)
+            if(!isSubmersibleOperation && canPrivate)
             {
                 return Process(false);
             }
@@ -26,19 +28,19 @@ public static class TaskTeleportToProperty
 
         if(C.AllowSimpleTeleport)
         {
-            var canFc = C.AllowFcTeleport && S.LifestreamIPC.HasFreeCompanyHouse() != false && (requireFc || !Data.DisableFcHouseTeleport);
+            var canFc = fcTeleportEnabled && S.LifestreamIPC.HasFreeCompanyHouse() != false;
             var canPrivate = Data.GetAllowPrivateTeleportForRetainers() && S.LifestreamIPC.HasPrivateHouse() != false;
-            if((requireFc || !canPrivate) && canFc)
+            if((isSubmersibleOperation || !canPrivate) && canFc)
             {
                 return ProcessSimple(true);
             }
-            if(!requireFc && canPrivate)
+            if(!isSubmersibleOperation && canPrivate)
             {
                 return ProcessSimple(false);
             }
         }
 
-        if(!requireFc && C.AllowRetireInnApartment)
+        if(!isSubmersibleOperation && Data.GetIsTeleportEnabledForRetainers())
         {
             //apartment logic
             if(Data.GetAllowApartmentTeleportForRetainers())
@@ -80,6 +82,23 @@ public static class TaskTeleportToProperty
                 return true;
             }
         }
+
+        //if at this point no decision was made, just invoke HET if needed, enter any house and don't care about it
+
+        if(ExcelTerritoryHelper.Get(Player.Territory).TerritoryIntendedUse == (uint)TerritoryIntendedUseEnum.Residential_Area)
+        {
+            if(TaskNeoHET.IsInMarkerHousingPlot([..TaskNeoHET.PrivateMarkers, .. TaskNeoHET.FcMarkers]))
+            {
+                TaskNeoHET.Enqueue(null);
+                return true;
+            }
+            else if(TaskNeoHET.GetApartmentEntrance() != null && Player.DistanceTo(TaskNeoHET.GetApartmentEntrance()) < 40f)
+            {
+                TaskNeoHET.Enqueue(null);
+                return true;
+            }
+        }
+
         return false;
 
         bool Process(bool fc)
@@ -120,7 +139,7 @@ public static class TaskTeleportToProperty
 
         bool ProcessSimple(bool fc)
         {
-            var isHere = TaskNeoHET.IsInMarkerTerritory(fc?TaskNeoHET.FcMarkers:TaskNeoHET.PrivateMarkers);
+            var isHere = TaskNeoHET.IsInMarkerHousingPlot(fc?TaskNeoHET.FcMarkers:TaskNeoHET.PrivateMarkers);
             var noProperty = !(fc ? S.LifestreamIPC.HasFreeCompanyHouse() : S.LifestreamIPC.HasPrivateHouse());
             if(noProperty == true)
             {
@@ -154,8 +173,9 @@ public static class TaskTeleportToProperty
 
     public static bool ShouldVoidHET()
     {
+        if(!Player.Available) return false;
         var subsSoon = Data.WorkshopEnabled && Data.AnyEnabledVesselsAvailable() && MultiMode.EnabledSubmarines && (!C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn || Data.AreAnyEnabledVesselsReturnInNext(1, true));
-        var retainersSoon = MultiMode.AnyRetainersAvailable(60) && MultiMode.EnabledRetainers;
+        var retainersSoon = MultiMode.AnyRetainersAvailable(0) && MultiMode.EnabledRetainers;
         var blockHet = subsSoon || retainersSoon;
         if(C.AllowSimpleTeleport && (Data.GetAllowFcTeleportForRetainers() || Data.GetAllowPrivateTeleportForRetainers())) return blockHet;
         var data = S.LifestreamIPC.GetHousePathData(Player.CID);

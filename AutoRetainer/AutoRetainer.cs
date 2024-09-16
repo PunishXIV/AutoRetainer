@@ -97,6 +97,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
         //);
     }
 
+    internal void SetConfig(Config c) => this.config = c;
+
     public void Load()
     {
         EzConfig.Migrate<Config>();

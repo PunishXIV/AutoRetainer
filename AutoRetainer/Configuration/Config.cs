@@ -123,16 +123,14 @@ internal unsafe class Config : IEzConfig
 
     public string DefaultSubmarineUnlockPlan = "";
     public bool AcceptedDisclamer = false;
-    public bool AllowPrivateTeleport = false;
-    public bool AllowFcTeleport = false;
     public bool AllowManualPostprocess = false;
     public bool AllowSimpleTeleport = false;
 
     public List<EntrustPlan> EntrustPlans = [];
     public bool AllowSellFromArmory = false;
-    public bool AllowRetireInnApartment = false;
-    public bool DisableApartment = false;
     public bool DontLogout = false;
+
+    public TeleportOptions GlobalTeleportOptions = new();
 
     internal bool DontReassign
     {

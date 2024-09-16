@@ -1,4 +1,7 @@
-﻿namespace AutoRetainer.UI.NeoUI.AdvancedEntries;
+﻿using ECommons.Configuration;
+using ECommons.Reflection;
+
+namespace AutoRetainer.UI.NeoUI.AdvancedEntries;
 public class ExpertTab : NeoUIEntry
 {
     public override string Path => "Advanced/Expert Settings";
@@ -58,7 +61,44 @@ public class ExpertTab : NeoUIEntry
                 }
                 DuoLog.Information($"Cleaned {i} entries");
             }
-        });
+        })
+        
+        .Section("Import/Export")
+        .Widget(() =>
+        {
+            if(ImGui.Button("Export without character data"))
+            {
+                var clone = C.JSONClone();
+                clone.OfflineData = null;
+                clone.AdditionalData = null;
+                clone.FCData = null;
+                clone.SelectedRetainers = null;
+                clone.Blacklist = null;
+                clone.AutoLogin = "";
+                Copy(EzConfig.DefaultSerializationFactory.Serialize(clone, false));
+            }
+            if(ImGui.Button("Import and merge with character data"))
+            {
+                try
+                {
+                    var c = EzConfig.DefaultSerializationFactory.Deserialize<Config>(Paste());
+                    c.OfflineData = C.OfflineData;
+                    c.AdditionalData = C.AdditionalData;
+                    c.FCData = C.FCData;
+                    c.SelectedRetainers = C.SelectedRetainers;
+                    c.Blacklist = C.Blacklist;
+                    c.AutoLogin = C.AutoLogin;
+                    if(c.GetType().GetFieldPropertyUnions().Any(x => x.GetValue(c) == null)) throw new NullReferenceException();
+                    EzConfig.SaveConfiguration(C, $"Backup_{DateTimeOffset.Now.ToUnixTimeMilliseconds()}.json");
+                    P.SetConfig(c);
+                }
+                catch(Exception e)
+                {
+                    e.LogDuo();
+                }
+            }
+        })
+        ;
 
     public override bool ShouldDisplay()
     {

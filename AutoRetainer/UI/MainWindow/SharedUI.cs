@@ -7,30 +7,6 @@ namespace AutoRetainer.UI.MainWindow;
 
 internal static class SharedUI
 {
-    internal static void DrawExcludedNotification(bool retainer, bool workshop)
-    {
-        /*if(Player.CID == 0) return;
-        var col = GradientColor.Get(ImGuiColors.DalamudYellow, ImGuiColors.DalamudRed, 750);
-        if(C.Blacklist.Any(x => x.CID == Player.CID))
-        {
-            ImGuiEx.ImGuiLineCentered("ExclWarning1", () => ImGuiEx.Text(col, "Your current character is excluded from AutoRetainer!"));
-            ImGuiEx.ImGuiLineCentered("ExclWarning2", () => ImGuiEx.Text(col, "Go to settings - exclusions to change it."));
-        }
-        else
-        {
-            if(retainer && Data.ExcludeRetainer)
-            {
-                ImGuiEx.ImGuiLineCentered("ExclWarning1", () => ImGuiEx.Text(col, "Your current character is excluded from retainer list!"));
-                ImGuiEx.ImGuiLineCentered("ExclWarning2", () => ImGuiEx.Text(col, "Go to settings - exclusions to change it."));
-            }
-            if(workshop && Data.ExcludeWorkshop)
-            {
-                ImGuiEx.ImGuiLineCentered("ExclWarning3", () => ImGuiEx.Text(col, "Your current character is excluded from deployable list!"));
-                ImGuiEx.ImGuiLineCentered("ExclWarning2", () => ImGuiEx.Text(col, "Go to settings - exclusions to change it."));
-            }
-        }*/
-    }
-
     internal static void DrawMultiModeHeader(OfflineCharacterData data, string overrideTitle = null)
     {
         var b = true;
@@ -76,7 +52,8 @@ internal static class SharedUI
 
     internal static void DrawExcludeReset(OfflineCharacterData data)
     {
-        if(ImGuiGroup.BeginGroupBox("Character Data Expunge/Reset"))
+        new NuiBuilder().Section("Character Data Expunge/Reset")
+        .Widget(() =>
         {
             if(ImGuiEx.ButtonCtrl("Exclude Character"))
             {
@@ -89,6 +66,6 @@ internal static class SharedUI
             }
             ImGuiComponents.HelpMarker("Character's saved data will be removed without excluding it. Character data will be regenerated once you log back into this character.");
             ImGuiGroup.EndGroupBox();
-        }
+        }).Draw();
     }
 }

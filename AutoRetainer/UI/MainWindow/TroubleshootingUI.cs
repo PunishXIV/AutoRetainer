@@ -21,6 +21,11 @@ public unsafe static class TroubleshootingUI
             Error("DontLogout debug option is enabled");
         }
 
+        if((C.GlobalTeleportOptions.Enabled || C.OfflineData.Any(x => x.TeleportOptionsOverride.Enabled == true)) && !Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "Lifestream" && x.IsLoaded))
+        {
+            Error("\"Teleportation is enabled but Lifestream plugin is not installed/loaded. AutoRetainer can not function in this configuration. Either disable teleportation or install Lifestream plugin.");
+        }
+
         try
         {
             var x = DalamudReflector.GetService("Dalamud.Configuration.Internal.DalamudConfiguration");
@@ -54,30 +59,11 @@ public unsafe static class TroubleshootingUI
             }
         }
 
-        if(C.AllowPrivateTeleport)
         {
-            var list = C.OfflineData.Where(x => x.DisablePrivateHouseTeleport);
+            var list = C.OfflineData.Where(x => x.GetAreTeleportSettingsOverriden());
             if(list.Any())
             {
-                Warning("Some characters are excluded from private house teleportation for retainers. Hover to see the list.", list.Select(x => Censor.Character(x.Name, x.World)).Print("\n"));
-            }
-        }
-
-        if(C.AllowFcTeleport)
-        {
-            var list = C.OfflineData.Where(x => x.DisableFcHouseTeleport);
-            if(list.Any())
-            {
-                Warning("Some characters are excluded from FC house teleportation for retainers. Hover to see the list.", list.Select(x => Censor.Character(x.Name, x.World)).Print("\n"));
-            }
-        }
-
-        if(!C.DisableApartment)
-        {
-            var list = C.OfflineData.Where(x => x.DisableApartmentTeleport);
-            if(list.Any())
-            {
-                Warning("Some characters are excluded from apartment teleportation for retainers. Hover to see the list.", list.Select(x => Censor.Character(x.Name, x.World)).Print("\n"));
+                Info("For some of your characters, teleportation options are customized. Hover to see list.", list.Select(x => $"{x.Name}@{x.World}").Print("\n"));
             }
         }
 
@@ -119,11 +105,6 @@ public unsafe static class TroubleshootingUI
         if(C.AllowSellFromArmory)
         {
             Info("Allow selling items from Armory Chest is enabled. Make sure to add your savage gear and ultimate weapons to protection list.");
-        }
-
-        if((C.AllowFcTeleport || C.AllowPrivateTeleport) && !Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "Lifestream" && x.IsLoaded))
-        {
-            Error("\"Enable teleport to free company/private house\" option is enabled but Lifestream plugin is not installed/loaded.  AutoRetainer can not function in this configuration. Either disable these options or install Lifestream plugin.");
         }
 
         {

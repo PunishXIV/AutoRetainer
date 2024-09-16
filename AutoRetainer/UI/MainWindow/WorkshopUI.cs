@@ -3,6 +3,7 @@ using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using AutoRetainer.Scheduler.Tasks;
+using AutoRetainer.UI.MainWindow.MultiModeTab;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game;
 using Dalamud.Interface.Components;
@@ -17,8 +18,6 @@ internal static unsafe class WorkshopUI
     internal static void Draw()
     {
         List<OverlayTextData> overlayTexts = [];
-        SharedUI.DrawExcludedNotification(false, true);
-        //ImGuiEx.ImGuiLineCentered("WorkshopBetaWarning", () => ImGuiEx.Text(ImGuiColors.DalamudYellow, "This feature is in beta testing."));
         var sortedData = new List<OfflineCharacterData>();
         if(C.NoCurrentCharaOnTop)
         {

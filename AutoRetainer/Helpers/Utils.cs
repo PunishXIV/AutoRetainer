@@ -32,9 +32,25 @@ internal static unsafe class Utils
     internal static float AnimationLock => Player.AnimationLock;
     private static bool IsNullOrEmpty(this string s) => GenericHelpers.IsNullOrEmpty(s);
 
-    public static bool GetAllowFcTeleportForRetainers(this OfflineCharacterData data) => C.AllowFcTeleport && !data.DisableFcHouseTeleport;
-    public static bool GetAllowPrivateTeleportForRetainers(this OfflineCharacterData data) => C.AllowPrivateTeleport && !data.DisablePrivateHouseTeleport;
-    public static bool GetAllowApartmentTeleportForRetainers(this OfflineCharacterData data) => !C.DisableApartment && !data.DisableApartmentTeleport;
+    public static bool GetAllowFcTeleportForRetainers(this OfflineCharacterData data) => data.IsTeleportEnabled() && data.GetIsTeleportEnabledForRetainers() && (data.TeleportOptionsOverride.RetainersFC ?? C.GlobalTeleportOptions.RetainersFC);
+    public static bool GetAllowPrivateTeleportForRetainers(this OfflineCharacterData data) => data.IsTeleportEnabled() && data.GetIsTeleportEnabledForRetainers() && (data.TeleportOptionsOverride.RetainersPrivate ?? C.GlobalTeleportOptions.RetainersPrivate);
+    public static bool GetAllowApartmentTeleportForRetainers(this OfflineCharacterData data) => data.IsTeleportEnabled() && data.GetIsTeleportEnabledForRetainers() && (data.TeleportOptionsOverride.RetainersApartment ?? C.GlobalTeleportOptions.RetainersApartment);
+
+    public static bool GetAllowFcTeleportForSubs(this OfflineCharacterData data) => data.IsTeleportEnabled() && (data.TeleportOptionsOverride.Deployables ?? C.GlobalTeleportOptions.Deployables);
+
+    public static bool IsTeleportEnabled(this OfflineCharacterData data) => data.TeleportOptionsOverride.Enabled ?? C.GlobalTeleportOptions.Enabled;
+
+    public static bool GetIsTeleportEnabledForRetainers(this OfflineCharacterData data) => data.TeleportOptionsOverride.Retainers ?? C.GlobalTeleportOptions.Retainers;
+
+    public static bool GetAreTeleportSettingsOverriden(this OfflineCharacterData data)
+    {
+        return data.TeleportOptionsOverride.Deployables != null
+            || data.TeleportOptionsOverride.Enabled != null
+            || data.TeleportOptionsOverride.Retainers != null
+            || data.TeleportOptionsOverride.RetainersApartment != null
+            || data.TeleportOptionsOverride.RetainersFC != null
+            || data.TeleportOptionsOverride.RetainersPrivate != null;
+    }
 
     public static long GetRemainingSessionMiliSeconds() => P.TimeLaunched[0] + 3 * 24 * 60 * 60 * 1000 - DateTimeOffset.Now.ToUnixTimeMilliseconds();
 

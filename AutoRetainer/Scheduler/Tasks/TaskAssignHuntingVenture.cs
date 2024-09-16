@@ -22,7 +22,6 @@ internal static class TaskAssignHuntingVenture
         for(var i = 0; i < 20; i++)
         {
             P.TaskManager.Enqueue(() => RetainerHandlers.ForceSearchVentureByName(VentureID), $"ForceSearchVentureByName({VentureID})/{i}");
-            P.TaskManager.EnqueueDelay(C.FrameDelay, true);
         }
         P.TaskManager.Enqueue(() => RetainerHandlers.SelectSpecificVentureByName(VentureID), $"SelectSpecificVentureByName({VentureID})");
         /*if (!C.NoErrorCheckPlanner2)

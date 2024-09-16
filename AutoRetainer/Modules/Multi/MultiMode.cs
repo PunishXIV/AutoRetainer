@@ -2,7 +2,7 @@
 using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainer.Scheduler.Tasks;
-using AutoRetainer.UI.MainWindow;
+using AutoRetainer.UI.MainWindow.MultiModeTab;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game.Config;
 using Dalamud.Interface.ImGuiNotification;

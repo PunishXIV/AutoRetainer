@@ -30,8 +30,10 @@ internal static class UIUtils
 
     public static void DrawTeleportIcons(ulong cid)
     {
+        var offlineData = C.OfflineData.FirstOrDefault(x => x.CID == cid);
+        if(offlineData == null) return;
         var data = S.LifestreamIPC.GetHousePathData(cid);
-        if(C.AllowFcTeleport)
+        if(offlineData.GetAllowFcTeleportForSubs() || offlineData.GetAllowFcTeleportForRetainers())
         {
             string error = null;
             if(data.FC == null)
@@ -45,10 +47,10 @@ internal static class UIUtils
             ImGui.PushFont(UiBuilder.IconFont);
             ImGuiEx.Text(error == null ? null : ImGuiColors.DalamudGrey3, "\uf1ad");
             ImGui.PopFont();
-            ImGuiEx.Tooltip(error ?? $"Free company house is registered in Lifestream and path is set. You will be teleported to Free company house for resending Deployables. If Private house is not registered, you will be teleported to Free company house for resending retainers as well.\nAddress: {Svc.Data.GetExcelSheet<Aetheryte>().GetRow((uint)data.FC.ResidentialDistrict)?.Territory.Value.PlaceNameRegion.Value.Name}, ward {data.FC.Ward + 1}, plot {data.FC.Plot + 1}");
+            ImGuiEx.Tooltip(error ?? $"Free company house is registered in Lifestream and path is set. You will be teleported to Free company house for resending Deployables. If enabled, you will be teleported to Free company house for resending retainers as well.\nAddress: {Svc.Data.GetExcelSheet<Aetheryte>().GetRow((uint)data.FC.ResidentialDistrict)?.Territory.Value.PlaceNameRegion.Value.Name}, ward {data.FC.Ward + 1}, plot {data.FC.Plot + 1}");
             ImGui.SameLine(0, 3);
         }
-        if(C.AllowPrivateTeleport)
+        if(offlineData.GetAllowPrivateTeleportForRetainers())
         {
             string error = null;
             if(data.Private == null)
