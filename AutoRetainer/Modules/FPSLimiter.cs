@@ -15,9 +15,9 @@ internal static unsafe class FPSLimiter
                 && (!C.FpsLockOnlyShutdownTimer || Shutdown.Active || (C.NightMode && C.NightModeFPSLimit))
                 )
             {
-                if(Utils.IsBusy)
+                if(Utils.IsBusy || !IsScreenReady())
                 {
-                    if(C.TargetMSPTIdle > 0)
+                    if(C.TargetMSPTRunning > 0)
                     {
                         var ms = (int)(C.TargetMSPTRunning - Stopwatch.ElapsedMilliseconds);
                         if(ms > 0 && ms <= C.TargetMSPTRunning)

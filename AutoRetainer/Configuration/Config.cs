@@ -131,6 +131,7 @@ internal unsafe class Config : IEzConfig
     public bool DontLogout = false;
 
     public TeleportOptions GlobalTeleportOptions = new();
+    public bool SharedHET = false;
 
     internal bool DontReassign
     {

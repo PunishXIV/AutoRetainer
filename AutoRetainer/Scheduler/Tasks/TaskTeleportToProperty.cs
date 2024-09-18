@@ -87,7 +87,7 @@ public static class TaskTeleportToProperty
 
         if(ExcelTerritoryHelper.Get(Player.Territory).TerritoryIntendedUse == (uint)TerritoryIntendedUseEnum.Residential_Area)
         {
-            if(TaskNeoHET.IsInMarkerHousingPlot([..TaskNeoHET.PrivateMarkers, .. TaskNeoHET.FcMarkers]))
+            if(TaskNeoHET.IsInMarkerHousingPlot([..TaskNeoHET.PrivateMarkers, .. TaskNeoHET.FcMarkers, .. (C.SharedHET ? TaskNeoHET.SharedMarkers : [])]))
             {
                 TaskNeoHET.Enqueue(null);
                 return true;

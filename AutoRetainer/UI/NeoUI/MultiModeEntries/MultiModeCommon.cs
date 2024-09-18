@@ -11,6 +11,7 @@ public class MultiModeCommon : NeoUIEntry
         .Checkbox($"Disable Multi Mode on Manual Login", () => ref C.MultiDisableOnRelog)
         .Checkbox($"Do not reset Preferred Character on Manual Login", () => ref C.MultiNoPreferredReset)
         .Checkbox("Enable Manual relogs character postprocess", () => ref C.AllowManualPostprocess)
+        .Checkbox("Allow entering shared houses", () => ref C.SharedHET)
 
         .Section("Game startup")
         .Checkbox($"Enable Multi Mode on Game Boot", () => ref C.MultiAutoStart)

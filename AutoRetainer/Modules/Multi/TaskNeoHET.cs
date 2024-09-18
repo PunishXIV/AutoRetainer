@@ -20,8 +20,10 @@ namespace AutoRetainer.Modules.Multi;
 public static unsafe class TaskNeoHET
 {
     public static readonly uint[] PrivateMarkers = Enum.GetValues<PrivateHousingMarker>().Select(x => (uint)x).ToArray();
+    public static readonly uint[] SharedMarkers = Enum.GetValues<SharedHousingMarker>().Select(x => (uint)x).ToArray();
     public static readonly uint[] FcMarkers = Enum.GetValues<FCHousingMarker>().Select(x => (uint)x).ToArray();
     public static readonly uint[] ApartmentMarkers = Enum.GetValues<ApartmentHousingMarker>().Select(x => (uint)x).ToArray();
+    public static readonly float ValidPlayerToApartmentDistance = 24f;
 
     public static void Enqueue(Action onFailure)
     {
@@ -101,7 +103,7 @@ public static unsafe class TaskNeoHET
 
     public static IGameObject GetWorkshopEntrance() => Svc.Objects.FirstOrDefault(x => x.IsTargetable && x.Name.ToString().EqualsIgnoreCaseAny(Lang.AdditionalChambersEntrance));
 
-    public static IGameObject GetFcOrPrivateEntranceFromMarkers() => GetHouseEntranceFromMarkers([.. PrivateMarkers, .. FcMarkers]);
+    public static IGameObject GetFcOrPrivateEntranceFromMarkers() => GetHouseEntranceFromMarkers([.. PrivateMarkers, .. FcMarkers, ..(C.SharedHET ? TaskNeoHET.SharedMarkers : [])]);
 
     public static IGameObject GetHouseEntranceFromMarkers(IEnumerable<uint> markers)
     {
@@ -109,7 +111,7 @@ public static unsafe class TaskNeoHET
         if(hud->MapMarkers.Where(x => x.IconId.EqualsAny(markers)).OrderBy(x => Player.DistanceTo(new Vector2(x.X, x.Z))).TryGetFirst(out var marker))
         {
             var mpos = new Vector2(marker.X, marker.Z);
-            var entrance = Svc.Objects.Where(x => x.IsTargetable && x.Name.ToString().EqualsIgnoreCaseAny([..Lang.Entrance, Lang.ApartmentEntrance])).OrderBy(x => Vector2.Distance(x.Position.ToVector2(), mpos)).FirstOrDefault(x => Vector2.Distance(mpos, x.Position.ToVector2()) < 20f);
+            var entrance = Svc.Objects.Where(x => x.IsTargetable && x.Name.ToString().EqualsIgnoreCaseAny([..Lang.Entrance, Lang.ApartmentEntrance])).OrderBy(x => Vector2.Distance(x.Position.ToVector2(), mpos)).FirstOrDefault(x => Vector2.Distance(mpos, x.Position.ToVector2()) < ValidPlayerToApartmentDistance);
             return entrance;
         }
         return null;
@@ -119,7 +121,7 @@ public static unsafe class TaskNeoHET
     {
         if(HousingManager.Instance()->GetCurrentPlot() < 0) return false;
         var hud = AgentHUD.Instance();
-        if(hud->MapMarkers.Where(x => x.IconId.EqualsAny(markers)).TryGetFirst(x => Player.DistanceTo(new Vector2(x.X, x.Z)) < 20f, out var marker))
+        if(hud->MapMarkers.Where(x => x.IconId.EqualsAny(markers)).TryGetFirst(x => Player.DistanceTo(new Vector2(x.X, x.Z)) < ValidPlayerToApartmentDistance, out var marker))
         {
             return true;
         }
