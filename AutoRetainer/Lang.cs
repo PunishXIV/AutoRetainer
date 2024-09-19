@@ -2,6 +2,7 @@
 using Dalamud.Utility;
 using Lumina.Excel.GeneratedSheets;
 using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
 
 namespace AutoRetainer;
 
@@ -186,7 +187,11 @@ internal static class Lang
     internal static readonly string[] PanelSubmersible = ["Select a submersible.", "潜水艦を選択してください。", "请选择潜水艇。", "請選擇潛水艇。", "Wähle ein Tauchboot.", "Choisissez un sous-marin."];
 
     //2004353	entrance to additional chambers	0	entrances to additional chambers	0	1	1	0	0
-    internal static string AdditionalChambersEntrance => Svc.Data.GetExcelSheet<EObjName>().GetRow(2004353).Singular.ExtractText();
+    internal static string[] AdditionalChambersEntrance => 
+    [
+        Svc.Data.GetExcelSheet<EObjName>().GetRow(2004353).Singular.ExtractText(),
+        Regex.Replace(Svc.Data.GetExcelSheet<EObjName>().GetRow(2004353).Singular.ExtractText(), @"\[.*?\]", "")
+    ];
 
     //2005274	voyage control panel	0	voyage control panels	0	0	1	0	0
     internal static string PanelName => Svc.Data.GetExcelSheet<EObjName>().GetRow(2005274).Singular.ExtractText();
