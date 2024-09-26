@@ -130,6 +130,7 @@ internal unsafe class Config : IEzConfig
 
     public TeleportOptions GlobalTeleportOptions = new();
     public bool SharedHET = false;
+    public bool SkipItemConfirmations = false;
 
     internal bool DontReassign
     {
