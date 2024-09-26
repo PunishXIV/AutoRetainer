@@ -25,7 +25,7 @@ internal static unsafe class TaskRepairAll
                 P.TaskManager.Enqueue(() => VoyageScheduler.TryRepair(index), $"Repair {index}");
                 P.TaskManager.Enqueue(() => Abort || VoyageScheduler.WaitForYesNoDisappear() == true, "WaitForYesNoDisappear", new(timeLimitMS:5000, abortOnTimeout: false));
                 P.TaskManager.Enqueue(() => Abort || VoyageUtils.GetVesselComponent(vesselIndex, type, index)->Condition > 0, "WaitUntilRepairComplete");
-                P.TaskManager.EnqueueDelay(C.FrameDelay * 2, true);
+                P.TaskManager.EnqueueDelay(Utils.FrameDelay * 2, true);
             }
             P.TaskManager.Enqueue(VoyageScheduler.CloseRepair);
         }

@@ -47,9 +47,7 @@ internal unsafe class Config : IEzConfig
     public bool Stay5 = true;
     public bool NoCurrentCharaOnTop = false;
 
-    public bool UseFrameDelay = true;
-    public int Delay = 200;
-    public int FrameDelay = 8;
+    public int ExtraFrameDelay = 0;
 
     public bool _dontReassign = false;
     public bool OldRetainerSense = false;
@@ -216,4 +214,6 @@ internal unsafe class Config : IEzConfig
     public int ConnectionErrorsRetry = 10;
     public bool ConnectionErrorsBlacklist = true;
     public bool EnableEntrustManager = true;
+
+    public bool HETWhenDisabled = false;
 }

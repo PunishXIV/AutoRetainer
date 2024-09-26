@@ -17,7 +17,7 @@ internal static class TaskAssignHuntingVenture
         //P.TaskManager.Enqueue(() => RetainerHandlers.SelectSpecificVenture(VentureID), $"SelectSpecificVenture({VentureID})");
         //P.TaskManager.Enqueue(() => RetainerHandlers.SearchVentureByName(VentureID));
         P.TaskManager.Enqueue(RetainerHandlers.WaitForVentureListUpdate);
-        P.TaskManager.EnqueueDelay(C.FrameDelay, true);
+        P.TaskManager.EnqueueDelay(Utils.FrameDelay, true);
         P.TaskManager.Enqueue(RetainerHandlers.ClearTaskSupplylist);
         for(var i = 0; i < 20; i++)
         {

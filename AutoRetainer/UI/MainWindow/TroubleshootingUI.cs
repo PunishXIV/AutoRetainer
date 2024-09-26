@@ -87,7 +87,7 @@ public unsafe static class TroubleshootingUI
             Warning("Time Desynchronization Compensation is set too high (>-5). This may cause issues.");
         }
 
-        if(C.FrameDelay < 8)
+        if(Utils.FrameDelay < 8)
         {
             Warning("Your Interaction delay is set too low (<8). AutoRetainer may function incorrectly.");
         }

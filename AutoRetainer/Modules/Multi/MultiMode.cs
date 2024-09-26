@@ -67,6 +67,10 @@ internal static unsafe class MultiMode
                 if(!TaskTeleportToProperty.ShouldVoidHET()) TaskNeoHET.Enqueue(null);
             }
             MultiModeUI.JustRelogged = true;
+            if(!MultiMode.Enabled && C.HETWhenDisabled && ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType))
+            {
+                TaskNeoHET.Enqueue(null);
+            }
         });
         if(ProperOnLogin.PlayerPresent)
         {
@@ -264,8 +268,8 @@ internal static unsafe class MultiMode
                         {
                             if(!TaskTeleportToProperty.EnqueueIfNeededAndPossible(false))
                             {
+                                EnterWorkshopForRetainers();
                                 EnsureCharacterValidity();
-                                RestoreValidityInWorkshop();
                                 if(data.Enabled)
                                 {
                                     DebugLog($"Enqueueing interaction with bell");
@@ -283,24 +287,20 @@ internal static unsafe class MultiMode
         }
     }
 
-    internal static bool CheckInventoryValidity() => Svc.ClientState.LocalPlayer.HomeWorld.Id == Svc.ClientState.LocalPlayer.CurrentWorld.Id && Utils.GetVenturesAmount() >= Data.GetNeededVentureAmount() && Utils.IsInventoryFree();
-    internal static void RestoreValidityInWorkshop()
+    internal static void EnterWorkshopForRetainers()
     {
-        return;
-        if(VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType))
+        if(Utils.GetReachableRetainerBell(true) == null && Houses.List.Contains((ushort)Player.Territory))
         {
-            if(!ProperOnLogin.PlayerPresent) return;
-            if(Data != null)
+            TaskNeoHET.TryEnterWorkshop(() =>
             {
-                if(CheckInventoryValidity())
-                {
-                    Data.Enabled = true;
-                    return;
-                }
-            }
+                Data.Enabled = false;
+                DuoLog.Error($"Due to absence of retainer bell and failure to find workshop, character is excluded from processing retainers");
+                P.TaskManager.Abort();
+            });
         }
-        return;
     }
+
+    internal static bool CheckInventoryValidity() => Svc.ClientState.LocalPlayer.HomeWorld.Id == Svc.ClientState.LocalPlayer.CurrentWorld.Id && Utils.GetVenturesAmount() >= Data.GetNeededVentureAmount() && Utils.IsInventoryFree();
 
     internal static IEnumerable<OfflineCharacterData> GetEnabledOfflineData()
     {
@@ -559,23 +559,6 @@ internal static unsafe class MultiMode
         }
         return false;
     }
-
-    /*internal static IGameObject GetNearbyBell()
-    {
-        if (!ProperOnLogin.PlayerPresent) return null;
-        foreach (var x in Svc.Objects)
-        {
-            if ((x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName, "リテイナーベル"))
-            {
-                if (Vector3.Distance(x.Position, Svc.ClientState.LocalPlayer.Position) < Utils.GetValidInteractionDistance(x) && x.Struct()->GetIsTargetable())
-                {
-                    return x;
-                }
-            }
-        }
-        return null;
-    }*/
-
     internal static int GetNeededVentureAmount(this OfflineCharacterData data)
     {
         return data.GetEnabledRetainers().Length * 2;

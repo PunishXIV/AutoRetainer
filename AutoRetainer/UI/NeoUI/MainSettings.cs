@@ -3,17 +3,10 @@ public class MainSettings : NeoUIEntry
 {
     public override string Path => "General";
 
-    private const string delayHelp = "The lower this value is the faster plugin will use actions. When dealing with low FPS or high latency you may want to increase this value. If you want the plugin to operate faster you may decrease it.";
-
     public override NuiBuilder Builder { get; init; } = new NuiBuilder()
         .Section("Delays")
         .Widget(100f, "Time Desynchronization Compensation", (x) => ImGuiEx.SliderInt(x, ref C.UnsyncCompensation.ValidateRange(-60, 0), -10, 0), "Additional amount of seconds that will be subtracted from venture ending time to help mitigate possible issues of time desynchronization between the game and your PC.")
-        .Widget("Enable frame delay", (x) => ImGui.Checkbox(x, ref C.UseFrameDelay))
-        .If(() => !C.UseFrameDelay)
-        .Widget(100f, "Interaction Delay, seconds", (x) => ImGuiEx.SliderIntAsFloat(x, ref C.Delay.ValidateRange(10, 1000), 20, 1000), delayHelp)
-        .Else()
-        .Widget(100f, "Interaction Delay, frames", (x) => ImGuiEx.SliderInt(x, ref C.FrameDelay.ValidateRange(2, 500), 2, 25), delayHelp)
-        .EndIf()
+        .Widget(100f, "Additional Interaction Delay, frames", (x) => ImGuiEx.SliderInt(x, ref C.ExtraFrameDelay.ValidateRange(0, 100), 0, 50), "The lower this value is the faster plugin will use actions. When dealing with low FPS or high latency you may want to increase this value. If you want the plugin to operate faster you may decrease it.")
         .Widget("Extra Logging", (x) => ImGui.Checkbox(x, ref C.ExtraDebug), "This option enables excessive logging for debugging purposes. It will spam your log and cause performance issues while enabled. This option will disable itself upon plugin reload or game restart.")
 
             .Section("Operation")

@@ -27,6 +27,7 @@ namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
+    public static int FrameDelay => 10 + C.ExtraFrameDelay;
     internal static bool IsCN => Svc.ClientState.ClientLanguage == (ClientLanguage)4;
     internal static int FCPoints => *(int*)((nint)AgentModule.Instance()->GetAgentByInternalId(AgentId.FreeCompanyCreditShop) + 256);
     internal static float AnimationLock => Player.AnimationLock;
@@ -528,28 +529,14 @@ internal static unsafe class Utils
         return sb.ToString();
     }
 
-    internal static bool GenericThrottle => C.UseFrameDelay ? FrameThrottler.Throttle("AutoRetainerGenericThrottle", C.FrameDelay) : EzThrottler.Throttle("AutoRetainerGenericThrottle", C.Delay);
+    internal static bool GenericThrottle => FrameThrottler.Throttle("AutoRetainerGenericThrottle", Utils.FrameDelay);
     internal static void RethrottleGeneric(int num)
     {
-        if(C.UseFrameDelay)
-        {
-            FrameThrottler.Throttle("AutoRetainerGenericThrottle", num, true);
-        }
-        else
-        {
-            EzThrottler.Throttle("AutoRetainerGenericThrottle", num, true);
-        }
+        FrameThrottler.Throttle("AutoRetainerGenericThrottle", num, true);
     }
     internal static void RethrottleGeneric()
     {
-        if(C.UseFrameDelay)
-        {
-            FrameThrottler.Throttle("AutoRetainerGenericThrottle", C.FrameDelay, true);
-        }
-        else
-        {
-            EzThrottler.Throttle("AutoRetainerGenericThrottle", C.Delay, true);
-        }
+        FrameThrottler.Throttle("AutoRetainerGenericThrottle", Utils.FrameDelay, true);
     }
 
     internal static bool TrySelectSpecificEntry(string text, Func<bool> Throttler = null)
