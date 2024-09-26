@@ -4,11 +4,12 @@ using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace AutoRetainer.Services;
-public unsafe class CharaListDebugger : IDisposable
+public unsafe class EventLogger : IDisposable
 {
-    private CharaListDebugger()
+    private string Addon = "FreeCompanyCreditShop";
+    private EventLogger()
     {
-        Svc.AddonLifecycle.RegisterListener(AddonEvent.PreReceiveEvent, "_CharaSelectListMenu", Handler);
+        Svc.AddonLifecycle.RegisterListener(AddonEvent.PreReceiveEvent, Addon, Handler);
     }
 
     private void Handler(AddonEvent type, AddonArgs args)
@@ -28,6 +29,6 @@ public unsafe class CharaListDebugger : IDisposable
 
     public void Dispose()
     {
-        Svc.AddonLifecycle.UnregisterListener(AddonEvent.PreReceiveEvent, "_CharaSelectListMenu", Handler);
+        Svc.AddonLifecycle.UnregisterListener(AddonEvent.PreReceiveEvent, Addon, Handler);
     }
 }

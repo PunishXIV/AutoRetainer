@@ -10,6 +10,11 @@ public sealed class GilDisplayManager
 
     public void Draw()
     {
+        if(Svc.Condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.LoggingOut] || !IsScreenReady())
+        {
+            ImGuiEx.Text($"Unable to display now");
+            return;
+        }
         ImGuiEx.SetNextItemWidthScaled(200f);
         ImGui.InputInt("Ignore characters/retainers with gil less than", ref C.MinGilDisplay.ValidateRange(0, int.MaxValue));
         ImGuiComponents.HelpMarker($"Ignored retainer gil still contributes to character/DC total. Character is ignored if their gil AND all retainers' gil is less than this value. Ignored characters do not contribute to DC total.");

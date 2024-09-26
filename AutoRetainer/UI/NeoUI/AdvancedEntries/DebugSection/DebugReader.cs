@@ -1,5 +1,8 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage.Readers;
+using AutoRetainer.Scheduler.Tasks;
+using AutoRetainer.UiHelpers;
+using ECommons.Automation.UIInput;
 using ECommons.UIHelpers.AtkReaderImplementations;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
@@ -9,6 +12,27 @@ internal unsafe class DebugReader : DebugSectionBase
 {
     public override void Draw()
     {
+        {
+            if(TryGetAddonByName<AtkUnitBase>("FreeCompanyCreditShop", out var a) && IsAddonReady(a))
+            {
+                var reader = new ReaderFreeCompanyCreditShop(a);
+                ImGuiEx.Text($"""
+                    Rank: {reader.FCRank}
+                    Credits: {reader.Credits}
+                    Count: {reader.Count}
+                    """);
+                for(int i = 0; i < reader.Count; i++)
+                {
+                    var x = reader.Listings[i];
+                    ImGuiEx.Text($"{x}");
+                    if(ImGuiEx.HoveredAndClicked()) new FreeCompanyCreditShop(a).Buy(0);
+                    var amount = Math.Floor((float)reader.Credits / (float)(x.Price));
+                }
+
+                if(ImGui.Button("Run task")) TaskRecursivelyBuyFuel.Enqueue();
+            }
+        }
+
         {
             if(TryGetAddonByName<AtkUnitBase>("RetainerList", out var a) && IsAddonReady(a))
             {
