@@ -13,6 +13,10 @@ using AutoRetainerAPI.Configuration;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Game.Network;
+using Dalamud.Plugin;
+using Dalamud.Interface;
+using Dalamud.Interface.Windowing;
 using Dalamud.Memory;
 using Dalamud.Utility;
 using ECommons.Automation;
@@ -33,6 +37,12 @@ using NotificationMasterAPI;
 using PunishLib;
 using System.Diagnostics;
 using LoginOverlay = AutoRetainer.UI.Overlays.LoginOverlay;
+using Dalamud.Plugin.Services;
+using System.Drawing;
+using Dalamud.Interface.Textures.TextureWraps;
+using System.IO;
+using static ECommons.UIHelpers.AddonMasterImplementations.AddonMaster;
+using static FFXIVClientStructs.FFXIV.Common.Component.BGCollision.ColliderStreamed;
 
 namespace AutoRetainer;
 
@@ -63,6 +73,9 @@ public unsafe class AutoRetainer : IDalamudPlugin
     internal MarketCooldownOverlay MarketCooldownOverlay;
     internal SubmarineUnlockPlanUI SubmarineUnlockPlanUI;
     internal SubmarinePointPlanUI SubmarinePointPlanUI;
+    internal ITitleScreenMenu TitleScreenMenu;
+    internal IReadOnlyTitleScreenMenuEntry TitleScreenMenuEntryButton;
+    internal ITextureProvider Textures;
 
     internal long Time => C.UseServerTime ? CSFramework.GetServerTime() : DateTimeOffset.Now.ToUnixTimeSeconds();
 
@@ -96,6 +109,9 @@ public unsafe class AutoRetainer : IDalamudPlugin
             {
                 new SingletonNotifyWindow();
             }
+            Svc.AddonLifecycle.RegisterListener(AddonEvent.PreReceiveEvent, EventAddon, OnEvent);
+
+
         }
         //);
     }
@@ -187,6 +203,9 @@ public unsafe class AutoRetainer : IDalamudPlugin
             }
         }
         SingletonServiceManager.Initialize(typeof(AutoRetainerServiceManager));
+
+        //add button to title menu
+        Svc.Framework.Update += RegisterTitleIcon;
     }
 
     private void Toasts_Toast(ref Dalamud.Game.Text.SeStringHandling.SeString message, ref Dalamud.Game.Gui.Toast.ToastOptions options, ref bool isHandled)
@@ -578,6 +597,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             Safe(() => PriorityManager.RestorePriority());
             Safe(() => VoyageMain.Shutdown());
             Safe(() => ContextMenuManager.Dispose());
+            Safe(() => Svc.TitleScreenMenu.RemoveEntry(TitleScreenMenuEntryButton));
             PunishLibMain.Dispose();
             ECommonsMain.Dispose();
         }
@@ -731,5 +751,14 @@ public unsafe class AutoRetainer : IDalamudPlugin
             MultiMode.LastLogin = 0;
         }
 
+    }
+
+    private void RegisterTitleIcon(object f)
+    {
+        if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "autoretainer.png"), out var _icon))
+        {
+            Svc.Framework.Update -= RegisterTitleIcon;
+            Svc.TitleScreenMenu.AddEntry(Svc.PluginInterface.Manifest.Name, _icon, () => AutoRetainerWindow.IsOpen = true);
+        }
     }
 }
