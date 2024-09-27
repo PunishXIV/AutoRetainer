@@ -187,7 +187,7 @@ internal static class Lang
     internal static readonly string[] PanelSubmersible = ["Select a submersible.", "潜水艦を選択してください。", "请选择潜水艇。", "請選擇潛水艇。", "Wähle ein Tauchboot.", "Choisissez un sous-marin."];
 
     //2004353	entrance to additional chambers	0	entrances to additional chambers	0	1	1	0	0
-    internal static string[] AdditionalChambersEntrance => 
+    internal static string[] AdditionalChambersEntrance =>
     [
         Svc.Data.GetExcelSheet<EObjName>().GetRow(2004353).Singular.ExtractText(),
         Regex.Replace(Svc.Data.GetExcelSheet<EObjName>().GetRow(2004353).Singular.ExtractText(), @"\[.*?\]", "")

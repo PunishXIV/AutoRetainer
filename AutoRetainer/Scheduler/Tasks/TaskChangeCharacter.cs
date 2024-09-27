@@ -22,7 +22,7 @@ public static unsafe class TaskChangeCharacter
     public static void EnqueueLogout()
     {
         P.TaskManager.Enqueue(Logout);
-        P.TaskManager.Enqueue(SelectYesLogout, new(timeLimitMS:100000));
+        P.TaskManager.Enqueue(SelectYesLogout, new(timeLimitMS: 100000));
     }
 
     public static void EnqueueLogin(string currentWorld, string charaName, string charaWorld, int account)

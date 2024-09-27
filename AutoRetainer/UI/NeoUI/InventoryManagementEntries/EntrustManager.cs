@@ -26,7 +26,7 @@ public class EntrustManager : InventoryManagemenrBase
         {
             if(ImGui.BeginCombo($"##select", selectedPlan?.Name ?? "Select plan...", ImGuiComboFlags.HeightLarge))
             {
-                for(int i = 0; i < C.EntrustPlans.Count; i++)
+                for(var i = 0; i < C.EntrustPlans.Count; i++)
                 {
                     var plan = C.EntrustPlans[i];
                     ImGui.PushID(plan.Guid.ToString());
@@ -48,7 +48,7 @@ public class EntrustManager : InventoryManagemenrBase
                 plan.Name = $"Entrust plan {C.EntrustPlans.Count}";
             }
             ImGui.SameLine();
-            if(ImGuiEx.IconButton(FontAwesomeIcon.Trash, enabled:selectedPlan != null && ImGuiEx.Ctrl))
+            if(ImGuiEx.IconButton(FontAwesomeIcon.Trash, enabled: selectedPlan != null && ImGuiEx.Ctrl))
             {
                 C.EntrustPlans.Remove(selectedPlan);
             }
@@ -59,7 +59,7 @@ public class EntrustManager : InventoryManagemenrBase
                 Copy(EzConfig.DefaultSerializationFactory.Serialize(selectedPlan, false));
             }
             ImGui.SameLine();
-            if(ImGuiEx.IconButton(FontAwesomeIcon.Paste, enabled:EzThrottler.Check("ImportPlan")))
+            if(ImGuiEx.IconButton(FontAwesomeIcon.Paste, enabled: EzThrottler.Check("ImportPlan")))
             {
                 try
                 {

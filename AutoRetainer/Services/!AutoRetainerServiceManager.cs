@@ -17,5 +17,5 @@ public static class AutoRetainerServiceManager
     public static LifestreamIPC LifestreamIPC { get; private set; }
     //public static EventLogger EventLogger { get; private set; }
     public static AutoBuyFuelOverlay AutoBuyFuelOverlay { get; private set; }
-    public  static TitleScreenButton TitleScreenButton { get; private set; }
+    public static TitleScreenButton TitleScreenButton { get; private set; }
 }

@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace AutoRetainer.UI.Overlays;
 public unsafe class AutoBuyFuelOverlay : Window
 {
-    float Height;
+    private float Height;
     private AutoBuyFuelOverlay() : base("AutoRetainer buy fuel window", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysUseWindowPadding | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoSavedSettings, true)
     {
         RespectCloseHotkey = false;

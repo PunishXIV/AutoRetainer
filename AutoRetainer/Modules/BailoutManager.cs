@@ -69,7 +69,7 @@ internal static unsafe class BailoutManager
                 }
             }
 
-            if(!Svc.ClientState.IsLoggedIn && C.ResolveConnectionErrors && Utils.GetRemainingSessionMiliSeconds() > 10*60*1000 && MultiMode.Enabled)
+            if(!Svc.ClientState.IsLoggedIn && C.ResolveConnectionErrors && Utils.GetRemainingSessionMiliSeconds() > 10 * 60 * 1000 && MultiMode.Enabled)
             {
                 if(TryGetAddonByName<AtkUnitBase>("Dialogue", out var addon) && IsAddonReady(addon))
                 {

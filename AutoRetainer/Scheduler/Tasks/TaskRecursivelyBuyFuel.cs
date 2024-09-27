@@ -43,6 +43,6 @@ public unsafe class TaskRecursivelyBuyFuel
                 return null;
             }
             return false;
-        }, new(timeLimitMS:1000 * 60 * 10));
+        }, new(timeLimitMS: 1000 * 60 * 10));
     }
 }

@@ -34,7 +34,7 @@ public static unsafe class TaskDesynthItems
 
     public static void Enqueue()
     {
-        P.TaskManager.Enqueue(RecursivelyDesynthItems, new(timeLimitMS:10 * 60 * 1000, abortOnTimeout:false));
+        P.TaskManager.Enqueue(RecursivelyDesynthItems, new(timeLimitMS: 10 * 60 * 1000, abortOnTimeout: false));
         P.TaskManager.Enqueue(() => !Svc.Condition[ConditionFlag.Occupied39]);
     }
 

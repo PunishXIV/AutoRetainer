@@ -23,7 +23,7 @@ internal static class TaskPostprocessRetainerIPC
                         SchedulerMain.RetainerPostProcessLocked = true;
                         IPC.FireRetainerPostprocessEvent(x, retainer);
                     }, $"Retainer Postprocess request from {x}");
-                    P.TaskManager.Enqueue(() => !SchedulerMain.RetainerPostProcessLocked, $"Retainer Postprocess task from {x}", new(timeLimitMS:int.MaxValue));
+                    P.TaskManager.Enqueue(() => !SchedulerMain.RetainerPostProcessLocked, $"Retainer Postprocess task from {x}", new(timeLimitMS: int.MaxValue));
                 }
             }
             catch(Exception ex) { ex.Log(); }

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace AutoRetainer.Services;
 public class TitleScreenButton : IDisposable
 {
-    IReadOnlyTitleScreenMenuEntry TitleScreenMenuEntryButton;
+    private IReadOnlyTitleScreenMenuEntry TitleScreenMenuEntryButton;
     private TitleScreenButton()
     {
         if(C.UseTitleScreenButton)

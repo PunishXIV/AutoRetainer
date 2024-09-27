@@ -12,6 +12,7 @@ using AutoRetainerAPI;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Plugin.Services;
 using Dalamud.Utility;
 using ECommons.Automation;
 using ECommons.Automation.NeoTaskManager;
@@ -29,9 +30,8 @@ using Lumina.Excel.GeneratedSheets;
 using NotificationMasterAPI;
 using PunishLib;
 using System.Diagnostics;
-using LoginOverlay = AutoRetainer.UI.Overlays.LoginOverlay;
-using Dalamud.Plugin.Services;
 using System.IO;
+using LoginOverlay = AutoRetainer.UI.Overlays.LoginOverlay;
 
 namespace AutoRetainer;
 
@@ -100,7 +100,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 }
                 else
                 {
-                    for(int i = 0; i < 100; i++)
+                    for(var i = 0; i < 100; i++)
                     {
                         PluginLog.Fatal($"AutoRetainer's loading was skipped because it's second instance of the game and you have \"Do not warn about second game instance running from same directory\" option enabled.");
                     }
@@ -110,7 +110,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         //);
     }
 
-    internal void SetConfig(Config c) => this.config = c;
+    internal void SetConfig(Config c) => config = c;
 
     public void Load()
     {
@@ -130,7 +130,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         SubmarineUnlockPlanUI = new();
         SubmarinePointPlanUI = new();
 
-        TaskManager = new(new(abortOnTimeout:true, timeLimitMS:20000, showDebug:true));
+        TaskManager = new(new(abortOnTimeout: true, timeLimitMS: 20000, showDebug: true));
         Memory = new();
         Svc.PluginInterface.UiBuilder.Draw += WindowSystem.Draw;
         Svc.PluginInterface.UiBuilder.OpenMainUi += () =>

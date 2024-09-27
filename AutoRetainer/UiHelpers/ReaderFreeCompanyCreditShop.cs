@@ -17,9 +17,9 @@ public unsafe class ReaderFreeCompanyCreditShop : AtkReader
     public ReaderFreeCompanyCreditShop(nint UnitBasePtr, int BeginOffset = 0) : base(UnitBasePtr, BeginOffset)
     {
     }
-    public uint FCRank => this.ReadUInt(0) ?? 0;
-    public uint Credits => this.ReadUInt(3) ?? 0;
-    public uint Count => this.ReadUInt(9) ?? 0;
+    public uint FCRank => ReadUInt(0) ?? 0;
+    public uint Credits => ReadUInt(3) ?? 0;
+    public uint Count => ReadUInt(9) ?? 0;
     public List<Listing> Listings => Loop<Listing>(10, 1, (int)Count);
 
     public class Listing : AtkReader
@@ -42,7 +42,7 @@ public unsafe class ReaderFreeCompanyCreditShop : AtkReader
 
         public override string ToString()
         {
-            return this.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public).Select(x => $"{x.Name}=" + (x.GetValue(this)?.ToString() ?? "<null>")).Print(", ");
+            return GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public).Select(x => $"{x.Name}=" + (x.GetValue(this)?.ToString() ?? "<null>")).Print(", ");
         }
     }
 }

@@ -63,7 +63,7 @@ public static class TaskTeleportToProperty
                             return null;
                         }
                         return IsScreenReady() && Player.Interactable && Apartments.Contains(Player.Territory) && !S.LifestreamIPC.IsBusy();
-                    }, new(timeLimitMS:5 * 60 * 1000));
+                    }, new(timeLimitMS: 5 * 60 * 1000));
                     return true;
                 }
             }
@@ -79,7 +79,7 @@ public static class TaskTeleportToProperty
                         return null;
                     }
                     return IsScreenReady() && Player.Interactable && Inns.List.Contains((ushort)Player.Territory) && !S.LifestreamIPC.IsBusy();
-                }, new(timeLimitMS:5 * 60 * 1000));
+                }, new(timeLimitMS: 5 * 60 * 1000));
                 return true;
             }
         }
@@ -88,7 +88,7 @@ public static class TaskTeleportToProperty
 
         if(ExcelTerritoryHelper.Get(Player.Territory).TerritoryIntendedUse == (uint)TerritoryIntendedUseEnum.Residential_Area)
         {
-            if(TaskNeoHET.IsInMarkerHousingPlot([..TaskNeoHET.PrivateMarkers, .. TaskNeoHET.FcMarkers, .. (C.SharedHET ? TaskNeoHET.SharedMarkers : [])]))
+            if(TaskNeoHET.IsInMarkerHousingPlot([.. TaskNeoHET.PrivateMarkers, .. TaskNeoHET.FcMarkers, .. (C.SharedHET ? TaskNeoHET.SharedMarkers : [])]))
             {
                 TaskNeoHET.Enqueue(null);
                 return true;
@@ -140,7 +140,7 @@ public static class TaskTeleportToProperty
 
         bool ProcessSimple(bool fc)
         {
-            var isHere = TaskNeoHET.IsInMarkerHousingPlot(fc?TaskNeoHET.FcMarkers:TaskNeoHET.PrivateMarkers);
+            var isHere = TaskNeoHET.IsInMarkerHousingPlot(fc ? TaskNeoHET.FcMarkers : TaskNeoHET.PrivateMarkers);
             var noProperty = !(fc ? S.LifestreamIPC.HasFreeCompanyHouse() : S.LifestreamIPC.HasPrivateHouse());
             if(noProperty == true)
             {
@@ -164,7 +164,7 @@ public static class TaskTeleportToProperty
                     return null;
                 }
                 return Player.Interactable
-                && Player.Territory.EqualsAny([..ResidentalAreas.List])
+                && Player.Territory.EqualsAny([.. ResidentalAreas.List])
                 && !S.LifestreamIPC.IsBusy();
             }, new(timeLimitMS: 5 * 60 * 1000));
             TaskNeoHET.Enqueue(null);

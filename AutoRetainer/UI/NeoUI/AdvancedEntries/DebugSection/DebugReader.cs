@@ -21,7 +21,7 @@ internal unsafe class DebugReader : DebugSectionBase
                     Credits: {reader.Credits}
                     Count: {reader.Count}
                     """);
-                for(int i = 0; i < reader.Count; i++)
+                for(var i = 0; i < reader.Count; i++)
                 {
                     var x = reader.Listings[i];
                     ImGuiEx.Text($"{x}");

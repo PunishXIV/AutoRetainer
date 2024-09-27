@@ -62,7 +62,7 @@ public class ExpertTab : NeoUIEntry
                 DuoLog.Information($"Cleaned {i} entries");
             }
         })
-        
+
         .Section("Import/Export")
         .Widget(() =>
         {

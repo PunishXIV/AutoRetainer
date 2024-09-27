@@ -25,7 +25,7 @@ internal unsafe class LoginOverlay : Window
     {
         var num = 1;
         ref var sacc = ref Ref<int>.Get("ServAcc", -1);
-        int[] userServiceAccounts = [-1, ..C.OfflineData.Select(x => x.ServiceAccount).Distinct().Order()];
+        int[] userServiceAccounts = [-1, .. C.OfflineData.Select(x => x.ServiceAccount).Distinct().Order()];
         if(!C.NoCharaSearch)
         {
             ImGuiEx.LineCentered(() =>

@@ -19,8 +19,8 @@ public unsafe class FreeCompanyCreditShop : AddonMasterBase
 
     public void Buy(int index)
     {
-        var evt = this.CreateAtkEvent();
-        var data = this.CreateAtkEventData().Build();
+        var evt = CreateAtkEvent();
+        var data = CreateAtkEventData().Build();
         Addon->ReceiveEvent(AtkEventType.ListItemToggle, 0, &evt, &data);
     }
 }

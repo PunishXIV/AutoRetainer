@@ -18,7 +18,7 @@ public static unsafe class InventorySpaceManager
 
     public static readonly List<SellSlotTask> SellSlotTasks = [];
 
-    public static InventoryType[] GetAllowedToSellInventoryTypes() => C.AllowSellFromArmory?[..Utils.PlayerInvetories, ..Utils.PlayerArmory]:Utils.PlayerInvetories;
+    public static InventoryType[] GetAllowedToSellInventoryTypes() => C.AllowSellFromArmory ? [.. Utils.PlayerInvetories, .. Utils.PlayerArmory] : Utils.PlayerInvetories;
 
     public static bool? SafeSellSlot(SellSlotTask Task)
     {

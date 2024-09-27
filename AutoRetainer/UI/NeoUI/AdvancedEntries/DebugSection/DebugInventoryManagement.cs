@@ -23,7 +23,7 @@ public unsafe class DebugInventoryManagement : DebugSectionBase
                 ImGuiEx.TreeNodeCollapsingHeader(x.ToString(), () =>
                 {
                     var inv = InventoryManager.Instance()->GetInventoryContainer(x);
-                    for(int i = 0; i < inv->Size; i++)
+                    for(var i = 0; i < inv->Size; i++)
                     {
                         var slot = inv->GetInventorySlot(i);
                         ImGuiEx.Text($"{i}: {ExcelItemHelper.GetName(slot->ItemId)} x{slot->Quantity} {slot->Flags}");

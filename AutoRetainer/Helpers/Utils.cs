@@ -95,7 +95,7 @@ internal static unsafe class Utils
         foreach(var type in inventoryTypes)
         {
             var inv = InventoryManager.Instance()->GetInventoryContainer(type);
-            for(int i = 0; i < inv->Size; i++)
+            for(var i = 0; i < inv->Size; i++)
             {
                 var item = InventoryManager.Instance()->GetInventorySlot(type, i);
                 ret.Add((item->ItemId, item->Quantity));
@@ -115,7 +115,7 @@ internal static unsafe class Utils
         foreach(var type in inventoryTypes)
         {
             var inv = InventoryManager.Instance()->GetInventoryContainer(type);
-            for(int i = 0; i < inv->Size; i++)
+            for(var i = 0; i < inv->Size; i++)
             {
                 var item = InventoryManager.Instance()->GetInventorySlot(type, i);
                 if(item->ItemId != 0)
@@ -135,11 +135,11 @@ internal static unsafe class Utils
     /// <returns></returns>
     public static int GetItemCount(IEnumerable<InventoryType> inventoryTypes, uint itemId)
     {
-        int ret = 0;
+        var ret = 0;
         foreach(var type in inventoryTypes)
         {
             var inv = InventoryManager.Instance()->GetInventoryContainer(type);
-            for(int i = 0; i < inv->Size; i++)
+            for(var i = 0; i < inv->Size; i++)
             {
                 var item = InventoryManager.Instance()->GetInventorySlot(type, i);
                 if(item->ItemId == itemId)
@@ -169,7 +169,7 @@ internal static unsafe class Utils
             foreach(var type in inventoryTypes)
             {
                 var inv = InventoryManager.Instance()->GetInventoryContainer(type);
-                for(int i = 0; i < inv->Size; i++)
+                for(var i = 0; i < inv->Size; i++)
                 {
                     var item = InventoryManager.Instance()->GetInventorySlot(type, i);
                     if(item->ItemId == itemId)
@@ -180,7 +180,7 @@ internal static unsafe class Utils
                     }
                 }
             }
-            return data.StackSize; 
+            return data.StackSize;
         }
         else
         {
@@ -188,7 +188,7 @@ internal static unsafe class Utils
             {
                 if(type.EqualsAny(InventoryType.Crystals, InventoryType.RetainerCrystals)) continue;
                 var inv = InventoryManager.Instance()->GetInventoryContainer(type);
-                for(int i = 0; i < inv->Size; i++)
+                for(var i = 0; i < inv->Size; i++)
                 {
                     var item = InventoryManager.Instance()->GetInventorySlot(type, i);
                     if(item->ItemId == itemId && item->Flags.HasFlag(InventoryItem.ItemFlags.HighQuality) == isHq && !item->Flags.HasFlag(InventoryItem.ItemFlags.Collectable))

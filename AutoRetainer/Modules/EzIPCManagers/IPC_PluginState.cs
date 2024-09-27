@@ -44,7 +44,8 @@ public class IPC_PluginState
     [EzIPC] public void SetOptionRetainerSense(bool value) => C.RetainerSense = value;
     [EzIPC] public int GetOptionRetainerSenseThreshold() => C.RetainerSenseThreshold;
     [EzIPC] public void SetOptionRetainerSenseThreshold(int value) => C.RetainerSenseThreshold = value;
-    [EzIPC] public long? GetClosestRetainerVentureSecondsRemaining(ulong CID)
+    [EzIPC]
+    public long? GetClosestRetainerVentureSecondsRemaining(ulong CID)
     {
         if(C.SelectedRetainers.TryGetValue(CID, out var enabledRetainers))
         {

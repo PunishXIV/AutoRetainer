@@ -23,7 +23,7 @@ public class TaskPostprocessCharacterIPC
                             SchedulerMain.CharacterPostProcessLocked = true;
                             IPC.FireCharacterPostprocessEvent(x);
                         }, $"Character Postprocess request from {x}");
-                    P.TaskManager.Enqueue(() => !SchedulerMain.CharacterPostProcessLocked, $"Character Postprocess task from {x}", new(timeLimitMS:int.MaxValue));
+                    P.TaskManager.Enqueue(() => !SchedulerMain.CharacterPostProcessLocked, $"Character Postprocess task from {x}", new(timeLimitMS: int.MaxValue));
                 }
             }
             catch(Exception e) { e.Log(); }

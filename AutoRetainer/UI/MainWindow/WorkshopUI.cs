@@ -155,7 +155,7 @@ internal static unsafe class WorkshopUI
             {
                 var prog = 1f - lowestVessel.GetRemainingSeconds() / (60f * 60f * 24f);
                 prog.ValidateRange(0f, 1f);
-                var pcol = prog == 1f ? (C.NoGradient? 0xbb005000.ToVector4() : GradientColor.Get(0xbb500000.ToVector4(), 0xbb005000.ToVector4())) : 0xbb500000.ToVector4();
+                var pcol = prog == 1f ? (C.NoGradient ? 0xbb005000.ToVector4() : GradientColor.Get(0xbb500000.ToVector4(), 0xbb005000.ToVector4())) : 0xbb500000.ToVector4();
                 ImGui.PushStyleColor(ImGuiCol.PlotHistogram, pcol);
                 ImGui.ProgressBar(prog, new(ImGui.GetContentRegionAvail().X, ImGui.CalcTextSize("A").Y + ImGui.GetStyle().FramePadding.Y * 2), "");
                 ImGui.PopStyleColor();

@@ -83,7 +83,7 @@ internal static class UIUtils
             ImGui.PushFont(UiBuilder.IconFont);
             ImGuiEx.Text(error == null ? null : ImGuiColors.DalamudGrey3, "\ue1b0");
             ImGui.PopFont();
-            ImGuiEx.Tooltip(error ?? $"Private house is registered in Lifestream and path is set. You will be teleported to Private house for resending Retainers.\nAddress: {Svc.Data.GetExcelSheet<Aetheryte>().GetRow((uint)data.Private.ResidentialDistrict)?.Territory.Value.PlaceNameRegion.Value.Name}, ward {data.Private.Ward+1}, plot {data.Private.Plot+1}");
+            ImGuiEx.Tooltip(error ?? $"Private house is registered in Lifestream and path is set. You will be teleported to Private house for resending Retainers.\nAddress: {Svc.Data.GetExcelSheet<Aetheryte>().GetRow((uint)data.Private.ResidentialDistrict)?.Territory.Value.PlaceNameRegion.Value.Name}, ward {data.Private.Ward + 1}, plot {data.Private.Plot + 1}");
             ImGui.SameLine(0, 3);
         }
     }
@@ -140,7 +140,7 @@ internal static class UIUtils
 
     public static int GetFPSFromMSPT(int frameTime)
     {
-        return frameTime == 0?60:(int)(1000f / frameTime);
+        return frameTime == 0 ? 60 : (int)(1000f / frameTime);
     }
 
     internal static void QRA(string text, ref LimitedKeys key)

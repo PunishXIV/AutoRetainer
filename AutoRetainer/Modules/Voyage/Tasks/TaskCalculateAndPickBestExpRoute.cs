@@ -12,7 +12,7 @@ internal static unsafe class TaskCalculateAndPickBestExpRoute
         Stop = false;
         VoyageUtils.Log($"Task enqueued: {nameof(TaskCalculateAndPickBestExpRoute)} (plan: {unlock})");
         P.TaskManager.Enqueue(() => Calculate(unlock));
-        P.TaskManager.Enqueue(WaitUntilCalculationStopped, new(timeLimitMS:60 * 60 * 1000));
+        P.TaskManager.Enqueue(WaitUntilCalculationStopped, new(timeLimitMS: 60 * 60 * 1000));
     }
 
     internal static void Calculate(SubmarineUnlockPlan unlock)

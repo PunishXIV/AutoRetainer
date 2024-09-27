@@ -23,7 +23,7 @@ public static unsafe class RetainerConfig
         if(ImGui.BeginCombo($"##select", selectedPlan?.Name ?? "Disabled", ImGuiComboFlags.HeightLarge))
         {
             if(ImGui.Selectable("Disabled")) adata.EntrustPlan = Guid.Empty;
-            for(int i = 0; i < C.EntrustPlans.Count; i++)
+            for(var i = 0; i < C.EntrustPlans.Count; i++)
             {
                 var plan = C.EntrustPlans[i];
                 ImGui.PushID(plan.Guid.ToString());
@@ -43,7 +43,7 @@ public static unsafe class RetainerConfig
         {
             if(ImGui.Selectable("To all other retainers of this character"))
             {
-                int cnt = 0;
+                var cnt = 0;
                 foreach(var x in data.RetainerData)
                 {
                     cnt++;

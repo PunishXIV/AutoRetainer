@@ -28,7 +28,7 @@ public static unsafe class TaskNeoHET
     public static void Enqueue(Action onFailure)
     {
         PluginLog.Debug($"Enqueued HouseEnterTask from {new StackTrace().GetFrames().Select(x => x.GetMethod()?.Name).Prepend("      ").Print("\n")}");
-        P.TaskManager.EnqueueTask(NeoTasks.WaitForNotOccupied(new(timeLimitMS: 10*60*1000)));
+        P.TaskManager.EnqueueTask(NeoTasks.WaitForNotOccupied(new(timeLimitMS: 10 * 60 * 1000)));
         P.TaskManager.Enqueue(() =>
         {
             var entrance = GetFcOrPrivateEntranceFromMarkers();
@@ -103,7 +103,7 @@ public static unsafe class TaskNeoHET
 
     public static IGameObject GetWorkshopEntrance() => Svc.Objects.FirstOrDefault(x => x.IsTargetable && x.Name.ToString().EqualsIgnoreCaseAny(Lang.AdditionalChambersEntrance));
 
-    public static IGameObject GetFcOrPrivateEntranceFromMarkers() => GetHouseEntranceFromMarkers([.. PrivateMarkers, .. FcMarkers, ..(C.SharedHET ? TaskNeoHET.SharedMarkers : [])]);
+    public static IGameObject GetFcOrPrivateEntranceFromMarkers() => GetHouseEntranceFromMarkers([.. PrivateMarkers, .. FcMarkers, .. (C.SharedHET ? TaskNeoHET.SharedMarkers : [])]);
 
     public static IGameObject GetHouseEntranceFromMarkers(IEnumerable<uint> markers)
     {
@@ -111,7 +111,7 @@ public static unsafe class TaskNeoHET
         if(hud->MapMarkers.Where(x => x.IconId.EqualsAny(markers)).OrderBy(x => Player.DistanceTo(new Vector2(x.X, x.Z))).TryGetFirst(out var marker))
         {
             var mpos = new Vector2(marker.X, marker.Z);
-            var entrance = Svc.Objects.Where(x => x.IsTargetable && x.Name.ToString().EqualsIgnoreCaseAny([..Lang.Entrance, Lang.ApartmentEntrance])).OrderBy(x => Vector2.Distance(x.Position.ToVector2(), mpos)).FirstOrDefault(x => Vector2.Distance(mpos, x.Position.ToVector2()) < ValidPlayerToApartmentDistance);
+            var entrance = Svc.Objects.Where(x => x.IsTargetable && x.Name.ToString().EqualsIgnoreCaseAny([.. Lang.Entrance, Lang.ApartmentEntrance])).OrderBy(x => Vector2.Distance(x.Position.ToVector2(), mpos)).FirstOrDefault(x => Vector2.Distance(mpos, x.Position.ToVector2()) < ValidPlayerToApartmentDistance);
             return entrance;
         }
         return null;

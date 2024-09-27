@@ -4,7 +4,7 @@ using ECommons.GameHelpers;
 using ECommons.Reflection;
 
 namespace AutoRetainer.UI.MainWindow;
-public unsafe static class TroubleshootingUI
+public static unsafe class TroubleshootingUI
 {
     private static readonly Config EmptyConfig = new();
     public static void Draw()
@@ -254,7 +254,7 @@ public unsafe static class TroubleshootingUI
         CheckExpertSetting("Use server time instead of PC time", nameof(C.UseServerTime));
     }
 
-    static void Error(string message, string tooltip = null)
+    private static void Error(string message, string tooltip = null)
     {
         ImGui.PushFont(UiBuilder.IconFont);
         ImGuiEx.Text(EColor.RedBright, "\uf057");
@@ -265,7 +265,7 @@ public unsafe static class TroubleshootingUI
         if(tooltip != null) ImGuiEx.Tooltip(tooltip);
     }
 
-    static void Warning(string message, string tooltip = null)
+    private static void Warning(string message, string tooltip = null)
     {
         ImGui.PushFont(UiBuilder.IconFont);
         ImGuiEx.Text(EColor.OrangeBright, "\uf071");
@@ -276,7 +276,7 @@ public unsafe static class TroubleshootingUI
         if(tooltip != null) ImGuiEx.Tooltip(tooltip);
     }
 
-    static void Info(string message, string tooltip = null)
+    private static void Info(string message, string tooltip = null)
     {
         ImGui.PushFont(UiBuilder.IconFont);
         ImGuiEx.Text(EColor.YellowBright, "\uf05a");
@@ -287,7 +287,7 @@ public unsafe static class TroubleshootingUI
         if(tooltip != null) ImGuiEx.Tooltip(tooltip);
     }
 
-    static void CheckExpertSetting(string setting, string nameOfSetting)
+    private static void CheckExpertSetting(string setting, string nameOfSetting)
     {
         var original = EmptyConfig.GetFoP(nameOfSetting);
         var current = C.GetFoP(nameOfSetting);

@@ -33,7 +33,7 @@ public static unsafe class NpcSaleManager
                             P.TaskManager.Enqueue(InteractWithNPC);
                             P.TaskManager.Enqueue(SelectPurchase);
                             P.TaskManager.EnqueueDelay(500);
-                            P.TaskManager.Enqueue(SellHardListItemsTask, new(timeLimitMS:1000 * 60 * 5));
+                            P.TaskManager.Enqueue(SellHardListItemsTask, new(timeLimitMS: 1000 * 60 * 5));
                             P.TaskManager.Enqueue(CloseShop);
                             P.TaskManager.InsertStack();
                             return;
