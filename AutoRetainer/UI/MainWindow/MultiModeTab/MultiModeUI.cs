@@ -1,10 +1,5 @@
 ﻿using AutoRetainer.Internal;
-using AutoRetainerAPI;
 using AutoRetainerAPI.Configuration;
-using ECommons.GameHelpers;
-using Lumina.Excel.GeneratedSheets;
-using PunishLib.ImGuiMethods;
-using ThreadLoadImageHandler = ECommons.ImGuiMethods.ThreadLoadImageHandler;
 
 namespace AutoRetainer.UI.MainWindow.MultiModeTab;
 

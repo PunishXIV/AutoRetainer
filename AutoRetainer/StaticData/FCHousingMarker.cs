@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AutoRetainer.StaticData;
+﻿namespace AutoRetainer.StaticData;
 /// <summary>
 /// This enum contains markers of free company property owned by it
 /// </summary>

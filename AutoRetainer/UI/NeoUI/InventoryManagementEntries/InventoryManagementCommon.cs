@@ -1,5 +1,4 @@
-﻿using AutoRetainer.Internal.InventoryManagement;
-using ECommons.Configuration;
+﻿using ECommons.Configuration;
 using ECommons.ExcelServices;
 using ECommons.MathHelpers;
 using Lumina.Excel.GeneratedSheets;

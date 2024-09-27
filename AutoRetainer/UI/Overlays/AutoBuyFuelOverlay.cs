@@ -1,17 +1,6 @@
 ﻿using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Scheduler.Tasks;
-using AutoRetainer.UiHelpers;
-using AutoRetainerAPI.Configuration;
-using ECommons.Configuration;
-using ECommons.GameHelpers;
-using ECommons.SimpleGui;
-using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AutoRetainer.UI.Overlays;
 public unsafe class AutoBuyFuelOverlay : Window

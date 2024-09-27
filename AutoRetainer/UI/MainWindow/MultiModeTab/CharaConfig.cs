@@ -1,11 +1,5 @@
 ﻿using AutoRetainerAPI.Configuration;
-using NotificationMasterAPI;
 using PunishLib.ImGuiMethods;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AutoRetainer.UI.MainWindow.MultiModeTab;
 public class CharaConfig

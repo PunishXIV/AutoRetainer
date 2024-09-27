@@ -5,7 +5,6 @@ using ECommons.Throttlers;
 using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using Lumina.Excel.GeneratedSheets;
-using System.Xml;
 
 namespace AutoRetainer.Modules;
 

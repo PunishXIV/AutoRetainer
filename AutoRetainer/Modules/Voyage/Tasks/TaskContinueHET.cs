@@ -1,7 +1,4 @@
-﻿using AutoRetainer.Internal.InventoryManagement;
-using ECommons.Automation;
-using ECommons.Throttlers;
-using FFXIVClientStructs.FFXIV.Client.Game.Control;
+﻿using ECommons.Throttlers;
 
 namespace AutoRetainer.Modules.Voyage.Tasks;
 

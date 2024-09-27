@@ -1,5 +1,4 @@
-﻿using ECommons.Automation;
-using ECommons.Events;
+﻿using ECommons.Events;
 using ECommons.MathHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;

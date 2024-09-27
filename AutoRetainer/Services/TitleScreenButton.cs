@@ -1,13 +1,5 @@
-﻿using AutoRetainer.UI.MainWindow;
-using Dalamud.Plugin.Services;
-using ECommons.LazyDataHelpers;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using ECommons.LazyDataHelpers;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AutoRetainer.Services;
 public class TitleScreenButton : IDisposable

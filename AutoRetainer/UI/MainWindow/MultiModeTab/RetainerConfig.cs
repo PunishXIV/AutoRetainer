@@ -1,11 +1,5 @@
 ﻿using AutoRetainerAPI;
 using AutoRetainerAPI.Configuration;
-using NotificationMasterAPI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AutoRetainer.UI.MainWindow.MultiModeTab;
 public static unsafe class RetainerConfig

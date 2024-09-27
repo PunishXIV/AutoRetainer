@@ -3,7 +3,6 @@ using AutoRetainer.Services.Lifestream;
 using AutoRetainer.UI.NeoUI;
 using AutoRetainer.UI.Overlays;
 using AutoRetainer.UI.Statistics;
-using System.Reflection.Metadata;
 
 namespace AutoRetainer.Services;
 public static class AutoRetainerServiceManager

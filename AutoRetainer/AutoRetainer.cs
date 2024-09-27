@@ -10,9 +10,7 @@ using AutoRetainer.UI.Overlays;
 using AutoRetainer.UI.Windows;
 using AutoRetainerAPI;
 using AutoRetainerAPI.Configuration;
-using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.ClientState.Conditions;
-using Dalamud.Plugin.Services;
 using Dalamud.Utility;
 using ECommons.Automation;
 using ECommons.Automation.NeoTaskManager;
@@ -30,7 +28,6 @@ using Lumina.Excel.GeneratedSheets;
 using NotificationMasterAPI;
 using PunishLib;
 using System.Diagnostics;
-using System.IO;
 using LoginOverlay = AutoRetainer.UI.Overlays.LoginOverlay;
 
 namespace AutoRetainer;

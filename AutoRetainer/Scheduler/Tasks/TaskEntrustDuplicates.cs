@@ -4,7 +4,6 @@ using ECommons.ExcelServices;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using System.Linq;
 
 namespace AutoRetainer.Scheduler.Tasks;
 

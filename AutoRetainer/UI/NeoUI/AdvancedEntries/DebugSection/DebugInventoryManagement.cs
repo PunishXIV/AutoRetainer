@@ -5,7 +5,6 @@ using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using Lumina.Excel.GeneratedSheets;
-using System.Windows.Forms.Design.Behavior;
 
 namespace AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;
 public unsafe class DebugInventoryManagement : DebugSectionBase

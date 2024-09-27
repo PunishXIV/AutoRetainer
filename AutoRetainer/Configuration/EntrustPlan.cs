@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO.Packaging;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AutoRetainer.Configuration;
+﻿namespace AutoRetainer.Configuration;
 [Serializable]
 public class EntrustPlan
 {

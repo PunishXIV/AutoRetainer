@@ -2,7 +2,6 @@
 using AutoRetainer.Modules.Voyage.Readers;
 using AutoRetainer.Scheduler.Tasks;
 using AutoRetainer.UiHelpers;
-using ECommons.Automation.UIInput;
 using ECommons.UIHelpers.AtkReaderImplementations;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
