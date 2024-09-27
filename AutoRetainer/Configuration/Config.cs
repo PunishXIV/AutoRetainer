@@ -221,4 +221,5 @@ internal unsafe class Config : IEzConfig
     public bool NoCharaSearch = false;
     public bool NoTeleportHetWhenNextToBell = false;
     public bool NoGradient = false;
+    public bool No2ndInstanceNotify = false;
 }

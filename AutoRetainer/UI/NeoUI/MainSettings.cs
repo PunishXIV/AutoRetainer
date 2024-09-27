@@ -52,5 +52,6 @@ public class MainSettings : NeoUIEntry
         .Checkbox("Skip item sell/trade confirmation while plugin is active", () => ref C.SkipItemConfirmations)
         .Checkbox("Enable title screen button (requires plugin restart)", () => ref C.UseTitleScreenButton)
         .Checkbox("Hide character search", () => ref C.NoCharaSearch)
-        .Checkbox("Don't flash background of characters that are complete", () => ref C.NoGradient);
+        .Checkbox("Don't flash background of characters that are complete", () => ref C.NoGradient)
+        .Checkbox("Do not warn about second game instance running from same directory", () => ref C.No2ndInstanceNotify, "This will automatically skip AutoRetainer's loading on second instance of the game and you will have no way of loading it until you disable this option in primary instance");
 }

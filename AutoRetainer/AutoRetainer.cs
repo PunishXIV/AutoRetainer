@@ -93,7 +93,18 @@ public unsafe class AutoRetainer : IDalamudPlugin
             }
             else
             {
-                new SingletonNotifyWindow();
+                var shouldCreateWindow = !EzConfig.LoadConfiguration<Config>(EzConfig.DefaultSerializationFactory.DefaultConfigFileName).No2ndInstanceNotify;
+                if(shouldCreateWindow)
+                {
+                    new SingletonNotifyWindow();
+                }
+                else
+                {
+                    for(int i = 0; i < 100; i++)
+                    {
+                        PluginLog.Fatal($"AutoRetainer's loading was skipped because it's second instance of the game and you have \"Do not warn about second game instance running from same directory\" option enabled.");
+                    }
+                }
             }
         }
         //);

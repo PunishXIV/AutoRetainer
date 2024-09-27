@@ -70,6 +70,8 @@ public unsafe static class TroubleshootingUI
             Warning("Teleporting or entering house/apartment is disabled when character is next to retainer bell. Pay attention to house demolition timer.");
         }
 
+
+
         if(C.AllowSimpleTeleport)
         {
             Warning("Simple Teleport option is enabled. It's less reliable than registering your houses with Lifestream. If you are experiencing issues with teleportation, consider disabling this option and registering your property with Lifestream.");
@@ -88,11 +90,6 @@ public unsafe static class TroubleshootingUI
         if(C.UnsyncCompensation > -5)
         {
             Warning("Time Desynchronization Compensation is set too high (>-5). This may cause issues.");
-        }
-
-        if(Utils.FrameDelay < 8)
-        {
-            Warning("Your Interaction delay is set too low (<8). AutoRetainer may function incorrectly.");
         }
 
         if(UIUtils.GetFPSFromMSPT(C.TargetMSPTIdle) < 10)
@@ -203,6 +200,11 @@ public unsafe static class TroubleshootingUI
             {
                 Warning("Some of your retainers' entrust plans were deleted before. Retainers with deleted entrust plans will not entrust anything. Hover to see list.", deletedList.Print("\n"));
             }
+        }
+
+        if(C.No2ndInstanceNotify)
+        {
+            Info("You have \"Do not warn about second game instance running from same directory\" option enabled, which will skip AutoRetainer's loading on 2nd instance of the game running with the same Dalamud directory automatically.");
         }
 
         if(Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "SimpleTweaksPlugin" && x.IsLoaded))
