@@ -438,6 +438,11 @@ public unsafe class AutoRetainer : IDalamudPlugin
                     C.SetFoP(field, value);
                     DuoLog.Information($"Set string {field}={value}");
                 }
+                else if(C.GetFoP(field).GetType().IsEnum)
+                {
+                    C.SetFoP(field, int.Parse(value));
+                    DuoLog.Information($"Set enum {field}={value}");
+                }
             }
             catch(Exception e)
             {

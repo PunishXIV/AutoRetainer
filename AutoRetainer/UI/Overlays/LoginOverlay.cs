@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.Internal;
+using AutoRetainerAPI.Configuration;
 using FFXIVClientStructs.FFXIV.Client.Game;
 
 namespace AutoRetainer.UI.Overlays;
@@ -24,14 +25,21 @@ internal unsafe class LoginOverlay : Window
     {
         var num = 1;
         ref var sacc = ref Ref<int>.Get("ServAcc", -1);
-        ImGuiEx.LineCentered(() =>
+        int[] userServiceAccounts = [-1, ..C.OfflineData.Select(x => x.ServiceAccount).Distinct().Order()];
+        if(!C.NoCharaSearch)
         {
-            ImGui.SetNextItemWidth(100f);
-            ImGui.InputTextWithHint("##search", "Search...", ref Search, 50);
-            ImGui.SameLine();
-            ImGui.SetNextItemWidth(100f);
-            ImGuiEx.Combo("##sacc", ref Ref<int>.Get("ServAcc", -1), Range(-1, 9), names: Range(-1, 9).ToDictionary(x => x, x => x == -1 ? "All service accounts" : $"Service account {x+1}"));
-        });
+            ImGuiEx.LineCentered(() =>
+            {
+                ImGui.SetNextItemWidth(100f);
+                ImGui.InputTextWithHint("##search", "Search...", ref Search, 50);
+                if(userServiceAccounts.Count() > 2)
+                {
+                    ImGui.SameLine();
+                    ImGui.SetNextItemWidth(100f);
+                    ImGuiEx.Combo("##sacc", ref Ref<int>.Get("ServAcc", -1), userServiceAccounts, names: userServiceAccounts.ToDictionary(x => x, x => x == -1 ? "All service accounts" : $"Service account {x + 1}"));
+                }
+            });
+        }
         ImGui.SetWindowFontScale(C.LoginOverlayScale);
         //ImGui.PushFont(Svc.PluginInterface.UiBuilder.GetGameFontHandle(new GameFontStyle(GameFontFamilyAndSize.MiedingerMid18)).ImFont);
         foreach(var x in C.OfflineData.Where(x => !x.Name.IsNullOrEmpty() && !x.ExcludeOverlay))

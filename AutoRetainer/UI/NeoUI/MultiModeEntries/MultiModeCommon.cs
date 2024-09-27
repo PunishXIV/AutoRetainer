@@ -13,6 +13,7 @@ public class MultiModeCommon : NeoUIEntry
         .Checkbox("Enable Manual relogs character postprocess", () => ref C.AllowManualPostprocess)
         .Checkbox("Allow entering shared houses", () => ref C.SharedHET)
         .Checkbox("Attempt to enter house on login even when Multi Mode is disabled", () => ref C.HETWhenDisabled)
+        .Checkbox("Do not teleport or enter house for retainers when already next to bell", () => ref C.NoTeleportHetWhenNextToBell)
 
         .Section("Game startup")
         .Checkbox($"Enable Multi Mode on Game Boot", () => ref C.MultiAutoStart)

@@ -35,7 +35,8 @@ internal static unsafe class MultiMode
     internal static CircularBuffer<long> Interactions = new(5);
 
     internal static Dictionary<ulong, int> CharaCnt = [];
-    internal static bool CanHET => Active && ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType);
+    internal static bool CanHET => Active && CanHETRaw;
+    internal static bool CanHETRaw => ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType) && (TaskNeoHET.GetFcOrPrivateEntranceFromMarkers() != null || TaskNeoHET.GetApartmentEntrance() != null) && (!C.NoTeleportHetWhenNextToBell || Utils.GetReachableRetainerBell(false) == null);
 
     internal static void Init()
     {
@@ -67,7 +68,7 @@ internal static unsafe class MultiMode
                 if(!TaskTeleportToProperty.ShouldVoidHET()) TaskNeoHET.Enqueue(null);
             }
             MultiModeUI.JustRelogged = true;
-            if(!MultiMode.Enabled && C.HETWhenDisabled && ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType))
+            if(!MultiMode.Enabled && C.HETWhenDisabled && CanHETRaw)
             {
                 TaskNeoHET.Enqueue(null);
             }

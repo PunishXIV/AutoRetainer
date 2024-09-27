@@ -1,5 +1,6 @@
 ﻿global using OverlayTextData = (System.Numerics.Vector2 Curpos, (bool Warning, string Text)[] Texts);
 using AutoRetainerAPI.Configuration;
+using ECommons.GameHelpers;
 using ECommons.Interop;
 using Lumina.Excel.GeneratedSheets;
 
@@ -7,10 +8,28 @@ namespace AutoRetainer.UI;
 
 internal static class UIUtils
 {
+    public static bool PushColIfPreferredCurrent(this OfflineCharacterData data)
+    {
+        var normalColor = Player.CID == data.CID ? EColor.CyanBright : ImGui.GetStyle().Colors[(int)ImGuiCol.Text];
+        if(data.Preferred)
+        {
+            ImGui.PushStyleColor(ImGuiCol.Text, GradientColor.Get(normalColor, ImGuiColors.ParsedGreen));
+            return true;
+        }
+        else
+        {
+            ImGui.PushStyleColor(ImGuiCol.Text, normalColor);
+            return true;
+        }
+    }
+
     public static void DrawSearch()
     {
-        ImGuiEx.SetNextItemFullWidth();
-        ImGui.InputTextWithHint("##search", "Search characters...", ref Ref<string>.Get("SearchChara"), 50);
+        if(!C.NoCharaSearch)
+        {
+            ImGuiEx.SetNextItemFullWidth();
+            ImGui.InputTextWithHint("##search", "Search characters...", ref Ref<string>.Get("SearchChara"), 50);
+        }
     }
 
     public static void DrawDCV(this OfflineCharacterData data)

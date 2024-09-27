@@ -10,6 +10,7 @@ public static class TaskTeleportToProperty
     public static bool EnqueueIfNeededAndPossible(bool isSubmersibleOperation)
     {
         if(Player.Territory.EqualsAny(VoyageUtils.Workshops)) return false;
+        if(!isSubmersibleOperation && C.NoTeleportHetWhenNextToBell && Utils.GetReachableRetainerBell(false) != null) return false;
         var fcTeleportEnabled = (Data.GetAllowFcTeleportForRetainers() && !isSubmersibleOperation) || (Data.GetAllowFcTeleportForSubs() && isSubmersibleOperation);
         var data = S.LifestreamIPC.GetHousePathData(Player.CID);
         var info = S.LifestreamIPC.GetCurrentPlotInfo();

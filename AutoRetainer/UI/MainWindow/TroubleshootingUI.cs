@@ -28,9 +28,7 @@ public unsafe static class TroubleshootingUI
 
         try
         {
-            var x = DalamudReflector.GetService("Dalamud.Configuration.Internal.DalamudConfiguration");
-            var branch = x.GetFoP<string>("DalamudBetaKind");
-            if(!branch.EqualsAny(null, "release"))
+            if(DalamudReflector.IsOnStaging())
             {
                 Error($"Non-release Dalamud branch detected. This may cause issues. If possible, please open branch switcher by typing /xlbranch, change to \"release\" and restart your game.");
             }
@@ -65,6 +63,11 @@ public unsafe static class TroubleshootingUI
             {
                 Info("For some of your characters, teleportation options are customized. Hover to see list.", list.Select(x => $"{x.Name}@{x.World}").Print("\n"));
             }
+        }
+
+        if(C.NoTeleportHetWhenNextToBell)
+        {
+            Warning("Teleporting or entering house/apartment is disabled when character is next to retainer bell. Pay attention to house demolition timer.");
         }
 
         if(C.AllowSimpleTeleport)
@@ -209,17 +212,22 @@ public unsafe static class TroubleshootingUI
 
         if(Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "PandorasBox" && x.IsLoaded))
         {
-            Info("Pandora's Box plugin detected. Functions that automatically use actions may affect AutoRetainer functions negatively. Please ensure that Pandora's Box's functions are configured in a way to not interfere with AutoRetainer functions.");
+            Info("Pandora's Box plugin detected. Automatic use of actions while AutoRetainer is enabled may affect AutoRetainer functions negatively. Please ensure that Pandora's Box is configured in a way to not automatically use actions while AutoRetainer is active.");
         }
 
         if(Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "Automaton" && x.IsLoaded))
         {
-            Info("Automaton plugin detected. Functions that automatically use actions and automatically input numeric values may affect AutoRetainer functions negatively. Please ensure that Automaton's functions are configured in a way to not interfere with AutoRetainer functions.");
+            Info("Automaton plugin detected. Automatic use of actions and automatic numeric inputs while AutoRetainer is enabled may affect AutoRetainer functions negatively. Please ensure that Automaton is configured in a way to not use automatically actions while AutoRetainer is active.");
         }
 
         if(Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "RotationSolver" && x.IsLoaded))
         {
-            Info("RotationSolver plugin detected. Functions that automatically use actions may affect AutoRetainer functions negatively. Please ensure that RotationSolver's functions are configured in a way to not interfere with AutoRetainer functions.");
+            Info("RotationSolver plugin detected. Automatic use of actions while AutoRetainer is enabled may affect AutoRetainer functions negatively. Please ensure that RotationSolver is configured in a way to not automatically use actions while AutoRetainer is active.");
+        }
+
+        if(Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName.StartsWith("BossMod") && x.IsLoaded))
+        {
+            Info("BossMod plugin detected. Automatic use of actions while AutoRetainer is enabled may affect AutoRetainer functions negatively. Please ensure that BossMod is configured in a way to not automatically use actions while AutoRetainer is active.");
         }
 
         ImGui.Separator();

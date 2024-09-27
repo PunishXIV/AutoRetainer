@@ -99,17 +99,14 @@ internal static unsafe class MultiModeUI
             if (lowestRetainer != default)
             {
                 var prog = Math.Max(0, (3600 - lowestRetainer.GetVentureSecondsRemaining(false)) / 3600f);
-                var pcol = prog == 1f ? GradientColor.Get(0xbb500000.ToVector4(), 0xbb005000.ToVector4()) : 0xbb500000.ToVector4();
+                var pcol = prog == 1f ? (C.NoGradient ? 0xbb005000.ToVector4() : GradientColor.Get(0xbb500000.ToVector4(), 0xbb005000.ToVector4())) : 0xbb500000.ToVector4();
                 ImGui.PushStyleColor(ImGuiCol.PlotHistogram, pcol);
                 ImGui.ProgressBar(prog, new(ImGui.GetContentRegionAvail().X, ImGui.CalcTextSize("A").Y + ImGui.GetStyle().FramePadding.Y * 2), "");
                 ImGui.PopStyleColor();
                 ImGui.SetCursorPos(initCurpos);
             }
-            var col = data.Preferred;
-            if (col)
-            {
-                ImGui.PushStyleColor(ImGuiCol.Text, GradientColor.Get(ImGui.GetStyle().Colors[(int)ImGuiCol.Text], ImGuiColors.ParsedGreen));
-            }
+            var colpref = UIUtils.PushColIfPreferredCurrent(data);
+            
             if (shouldExpand && doExpand)
             {
                 ImGui.SetNextItemOpen(index == 0);
@@ -117,10 +114,10 @@ internal static unsafe class MultiModeUI
             if (ImGui.CollapsingHeader(data.GetCutCharaString(StatusTextWidth) + $"###workshop{data.CID}" + $"###chara{data.CID}"))
             {
                 SetAsPreferred(data);
-                if (col)
+                if (colpref)
                 {
                     ImGui.PopStyleColor();
-                    col = false;
+                    colpref = false;
                 }
                 var enabledRetainers = data.GetEnabledRetainers();
                 ImGui.PushID(data.CID.ToString());
@@ -152,10 +149,10 @@ internal static unsafe class MultiModeUI
             else
             {
                 SetAsPreferred(data);
-                if (col)
+                if (colpref)
                 {
                     ImGui.PopStyleColor();
-                    col = false;
+                    colpref = false;
                 }
             }
             ImGui.SameLine(0, 0);

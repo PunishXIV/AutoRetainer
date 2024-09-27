@@ -155,18 +155,14 @@ internal static unsafe class WorkshopUI
             {
                 var prog = 1f - lowestVessel.GetRemainingSeconds() / (60f * 60f * 24f);
                 prog.ValidateRange(0f, 1f);
-                var pcol = prog == 1f ? GradientColor.Get(0xbb500000.ToVector4(), 0xbb005000.ToVector4()) : 0xbb500000.ToVector4();
+                var pcol = prog == 1f ? (C.NoGradient? 0xbb005000.ToVector4() : GradientColor.Get(0xbb500000.ToVector4(), 0xbb005000.ToVector4())) : 0xbb500000.ToVector4();
                 ImGui.PushStyleColor(ImGuiCol.PlotHistogram, pcol);
                 ImGui.ProgressBar(prog, new(ImGui.GetContentRegionAvail().X, ImGui.CalcTextSize("A").Y + ImGui.GetStyle().FramePadding.Y * 2), "");
                 ImGui.PopStyleColor();
                 ImGui.SetCursorPos(initCurpos);
             }
 
-            var colpref = data.Preferred;
-            if(colpref)
-            {
-                ImGui.PushStyleColor(ImGuiCol.Text, GradientColor.Get(ImGui.GetStyle().Colors[(int)ImGuiCol.Text], ImGuiColors.ParsedGreen));
-            }
+            var colpref = UIUtils.PushColIfPreferredCurrent(data);
 
             if(ImGuiEx.CollapsingHeader(data.GetCutCharaString(StatusTextWidth) + $"###workshop{data.CID}"))
             {

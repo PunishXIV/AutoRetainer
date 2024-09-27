@@ -218,4 +218,7 @@ internal unsafe class Config : IEzConfig
 
     public bool HETWhenDisabled = false;
     public bool UseTitleScreenButton = false;
+    public bool NoCharaSearch = false;
+    public bool NoTeleportHetWhenNextToBell = false;
+    public bool NoGradient = false;
 }
