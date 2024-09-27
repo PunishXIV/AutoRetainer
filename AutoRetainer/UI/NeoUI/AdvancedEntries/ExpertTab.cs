@@ -1,4 +1,5 @@
-﻿using NightmareUI.PrimaryUI;
+﻿using ECommons.Configuration;
+using ECommons.Reflection;
 
 namespace AutoRetainer.UI.NeoUI.AdvancedEntries;
 public class ExpertTab : NeoUIEntry
@@ -41,9 +42,6 @@ public class ExpertTab : NeoUIEntry
                 }
             }
         })
-        .Checkbox($"Housing Bell Support", () => ref C.ExpertMultiAllowHET)
-        .Widget("", (x) => ImGuiEx.HelpMarker("A Summoning Bell must be within range of the spawn point once the home is entered, or a workshop must be purchased.", ImGuiColors.DalamudOrange, FontAwesomeIcon.ExclamationTriangle.ToIconString()))
-         .Checkbox($"Upon activating Multi Mode, attempt to enter nearby house", () => ref C.MultiHETOnEnable)
 
         .Section("Integrations")
         .Checkbox($"Artisan integration", () => ref C.ArtisanIntegration, "Automatically enables AutoRetainer while Artisan is Pauses Artisan operation when ventures are ready to be collected and a retainer bell is within range. Once ventures have been dealt with Artisan will be enabled and resume whatever it was doing.")
@@ -63,7 +61,44 @@ public class ExpertTab : NeoUIEntry
                 }
                 DuoLog.Information($"Cleaned {i} entries");
             }
-        });
+        })
+        
+        .Section("Import/Export")
+        .Widget(() =>
+        {
+            if(ImGui.Button("Export without character data"))
+            {
+                var clone = C.JSONClone();
+                clone.OfflineData = null;
+                clone.AdditionalData = null;
+                clone.FCData = null;
+                clone.SelectedRetainers = null;
+                clone.Blacklist = null;
+                clone.AutoLogin = "";
+                Copy(EzConfig.DefaultSerializationFactory.Serialize(clone, false));
+            }
+            if(ImGui.Button("Import and merge with character data"))
+            {
+                try
+                {
+                    var c = EzConfig.DefaultSerializationFactory.Deserialize<Config>(Paste());
+                    c.OfflineData = C.OfflineData;
+                    c.AdditionalData = C.AdditionalData;
+                    c.FCData = C.FCData;
+                    c.SelectedRetainers = C.SelectedRetainers;
+                    c.Blacklist = C.Blacklist;
+                    c.AutoLogin = C.AutoLogin;
+                    if(c.GetType().GetFieldPropertyUnions().Any(x => x.GetValue(c) == null)) throw new NullReferenceException();
+                    EzConfig.SaveConfiguration(C, $"Backup_{DateTimeOffset.Now.ToUnixTimeMilliseconds()}.json");
+                    P.SetConfig(c);
+                }
+                catch(Exception e)
+                {
+                    e.LogDuo();
+                }
+            }
+        })
+        ;
 
     public override bool ShouldDisplay()
     {

@@ -1,11 +1,4 @@
-﻿using NightmareUI.PrimaryUI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries;
+﻿namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries;
 public class ProtectionList : InventoryManagemenrBase
 {
     public override string Name { get; } = "Protection List";

@@ -1,8 +1,8 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage;
+using AutoRetainer.Scheduler.Handlers;
+using AutoRetainer.Scheduler.Tasks;
 using AutoRetainerAPI.Configuration;
-
-using Dalamud;
 using Dalamud.Game;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Enums;
@@ -10,32 +10,203 @@ using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Memory;
 using Dalamud.Utility;
 using ECommons.Events;
+using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
-using ECommons.Interop;
 using ECommons.MathHelpers;
 using ECommons.Reflection;
 using ECommons.Throttlers;
 using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.Game;
-using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
 using CharaData = (string Name, ushort World);
 
 namespace AutoRetainer.Helpers;
 
 internal static unsafe class Utils
 {
+    public static int FrameDelay => 10 + C.ExtraFrameDelay;
     internal static bool IsCN => Svc.ClientState.ClientLanguage == (ClientLanguage)4;
     internal static int FCPoints => *(int*)((nint)AgentModule.Instance()->GetAgentByInternalId(AgentId.FreeCompanyCreditShop) + 256);
-    internal static float AnimationLock => *(float*)((nint)ActionManager.Instance() + 8);
-
+    internal static float AnimationLock => Player.AnimationLock;
     private static bool IsNullOrEmpty(this string s) => GenericHelpers.IsNullOrEmpty(s);
+
+    public static void EnqueueVendorItemsByRetainer()
+    {
+        for(var i = 0; i < GameRetainerManager.Count; i++)
+        {
+            var ret = GameRetainerManager.Retainers[i];
+            if(ret.Available)
+            {
+                P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
+                TaskVendorItems.Enqueue();
+
+                if(C.RetainerMenuDelay > 0)
+                {
+                    TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
+                }
+                P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
+                P.TaskManager.Enqueue(RetainerHandlers.ConfirmCantBuyback);
+                break;
+            }
+        }
+    }
+
+    public static bool GetAllowFcTeleportForRetainers(this OfflineCharacterData data) => data.IsTeleportEnabled() && data.GetIsTeleportEnabledForRetainers() && (data.TeleportOptionsOverride.RetainersFC ?? C.GlobalTeleportOptions.RetainersFC);
+    public static bool GetAllowPrivateTeleportForRetainers(this OfflineCharacterData data) => data.IsTeleportEnabled() && data.GetIsTeleportEnabledForRetainers() && (data.TeleportOptionsOverride.RetainersPrivate ?? C.GlobalTeleportOptions.RetainersPrivate);
+    public static bool GetAllowApartmentTeleportForRetainers(this OfflineCharacterData data) => data.IsTeleportEnabled() && data.GetIsTeleportEnabledForRetainers() && (data.TeleportOptionsOverride.RetainersApartment ?? C.GlobalTeleportOptions.RetainersApartment);
+
+    public static bool GetAllowFcTeleportForSubs(this OfflineCharacterData data) => data.IsTeleportEnabled() && (data.TeleportOptionsOverride.Deployables ?? C.GlobalTeleportOptions.Deployables);
+
+    public static bool IsTeleportEnabled(this OfflineCharacterData data) => data.TeleportOptionsOverride.Enabled ?? C.GlobalTeleportOptions.Enabled;
+
+    public static bool GetIsTeleportEnabledForRetainers(this OfflineCharacterData data) => data.TeleportOptionsOverride.Retainers ?? C.GlobalTeleportOptions.Retainers;
+
+    public static bool GetAreTeleportSettingsOverriden(this OfflineCharacterData data)
+    {
+        return data.TeleportOptionsOverride.Deployables != null
+            || data.TeleportOptionsOverride.Enabled != null
+            || data.TeleportOptionsOverride.Retainers != null
+            || data.TeleportOptionsOverride.RetainersApartment != null
+            || data.TeleportOptionsOverride.RetainersFC != null
+            || data.TeleportOptionsOverride.RetainersPrivate != null;
+    }
+
+    public static long GetRemainingSessionMiliSeconds() => P.TimeLaunched[0] + 3 * 24 * 60 * 60 * 1000 - DateTimeOffset.Now.ToUnixTimeMilliseconds();
+
+    public static readonly InventoryType[] RetainerInventories = [InventoryType.RetainerPage1, InventoryType.RetainerPage2, InventoryType.RetainerPage3, InventoryType.RetainerPage4, InventoryType.RetainerPage5, InventoryType.RetainerPage6, InventoryType.RetainerPage7];
+    public static readonly InventoryType[] RetainerInventoriesWithCrystals = [InventoryType.RetainerPage1, InventoryType.RetainerPage2, InventoryType.RetainerPage3, InventoryType.RetainerPage4, InventoryType.RetainerPage5, InventoryType.RetainerPage6, InventoryType.RetainerPage7, InventoryType.RetainerCrystals];
+    public static readonly InventoryType[] PlayerInvetories = [InventoryType.Inventory1, InventoryType.Inventory2, InventoryType.Inventory3, InventoryType.Inventory4];
+    public static readonly InventoryType[] PlayerInvetoriesWithCrystals = [InventoryType.Inventory1, InventoryType.Inventory2, InventoryType.Inventory3, InventoryType.Inventory4, InventoryType.Crystals];
+    public static readonly InventoryType[] PlayerArmory = [InventoryType.ArmoryOffHand, InventoryType.ArmoryHead, InventoryType.ArmoryBody, InventoryType.ArmoryHands, InventoryType.ArmoryWaist, InventoryType.ArmoryLegs, InventoryType.ArmoryFeets, InventoryType.ArmoryEar, InventoryType.ArmoryNeck, InventoryType.ArmoryWrist, InventoryType.ArmoryRings, InventoryType.ArmorySoulCrystal, InventoryType.ArmoryMainHand];
+
+    public static InventoryType[] GetAllowedInventories(this EntrustPlan plan)
+    {
+        return plan.AllowEntrustFromArmory ? [.. PlayerInvetoriesWithCrystals, .. PlayerArmory] : PlayerInvetoriesWithCrystals;
+    }
+
+    public static List<(uint ID, uint Quantity)> GetCapturedInventoryState(IEnumerable<InventoryType> inventoryTypes)
+    {
+        var ret = new List<(uint ID, uint Quantity)>();
+        foreach(var type in inventoryTypes)
+        {
+            var inv = InventoryManager.Instance()->GetInventoryContainer(type);
+            for(int i = 0; i < inv->Size; i++)
+            {
+                var item = InventoryManager.Instance()->GetInventorySlot(type, i);
+                ret.Add((item->ItemId, item->Quantity));
+            }
+        }
+        return ret;
+    }
+
+    /// <summary>
+    /// Request all unique items from select inventories
+    /// </summary>
+    /// <param name="inventoryTypes"></param>
+    /// <returns></returns>
+    public static HashSet<uint> GetItemsInInventory(IEnumerable<InventoryType> inventoryTypes)
+    {
+        var ret = new HashSet<uint>();
+        foreach(var type in inventoryTypes)
+        {
+            var inv = InventoryManager.Instance()->GetInventoryContainer(type);
+            for(int i = 0; i < inv->Size; i++)
+            {
+                var item = InventoryManager.Instance()->GetInventorySlot(type, i);
+                if(item->ItemId != 0)
+                {
+                    ret.Add(item->ItemId);
+                }
+            }
+        }
+        return ret;
+    }
+
+    /// <summary>
+    /// Gets total item count of certain item across all inventories
+    /// </summary>
+    /// <param name="inventoryTypes"></param>
+    /// <param name="itemId"></param>
+    /// <returns></returns>
+    public static int GetItemCount(IEnumerable<InventoryType> inventoryTypes, uint itemId)
+    {
+        int ret = 0;
+        foreach(var type in inventoryTypes)
+        {
+            var inv = InventoryManager.Instance()->GetInventoryContainer(type);
+            for(int i = 0; i < inv->Size; i++)
+            {
+                var item = InventoryManager.Instance()->GetInventorySlot(type, i);
+                if(item->ItemId == itemId)
+                {
+                    ret += (int)item->Quantity;
+                }
+            }
+        }
+        return ret;
+    }
+
+    /// <summary>
+    /// Gets amount of items that can fit into inventories
+    /// </summary>
+    /// <param name="inventoryTypes"></param>
+    /// <param name="itemId"></param>
+    /// <param name="isHq"></param>
+    /// <returns></returns>
+    public static uint GetAmountThatCanFit(IEnumerable<InventoryType> inventoryTypes, uint itemId, bool isHq, out List<string> debugData)
+    {
+        uint ret = 0;
+        var data = ExcelItemHelper.Get(itemId);
+        debugData = [];
+        if(data == null) return 0;
+        if(data.ItemUICategory.Row == 59)//crystal special handling
+        {
+            foreach(var type in inventoryTypes)
+            {
+                var inv = InventoryManager.Instance()->GetInventoryContainer(type);
+                for(int i = 0; i < inv->Size; i++)
+                {
+                    var item = InventoryManager.Instance()->GetInventorySlot(type, i);
+                    if(item->ItemId == itemId)
+                    {
+                        ret += data.StackSize - item->Quantity;
+                        debugData.Add($"[TED] [CrystalDebugData] in {type} slot {i} found incomplete stack: {ExcelItemHelper.GetName(itemId, true)} q={item->Quantity} canFit={ret}");
+                        return ret;
+                    }
+                }
+            }
+            return data.StackSize; 
+        }
+        else
+        {
+            foreach(var type in inventoryTypes)
+            {
+                if(type.EqualsAny(InventoryType.Crystals, InventoryType.RetainerCrystals)) continue;
+                var inv = InventoryManager.Instance()->GetInventoryContainer(type);
+                for(int i = 0; i < inv->Size; i++)
+                {
+                    var item = InventoryManager.Instance()->GetInventorySlot(type, i);
+                    if(item->ItemId == itemId && item->Flags.HasFlag(InventoryItem.ItemFlags.HighQuality) == isHq && !item->Flags.HasFlag(InventoryItem.ItemFlags.Collectable))
+                    {
+                        if(data.IsUnique) return 0;
+                        debugData.Add($"[TED] [DebugData] in {type} slot {i} found incomplete stack: {ExcelItemHelper.GetName(itemId, true)} q={item->Quantity} canFit={ret}");
+                        ret += data.StackSize - item->Quantity;
+                    }
+                    else if(item->ItemId == 0)
+                    {
+                        debugData.Add($"[TED] [DebugData] in {type} slot {i} is empty, canFit={data.StackSize}");
+                        ret += data.StackSize;
+                    }
+                }
+            }
+        }
+        return ret;
+    }
 
     public static bool IsItemSellableByHardList(uint item, uint quantity)
     {
@@ -53,14 +224,6 @@ internal static unsafe class Utils
 
     public static bool? WaitForScreen() => IsScreenReady();
 
-    public static bool IsPublic(this World w)
-    {
-        if(w.IsPublic) return true;
-        return w.RowId.EqualsAny<uint>(408, 409, 410, 411);
-    }
-
-    internal static int LoadedItems => AtkStage.Instance()->GetNumberArrayData()[36]->IntArray[401];
-
     internal static void ExtraLog(string s)
     {
         if(C.ExtraDebug) PluginLog.Debug(s);
@@ -69,11 +232,6 @@ internal static unsafe class Utils
     internal static bool ContainsAllItems<T>(this IEnumerable<T> a, IEnumerable<T> b)
     {
         return !b.Except(a).Any();
-    }
-
-    internal static string Read(byte* ptr)
-    {
-        return MemoryHelper.ReadStringNullTerminated((nint)ptr);
     }
 
     internal static float Random { get; private set; } = 1f;
@@ -169,9 +327,13 @@ internal static unsafe class Utils
 
     internal static bool CanAutoLogin()
     {
+        return CanAutoLoginFromTaskManager() && !P.TaskManager.IsBusy;
+    }
+
+    internal static bool CanAutoLoginFromTaskManager()
+    {
         return !Svc.ClientState.IsLoggedIn
             && !Svc.Condition.Any()
-            && !P.TaskManager.IsBusy
             && IsTitleScreenReady();
     }
 
@@ -390,28 +552,14 @@ internal static unsafe class Utils
         return sb.ToString();
     }
 
-    internal static bool GenericThrottle => C.UseFrameDelay ? FrameThrottler.Throttle("AutoRetainerGenericThrottle", C.FrameDelay) : EzThrottler.Throttle("AutoRetainerGenericThrottle", C.Delay);
+    internal static bool GenericThrottle => FrameThrottler.Throttle("AutoRetainerGenericThrottle", Utils.FrameDelay);
     internal static void RethrottleGeneric(int num)
     {
-        if(C.UseFrameDelay)
-        {
-            FrameThrottler.Throttle("AutoRetainerGenericThrottle", num, true);
-        }
-        else
-        {
-            EzThrottler.Throttle("AutoRetainerGenericThrottle", num, true);
-        }
+        FrameThrottler.Throttle("AutoRetainerGenericThrottle", num, true);
     }
     internal static void RethrottleGeneric()
     {
-        if(C.UseFrameDelay)
-        {
-            FrameThrottler.Throttle("AutoRetainerGenericThrottle", C.FrameDelay, true);
-        }
-        else
-        {
-            EzThrottler.Throttle("AutoRetainerGenericThrottle", C.Delay, true);
-        }
+        FrameThrottler.Throttle("AutoRetainerGenericThrottle", Utils.FrameDelay, true);
     }
 
     internal static bool TrySelectSpecificEntry(string text, Func<bool> Throttler = null)
@@ -520,22 +668,14 @@ internal static unsafe class Utils
         return obj.Name.ToString().EqualsIgnoreCase(Lang.ApartmentEntrance);
     }
 
-    internal static IGameObject GetNearestEntrance(out float Distance, bool bypassPredefined = false)
+    internal static IGameObject GetNearestEntrance(out float Distance)
     {
         var currentDistance = float.MaxValue;
         IGameObject currentObject = null;
 
-        var fcOverride = Data.FreeCompanyHouseEntrance == null ? null : GetEntranceAtLocation(Data.FreeCompanyHouseEntrance.Entrance);
-
-        if(fcOverride != null)
-        {
-            Distance = Vector3.Distance(Player.Object.Position, fcOverride.Position);
-            return fcOverride;
-        }
-
         foreach(var x in Svc.Objects)
         {
-            if(x.IsTargetable && x.Name.ToString().EqualsIgnoreCaseAny([.. Lang.Entrance, Lang.ApartmentEntrance]))
+            if(x.IsTargetable && x.Name.ToString().EqualsIgnoreCaseAny([.. Lang.Entrance/*, Lang.ApartmentEntrance*/]))
             {
                 var distance = Vector3.Distance(Svc.ClientState.LocalPlayer.Position, x.Position);
                 if(distance < currentDistance)
@@ -546,6 +686,7 @@ internal static unsafe class Utils
             }
         }
         Distance = currentDistance;
+        if(Distance > 20) return null;
         return currentObject;
     }
 
@@ -670,7 +811,6 @@ internal static unsafe class Utils
         P.VenturePlanner.RespectCloseHotkey = !C.IgnoreEsc;
         P.VentureBrowser.RespectCloseHotkey = !C.IgnoreEsc;
         P.LogWindow.RespectCloseHotkey = !C.IgnoreEsc;
-        P.DuplicateBlacklistSelector.RespectCloseHotkey = !C.IgnoreEsc;
     }
 
     internal static string ToTimeString(long seconds)

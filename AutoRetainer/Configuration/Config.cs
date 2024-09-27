@@ -21,7 +21,6 @@ internal unsafe class Config : IEzConfig
     public bool ShouldSerializeEnableAutoGCHandin() => false;
     public bool GCHandinNotify = false;
     internal bool BypassSanctuaryCheck = false;
-    public bool ExpertMultiAllowHET = true;
     public bool MultiHETOnEnable = true;
     public bool UseServerTime = true;
     public bool NoTheme = false;
@@ -48,9 +47,7 @@ internal unsafe class Config : IEzConfig
     public bool Stay5 = true;
     public bool NoCurrentCharaOnTop = false;
 
-    public bool UseFrameDelay = true;
-    public int Delay = 200;
-    public int FrameDelay = 8;
+    public int ExtraFrameDelay = 0;
 
     public bool _dontReassign = false;
     public bool OldRetainerSense = false;
@@ -109,6 +106,8 @@ internal unsafe class Config : IEzConfig
     public bool GilOnlyChars = false;
 
     public bool MultiAutoStart = false;
+    public string AutoLogin = "";
+    public int AutoLoginDelay = 10;
     public bool MultiDisableOnRelog = false;
     public bool MultiNoPreferredReset = false;
     public bool MultiPreferredCharLast = true;
@@ -122,8 +121,16 @@ internal unsafe class Config : IEzConfig
 
     public string DefaultSubmarineUnlockPlan = "";
     public bool AcceptedDisclamer = false;
-    public bool AllowPrivateTeleport = false;
-    public bool AllowFcTeleport = false;
+    public bool AllowManualPostprocess = false;
+    public bool AllowSimpleTeleport = false;
+
+    public List<EntrustPlan> EntrustPlans = [];
+    public bool AllowSellFromArmory = false;
+    public bool DontLogout = false;
+
+    public TeleportOptions GlobalTeleportOptions = new();
+    public bool SharedHET = false;
+    public bool SkipItemConfirmations = false;
 
     internal bool DontReassign
     {
@@ -203,4 +210,11 @@ internal unsafe class Config : IEzConfig
     public Vector2 WindowPos;
     public bool PinWindow = false;
     public bool DisplayOnStart = false;
+
+    public bool ResolveConnectionErrors = false;
+    public int ConnectionErrorsRetry = 10;
+    public bool ConnectionErrorsBlacklist = true;
+    public bool EnableEntrustManager = true;
+
+    public bool HETWhenDisabled = false;
 }

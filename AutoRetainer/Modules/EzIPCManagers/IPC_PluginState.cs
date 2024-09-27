@@ -1,7 +1,6 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage;
 using ECommons.EzIpcManager;
-using static FFXIVClientStructs.FFXIV.Client.UI.RaptureAtkHistory.Delegates;
 
 namespace AutoRetainer.Modules.EzIPCManagers;
 public class IPC_PluginState
@@ -24,9 +23,10 @@ public class IPC_PluginState
     }
     [EzIPC] public void EnableMultiMode() => Svc.Commands.ProcessCommand("/autoretainer multi enable");
     [EzIPC] public int GetInventoryFreeSlotCount() => Utils.GetInventoryFreeSlotCount();
-    [EzIPC] public void EnqueueHET(bool ignoreTeleportZonecheck, bool noTeleport) => HouseEnterTask.EnqueueTask();
+    [EzIPC] public void EnqueueHET(Action onFailure) => TaskNeoHET.Enqueue(onFailure);
     [EzIPC] public bool CanAutoLogin() => Utils.CanAutoLogin();
-    [EzIPC] public bool Relog(string charaNameWithWorld)
+    [EzIPC]
+    public bool Relog(string charaNameWithWorld)
     {
         if(Utils.CanAutoLogin())
         {
@@ -38,5 +38,22 @@ public class IPC_PluginState
             }
         }
         return false;
-    } 
+    }
+
+    [EzIPC] public bool GetOptionRetainerSense() => C.RetainerSense;
+    [EzIPC] public void SetOptionRetainerSense(bool value) => C.RetainerSense = value;
+    [EzIPC] public int GetOptionRetainerSenseThreshold() => C.RetainerSenseThreshold;
+    [EzIPC] public void SetOptionRetainerSenseThreshold(int value) => C.RetainerSenseThreshold = value;
+    [EzIPC] public long? GetClosestRetainerVentureSecondsRemaining(ulong CID)
+    {
+        if(C.SelectedRetainers.TryGetValue(CID, out var enabledRetainers))
+        {
+            if(C.OfflineData.TryGetFirst(x => x.CID == CID, out var data))
+            {
+                var selectedRetainers = data.GetEnabledRetainers().Where(z => z.HasVenture).OrderBy(z => z.GetVentureSecondsRemaining());
+                if(selectedRetainers.Any()) return selectedRetainers.First().GetVentureSecondsRemaining();
+            }
+        }
+        return null;
+    }
 }

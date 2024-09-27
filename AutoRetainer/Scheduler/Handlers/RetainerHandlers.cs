@@ -1,5 +1,4 @@
-﻿using AutoRetainer.Internal.Clicks;
-using AutoRetainer.Scheduler.Tasks;
+﻿using AutoRetainer.Scheduler.Tasks;
 
 using Dalamud.Memory;
 using Dalamud.Utility;
@@ -494,9 +493,15 @@ internal static unsafe class RetainerHandlers
                 //An Error is on screen.
                 new AddonMaster.RetainerTaskAsk((IntPtr)addon).Return();
                 DebugLog($"Clicked cancel");
-                P.TaskManager.EnqueueImmediate(() => SelectSpecificVentureByName(ventureID), "SelectSpecificVenture");
-                P.TaskManager.DelayNextImmediate(10, false);
-                P.TaskManager.EnqueueImmediate(() => CheckForErrorAssignedVenture(ventureID), 500, false, "RedoErrorCheck");
+                P.TaskManager.BeginStack();
+                try
+                {
+                    P.TaskManager.Enqueue(() => SelectSpecificVentureByName(ventureID), "SelectSpecificVenture");
+                    P.TaskManager.EnqueueDelay(10, true);
+                    P.TaskManager.Enqueue(() => CheckForErrorAssignedVenture(ventureID), "RedoErrorCheck", new(timeLimitMS:500, abortOnTimeout:false));
+                }
+                catch(Exception e) { e.Log(); }
+                P.TaskManager.InsertStack();
                 return true;
             }
         }

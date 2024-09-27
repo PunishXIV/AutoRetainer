@@ -365,6 +365,7 @@ internal static unsafe class VoyageUtils
 
     internal static bool IsRetainerBlockedByVoyage()
     {
+        if(C.MultiModeType == MultiModeType.Retainers) return false;
         if(C.DisableRetainerVesselReturn == 0) return false;
         foreach(var x in C.OfflineData.Where(x => x.WorkshopEnabled))
         {

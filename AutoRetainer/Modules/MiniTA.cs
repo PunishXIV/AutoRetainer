@@ -4,6 +4,8 @@ using Dalamud.Game.ClientState.Conditions;
 using ECommons.Throttlers;
 using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.UI;
+using Lumina.Excel.GeneratedSheets;
+using System.Xml;
 
 namespace AutoRetainer.Modules;
 
@@ -25,6 +27,25 @@ internal static unsafe class MiniTA
                     new AddonMaster.Talk((nint)addon).Click();
                 }
             }
+            if(C.SkipItemConfirmations && (P.TaskManager.IsBusy || AutoGCHandin.Operation))
+            {
+                SkipItemConfirmations();
+            }
+        }
+    }
+
+    internal static void SkipItemConfirmations()
+    {
+        //397	This item has materia attached. Are you certain you wish to sell it?
+        //398	Your spiritbond with this item is 100%. Are you certain you wish to sell it?
+        //399 This item is unique and untradable.Are you certain you wish to sell it?
+        //4477  Are you certain you wish to sell this item ?
+        //102433	Do you really want to trade an item with materia affixed? The materia will be lost.
+        //102434	Do you really want to trade a high-quality item?
+        var x = Utils.GetSpecificYesno(s => s.ContainsAny(StringComparison.OrdinalIgnoreCase, Ref<string[]>.Get("Skip", () => ((uint[])[397, 398, 399, 4477, 102433, 102434]).Select(a => Svc.Data.GetExcelSheet<Addon>().GetRow(a).Text.ExtractText()).ToArray())));
+        if(x != null && IsAddonReady(x))
+        {
+            new AddonMaster.SelectYesno(x).Yes();
         }
     }
 

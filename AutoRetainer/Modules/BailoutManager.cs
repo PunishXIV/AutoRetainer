@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.Modules.Voyage;
+using ECommons.Automation.UIInput;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -49,7 +50,7 @@ internal static unsafe class BailoutManager
                             if(Utils.GenericThrottle)
                             {
                                 DuoLog.Warning($"[Bailout] Backing out of CharaSelect");
-                                Callback.Fire(addon, true, 4);
+                                addon->GetButtonNodeById(4)->ClickAddonButton(addon);
                                 CharaSelectStuck = Environment.TickCount64;
                                 EzThrottler.Throttle("MultiModeAfkOnTitleLogin", 60000, true);
                                 IsLogOnTitleEnabled = true;
@@ -65,6 +66,19 @@ internal static unsafe class BailoutManager
                 {
                     IsLogOnTitleEnabled = false;
                     CharaSelectStuck = long.MaxValue;
+                }
+            }
+
+            if(!Svc.ClientState.IsLoggedIn && C.ResolveConnectionErrors && Utils.GetRemainingSessionMiliSeconds() > 10*60*1000 && MultiMode.Enabled)
+            {
+                if(TryGetAddonByName<AtkUnitBase>("Dialogue", out var addon) && IsAddonReady(addon))
+                {
+                    if(EzThrottler.Throttle("ClickDialogueOk", 10000))
+                    {
+                        addon->GetButtonNodeById(4)->ClickAddonButton(addon);
+                        EzThrottler.Throttle("MultiModeAfkOnTitleLogin", 60000, true);
+                        IsLogOnTitleEnabled = true;
+                    }
                 }
             }
         }

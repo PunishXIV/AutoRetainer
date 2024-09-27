@@ -1,4 +1,5 @@
 ﻿using AutoRetainerAPI.Configuration;
+using Dalamud.Plugin.Ipc.Exceptions;
 using ECommons.Throttlers;
 
 namespace AutoRetainer.Scheduler;
@@ -39,6 +40,7 @@ internal static class Artisan
                         }
                     }
                 }
+                catch(IpcNotReadyError) { }
                 catch(Exception ex)
                 {
                     {
@@ -76,6 +78,7 @@ internal static class Artisan
         {
             return IsListRunning || GetEnduranceStatus;
         }
+        catch(IpcNotReadyError) { }
         catch(Exception ex)
         {
             ex.LogWarning();

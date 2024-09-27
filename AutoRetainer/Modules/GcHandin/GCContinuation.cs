@@ -29,7 +29,7 @@ internal static unsafe class GCContinuation
         P.TaskManager.Enqueue(GCContinuation.EnableDeliveringIfPossible);
     }
 
-    public static async void EnqueueExchangeVentures()
+    public static void EnqueueExchangeVentures()
     {
         if(AutoGCHandin.GetSeals() > 1000 && Utils.GetVenturesAmount() < 65000)
         {
@@ -135,6 +135,7 @@ internal static unsafe class GCContinuation
     {
         if(Svc.Targets.Target != null)
         {
+            if(Player.IsAnimationLocked) return false;
             var t = Svc.Targets.Target;
             if(t.IsTargetable && t.DataId == dataID && Vector3.Distance(Player.Object.Position, t.Position) < 10f && !IsOccupied() && EzThrottler.Throttle("GCInteract"))
             {

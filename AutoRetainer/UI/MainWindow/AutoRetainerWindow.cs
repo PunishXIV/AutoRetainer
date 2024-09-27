@@ -1,12 +1,12 @@
 ﻿using AutoRetainer.Modules.Voyage;
+using AutoRetainer.UI.MainWindow.MultiModeTab;
 using AutoRetainerAPI;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Interface.Components;
+using Dalamud.Support;
 using ECommons.Configuration;
 using ECommons.Funding;
 using NightmareUI;
-using NightmareUI.PrimaryUI;
-using PunishLib.ImGuiMethods;
 
 namespace AutoRetainer.UI.MainWindow;
 
@@ -53,7 +53,7 @@ internal unsafe class AutoRetainerWindow : Window
     public override void PreDraw()
     {
         var prefix = SchedulerMain.PluginEnabled ? $" [{SchedulerMain.Reason}]" : "";
-        var tokenRem = TimeSpan.FromMilliseconds(P.TimeLaunched[0] + 3 * 24 * 60 * 60 * 1000 - DateTimeOffset.Now.ToUnixTimeMilliseconds());
+        var tokenRem = TimeSpan.FromMilliseconds(Utils.GetRemainingSessionMiliSeconds());
         WindowName = $"{P.Name} {P.GetType().Assembly.GetName().Version}{prefix} | {FormatToken(tokenRem)}###AutoRetainer";
         if(C.PinWindow)
         {
@@ -201,6 +201,7 @@ internal unsafe class AutoRetainerWindow : Window
         ImGuiEx.EzTabBar("tabbar", PatreonBanner.Text,
                         ("Retainers", MultiModeUI.Draw, null, true),
                         ("Deployables", WorkshopUI.Draw, null, true),
+                        ("Troubleshooting", TroubleshootingUI.Draw, null, true),
                         ("Statistics", DrawStats, null, true),
                         ("About", CustomAboutTab.Draw, null, true)
                         );

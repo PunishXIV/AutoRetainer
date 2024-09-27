@@ -1,11 +1,4 @@
-﻿using NightmareUI.PrimaryUI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AutoRetainer.UI.NeoUI.MultiModeEntries;
+﻿namespace AutoRetainer.UI.NeoUI.MultiModeEntries;
 public class MultiModeFPSLimiter : NeoUIEntry
 {
     public override string Path => "Multi Mode/FPS Limiter";

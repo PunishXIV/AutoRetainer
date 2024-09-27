@@ -17,9 +17,9 @@ internal unsafe class DebugGCAuto : DebugSectionBase
         if(ImGui.Button("EnqueueInitiation")) GCContinuation.EnqueueInitiation();
         if(ImGui.Button("EnqueueExchangeClose")) GCContinuation.EnqueueDeliveryClose();
         if(ImGui.Button("EnqueueExchangeVentures")) GCContinuation.EnqueueExchangeVentures();
-        if(ImGui.Button("Step on")) P.TaskManager.SetStepMode(true);
+        if(ImGui.Button("Step on")) P.TaskManager.StepMode = true;
         ImGui.SameLine();
-        if(ImGui.Button("Step off")) P.TaskManager.SetStepMode(false);
+        if(ImGui.Button("Step off")) P.TaskManager.StepMode=false;
         ImGui.SameLine();
         if(ImGui.Button("Step")) P.TaskManager.Step();
         if(ImGui.CollapsingHeader("GrandCompanySupplyList"))

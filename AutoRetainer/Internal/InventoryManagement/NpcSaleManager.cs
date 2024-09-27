@@ -11,6 +11,7 @@ using Lumina.Excel.GeneratedSheets;
 namespace AutoRetainer.Internal.InventoryManagement;
 public static unsafe class NpcSaleManager
 {
+    internal static List<(uint ID, uint Quantity)> CapturedInventoryState = [];
     public static void EnqueueIfItemsPresent()
     {
         if(GetValidNPC() == null) return;
@@ -27,12 +28,14 @@ public static unsafe class NpcSaleManager
                     {
                         if(Utils.IsItemSellableByHardList(slot->ItemId, slot->Quantity))
                         {
-                            P.TaskManager.EnqueueImmediate(Utils.WaitForScreen);
-                            P.TaskManager.EnqueueImmediate(InteractWithNPC);
-                            P.TaskManager.EnqueueImmediate(SelectPurchase);
-                            P.TaskManager.DelayNextImmediate(500);
-                            P.TaskManager.EnqueueImmediate(SellHardListItemsTask, 1000 * 60 * 5);
-                            P.TaskManager.EnqueueImmediate(CloseShop);
+                            P.TaskManager.BeginStack();
+                            P.TaskManager.Enqueue(Utils.WaitForScreen);
+                            P.TaskManager.Enqueue(InteractWithNPC);
+                            P.TaskManager.Enqueue(SelectPurchase);
+                            P.TaskManager.EnqueueDelay(500);
+                            P.TaskManager.Enqueue(SellHardListItemsTask, new(timeLimitMS:1000 * 60 * 5));
+                            P.TaskManager.Enqueue(CloseShop);
+                            P.TaskManager.InsertStack();
                             return;
                         }
                     }
@@ -43,6 +46,11 @@ public static unsafe class NpcSaleManager
 
     public static bool? SellHardListItemsTask()
     {
+
+        if(!EzThrottler.Check("NpcInventoryTimeout") && Utils.GetCapturedInventoryState(InventorySpaceManager.GetAllowedToSellInventoryTypes()).SequenceEqual(CapturedInventoryState))
+        {
+            return false;
+        }
         List<(InventoryType Type, int Slot)> Processed = [];
         foreach(var type in InventorySpaceManager.GetAllowedToSellInventoryTypes())
         {
@@ -59,6 +67,7 @@ public static unsafe class NpcSaleManager
                             if(EzThrottler.Throttle("VendorItem", 500))
                             {
                                 Processed.Add((type, i));
+                                EzThrottler.Throttle("NpcInventoryTimeout", 5000, true);
                                 P.Memory.SellItemToShop(type, i);
                             }
                             return false;
@@ -96,6 +105,7 @@ public static unsafe class NpcSaleManager
         }
         else
         {
+            if(Player.IsAnimationLocked) return false;
             if(EzThrottler.Throttle("InteractWithNPC", 2000))
             {
                 TargetSystem.Instance()->InteractWithObject(npc.Struct(), false);

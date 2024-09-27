@@ -2,6 +2,7 @@
 using Dalamud.Utility;
 using Lumina.Excel.GeneratedSheets;
 using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
 
 namespace AutoRetainer;
 
@@ -186,7 +187,11 @@ internal static class Lang
     internal static readonly string[] PanelSubmersible = ["Select a submersible.", "潜水艦を選択してください。", "请选择潜水艇。", "請選擇潛水艇。", "Wähle ein Tauchboot.", "Choisissez un sous-marin."];
 
     //2004353	entrance to additional chambers	0	entrances to additional chambers	0	1	1	0	0
-    internal static string AdditionalChambersEntrance => Svc.Data.GetExcelSheet<EObjName>().GetRow(2004353).Singular.ExtractText();
+    internal static string[] AdditionalChambersEntrance => 
+    [
+        Svc.Data.GetExcelSheet<EObjName>().GetRow(2004353).Singular.ExtractText(),
+        Regex.Replace(Svc.Data.GetExcelSheet<EObjName>().GetRow(2004353).Singular.ExtractText(), @"\[.*?\]", "")
+    ];
 
     //2005274	voyage control panel	0	voyage control panels	0	0	1	0	0
     internal static string PanelName => Svc.Data.GetExcelSheet<EObjName>().GetRow(2005274).Singular.ExtractText();
@@ -258,7 +263,9 @@ internal static class Lang
         "Your retainer will be unable to process item buyback requests once recalled. Are you sure you wish to proceed?",
         "リテイナーを帰すと売却依頼アイテムの買い戻しができなくなりますが、よろしいですか？",
         "Renvoyer le servant effacera la liste de rachat. Confirmer",
-        "Wenn du deinen Gehilfen wegschickst, kannst du die von ihm verkauften Gegenstände nicht mehr zurückkaufen. Möchtest du trotzdem fortfahren"
+        "Wenn du deinen Gehilfen wegschickst, kannst du die von ihm verkauften Gegenstände nicht mehr zurückkaufen. Möchtest du trotzdem fortfahren",
+        "让雇员返回后将无法购回委托卖掉的道具",
+        "讓僱員返回後將無法購回委託賣掉的道具"
         ];
 
     internal static readonly string[] LogInPartialText = ["Logging in with", "Log in with", "でログインします。", "einloggen?", "eingeloggt.", "Se connecter avec", "Vous allez vous connecter avec", "Souhaitez-vous vous connecter avec", "登入吗", "登入嗎"];

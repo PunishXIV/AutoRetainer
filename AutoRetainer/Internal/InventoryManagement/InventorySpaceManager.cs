@@ -12,14 +12,13 @@ public static unsafe class InventorySpaceManager
     public static readonly List<string> Log = [];
     public static readonly string[] Addons = ["InventoryRetainer", "InventoryRetainerLarge"];
 
-    private static nint AgentRetainerItemCommandModule => (nint)AgentModule.Instance()->GetAgentByInternalId(AgentId.Retainer) + 40;
+    public static nint AgentRetainerItemCommandModule => (nint)AgentModule.Instance()->GetAgentByInternalId(AgentId.Retainer) + 40;
 
     private static bool IsAgentRetainerActive => AgentModule.Instance()->GetAgentByInternalId(AgentId.Retainer)->IsAgentActive();
 
     public static readonly List<SellSlotTask> SellSlotTasks = [];
-    private static readonly InventoryType[] NormalInventoryTypes = [InventoryType.Inventory1, InventoryType.Inventory2, InventoryType.Inventory3, InventoryType.Inventory4];
 
-    public static InventoryType[] GetAllowedToSellInventoryTypes() => [.. NormalInventoryTypes];
+    public static InventoryType[] GetAllowedToSellInventoryTypes() => C.AllowSellFromArmory?[..Utils.PlayerInvetories, ..Utils.PlayerArmory]:Utils.PlayerInvetories;
 
     public static bool? SafeSellSlot(SellSlotTask Task)
     {
@@ -107,7 +106,7 @@ public static unsafe class InventorySpaceManager
         }
     }
 
-    public static void EnqueueAllHardItems()
+    public static void EnqueueAllHardItems(bool softAsHard = false)
     {
         var im = InventoryManager.Instance();
         foreach(var invType in InventorySpaceManager.GetAllowedToSellInventoryTypes())
@@ -118,7 +117,7 @@ public static unsafe class InventorySpaceManager
                 var item = inv->Items[i];
                 if(item.ItemId != 0 && (item.Quantity < C.IMAutoVendorHardStackLimit || C.IMAutoVendorHardIgnoreStack.Contains(item.ItemId)))
                 {
-                    if(C.IMAutoVendorHard.Contains(item.ItemId) && !TaskDesynthItems.DesynthEligible(item.ItemId))
+                    if((C.IMAutoVendorHard.Contains(item.ItemId) || (softAsHard && C.IMAutoVendorSoft.Contains(item.ItemId))) && !TaskDesynthItems.DesynthEligible(item.ItemId))
                     {
                         var task = new SellSlotTask(invType, (uint)i, item.ItemId, item.Quantity);
                         PluginLog.Information($"Enqueueing {task} for hard sale");

@@ -5,9 +5,9 @@ namespace AutoRetainer.Scheduler.Tasks;
 
 public static class TaskVendorItems
 {
-    public static void Enqueue()
+    public static void Enqueue(bool softAsHard = false)
     {
-        P.TaskManager.Enqueue(AddHardItems);
+        P.TaskManager.Enqueue(() => AddHardItems(softAsHard));
         P.TaskManager.Enqueue(SelectEntrustItems);
         P.TaskManager.Enqueue(WaitUntilInventoryLoaded);
         P.TaskManager.Enqueue(EnqueueImmediateAllItems);
@@ -21,13 +21,19 @@ public static class TaskVendorItems
         }
         else
         {
-            foreach(var x in InventorySpaceManager.SellSlotTasks)
+            P.TaskManager.BeginStack();
+            try
             {
-                P.TaskManager.EnqueueImmediate(() => InventorySpaceManager.SafeSellSlot(x), $"InventorySpaceManager.SafeSellSlot({x})");
+                foreach(var x in InventorySpaceManager.SellSlotTasks)
+                {
+                    P.TaskManager.Enqueue(() => InventorySpaceManager.SafeSellSlot(x), $"InventorySpaceManager.SafeSellSlot({x})");
+                }
+                P.TaskManager.Enqueue(InventorySpaceManager.SellSlotTasks.Clear);
+                P.TaskManager.EnqueueDelay(333);
+                P.TaskManager.Enqueue(CloseInventory);
             }
-            P.TaskManager.EnqueueImmediate(InventorySpaceManager.SellSlotTasks.Clear);
-            P.TaskManager.DelayNextImmediate(333);
-            P.TaskManager.EnqueueImmediate(CloseInventory);
+            catch(Exception e) { e.Log(); }
+            P.TaskManager.InsertStack();
         }
     }
 
@@ -36,9 +42,9 @@ public static class TaskVendorItems
         return RetainerHandlers.CloseAgentRetainer();
     }
 
-    public static void AddHardItems()
+    public static void AddHardItems(bool softAsHard = false)
     {
-        InventorySpaceManager.EnqueueAllHardItems();
+        InventorySpaceManager.EnqueueAllHardItems(softAsHard);
     }
 
     public static bool? SelectEntrustItems()

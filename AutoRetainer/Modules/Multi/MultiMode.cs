@@ -2,13 +2,12 @@
 using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainer.Scheduler.Tasks;
-using AutoRetainer.UI.MainWindow;
+using AutoRetainer.UI.MainWindow.MultiModeTab;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game.Config;
 using Dalamud.Interface.ImGuiNotification;
 using ECommons.CircularBuffers;
 using ECommons.Events;
-using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.EzSharedDataManager;
 using ECommons.GameHelpers;
@@ -36,7 +35,7 @@ internal static unsafe class MultiMode
     internal static CircularBuffer<long> Interactions = new(5);
 
     internal static Dictionary<ulong, int> CharaCnt = [];
-    internal static bool CanHET => Active && C.ExpertMultiAllowHET && (ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType));
+    internal static bool CanHET => Active && ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType);
 
     internal static void Init()
     {
@@ -65,9 +64,13 @@ internal static unsafe class MultiMode
             if(CanHET)
             {
                 DebugLog($"ProperOnLogin: {Svc.ClientState.LocalPlayer}, residential area, scheduling HET");
-                if(!TaskTeleportToProperty.HasRegisteredProperty()) HouseEnterTask.EnqueueTask();
+                if(!TaskTeleportToProperty.ShouldVoidHET()) TaskNeoHET.Enqueue(null);
             }
             MultiModeUI.JustRelogged = true;
+            if(!MultiMode.Enabled && C.HETWhenDisabled && ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType))
+            {
+                TaskNeoHET.Enqueue(null);
+            }
         });
         if(ProperOnLogin.PlayerPresent)
         {
@@ -94,15 +97,11 @@ internal static unsafe class MultiMode
             return;
         }
         LastLogin = 0;
-        if(!TaskTeleportToProperty.HasRegisteredProperty())
+        if(!TaskTeleportToProperty.ShouldVoidHET())
         {
             if(C.MultiHETOnEnable && Player.Available && CanHET)
             {
-                HouseEnterTask.EnqueueTask();
-            }
-            if(Utils.GetNearestWorkshopEntrance(out _) != null && Utils.GetReachableRetainerBell(false) == null)
-            {
-                TaskContinueHET.Enqueue();
+                TaskNeoHET.Enqueue(null);
             }
         }
     }
@@ -216,8 +215,6 @@ internal static unsafe class MultiMode
                     {
                         DebugLog($"Enqueueing relog");
                         BlockInteraction(20);
-                        EnsureCharacterValidity();
-                        RestoreValidityInWorkshop();
                         if(!Relog(next, out var error, RelogReason.MultiMode))
                         {
                             DuoLog.Error(error);
@@ -235,8 +232,6 @@ internal static unsafe class MultiMode
                         {
                             DebugLog($"Enqueueing logoff");
                             BlockInteraction(20);
-                            EnsureCharacterValidity();
-                            RestoreValidityInWorkshop();
                             if(!Relog(null, out var error, RelogReason.MultiMode))
                             {
                                 DuoLog.Error(error);
@@ -273,8 +268,8 @@ internal static unsafe class MultiMode
                         {
                             if(!TaskTeleportToProperty.EnqueueIfNeededAndPossible(false))
                             {
+                                EnterWorkshopForRetainers();
                                 EnsureCharacterValidity();
-                                RestoreValidityInWorkshop();
                                 if(data.Enabled)
                                 {
                                     DebugLog($"Enqueueing interaction with bell");
@@ -292,35 +287,31 @@ internal static unsafe class MultiMode
         }
     }
 
-    internal static bool CheckInventoryValidity() => Svc.ClientState.LocalPlayer.HomeWorld.Id == Svc.ClientState.LocalPlayer.CurrentWorld.Id && Utils.GetVenturesAmount() >= Data.GetNeededVentureAmount() && Utils.IsInventoryFree();
-    internal static void RestoreValidityInWorkshop()
+    internal static void EnterWorkshopForRetainers()
     {
-        return;
-        if(VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType))
+        if(Utils.GetReachableRetainerBell(true) == null && Houses.List.Contains((ushort)Player.Territory))
         {
-            if(!ProperOnLogin.PlayerPresent) return;
-            if(Data != null)
+            TaskNeoHET.TryEnterWorkshop(() =>
             {
-                if(CheckInventoryValidity())
-                {
-                    Data.Enabled = true;
-                    return;
-                }
-            }
+                Data.Enabled = false;
+                DuoLog.Error($"Due to absence of retainer bell and failure to find workshop, character is excluded from processing retainers");
+                P.TaskManager.Abort();
+            });
         }
-        return;
     }
+
+    internal static bool CheckInventoryValidity() => Svc.ClientState.LocalPlayer.HomeWorld.Id == Svc.ClientState.LocalPlayer.CurrentWorld.Id && Utils.GetVenturesAmount() >= Data.GetNeededVentureAmount() && Utils.IsInventoryFree();
 
     internal static IEnumerable<OfflineCharacterData> GetEnabledOfflineData()
     {
         return C.OfflineData.Where(x => x.Enabled);
     }
 
-    internal static bool AnyRetainersAvailable()
+    internal static bool AnyRetainersAvailable(int advanceSeconds = 0)
     {
         if(GetEnabledOfflineData().TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
         {
-            return data.GetEnabledRetainers().Any(z => z.GetVentureSecondsRemaining() <= C.UnsyncCompensation);
+            return data.GetEnabledRetainers().Any(z => z.GetVentureSecondsRemaining() <= C.UnsyncCompensation + advanceSeconds);
         }
         return false;
     }
@@ -361,7 +352,7 @@ internal static unsafe class MultiMode
         return Array.Empty<OfflineRetainerData>();
     }
 
-    internal static bool Relog(OfflineCharacterData data, out string ErrorMessage, RelogReason reason)
+    internal static bool Relog(OfflineCharacterData data, out string ErrorMessage, RelogReason reason, bool allowFromTaskManager = false)
     {
         if(reason.EqualsAny(RelogReason.Overlay, RelogReason.Command, RelogReason.ConfigGUI))
         {
@@ -379,7 +370,7 @@ internal static unsafe class MultiMode
             }
         }
         ErrorMessage = string.Empty;
-        if(P.TaskManager.IsBusy)
+        if(P.TaskManager.IsBusy && !allowFromTaskManager)
         {
             ErrorMessage = "AutoRetainer is processing tasks";
         }
@@ -405,10 +396,13 @@ internal static unsafe class MultiMode
                 }
                 else
                 {
+                    if(reason == RelogReason.MultiMode || C.AllowManualPostprocess)
+                    {
+                        TaskPostprocessCharacterIPC.Enqueue();
+                    }
                     if(MultiMode.Enabled)
                     {
                         CharaCnt.IncrementOrSet(Svc.ClientState.LocalContentId);
-                        TaskPostprocessCharacterIPC.Enqueue();
                     }
                     else
                     {
@@ -427,7 +421,7 @@ internal static unsafe class MultiMode
             }
             else
             {
-                if(Utils.CanAutoLogin())
+                if(Utils.CanAutoLogin() || (allowFromTaskManager && Utils.CanAutoLoginFromTaskManager()))
                 {
                     TaskChangeCharacter.EnqueueLogin(data.CurrentWorld, data.Name, data.World, data.ServiceAccount);
                     return true;
@@ -565,23 +559,6 @@ internal static unsafe class MultiMode
         }
         return false;
     }
-
-    /*internal static IGameObject GetNearbyBell()
-    {
-        if (!ProperOnLogin.PlayerPresent) return null;
-        foreach (var x in Svc.Objects)
-        {
-            if ((x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName, "リテイナーベル"))
-            {
-                if (Vector3.Distance(x.Position, Svc.ClientState.LocalPlayer.Position) < Utils.GetValidInteractionDistance(x) && x.Struct()->GetIsTargetable())
-                {
-                    return x;
-                }
-            }
-        }
-        return null;
-    }*/
-
     internal static int GetNeededVentureAmount(this OfflineCharacterData data)
     {
         return data.GetEnabledRetainers().Length * 2;
@@ -590,16 +567,49 @@ internal static unsafe class MultiMode
     internal static void PerformAutoStart()
     {
         EzSharedData.TryGet<object>("AutoRetainer.WasLoaded", out _, CreationMode.CreateAndKeep, new());
-        for(var i = 0; i < 10; i++)
+        for(var i = 0; i < C.AutoLoginDelay; i++)
         {
-            var seconds = 10 - i;
-            P.TaskManager.Enqueue(() => Svc.PluginInterface.UiBuilder.AddNotification($"MultiMode autostarts in {seconds} seconds!", P.Name, NotificationType.Warning, 0));
-            P.TaskManager.DelayNext(1000);
+            var seconds = C.AutoLoginDelay - i;
+            P.TaskManager.Enqueue(() => Svc.NotificationManager.AddNotification(new()
+            {
+                Content = $"Autostart in {seconds}!",
+                InitialDuration = TimeSpan.FromSeconds(1),
+                HardExpiry = DateTime.Now.AddSeconds(1),
+                Type = NotificationType.Warning,
+            }));
+            P.TaskManager.EnqueueDelay(1000);
         }
         P.TaskManager.Enqueue(() =>
         {
-            MultiMode.Enabled = true;
-            BailoutManager.IsLogOnTitleEnabled = true;
+            if(C.AutoLogin != "")
+            {
+                var data = C.OfflineData.First(s => $"{s.Name}@{s.World}" == C.AutoLogin);
+                if(Utils.CanAutoLoginFromTaskManager())
+                {
+                    MultiMode.Relog(data, out var error, RelogReason.Command, true);
+                    if(error == "")
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        DuoLog.Error($"Error during auto login: {error}");
+                    }
+                }
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        });
+        P.TaskManager.Enqueue(() =>
+        {
+            if(C.MultiAutoStart)
+            {
+                MultiMode.Enabled = true;
+                BailoutManager.IsLogOnTitleEnabled = true;
+            }
         });
     }
 }

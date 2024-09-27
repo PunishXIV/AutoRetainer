@@ -98,14 +98,23 @@ internal unsafe class RetainerListOverlay : Window
                     var ret = GameRetainerManager.Retainers[i];
                     if(ret.Available)
                     {
-                        P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
-                        TaskEntrustDuplicates.Enqueue();
-
-                        if(C.RetainerMenuDelay > 0)
+                        var adata = Utils.GetAdditionalData(Data.CID, ret.Name);
+                        var selectedPlan = C.EntrustPlans.FirstOrDefault(x => x.Guid == adata.EntrustPlan);
+                        if(selectedPlan != null)
                         {
-                            TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
+                            P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
+                            TaskEntrustDuplicates.EnqueueNew(selectedPlan);
+                            if(C.RetainerMenuDelay > 0)
+                            {
+                                TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
+                            }
+                            P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
                         }
-                        P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
+                        else
+                        {
+                            Notify.Error($"No entrust plan found for retainer {ret.Name}");
+                        }
+
                     }
                 }
             }
@@ -136,25 +145,37 @@ internal unsafe class RetainerListOverlay : Window
                 ImGui.SameLine();
                 if(ImGuiEx.IconButton($"{Lang.IconFire}##vendoritems"))
                 {
-                    for(var i = 0; i < GameRetainerManager.Count; i++)
-                    {
-                        var ret = GameRetainerManager.Retainers[i];
-                        if(ret.Available)
-                        {
-                            P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
-                            TaskVendorItems.Enqueue();
-
-                            if(C.RetainerMenuDelay > 0)
-                            {
-                                TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
-                            }
-                            P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
-                            P.TaskManager.Enqueue(RetainerHandlers.ConfirmCantBuyback);
-                            break;
-                        }
-                    }
+                    Utils.EnqueueVendorItemsByRetainer();
+                }
+                if(ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                {
+                    ImGui.OpenPopup("QuickVendorPopup");
                 }
                 ImGuiEx.Tooltip("Quick Vendor Items");
+                if(ImGui.BeginPopup("QuickVendorPopup"))
+                {
+                    if(ImGui.Selectable("Sell items from Quick Venture List"))
+                    {
+                        for(var i = 0; i < GameRetainerManager.Count; i++)
+                        {
+                            var ret = GameRetainerManager.Retainers[i];
+                            if(ret.Available)
+                            {
+                                P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
+                                TaskVendorItems.Enqueue(true);
+
+                                if(C.RetainerMenuDelay > 0)
+                                {
+                                    TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
+                                }
+                                P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
+                                P.TaskManager.Enqueue(RetainerHandlers.ConfirmCantBuyback);
+                                break;
+                            }
+                        }
+                    }
+                    ImGui.EndPopup();
+                }
             }
 
             PluginToProcess = null;

@@ -1,10 +1,13 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainer.Scheduler.Tasks;
 using Dalamud.Utility;
+using ECommons.Automation.NeoTaskManager.Tasks;
 using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
+using ECommons.Reflection;
 using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using Lumina.Excel.GeneratedSheets;
 
@@ -14,6 +17,23 @@ internal unsafe class DebugMulti : DebugSectionBase
 {
     public override void Draw()
     {
+        if(ImGui.CollapsingHeader("NeoHET"))
+        {
+            if(ImGui.Button("Enqueue HET")) TaskNeoHET.Enqueue(null);
+            if(ImGui.Button("Enqueue workshop")) TaskNeoHET.TryEnterWorkshop(() => DuoLog.Error("Fail"));
+        }
+        if(ImGui.CollapsingHeader("Tasks"))
+        {
+            if(ImGui.Button("TestAutomoveTask")) P.TaskManager.EnqueueTask(NeoTasks.ApproachObjectViaAutomove(() => Svc.Targets.FocusTarget));
+            if(ImGui.Button("TestInteractTask")) P.TaskManager.EnqueueTask(NeoTasks.InteractWithObject(() => Svc.Targets.FocusTarget));
+            if(ImGui.Button("TestBoth"))
+            {
+                P.TaskManager.EnqueueTask(NeoTasks.ApproachObjectViaAutomove(() => Svc.Targets.FocusTarget));
+                P.TaskManager.EnqueueTask(NeoTasks.InteractWithObject(() => Svc.Targets.FocusTarget));
+            }
+        }
+        ImGui.Checkbox("Don't logout", ref C.DontLogout);
+        ImGui.Checkbox("Enabled", ref MultiMode.Enabled);
         ImGuiEx.Text($"Expected: {TaskChangeCharacter.Expected}");
         if(ImGui.Button("Force mismatch")) TaskChangeCharacter.Expected = ("AAAAAAAA", "BBBBBBB");
         if(ImGui.Button("Simulate nothing left"))
@@ -23,6 +43,10 @@ internal unsafe class DebugMulti : DebugSectionBase
         if(ImGui.Button($"Simulate autostart"))
         {
             MultiMode.PerformAutoStart();
+        }
+        if(ImGui.Button("Delete was loaded data"))
+        {
+            DalamudReflector.DeleteSharedData("AutoRetainer.WasLoaded");
         }
         ImGuiEx.Text($"Moving: {AgentMap.Instance()->IsPlayerMoving}");
         ImGuiEx.Text($"Occupied: {IsOccupied()}");
@@ -36,7 +60,7 @@ internal unsafe class DebugMulti : DebugSectionBase
             ImGuiEx.Text($"Nearest entrance: {Utils.GetNearestEntrance(out var d)}, d={d}");
             if(ImGui.Button("Enter house"))
             {
-                HouseEnterTask.EnqueueTask();
+                TaskNeoHET.Enqueue(null);
             }
         }
         if(ImGui.CollapsingHeader("Estate territories"))

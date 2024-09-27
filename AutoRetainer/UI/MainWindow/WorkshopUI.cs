@@ -3,6 +3,7 @@ using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using AutoRetainer.Scheduler.Tasks;
+using AutoRetainer.UI.MainWindow.MultiModeTab;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game;
 using Dalamud.Interface.Components;
@@ -17,8 +18,6 @@ internal static unsafe class WorkshopUI
     internal static void Draw()
     {
         List<OverlayTextData> overlayTexts = [];
-        SharedUI.DrawExcludedNotification(false, true);
-        //ImGuiEx.ImGuiLineCentered("WorkshopBetaWarning", () => ImGuiEx.Text(ImGuiColors.DalamudYellow, "This feature is in beta testing."));
         var sortedData = new List<OfflineCharacterData>();
         if(C.NoCurrentCharaOnTop)
         {
@@ -79,12 +78,6 @@ internal static unsafe class WorkshopUI
                     SharedUI.DrawPreferredCharacterUI(data);
                     ImGui.Checkbox($"Wait For All Pending Deployables", ref data.MultiWaitForAllDeployables);
                     ImGuiComponents.HelpMarker("Prevent processing this character until all enabled deployables have returned from their voyages.");
-                    ImGuiGroup.EndGroupBox();
-                }
-
-                if(ImGuiGroup.BeginGroupBox("Estate entrance override"))
-                {
-                    data.DrawEntranceConfig(ref data.FreeCompanyHouseEntrance);
                     ImGuiGroup.EndGroupBox();
                 }
 
@@ -288,7 +281,7 @@ internal static unsafe class WorkshopUI
                     }
                     else
                     {
-                        ImGuiEx.Text(EColor.RedBright, $"Currently executing: {P.TaskManager.CurrentTaskName}");
+                        ImGuiEx.Text(EColor.RedBright, $"Currently executing: {P.TaskManager.CurrentTask?.Name}");
                     }
                 }
                 catch(Exception e)

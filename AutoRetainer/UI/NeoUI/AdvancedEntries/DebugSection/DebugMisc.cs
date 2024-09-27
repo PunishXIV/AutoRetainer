@@ -1,7 +1,5 @@
-﻿using AutoRetainer.UI.Statistics;
-using ECommons.Automation;
+﻿using ECommons.Automation;
 using ECommons.Events;
-using ECommons.ExcelServices;
 using ECommons.MathHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
@@ -15,36 +13,6 @@ internal unsafe class DebugMisc : DebugSectionBase
 {
     public override void Draw()
     {
-        if(ImGui.CollapsingHeader("pfinder"))
-        {
-            if(ImGui.Button("Callback"))
-            {
-                if(!TryGetAddonByName<AtkUnitBase>("LookingForGroup", out var _))
-                {
-                    P.TaskManager.Enqueue(() => Chat.Instance.ExecuteCommand("/partyfinder"));
-                    P.TaskManager.DelayNext(500);
-                }
-                P.TaskManager.Enqueue(() =>
-                {
-                    if(TryGetAddonByName<AtkUnitBase>("LookingForGroup", out var addon))
-                    {
-                        var btn = addon->UldManager.NodeList[35];
-                        var enabled = btn->GetAsAtkComponentNode()->Component->UldManager.NodeList[2]->Alpha_2 == 255;
-                        var selected = btn->GetAsAtkComponentNode()->Component->UldManager.NodeList[4]->GetAsAtkImageNode()->PartId == 0;
-                        if(enabled)
-                        {
-                            if(!selected)
-                            {
-                                PluginLog.Debug($"Selecting hunts");
-                                Callback.Fire(addon, true, 21, 11, Callback.ZeroAtkValue);
-                            }
-                            return true;
-                        }
-                    }
-                    return false;
-                });
-            }
-        }
         ImGuiEx.Text($"FC points: {Utils.FCPoints}");
         if(ImGui.CollapsingHeader("Housing"))
         {
@@ -114,7 +82,7 @@ internal unsafe class DebugMisc : DebugSectionBase
         ImGuiEx.Text($"ConditionWasEnabled={P.ConditionWasEnabled}");
         if(ImGui.CollapsingHeader("Task debug"))
         {
-            ImGuiEx.Text($"Busy: {P.TaskManager.IsBusy}, abort in {P.TaskManager.AbortAt - Environment.TickCount64}");
+            ImGuiEx.Text($"Busy: {P.TaskManager.IsBusy}, abort in {P.TaskManager.RemainingTimeMS}");
             if(ImGui.Button($"Generate random numbers 1/500"))
             {
                 P.TaskManager.Enqueue(() => { var r = new Random().Next(0, 500); InternalLog.Verbose($"Gen 1/500: {r}"); return r == 0; });

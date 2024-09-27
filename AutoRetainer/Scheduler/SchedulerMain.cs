@@ -162,10 +162,10 @@ internal static unsafe class SchedulerMain
                                         adata.VenturePlanIndex++;
                                     }
 
-                                    //entrust duplicates
-                                    if(adata.EntrustDuplicates)
+                                    var selectedPlan = C.EntrustPlans.FirstOrDefault(x => x.Guid == adata.EntrustPlan && !x.ManualPlan);
+                                    if(C.EnableEntrustManager && selectedPlan != null)
                                     {
-                                        TaskEntrustDuplicates.Enqueue();
+                                        TaskEntrustDuplicates.EnqueueNew(selectedPlan);
                                     }
 
                                     //withdraw gil
