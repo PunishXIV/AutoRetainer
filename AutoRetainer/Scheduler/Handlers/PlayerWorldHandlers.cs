@@ -1,4 +1,5 @@
-﻿using ECommons.Throttlers;
+﻿using ECommons.GameHelpers;
+using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using ObjectKind = Dalamud.Game.ClientState.Objects.Enums.ObjectKind;
@@ -32,6 +33,7 @@ internal static unsafe class PlayerWorldHandlers
         {
             if(Vector3.Distance(x.Position, Svc.ClientState.LocalPlayer.Position) < Utils.GetValidInteractionDistance(x) && x.IsTargetable)
             {
+                if(Player.IsAnimationLocked) return false;
                 if(Utils.GenericThrottle && EzThrottler.Throttle("InteractWithBell", 5000))
                 {
                     TargetSystem.Instance()->InteractWithObject((GameObject*)x.Address, false);

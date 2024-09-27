@@ -105,6 +105,7 @@ public static unsafe class NpcSaleManager
         }
         else
         {
+            if(Player.IsAnimationLocked) return false;
             if(EzThrottler.Throttle("InteractWithNPC", 2000))
             {
                 TargetSystem.Instance()->InteractWithObject(npc.Struct(), false);

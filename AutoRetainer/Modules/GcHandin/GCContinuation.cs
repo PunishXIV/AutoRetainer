@@ -135,6 +135,7 @@ internal static unsafe class GCContinuation
     {
         if(Svc.Targets.Target != null)
         {
+            if(Player.IsAnimationLocked) return false;
             var t = Svc.Targets.Target;
             if(t.IsTargetable && t.DataId == dataID && Vector3.Distance(Player.Object.Position, t.Position) < 10f && !IsOccupied() && EzThrottler.Throttle("GCInteract"))
             {

@@ -1,5 +1,7 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage;
+using AutoRetainer.Scheduler.Handlers;
+using AutoRetainer.Scheduler.Tasks;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game;
 using Dalamud.Game.ClientState.Conditions;
@@ -32,6 +34,27 @@ internal static unsafe class Utils
     internal static int FCPoints => *(int*)((nint)AgentModule.Instance()->GetAgentByInternalId(AgentId.FreeCompanyCreditShop) + 256);
     internal static float AnimationLock => Player.AnimationLock;
     private static bool IsNullOrEmpty(this string s) => GenericHelpers.IsNullOrEmpty(s);
+
+    public static void EnqueueVendorItemsByRetainer()
+    {
+        for(var i = 0; i < GameRetainerManager.Count; i++)
+        {
+            var ret = GameRetainerManager.Retainers[i];
+            if(ret.Available)
+            {
+                P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
+                TaskVendorItems.Enqueue();
+
+                if(C.RetainerMenuDelay > 0)
+                {
+                    TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
+                }
+                P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
+                P.TaskManager.Enqueue(RetainerHandlers.ConfirmCantBuyback);
+                break;
+            }
+        }
+    }
 
     public static bool GetAllowFcTeleportForRetainers(this OfflineCharacterData data) => data.IsTeleportEnabled() && data.GetIsTeleportEnabledForRetainers() && (data.TeleportOptionsOverride.RetainersFC ?? C.GlobalTeleportOptions.RetainersFC);
     public static bool GetAllowPrivateTeleportForRetainers(this OfflineCharacterData data) => data.IsTeleportEnabled() && data.GetIsTeleportEnabledForRetainers() && (data.TeleportOptionsOverride.RetainersPrivate ?? C.GlobalTeleportOptions.RetainersPrivate);

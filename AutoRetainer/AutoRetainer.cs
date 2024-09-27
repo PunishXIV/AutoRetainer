@@ -2,6 +2,7 @@
 using AutoRetainer.Internal.InventoryManagement;
 using AutoRetainer.Modules.Statistics;
 using AutoRetainer.Modules.Voyage;
+using AutoRetainer.Scheduler.Handlers;
 using AutoRetainer.Scheduler.Tasks;
 using AutoRetainer.Services;
 using AutoRetainer.UI.MainWindow;
@@ -25,6 +26,8 @@ using ECommons.GameHelpers;
 using ECommons.Reflection;
 using ECommons.Singletons;
 using ECommons.Throttlers;
+using ECommons.UIHelpers.AddonMasterImplementations;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
 using NotificationMasterAPI;
 using PunishLib;
@@ -142,7 +145,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             /autoretainer expert - toggle expert settings
             /autoretainer debug - toggle debug menu and verbose output
             /autoretainer shutdown <hours> [minutes] [seconds] - schedule a game shutdown in this amount of time
-            /autoretainer npcsell - begin selling items to NPC if possible
+            /autoretainer itemsell - begin selling items to NPC or retainer if possible
             /autoretainer het - enter nearby own house or apartment if possible
             /autoretainer reset - reset all pending tasks
             """);
@@ -291,15 +294,31 @@ public unsafe class AutoRetainer : IDalamudPlugin
         {
             GCContinuation.EnableDeliveringIfPossible();
         }
-        else if(arguments.EqualsIgnoreCaseAny("npcsell"))
+        else if(arguments.EqualsIgnoreCaseAny("itemsell"))
         {
-            if(C.IMEnableNpcSell && NpcSaleManager.GetValidNPC() != null && !IsOccupied() && !P.TaskManager.IsBusy)
+            if(!IsOccupied() && !P.TaskManager.IsBusy)
             {
-                NpcSaleManager.EnqueueIfItemsPresent();
+                if(NpcSaleManager.GetValidNPC() != null && C.IMEnableNpcSell)
+                {
+                    NpcSaleManager.EnqueueIfItemsPresent();
+                }
+                else if(C.IMEnableAutoVendor && Utils.GetReachableRetainerBell(true) != null && Player.IsInHomeWorld)
+                {
+                    P.SkipNextEnable = true;
+                    TaskInteractWithNearestBell.Enqueue(true);
+                    P.TaskManager.Enqueue(() => TryGetAddonMaster<AddonMaster.RetainerList>(out var m) && m.IsAddonReady);
+                    P.TaskManager.Enqueue(() =>
+                    {
+                        P.TaskManager.BeginStack();
+                        Safe(Utils.EnqueueVendorItemsByRetainer);
+                        P.TaskManager.InsertStack();
+                    });
+                    P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
+                }
             }
             else
             {
-                DuoLog.Error($"No valid housing NPC was found, or AutoRetainer is busy, or NPC sale function is disabled");
+                DuoLog.Error($"No valid housing NPC or retainer bell were found, or AutoRetainer is busy, or sale function is disabled");
             }
         }
         else if(arguments.StartsWith("shutdown"))
@@ -611,6 +630,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
         }
     }
 
+    public bool SkipNextEnable = false;
+
     private void ConditionChange(ConditionFlag flag, bool value)
     {
         if(flag == ConditionFlag.OccupiedSummoningBell)
@@ -621,68 +642,72 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 ConditionWasEnabled = false;
                 DebugLog("ConditionWasEnabled = false;");
             }
-            if(Svc.Targets.Target.IsRetainerBell())
+            if(!SkipNextEnable)
             {
-                if(value)
+                if(Svc.Targets.Target.IsRetainerBell())
                 {
-                    if(Utils.MultiModeOrArtisan)
+                    if(value)
                     {
-                        WasEnabled = false;
-                        if(IsInteractionAutomatic)
+                        if(Utils.MultiModeOrArtisan)
                         {
-                            IsInteractionAutomatic = false;
-                            SchedulerMain.EnablePlugin(MultiMode.Enabled ? PluginEnableReason.MultiMode : PluginEnableReason.Artisan);
-                        }
-                    }
-                    else
-                    {
-                        var bellBehavior = Utils.IsAnyRetainersCompletedVenture() ? C.OpenBellBehaviorWithVentures : C.OpenBellBehaviorNoVentures;
-                        if(bellBehavior != OpenBellBehavior.Pause_AutoRetainer && IsKeyPressed(C.Suppress) && !CSFramework.Instance()->WindowInactive)
-                        {
-                            bellBehavior = OpenBellBehavior.Do_nothing;
-                            Notify.Info($"Open bell action cancelled");
-                        }
-                        if(SchedulerMain.PluginEnabled && bellBehavior == OpenBellBehavior.Pause_AutoRetainer)
-                        {
-                            WasEnabled = true;
-                            SchedulerMain.DisablePlugin();
-                        }
-                        if(IsInteractionAutomatic)
-                        {
-                            IsInteractionAutomatic = false;
-                            SchedulerMain.EnablePlugin(PluginEnableReason.Auto);
+                            WasEnabled = false;
+                            if(IsInteractionAutomatic)
+                            {
+                                IsInteractionAutomatic = false;
+                                SchedulerMain.EnablePlugin(MultiMode.Enabled ? PluginEnableReason.MultiMode : PluginEnableReason.Artisan);
+                            }
                         }
                         else
                         {
-                            if(bellBehavior == OpenBellBehavior.Enable_AutoRetainer)
+                            var bellBehavior = Utils.IsAnyRetainersCompletedVenture() ? C.OpenBellBehaviorWithVentures : C.OpenBellBehaviorNoVentures;
+                            if(bellBehavior != OpenBellBehavior.Pause_AutoRetainer && IsKeyPressed(C.Suppress) && !CSFramework.Instance()->WindowInactive)
                             {
-                                SchedulerMain.EnablePlugin(PluginEnableReason.Access);
+                                bellBehavior = OpenBellBehavior.Do_nothing;
+                                Notify.Info($"Open bell action cancelled");
                             }
-                            else if(bellBehavior == OpenBellBehavior.Disable_AutoRetainer)
+                            if(SchedulerMain.PluginEnabled && bellBehavior == OpenBellBehavior.Pause_AutoRetainer)
                             {
+                                WasEnabled = true;
                                 SchedulerMain.DisablePlugin();
+                            }
+                            if(IsInteractionAutomatic)
+                            {
+                                IsInteractionAutomatic = false;
+                                SchedulerMain.EnablePlugin(PluginEnableReason.Auto);
+                            }
+                            else
+                            {
+                                if(bellBehavior == OpenBellBehavior.Enable_AutoRetainer)
+                                {
+                                    SchedulerMain.EnablePlugin(PluginEnableReason.Access);
+                                }
+                                else if(bellBehavior == OpenBellBehavior.Disable_AutoRetainer)
+                                {
+                                    SchedulerMain.DisablePlugin();
+                                }
                             }
                         }
                     }
                 }
-            }
-            else
-            {
-                if(Svc.Targets.Target.IsRetainerBell() || Svc.Targets.PreviousTarget.IsRetainerBell())
+                else
                 {
-                    if(WasEnabled)
+                    if(Svc.Targets.Target.IsRetainerBell() || Svc.Targets.PreviousTarget.IsRetainerBell())
                     {
-                        DebugLog($"Enabling plugin because WasEnabled is true");
-                        SchedulerMain.EnablePlugin(PluginEnableReason.Auto);
-                        WasEnabled = false;
-                    }
-                    else if(!IsCloseActionAutomatic && C.AutoDisable && !Utils.MultiModeOrArtisan)
-                    {
-                        DebugLog($"Disabling plugin because AutoDisable is on");
-                        SchedulerMain.DisablePlugin();
+                        if(WasEnabled)
+                        {
+                            DebugLog($"Enabling plugin because WasEnabled is true");
+                            SchedulerMain.EnablePlugin(PluginEnableReason.Auto);
+                            WasEnabled = false;
+                        }
+                        else if(!IsCloseActionAutomatic && C.AutoDisable && !Utils.MultiModeOrArtisan)
+                        {
+                            DebugLog($"Disabling plugin because AutoDisable is on");
+                            SchedulerMain.DisablePlugin();
+                        }
                     }
                 }
             }
+            SkipNextEnable = false;
             IsCloseActionAutomatic = false;
         }
         if(flag == ConditionFlag.Gathering)

@@ -145,23 +145,7 @@ internal unsafe class RetainerListOverlay : Window
                 ImGui.SameLine();
                 if(ImGuiEx.IconButton($"{Lang.IconFire}##vendoritems"))
                 {
-                    for(var i = 0; i < GameRetainerManager.Count; i++)
-                    {
-                        var ret = GameRetainerManager.Retainers[i];
-                        if(ret.Available)
-                        {
-                            P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
-                            TaskVendorItems.Enqueue();
-
-                            if(C.RetainerMenuDelay > 0)
-                            {
-                                TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
-                            }
-                            P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
-                            P.TaskManager.Enqueue(RetainerHandlers.ConfirmCantBuyback);
-                            break;
-                        }
-                    }
+                    Utils.EnqueueVendorItemsByRetainer();
                 }
                 if(ImGui.IsItemClicked(ImGuiMouseButton.Right))
                 {

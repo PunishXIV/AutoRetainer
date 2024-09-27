@@ -160,6 +160,7 @@ internal static unsafe class VoyageScheduler
         {
             if(Svc.Targets.Target?.Address == obj.Address)
             {
+                if(Player.IsAnimationLocked) return false;
                 if(Utils.GenericThrottle && EzThrottler.Throttle("Voyage.Interact", 2000))
                 {
                     Log("Interacting with workshop CP");
