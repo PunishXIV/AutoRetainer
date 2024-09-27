@@ -268,5 +268,5 @@ internal static class Lang
         "讓僱員返回後將無法購回委託賣掉的道具"
         ];
 
-    internal static readonly string[] LogInPartialText = ["Logging in with", "Log in with", "でログインします。", "einloggen?", "eingeloggt.", "Se connecter avec", "Vous allez vous connecter avec", "Souhaitez-vous vous connecter avec", "登入吗", "登入嗎"];
+    internal static readonly string[] LogInPartialText = ["Logging in with", "Log in with", "でログインします。", "einloggen?", "eingeloggt.", "Se connecter avec", "Vous allez vous connecter avec", "Souhaitez-vous vous connecter avec", "登入吗", "登入嗎", "登录吗"];
 }

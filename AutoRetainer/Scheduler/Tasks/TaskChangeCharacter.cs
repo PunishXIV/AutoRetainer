@@ -29,9 +29,16 @@ public static unsafe class TaskChangeCharacter
     {
         BailoutManager.IsLogOnTitleEnabled = false;
         var dc = (int)ExcelWorldHelper.Get(currentWorld).DataCenter.Row;
-        P.TaskManager.Enqueue(ClickSelectDataCenter, new(timeLimitMS: 1000000));
-        P.TaskManager.Enqueue(() => SelectDataCenter(dc), $"Connect to DC {dc}");
-        P.TaskManager.Enqueue(() => SelectServiceAccount(account), $"SelectServiceAccount {account}");
+        if((int)Svc.Data.Language < 4)
+        {
+            P.TaskManager.Enqueue(ClickSelectDataCenter, new(timeLimitMS: 1000000));
+            P.TaskManager.Enqueue(() => SelectDataCenter(dc), $"Connect to DC {dc}");
+            P.TaskManager.Enqueue(() => SelectServiceAccount(account), $"SelectServiceAccount {account}");
+        }
+        else
+        {
+            P.TaskManager.Enqueue(ClickStart);
+        }
         P.TaskManager.Enqueue(() => SelectCharacter(charaName, charaWorld), $"Select chara {charaName}@{charaWorld}", new(timeLimitMS: 1000000));
         P.TaskManager.Enqueue(ConfirmLogin);
     }
@@ -100,6 +107,29 @@ public static unsafe class TaskChangeCharacter
             if(Utils.GenericThrottle && EzThrottler.Throttle("ClickTitleMenuStart"))
             {
                 m.DataCenter();
+                return false;
+            }
+        }
+        else
+        {
+            Utils.RethrottleGeneric();
+        }
+        return false;
+    }
+
+    public static bool? ClickStart()
+    {
+        if(TryGetAddonByName<AtkUnitBase>("_CharaSelectListMenu", out var addon) && addon->IsVisible)
+        {
+            PluginLog.Information($"Visible");
+            Utils.RethrottleGeneric();
+            return true;
+        }
+        if(TryGetAddonMaster<AddonMaster._TitleMenu>(out var m) && m.IsReady)
+        {
+            if(Utils.GenericThrottle && EzThrottler.Throttle("ClickTitleMenuStart"))
+            {
+                m.Start();
                 return false;
             }
         }

@@ -593,7 +593,7 @@ internal static unsafe class RetainerHandlers
                 return false;
             }
 
-            if(FrameThrottler.Check("RetainerTaskSupply.InitWait") && Utils.GenericThrottle)
+            if(FrameThrottler.Check("RetainerTaskSupply.InitWait"))
             {
                 Callback.Fire(addon, true, 2, new AtkValue() { Type = 0, Int = 0 }, name);
                 Utils.RethrottleGeneric();
