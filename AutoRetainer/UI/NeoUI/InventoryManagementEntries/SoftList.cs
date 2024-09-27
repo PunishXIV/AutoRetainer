@@ -1,7 +1,7 @@
 ﻿namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries;
 public class SoftList : InventoryManagemenrBase
 {
-    public override string Name => "Quick Venture Sell List";
+    public override string Name => "Automatic Selling/Quick Venture Sell List";
     private SoftList()
     {
         Builder = new NuiBuilder()

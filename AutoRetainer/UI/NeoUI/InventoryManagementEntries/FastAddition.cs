@@ -3,7 +3,7 @@
 namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries;
 public class FastAddition : InventoryManagemenrBase
 {
-    public override string Name { get; } = "Fast Addition and Removal";
+    public override string Name { get; } = "Automatic Selling/Fast Addition and Removal";
 
     private FastAddition()
     {

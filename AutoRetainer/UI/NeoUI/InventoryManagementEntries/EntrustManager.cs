@@ -1,4 +1,5 @@
 ﻿using ECommons.Configuration;
+using ECommons.ExcelServices;
 using ECommons.Reflection;
 using ECommons.Throttlers;
 using Lumina.Excel.GeneratedSheets;
@@ -145,6 +146,32 @@ public class EntrustManager : InventoryManagemenrBase
                     }
                     ImGuiEx.Tooltip("Amount to keep in your inventory");
                 });
+            });
+            ImGuiEx.TreeNodeCollapsingHeader($"Fast addition/removal", () =>
+            {
+                ImGuiEx.TextWrapped(GradientColor.Get(EColor.RedBright, EColor.YellowBright), $"While this text is visible, hover over items while holding:");
+                ImGuiEx.Text(!ImGui.GetIO().KeyShift ? ImGuiColors.DalamudGrey : ImGuiColors.DalamudRed, $"Shift - add to entrust plan");
+                ImGuiEx.Text(!ImGui.GetIO().KeyAlt ? ImGuiColors.DalamudGrey : ImGuiColors.DalamudRed, $"Alt - delete from entrust plan");
+                if(Svc.GameGui.HoveredItem > 0)
+                {
+                    var id = (uint)(Svc.GameGui.HoveredItem % 1000000);
+                    if(ImGui.GetIO().KeyShift)
+                    {
+                        if(!selectedPlan.EntrustItems.Contains(id))
+                        {
+                            selectedPlan.EntrustItems.Add(id);
+                            Notify.Success($"Added {ExcelItemHelper.GetName(id)} to entrust plan {selectedPlan.Name}");
+                        }
+                    }
+                    if(ImGui.GetIO().KeyAlt)
+                    {
+                        if(selectedPlan.EntrustItems.Contains(id))
+                        {
+                            selectedPlan.EntrustItems.Remove(id);
+                            Notify.Success($"Removed {ExcelItemHelper.GetName(id)} from entrust plan {selectedPlan.Name}");
+                        }
+                    }
+                }
             });
         }
     }

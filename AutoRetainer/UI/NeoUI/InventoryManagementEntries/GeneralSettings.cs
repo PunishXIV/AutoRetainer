@@ -4,7 +4,7 @@ using ECommons.GameHelpers;
 namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries;
 public class GeneralSettings : InventoryManagemenrBase
 {
-    public override string Name { get; } = "General Settings";
+    public override string Name { get; } = "Automatic Selling/General Settings";
 
     private GeneralSettings()
     {

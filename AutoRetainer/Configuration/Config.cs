@@ -217,4 +217,5 @@ internal unsafe class Config : IEzConfig
     public bool EnableEntrustManager = true;
 
     public bool HETWhenDisabled = false;
+    public bool UseTitleScreenButton = false;
 }

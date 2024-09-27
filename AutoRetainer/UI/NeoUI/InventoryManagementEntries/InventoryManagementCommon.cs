@@ -8,41 +8,6 @@ using Action = System.Action;
 namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries;
 public static unsafe class InventoryManagementCommon
 {
-    public static void Draw()
-    {
-        if(ImGui.CollapsingHeader("Hard list"))
-        {
-            DrawListOfItems(C.IMAutoVendorHard);
-        }
-        if(ImGui.CollapsingHeader("Soft list"))
-        {
-            DrawListOfItems(C.IMAutoVendorSoft);
-        }
-        if(ImGui.CollapsingHeader("Protection list"))
-        {
-            DrawListOfItems(C.IMProtectList);
-        }
-        ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudOrange);
-        if(ImGui.CollapsingHeader("Fast addition/removal"))
-        {
-
-        }
-        ImGui.PopStyleColor();
-
-        ImGui.Separator();
-        if(ImGui.CollapsingHeader("Debug"))
-        {
-            if(ImGui.CollapsingHeader("Queue"))
-            {
-                ImGuiEx.Text(InventorySpaceManager.SellSlotTasks.Print("\n"));
-            }
-            if(ImGui.CollapsingHeader("Sell log"))
-            {
-                ImGuiEx.TextWrappedCopy(InventorySpaceManager.Log.Print("\n"));
-            }
-        }
-    }
-
     private static HashSet<uint> SelectedCategories = [];
     private static bool? Tradeable = null;
     private static HashSet<ItemRarity> Rarities = [];
