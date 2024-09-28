@@ -62,7 +62,7 @@ internal static unsafe class WorkshopUI
                 }
             }
             ImGui.SameLine(0, 3);
-            if(ImGuiEx.IconButton(FontAwesomeIcon.Cog))
+            if(ImGuiEx.IconButton(FontAwesomeIcon.UserCog))
             {
                 ImGui.OpenPopup($"popup{data.CID}");
             }

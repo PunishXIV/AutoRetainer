@@ -74,7 +74,7 @@ internal static unsafe class MultiModeUI
             }
             ImGuiEx.Tooltip($"Left click - relog to this character\nRight click - copy relog command into clipboard");
             ImGui.SameLine(0, 3);
-            if(ImGuiEx.IconButton(FontAwesomeIcon.Cog))
+            if(ImGuiEx.IconButton(FontAwesomeIcon.UserCog))
             {
                 ImGui.OpenPopup($"popup{data.CID}");
             }
