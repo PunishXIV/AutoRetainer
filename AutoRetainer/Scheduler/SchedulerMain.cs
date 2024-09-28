@@ -323,7 +323,7 @@ internal static unsafe class SchedulerMain
         {
             if(C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var cdata))
             {
-                var retainerData = cdata.ShowRetainersInDisplayOrder ? [.. cdata.RetainerData.OrderBy(x => x.DisplayOrder)] : cdata.RetainerData;
+                List<OfflineRetainerData> retainerData = [.. cdata.RetainerData];
                 if(C.LeastMBSFirst)
                 {
                     retainerData = [.. cdata.RetainerData.OrderBy(x => x.MBItems)];

@@ -77,10 +77,7 @@ internal static unsafe class OfflineDataManager
             data.WorldOverride = null;
         }
         data.Gil = (uint)InventoryManager.Instance()->GetInventoryItemCount(1);
-        for(var i = 0; i < 30; i++)
-        {
-            data.ClassJobLevelArray[i] = UIState.Instance()->PlayerState.ClassJobLevels[i];
-        }
+        data.ClassJobLevelArray = UIState.Instance()->PlayerState.ClassJobLevels.ToArray();
         if(writeGatherables)
         {
             try
@@ -124,15 +121,6 @@ internal static unsafe class OfflineDataManager
                     RetainerID = ret.RetainerID,
                     MBItems = ret.MarkerItemCount,
                 });
-
-                for(var p = 0; p < GameRetainerManager.Count; p++)
-                {
-                    if(RetainerManager.Instance()->DisplayOrder[p] == i)
-                    {
-                        data.RetainerData[i].DisplayOrder = p;
-                        break;
-                    }
-                }
             }
         }
         if(Player.IsInHomeWorld)

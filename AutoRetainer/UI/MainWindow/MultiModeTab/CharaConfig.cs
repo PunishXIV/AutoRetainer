@@ -1,34 +1,47 @@
 ﻿using AutoRetainerAPI.Configuration;
+using Dalamud.Interface.Components;
 using PunishLib.ImGuiMethods;
 
 namespace AutoRetainer.UI.MainWindow.MultiModeTab;
 public class CharaConfig
 {
-    public static void Draw(OfflineCharacterData data)
+    public static void Draw(OfflineCharacterData data, bool isRetainer)
     {
+        ImGui.PushID(data.CID.ToString());
         SharedUI.DrawMultiModeHeader(data);
-        new NuiBuilder()
+        var b = new NuiBuilder()
 
         .Section("General Character Specific Settings")
         .Widget(() =>
         {
             SharedUI.DrawServiceAccSelector(data);
             SharedUI.DrawPreferredCharacterUI(data);
-            ImGui.Checkbox("List & Process Retainers in Display Order", ref data.ShowRetainersInDisplayOrder);
-
-            ImGuiEx.Text($"Automatic Grand Company Expert Delivery:");
-            if(!AutoGCHandin.Operation)
+        });
+        if(isRetainer)
+        {
+            b = b.Section("Retainers").Widget(() =>
             {
-                ImGuiEx.SetNextItemWidthScaled(200f);
-                ImGuiEx.EnumCombo("##gcHandin", ref data.GCDeliveryType);
-            }
-            else
+                ImGuiEx.Text($"Automatic Grand Company Expert Delivery:");
+                if(!AutoGCHandin.Operation)
+                {
+                    ImGuiEx.SetNextItemWidthScaled(200f);
+                    ImGuiEx.EnumCombo("##gcHandin", ref data.GCDeliveryType);
+                }
+                else
+                {
+                    ImGuiEx.Text($"Can't change this now");
+                }
+            });
+        }
+        else
+        {
+            b = b.Section("Deployables").Widget(() =>
             {
-                ImGuiEx.Text($"Can't change this now");
-            }
-            ImGuiGroup.EndGroupBox();
-        })
-        .Section("Teleport overrides")
+                ImGui.Checkbox($"Wait For All Pending Deployables", ref data.MultiWaitForAllDeployables);
+                ImGuiComponents.HelpMarker("Prevent processing this character until all enabled deployables have returned from their voyages.");
+            });
+        }
+        b = b.Section("Teleport overrides", data.GetAreTeleportSettingsOverriden() ? ImGui.GetStyle().Colors[(int)ImGuiCol.FrameBg] with { X = 1f} :null, true)
         .Widget(() =>
         {
             ImGuiEx.Text($"You can override teleport settings per character.");
@@ -48,5 +61,6 @@ public class CharaConfig
             ImGuiGroup.EndGroupBox();
         }).Draw();
         SharedUI.DrawExcludeReset(data);
+        ImGui.PopID();
     }
 }

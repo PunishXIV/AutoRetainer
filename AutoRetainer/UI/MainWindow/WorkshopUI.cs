@@ -71,18 +71,7 @@ internal static unsafe class WorkshopUI
 
             if(ImGui.BeginPopup($"popup{data.CID}"))
             {
-                SharedUI.DrawMultiModeHeader(data, "Deployable Configuration");
-                if(ImGuiGroup.BeginGroupBox("General Character Specific Settings"))
-                {
-                    SharedUI.DrawServiceAccSelector(data);
-                    SharedUI.DrawPreferredCharacterUI(data);
-                    ImGui.Checkbox($"Wait For All Pending Deployables", ref data.MultiWaitForAllDeployables);
-                    ImGuiComponents.HelpMarker("Prevent processing this character until all enabled deployables have returned from their voyages.");
-                    ImGuiGroup.EndGroupBox();
-                }
-
-                SharedUI.DrawExcludeReset(data);
-
+                CharaConfig.Draw(data, false);
                 ImGui.EndPopup();
             }
 

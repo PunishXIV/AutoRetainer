@@ -83,7 +83,7 @@ internal static unsafe class MultiModeUI
 
             if(ImGui.BeginPopup($"popup{data.CID}"))
             {
-                CharaConfig.Draw(data);
+                CharaConfig.Draw(data, true);
                 ImGui.EndPopup();
             }
             data.DrawDCV();
@@ -119,10 +119,6 @@ internal static unsafe class MultiModeUI
 
                 var storePos = ImGui.GetCursorPos();
                 var retainerData = data.RetainerData;
-                if(data.ShowRetainersInDisplayOrder)
-                {
-                    retainerData = retainerData.OrderBy(x => x.DisplayOrder).ToList();
-                }
                 foreach(var ret in retainerData)
                 {
                     if(bars.TryGetValue($"{data.CID}{ret.Name}", out var v))
