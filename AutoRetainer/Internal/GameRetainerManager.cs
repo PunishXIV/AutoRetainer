@@ -17,10 +17,11 @@ public static unsafe class GameRetainerManager
                 {
                     ret.Add(new(x)
                     {
-                        DisplayOrder = m->DisplayOrder[i]
+                        DisplayOrder = m->DisplayOrder.IndexOf((byte)i)
                     });
                 }
             }
+            if(ret.Any(x => x.DisplayOrder == -1)) return ret;
             return [.. ret.OrderBy(x => x.DisplayOrder)];
         }
     }
