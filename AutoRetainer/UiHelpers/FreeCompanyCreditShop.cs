@@ -12,6 +12,8 @@ public unsafe class FreeCompanyCreditShop : AddonMasterBase
     {
     }
 
+    public override string AddonDescription { get; } = "";
+
     public void Buy(int index)
     {
         var evt = CreateAtkEvent();

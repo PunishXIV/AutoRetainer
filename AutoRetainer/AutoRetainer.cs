@@ -24,6 +24,7 @@ using ECommons.Reflection;
 using ECommons.Singletons;
 using ECommons.Throttlers;
 using ECommons.UIHelpers.AddonMasterImplementations;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
 using NotificationMasterAPI;
 using PunishLib;
@@ -548,6 +549,10 @@ public unsafe class AutoRetainer : IDalamudPlugin
                     }
                 }
             }
+        }
+        if(Utils.IsBusy && TryGetAddonByName<AtkUnitBase>("Trade", out var trade))
+        {
+            Callback.Fire(trade, true, -1);
         }
     }
 

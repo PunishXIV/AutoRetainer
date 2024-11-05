@@ -20,6 +20,9 @@ internal unsafe class DebugMulti : DebugSectionBase
         {
             if(ImGui.Button("Enqueue HET")) TaskNeoHET.Enqueue(null);
             if(ImGui.Button("Enqueue workshop")) TaskNeoHET.TryEnterWorkshop(() => DuoLog.Error("Fail"));
+            ImGuiEx.Text($"""
+                Can enter workshop: {S.LifestreamIPC.CanMoveToWorkshop()}
+                """);
         }
         if(ImGui.CollapsingHeader("Tasks"))
         {

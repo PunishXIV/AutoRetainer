@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<Authors>Puni.sh</Authors>
-		<Version>4.4.1.5</Version>
+		<Version>4.4.1.6</Version>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -22,6 +22,7 @@
 		<RootNamespace>AutoRetainer</RootNamespace>
 		<Nullable>disable</Nullable>
 		<NoWarn>CS1591;CS0419</NoWarn>
+      <Deterministic>true</Deterministic>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
