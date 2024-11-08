@@ -16,3 +16,6 @@
 [submodule "OtterGui"]
 	path = OtterGui
 	url = https://github.com/Limiana/OtterGui.git
+[submodule "ECommons.FileWriter"]
+	path = ECommons.FileWriter
+	url = https://github.com/Limiana/ECommons.FileWriter
