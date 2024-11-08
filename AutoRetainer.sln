@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NightmareUI.OtterGuiWrapper
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OtterGui", "OtterGui\OtterGui.csproj", "{A9A854AA-F54E-4739-9752-AC0FE54FCEA1}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECommons.FileWriter", "ECommons.FileWriter\ECommons.FileWriter\ECommons.FileWriter.csproj", "{100B454B-F244-4125-BCD0-FBC78B31DC50}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,14 @@ Global
 		{A9A854AA-F54E-4739-9752-AC0FE54FCEA1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A9A854AA-F54E-4739-9752-AC0FE54FCEA1}.Release|x64.ActiveCfg = Release|Any CPU
 		{A9A854AA-F54E-4739-9752-AC0FE54FCEA1}.Release|x64.Build.0 = Release|Any CPU
+		{100B454B-F244-4125-BCD0-FBC78B31DC50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{100B454B-F244-4125-BCD0-FBC78B31DC50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{100B454B-F244-4125-BCD0-FBC78B31DC50}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{100B454B-F244-4125-BCD0-FBC78B31DC50}.Debug|x64.Build.0 = Debug|Any CPU
+		{100B454B-F244-4125-BCD0-FBC78B31DC50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{100B454B-F244-4125-BCD0-FBC78B31DC50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{100B454B-F244-4125-BCD0-FBC78B31DC50}.Release|x64.ActiveCfg = Release|Any CPU
+		{100B454B-F244-4125-BCD0-FBC78B31DC50}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

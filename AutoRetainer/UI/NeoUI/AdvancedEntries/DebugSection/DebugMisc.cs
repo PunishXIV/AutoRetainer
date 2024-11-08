@@ -1,9 +1,11 @@
-﻿using ECommons.Events;
+﻿using ECommons.Configuration;
+using ECommons.Events;
 using ECommons.MathHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PInvoke;
+using System.IO;
 using ItemLevel = AutoRetainer.Helpers.ItemLevel;
 
 namespace AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;
@@ -12,6 +14,10 @@ internal unsafe class DebugMisc : DebugSectionBase
 {
     public override void Draw()
     {
+        if(ImGui.Button("Write config via external process"))
+        {
+            ExternalWriter.PlaceWriteOrder(new(System.IO.Path.Combine(Svc.PluginInterface.ConfigDirectory.FullName, "WriterTest.json"), EzConfig.DefaultSerializationFactory.Serialize(C, true)));
+        }
         ImGuiEx.Text($"FC points: {Utils.FCPoints}");
         if(ImGui.CollapsingHeader("Housing"))
         {

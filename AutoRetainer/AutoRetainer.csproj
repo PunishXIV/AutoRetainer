@@ -35,6 +35,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\AutoRetainerAPI\AutoRetainerAPI\AutoRetainerAPI.csproj" />
+		<ProjectReference Include="..\ECommons.FileWriter\ECommons.FileWriter\ECommons.FileWriter.csproj" ReferenceOutputAssembly="false" OutputItemType="Content" CopyToOutputDirectory="Always" />
 		<ProjectReference Include="..\ECommons\ECommons\ECommons.csproj" />
 		<ProjectReference Include="..\NightmareUI.OtterGuiWrapper\NightmareUI.OtterGuiWrapper\NightmareUI.OtterGuiWrapper.csproj" />
 		<ProjectReference Include="..\NightmareUI\NightmareUI\NightmareUI.csproj" />
