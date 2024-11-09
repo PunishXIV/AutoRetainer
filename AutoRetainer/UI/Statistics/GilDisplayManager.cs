@@ -10,11 +10,6 @@ public sealed class GilDisplayManager
 
     public void Draw()
     {
-        if(Svc.Condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.LoggingOut] || !IsScreenReady())
-        {
-            ImGuiEx.Text($"Unable to display now");
-            return;
-        }
         ImGuiEx.SetNextItemWidthScaled(200f);
         ImGui.InputInt("Ignore characters/retainers with gil less than", ref C.MinGilDisplay.ValidateRange(0, int.MaxValue));
         ImGuiComponents.HelpMarker($"Ignored retainer gil still contributes to character/DC total. Character is ignored if their gil AND all retainers' gil is less than this value. Ignored characters do not contribute to DC total.");
@@ -38,6 +33,7 @@ public sealed class GilDisplayManager
             var dcTotal = 0L;
             foreach(var c in x.Value)
             {
+                if(c.NoGilTrack) continue;
                 FCData fcdata = null;
                 var charTotal = c.Gil + c.RetainerData.Sum(s => s.Gil);
                 foreach(var fc in C.FCData)
@@ -67,6 +63,13 @@ public sealed class GilDisplayManager
                         }
                     }
                     ImGuiEx.Text(ImGuiColors.DalamudViolet, $"    {Censor.Character(c.Name, c.World)}{(fcdata != null && fcdata.Gil > 0 ? "+FC" : "")} total: {charTotal:N0}");
+                    if(ImGuiEx.HoveredAndClicked("Click to relog"))
+                    {
+                        if(!MultiMode.Relog(c, out var error, Internal.RelogReason.Command))
+                        {
+                            Notify.Error(error);
+                        }
+                    }
                     dcTotal += charTotal;
                     ImGui.Separator();
                 }

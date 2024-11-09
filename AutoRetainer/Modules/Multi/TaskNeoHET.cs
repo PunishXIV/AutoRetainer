@@ -3,6 +3,7 @@ using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainer.StaticData;
 using Dalamud.Game.ClientState.Objects.Types;
+using ECommons.Automation.NeoTaskManager;
 using ECommons.Automation.NeoTaskManager.Tasks;
 using ECommons.GameHelpers;
 using ECommons.MathHelpers;
@@ -84,25 +85,34 @@ public static unsafe class TaskNeoHET
         {
             if(GetWorkshopEntrance() != null)
             {
-                P.TaskManager.InsertMulti(
+                var tasks = new List<TaskManagerTask>();
+                if(S.LifestreamIPC.CanMoveToWorkshop())
+                {
+                    tasks.AddRange([
+                        new(S.LifestreamIPC.MoveToWorkshop),
+                        new(() => !S.LifestreamIPC.IsBusy())
+                        ]);
+                }
+                tasks.AddRange([
                     NeoTasks.ApproachObjectViaAutomove(GetWorkshopEntrance, 4f),
                     NeoTasks.InteractWithObject(GetWorkshopEntrance),
                     new(TaskContinueHET.SelectEnterWorkshop),
                     new(() => VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType), "Wait Until entered workshop"),
                     NeoTasks.WaitForScreenAndPlayer(),
+                    ]);
+                if(C.FCChestGilCheck && DateTimeOffset.Now.ToUnixTimeMilliseconds() - C.FCChestGilCheckTimes.GetSafe(Player.CID) > C.FCChestGilCheckCd * 60 * 60 * 1000)
+                {
+                    tasks.AddRange([
                     new(UpdateGilFromChest, new(timeLimitMS:10000, abortOnTimeout:false)),
                     new(WaitUntilChestVisible, new(timeLimitMS: 10000, abortOnTimeout: false)),
                     new(() => S.FCPointsUpdater.IsFCChestReady() == true, new(timeLimitMS: 10000, abortOnTimeout: false)),
                     new DelayTask(5000),
                     new(() => OfflineDataManager.WriteOfflineData(false, false)),
+                    new(() => C.FCChestGilCheckTimes[Player.CID] = DateTimeOffset.Now.ToUnixTimeMilliseconds()),
                     new(CloseFCChest)
-                    );
-                if(S.LifestreamIPC.CanMoveToWorkshop())
-                {
-                    P.TaskManager.InsertMulti(
-                        new(S.LifestreamIPC.MoveToWorkshop),
-                        new(() => !S.LifestreamIPC.IsBusy()));
+                    ]);
                 }
+                P.TaskManager.InsertMulti([..tasks]);
             }
             else
             {

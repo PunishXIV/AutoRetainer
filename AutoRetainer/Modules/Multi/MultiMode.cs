@@ -42,6 +42,10 @@ internal static unsafe class MultiMode
     {
         ProperOnLogin.RegisterInteractable(delegate
         {
+            if(Data != null)
+            {
+                C.LastLoggedInChara = Data.CID;
+            }
             if(TaskChangeCharacter.Expected != null)
             {
                 if(MultiMode.Enabled)
@@ -76,6 +80,10 @@ internal static unsafe class MultiMode
         if(ProperOnLogin.PlayerPresent)
         {
             WriteOfflineData(true, true);
+            if(Data != null)
+            {
+                C.LastLoggedInChara = Data.CID;
+            }
         }
     }
 
@@ -136,11 +144,6 @@ internal static unsafe class MultiMode
         if(Active)
         {
             ValidateAutoAfkSettings();
-            if(!C.MultiModeWorkshopConfiguration.MultiWaitForAll && C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn)
-            {
-                DuoLog.Warning($"Invalid configuration: {nameof(C.MultiModeWorkshopConfiguration.MultiWaitForAll)} was not activated but {nameof(C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn)} was. The configuration was fixed.");
-                C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn = false;
-            }
             if(!Svc.ClientState.IsLoggedIn && TryGetAddonByName<AtkUnitBase>("Title", out _) && !P.TaskManager.IsBusy)
             {
                 LastLogin = 0;
@@ -250,7 +253,7 @@ internal static unsafe class MultiMode
                 {
                     if(Data.WorkshopEnabled && Data.AnyEnabledVesselsAvailable() && MultiMode.EnabledSubmarines)
                     {
-                        if(!C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn || Data.AreAnyEnabledVesselsReturnInNext(0, true))
+                        if(!Data.ShouldWaitForAllWhenLoggedIn() || Data.AreAnyEnabledVesselsReturnInNext(0, true))
                         {
                             if(!TaskTeleportToProperty.EnqueueIfNeededAndPossible(true))
                             {
@@ -529,7 +532,7 @@ internal static unsafe class MultiMode
     {
         if(!EnabledSubmarines) return true;
         if(!Data.WorkshopEnabled) return true;
-        return !Data.AreAnyEnabledVesselsReturnInNext(5 * 60, C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn);
+        return !Data.AreAnyEnabledVesselsReturnInNext(5 * 60, Data.ShouldWaitForAllWhenLoggedIn());
     }
 
     internal static bool IsAnySelectedRetainerFinishesWithin(int seconds)
@@ -584,7 +587,16 @@ internal static unsafe class MultiMode
         {
             if(C.AutoLogin != "")
             {
-                var data = C.OfflineData.First(s => $"{s.Name}@{s.World}" == C.AutoLogin);
+                OfflineCharacterData data;
+                if(C.AutoLogin == "~")
+                {
+                    data = C.OfflineData.FirstOrDefault(s => s.CID == C.LastLoggedInChara);
+                }
+                else
+                {
+                    data = C.OfflineData.First(s => $"{s.Name}@{s.World}" == C.AutoLogin);
+                }
+                if(data == null) return true;
                 if(Utils.CanAutoLoginFromTaskManager())
                 {
                     MultiMode.Relog(data, out var error, RelogReason.Command, true);

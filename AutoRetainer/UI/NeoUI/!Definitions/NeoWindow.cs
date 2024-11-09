@@ -19,7 +19,6 @@ public sealed class NeoWindow : Window
         new MultiModeDeployables(),
         new MultiModeContingency(),
         new CharaOrder(),
-        new Exclusions(),
         new MultiModeFPSLimiter(),
 
         ..ConfigFileSystemHelpers.CreateInstancesOf<InventoryManagemenrBase>(),

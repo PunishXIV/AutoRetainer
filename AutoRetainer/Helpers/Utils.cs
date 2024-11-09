@@ -35,6 +35,11 @@ internal static unsafe class Utils
     internal static float AnimationLock => Player.AnimationLock;
     private static bool IsNullOrEmpty(this string s) => GenericHelpers.IsNullOrEmpty(s);
 
+    public static bool ShouldWaitForAllWhenLoggedIn(this OfflineCharacterData data)
+    {
+        return C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn && (C.MultiModeWorkshopConfiguration.MultiWaitForAll || data.MultiWaitForAllDeployables);
+    }
+
     public static void EnqueueVendorItemsByRetainer()
     {
         for(var i = 0; i < GameRetainerManager.Count; i++)

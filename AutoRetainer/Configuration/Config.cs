@@ -131,6 +131,7 @@ internal unsafe class Config : IEzConfig
     public TeleportOptions GlobalTeleportOptions = new();
     public bool SharedHET = false;
     public bool SkipItemConfirmations = false;
+    public ulong LastLoggedInChara = 0;
 
     internal bool DontReassign
     {
@@ -222,4 +223,8 @@ internal unsafe class Config : IEzConfig
     public bool NoTeleportHetWhenNextToBell = false;
     public bool NoGradient = false;
     public bool No2ndInstanceNotify = false;
+
+    public bool FCChestGilCheck = false;
+    public int FCChestGilCheckCd = 24;
+    public Dictionary<ulong, long> FCChestGilCheckTimes = [];
 }
