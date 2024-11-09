@@ -39,10 +39,7 @@ public class CharaOrder : NeoUIEntry
                     DragDrop.SetRowColor(chr.Identity);
                     ImGui.TableNextColumn();
                     DragDrop.NextRow();
-                    DragDrop.DrawButtonDummy(chr.Identity, (x) =>
-                    {
-                        MoveItemToPosition(C.OfflineData, (s) => s.Identity == x, idx);
-                    });
+                    DragDrop.DrawButtonDummy(chr, C.OfflineData, s => s.Identity, idx);
                     ImGui.TableNextColumn();
                     if(chr.World.IsNullOrEmpty()) continue;
                     ImGuiEx.TextV((Search != "" && ($"{chr.Name}@{chr.World}").Contains(Search, StringComparison.OrdinalIgnoreCase)) ? ImGuiColors.ParsedGreen : (Search == ""?null:ImGuiColors.DalamudGrey3), Censor.Character(chr.Name, chr.World));
