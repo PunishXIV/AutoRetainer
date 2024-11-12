@@ -33,13 +33,12 @@ public class CharaOrder : NeoUIEntry
                 for(var index = 0; index < C.OfflineData.Count; index++)
                 {
                     var chr = C.OfflineData[index];
-                    var idx = index;
                     ImGui.PushID(chr.Identity);
                     ImGui.TableNextRow();
                     DragDrop.SetRowColor(chr.Identity);
                     ImGui.TableNextColumn();
                     DragDrop.NextRow();
-                    DragDrop.DrawButtonDummy(chr, C.OfflineData, s => s.Identity, idx);
+                    DragDrop.DrawButtonDummy(chr, index, C.OfflineData, s => s.Identity);
                     ImGui.TableNextColumn();
                     if(chr.World.IsNullOrEmpty()) continue;
                     ImGuiEx.TextV((Search != "" && ($"{chr.Name}@{chr.World}").Contains(Search, StringComparison.OrdinalIgnoreCase)) ? ImGuiColors.ParsedGreen : (Search == ""?null:ImGuiColors.DalamudGrey3), Censor.Character(chr.Name, chr.World));
