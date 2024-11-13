@@ -3,7 +3,7 @@ using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using Dalamud.Utility;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace AutoRetainer.Modules.Voyage.Tasks;
 
@@ -17,7 +17,7 @@ internal static unsafe class TaskPickSubmarineRoute
         P.TaskManager.Enqueue(() => PickMap(map), $"PickMap({map})");
         foreach(var point in points)
         {
-            var name = C.SimpleTweaksCompat ? Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(point).Location.ToDalamudString().ExtractText().Trim() : Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(point).Destination.ToDalamudString().ExtractText().Trim();
+            var name = C.SimpleTweaksCompat ? Svc.Data.GetExcelSheet<SubmarineExploration>().GetRow(point).Location.ToDalamudString().ExtractText().Trim() : Svc.Data.GetExcelSheet<SubmarineExploration>().GetRow(point).Destination.ToDalamudString().ExtractText().Trim();
             P.TaskManager.Enqueue(() => PickPoint(name), $"PickPoint({name})");
         }
     }
@@ -33,7 +33,7 @@ internal static unsafe class TaskPickSubmarineRoute
             P.TaskManager.Enqueue(() => PickMap(map), $"PickMap({map})");
             foreach(var point in points)
             {
-                var name = C.SimpleTweaksCompat ? Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(point).Location.ToDalamudString().ExtractText().Trim() : Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(point).Destination.ToDalamudString().ExtractText().Trim();
+                var name = C.SimpleTweaksCompat ? Svc.Data.GetExcelSheet<SubmarineExploration>().GetRow(point).Location.ToDalamudString().ExtractText().Trim() : Svc.Data.GetExcelSheet<SubmarineExploration>().GetRow(point).Destination.ToDalamudString().ExtractText().Trim();
                 P.TaskManager.Enqueue(() => PickPoint(name), $"PickPoint({name})");
             }
         }

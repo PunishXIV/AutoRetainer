@@ -1,5 +1,5 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace AutoRetainer.Helpers;
 
@@ -14,6 +14,8 @@ internal static unsafe class ItemLevel
     {
         gathering = 0;
         perception = 0;
+        return null; //TODO: fix
+        /*
         var container = InventoryManager.Instance()->GetInventoryContainer(InventoryType.RetainerEquippedItems);
         if(container == null) return null;
         var sum = 0U;
@@ -24,18 +26,17 @@ internal static unsafe class ItemLevel
             var slot = container->GetInventorySlot(i);
             if(slot == null) continue;
             var id = slot->ItemId;
-            var item = Svc.Data.Excel.GetSheet<ECommons.ExcelServices.Sheets.ExtendedItem>()?.GetRow(id);
-            if(item == null) continue;
-            if(ignoreCategory.Contains(item.ItemUICategory.Row))
+            if(!Svc.Data.GetExcelSheet<Item>().TryGetRow(id, out var item)) continue;
+            if(ignoreCategory.ContainsNullable(item.ItemUICategory.RowId))
             {
                 if(i == 0) c -= 1;
                 c -= 1;
                 continue;
             }
 
-            if(i == 0 && !canHaveOffhand.Contains(item.ItemUICategory.Row))
+            if(i == 0 && !canHaveOffhand.ContainsNullable(item.ItemUICategory.RowId))
             {
-                sum += item.LevelItem.Row;
+                sum += item.LevelItem.RowId;
                 i++;
             }
 
@@ -95,5 +96,6 @@ internal static unsafe class ItemLevel
 
         var avgItemLevel = sum / c;
         return (int)avgItemLevel;
+        */
     }
 }

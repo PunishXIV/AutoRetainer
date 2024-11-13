@@ -1,5 +1,5 @@
 ﻿using Lumina.Excel;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace AutoRetainer.Modules.Voyage.VoyageCalculator;
 
@@ -7,7 +7,6 @@ public static class Build
 {
     private static ExcelSheet<SubmarineRank> RankSheet => Svc.Data.GetExcelSheet<SubmarineRank>();
     private static ExcelSheet<SubmarinePart> PartSheet => Svc.Data.GetExcelSheet<SubmarinePart>();
-    private static ExcelSheet<SubmarineExplorationPretty> ExplorationSheet => Svc.Data.GetExcelSheet<SubmarineExplorationPretty>();
 
     public struct SubmarineBuild
     {
@@ -125,7 +124,7 @@ public static class Build
         public SubmarineBuild GetSubmarineBuild => new(this);
         public static RouteBuild Empty => new();
 
-        public int FuelCost => OptimizedRoute.Any() ? OptimizedRoute.Select(p => (int)p.CeruleumTankReq).Sum() : 0;
+        public int FuelCost => OptimizedRoute.Any() ? OptimizedRoute.Select(p => (int)p.Row.CeruleumTankReq).Sum() : 0;
 
         public string HullIdentifier => ToIdentifier((ushort)Hull);
         public string SternIdentifier => ToIdentifier((ushort)Stern);
@@ -188,7 +187,7 @@ public static class Build
             {
                 var damaged = 0;
                 foreach(var sector in OptimizedRoute)
-                    damaged += (335 + sector.RankReq - PartSheet.GetRow((uint)part)!.Rank) * 7;
+                    damaged += (335 + sector.Row.RankReq - PartSheet.GetRow((uint)part)!.Rank) * 7;
 
                 if(highestDamage < damaged)
                     highestDamage = damaged;

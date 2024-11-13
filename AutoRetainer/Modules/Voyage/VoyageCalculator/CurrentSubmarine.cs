@@ -1,12 +1,11 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game;
 using Lumina.Excel;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace AutoRetainer.Modules.Voyage.VoyageCalculator;
 
 internal static unsafe class CurrentSubmarine
 {
-    internal static ExcelSheet<SubmarineExplorationPretty> ExplorationSheet => Svc.Data.GetExcelSheet<SubmarineExplorationPretty>();
     internal static HousingWorkshopSubmersibleSubData* Get()
     {
         var cur = HousingManager.Instance()->WorkshopTerritory->Submersible.DataPointers[4];
@@ -35,14 +34,14 @@ internal static unsafe class CurrentSubmarine
 
     public static uint[] GetMaps()
     {
-        var maps = ExplorationSheet
+        var maps = Svc.Data.GetExcelSheet<SubmarineExploration>()
                        .Where(r => r.StartingPoint)
-                       .Select(r => ExplorationSheet.GetRow(r.RowId + 1)!)
-                       .Where(r => r.RankReq <= Get()->RankId)
-                       .Where(r => GetUnlockedSectors().Contains(r.RowId))
-                       .Select(r => r.Map.Value!.RowId)
+                       .Select(r => Svc.Data.GetExcelSheet<SubmarineExploration>().GetRowOrDefault(r.RowId + 1)!)
+                       .Where(r => r?.RankReq <= Get()->RankId)
+                       .Where(r => GetUnlockedSectors().ContainsNullable(r?.RowId))
+                       .Select(r => r?.Map.Value.RowId)
                        .ToArray();
-        return maps;
+        return maps.Where(x => x != null).Select(x => x.Value).ToArray();
     }
 
     public static void GetBestExps()
@@ -58,32 +57,8 @@ internal static unsafe class CurrentSubmarine
                 var best = calc.FindBestPath(x);
                 if(best != null)
                 {
-                    DuoLog.Information($"Map {x}: {best.Value.path.Select(z => $"{z}/{ExplorationSheet.GetRow(z).Location}").Print()}, {best.Value.duration}, {best.Value.exp} / ");
+                    DuoLog.Information($"Map {x}: {best.Value.path.Select(z => $"{z}/{Svc.Data.GetExcelSheet<SubmarineExploration>().GetPretty(z).Row.Location}").Print()}, {best.Value.duration}, {best.Value.exp} / ");
                 }
-            }
-            VoyageMain.WaitOverlay.IsProcessing = false;
-        });
-    }
-
-    public static void Fill()
-    {
-        return;
-        var calc = new Calculator();
-        Task.Run(() =>
-        {
-            VoyageMain.WaitOverlay.IsProcessing = true;
-            calc.RouteBuild.Value.ChangeMap((int)1);
-            var best = calc.FindBestPath(1);
-            if(best != null)
-            {
-                DuoLog.Information($"{best.Value.path.Select(z => $"{z}/{ExplorationSheet.GetRow(z).Location}").Print()}, {best.Value.duration}, {best.Value.exp}");
-                new TickScheduler(delegate
-                {
-                    foreach(var x in best.Value.path)
-                    {
-                        P.TaskManager.Enqueue(() => P.Memory.SelectRoutePointUnsafe((int)(x)));
-                    }
-                });
             }
             VoyageMain.WaitOverlay.IsProcessing = false;
         });

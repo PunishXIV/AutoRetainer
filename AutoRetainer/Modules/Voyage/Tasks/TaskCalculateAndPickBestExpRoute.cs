@@ -1,5 +1,6 @@
 ﻿using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using AutoRetainerAPI.Configuration;
+using Lumina.Excel.Sheets;
 
 namespace AutoRetainer.Modules.Voyage.Tasks;
 
@@ -48,7 +49,7 @@ internal static unsafe class TaskCalculateAndPickBestExpRoute
                         if(prioList != null && prioList.Count > 0)
                         {
                             var point = VoyageUtils.GetSubmarineExploration(prioList[0].point);
-                            if(point == null || point.Map.Row != map || point.RankReq > curSubRank)
+                            if(point == null || point?.Map.RowId != map || point?.RankReq > curSubRank)
                             {
                                 //
                             }
@@ -56,7 +57,7 @@ internal static unsafe class TaskCalculateAndPickBestExpRoute
                             {
                                 doCalc = true;
                                 VoyageUtils.Log($"Adding point: {VoyageUtils.GetSubmarineExplorationName(prioList[0].point)} ({prioList[0].justification})");
-                                calc.MustInclude.Add(VoyageUtils.GetSubmarineExploration(prioList[0].point));
+                                calc.MustInclude.Add(VoyageUtils.GetSubmarineExploration(prioList[0].point).Value);
                             }
                         }
                         else
@@ -69,7 +70,7 @@ internal static unsafe class TaskCalculateAndPickBestExpRoute
                             if(best != null && best.Value.path != null)
                             {
                                 var xptime = best.Value.exp / (double)best.Value.duration.TotalHours;
-                                VoyageUtils.Log($"Path {best.Value.path.Select(z => $"{z}/{Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(z).Location}").Print()}, is best for map {map} with {best.Value.duration} duration and {best.Value.exp} exp ({xptime} exp/hour)");
+                                VoyageUtils.Log($"Path {best.Value.path.Select(z => $"{z}/{Svc.Data.GetExcelSheet<SubmarineExploration>().GetRowOrDefault(z)?.Location}").Print()}, is best for map {map} with {best.Value.duration} duration and {best.Value.exp} exp ({xptime} exp/hour)");
                                 if(xptime > exp)
                                 {
                                     selectedMap = (int)map;
@@ -92,7 +93,7 @@ internal static unsafe class TaskCalculateAndPickBestExpRoute
                     prioList = null;
                     Calc();
                 }
-                VoyageUtils.Log($"Path {path.Select(z => $"{z}/{Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(z).Location}").Print()}, is determined best on map {selectedMap} with ({exp} exp/hour)");
+                VoyageUtils.Log($"Path {path.Select(z => $"{z}/{Svc.Data.GetExcelSheet<SubmarineExploration>().GetRowOrDefault(z)?.Location}").Print()}, is determined best on map {selectedMap} with ({exp} exp/hour)");
                 if(path != null)
                 {
                     new TickScheduler(delegate

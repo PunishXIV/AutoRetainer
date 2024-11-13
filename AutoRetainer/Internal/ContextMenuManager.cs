@@ -4,7 +4,7 @@ using ECommons.ChatMethods;
 using ECommons.ExcelServices;
 using ECommons.EzContextMenu;
 using ECommons.Interop;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using UIColor = ECommons.ChatMethods.UIColor;
 
 namespace AutoRetainer.Internal;

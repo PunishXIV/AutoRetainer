@@ -86,7 +86,7 @@ public static class TaskTeleportToProperty
 
         //if at this point no decision was made, just invoke HET if needed, enter any house and don't care about it
 
-        if(ExcelTerritoryHelper.Get(Player.Territory).TerritoryIntendedUse == (uint)TerritoryIntendedUseEnum.Residential_Area)
+        if(ExcelTerritoryHelper.Get(Player.Territory)?.TerritoryIntendedUse.RowId == (uint)TerritoryIntendedUseEnum.Residential_Area)
         {
             if(TaskNeoHET.IsInMarkerHousingPlot([.. TaskNeoHET.PrivateMarkers, .. TaskNeoHET.FcMarkers, .. (C.SharedHET ? TaskNeoHET.SharedMarkers : [])]))
             {

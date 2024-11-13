@@ -1,7 +1,7 @@
 ﻿using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;
 public unsafe class DebugAddonMaster : DebugSectionBase
@@ -41,7 +41,7 @@ public unsafe class DebugAddonMaster : DebugSectionBase
             {
                 foreach(var x in AddonMaster.TitleDCWorldMap.PublicDC)
                 {
-                    if(ImGui.Button(Svc.Data.GetExcelSheet<WorldDCGroupType>().GetRow((uint)x).Name))
+                    if(ImGui.Button(Svc.Data.GetExcelSheet<WorldDCGroupType>().GetRowOrDefault((uint)x)?.Name.ToString() ?? ""))
                     {
                         m.Select(x);
                     }

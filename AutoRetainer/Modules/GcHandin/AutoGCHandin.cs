@@ -114,7 +114,7 @@ internal static unsafe class AutoGCHandin
                 var str = MemoryHelper.ReadSeString(&addon->PromptText->NodeText).ExtractText().Replace(" ", "");
                 DebugLog($"SelectYesno encountered: {str}");
                 //102434	Do you really want to trade a high-quality item?
-                if(str.Equals(Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(102434).Text.ExtractText().Replace(" ", "")))
+                if(str.Equals(Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(102434).Text.ExtractText().Replace(" ", "")))
                 {
                     if(FrameThrottler.Throttle(Throttler, 10))
                     {
@@ -256,9 +256,9 @@ internal static unsafe class AutoGCHandin
         //4619	Hide Armoury Chest Items
         //4618	Hide Gear Set Items
         //4617	Show All Items
-        var hideArmory = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(4619).Text.ToDalamudString().ExtractText();
-        var hideGearSet = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(4618).Text.ToDalamudString().ExtractText();
-        var showAll = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(4617).Text.ToDalamudString().ExtractText();
+        var hideArmory = Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(4619).Text.ToDalamudString().ExtractText();
+        var hideGearSet = Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(4618).Text.ToDalamudString().ExtractText();
+        var showAll = Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(4617).Text.ToDalamudString().ExtractText();
         if(text.Equals(hideArmory))
         {
             return true;

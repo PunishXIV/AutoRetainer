@@ -1,6 +1,6 @@
 ﻿using AutoRetainerAPI.Configuration;
 using Dalamud.Utility;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 

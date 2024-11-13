@@ -59,10 +59,10 @@ internal static unsafe class TaskEntrustDuplicates
                     if(plan.ExcludeProtected && C.IMProtectList.Contains(x)) continue;
                     var item = ExcelItemHelper.Get(x);
                     if(item == null) continue;
-                    if(itemList.Any(s => s.ItemID == item.RowId)) continue;
-                    if(plan.EntrustCategories.TryGetFirst(c => c.ID == item.ItemUICategory.Row, out var info))
+                    if(itemList.Any(s => s.ItemID == item?.RowId)) continue;
+                    if(plan.EntrustCategories.TryGetFirst(c => c.ID == item.Value.ItemUICategory.RowId, out var info))
                     {
-                        var add = (item.RowId, info.AmountToKeep);
+                        var add = (item.Value.RowId, info.AmountToKeep);
                         itemList.Add(add);
                         PluginLog.Debug($"[TED] From EntrustCategories added item: {ExcelItemHelper.GetName(add.Item1, true)} toKeep={add.Item2}");
                     }
@@ -135,8 +135,8 @@ internal static unsafe class TaskEntrustDuplicates
                             if(item->ItemId != 0 && !itemList.Any(s => s.ItemID == item->ItemId))
                             {
                                 var data = ExcelItemHelper.Get(item->ItemId);
-                                if(data == null || data.IsUnique) continue;
-                                var canFit = data.StackSize - item->Quantity;
+                                if(data == null || data.Value.IsUnique) continue;
+                                var canFit = data.Value.StackSize - item->Quantity;
                                 if(canFit > 0)
                                 {
                                     foreach(var playerType in allowedPlayerInventories)

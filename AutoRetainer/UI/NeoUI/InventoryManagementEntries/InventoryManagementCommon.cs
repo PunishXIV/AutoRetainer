@@ -1,7 +1,7 @@
 ﻿using ECommons.Configuration;
 using ECommons.ExcelServices;
 using ECommons.MathHelpers;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using Action = System.Action;
 
 namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries;
@@ -109,9 +109,9 @@ public static unsafe class InventoryManagementCommon
                 {
                     Modified = false;
                     SelectedItems = Svc.Data.GetExcelSheet<Item>().Where(x =>
-                    x.LevelItem.Row.InRange((uint)ItemLevelMin, (uint)ItemLevelMax, true)
+                    x.LevelItem.RowId.InRange((uint)ItemLevelMin, (uint)ItemLevelMax, true)
                     && (Tradeable == null || x.IsUntradable == !Tradeable)
-                    && x.ItemUICategory.Row.EqualsAny(SelectedCategories)
+                    && x.ItemUICategory.RowId.EqualsAny(SelectedCategories)
                     && (Rarities.Count == 0 || ((ItemRarity)x.Rarity).EqualsAny(Rarities))
                     && (ItemSearch == "" || x.Name.ToString().Contains(ItemSearch, StringComparison.OrdinalIgnoreCase))
                     ).ToList();
@@ -123,13 +123,13 @@ public static unsafe class InventoryManagementCommon
                     {
                         actions.Add(() =>
                         {
-                            if(ThreadLoadImageHandler.TryGetIconTextureWrap(x?.Icon ?? 0, false, out var tex))
+                            if(ThreadLoadImageHandler.TryGetIconTextureWrap(x.Icon, false, out var tex))
                             {
                                 ImGui.Image(tex.ImGuiHandle, new(ImGuiHelpers.GetButtonSize("X").Y));
                                 Tooltip();
                                 ImGui.SameLine();
                             }
-                            ImGuiEx.Text(list.Contains(x.RowId) ? ImGuiColors.DalamudGrey3 : null, x.Name);
+                            ImGuiEx.Text(list.Contains(x.RowId) ? ImGuiColors.DalamudGrey3 : null, x.Name.ToString());
                             Tooltip();
 
                             void Tooltip()
@@ -178,12 +178,12 @@ public static unsafe class InventoryManagementCommon
             var data = ExcelItemHelper.Get(x);
             if(data != null)
             {
-                if(!ItemsByCategories.TryGetValue(data.ItemUICategory.Row, out var lst))
+                if(!ItemsByCategories.TryGetValue(data.Value.ItemUICategory.RowId, out var lst))
                 {
-                    ItemsByCategories[data.ItemUICategory.Row] = [];
-                    lst = ItemsByCategories[data.ItemUICategory.Row];
+                    ItemsByCategories[data.Value.ItemUICategory.RowId ] = [];
+                    lst = ItemsByCategories[data.Value.ItemUICategory.RowId ];
                 }
-                lst.Add(data);
+                lst.Add(data.Value);
             }
         }
         foreach(var cat in ItemsByCategories)
@@ -206,12 +206,12 @@ public static unsafe class InventoryManagementCommon
                         ImGui.PushID(item.RowId.ToString());
                         ImGui.TableNextRow();
                         ImGui.TableNextColumn();
-                        if(ThreadLoadImageHandler.TryGetIconTextureWrap(item?.Icon ?? 0, false, out var tex))
+                        if(ThreadLoadImageHandler.TryGetIconTextureWrap(item.Icon, false, out var tex))
                         {
                             ImGui.Image(tex.ImGuiHandle, new(ImGuiHelpers.GetButtonSize("X").Y));
                         }
                         ImGui.TableNextColumn();
-                        ImGuiEx.TextV($"{item?.Name}");
+                        ImGuiEx.TextV($"{item.Name}");
                         ImGui.TableNextColumn();
                         if(ImGuiEx.IconButton(FontAwesomeIcon.Trash))
                         {
@@ -293,20 +293,20 @@ public static unsafe class InventoryManagementCommon
         Dictionary<uint, List<Item>> ListByCategories = [];
         foreach(var x in ItemList)
         {
-            var data = Svc.Data.GetExcelSheet<Item>().GetRow(x);
+            var data = Svc.Data.GetExcelSheet<Item>().GetRowOrDefault(x);
             if(data != null)
             {
-                if(!ListByCategories.TryGetValue(data.ItemUICategory.Row, out var list))
+                if(!ListByCategories.TryGetValue(data.Value.ItemUICategory.RowId , out var list))
                 {
                     list = [];
-                    ListByCategories[data.ItemUICategory.Row] = list;
+                    ListByCategories[data.Value.ItemUICategory.RowId ] = list;
                 }
-                list.Add(data);
+                list.Add(data.Value);
             }
         }
         foreach(var x in ListByCategories)
         {
-            ImGui.Selectable($"{Svc.Data.GetExcelSheet<ItemUICategory>().GetRow(x.Key).Name?.ExtractText() ?? x.Key.ToString()}", true);
+            ImGui.Selectable($"{Svc.Data.GetExcelSheet<ItemUICategory>().GetRowOrDefault(x.Key)?.Name.ExtractText() ?? x.Key.ToString()}", true);
             foreach(var data in x.Value)
             {
                 if(ThreadLoadImageHandler.TryGetIconTextureWrap(data.Icon, false, out var tex))

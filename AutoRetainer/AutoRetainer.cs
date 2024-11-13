@@ -25,7 +25,7 @@ using ECommons.Singletons;
 using ECommons.Throttlers;
 using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using NotificationMasterAPI;
 using PunishLib;
 using System.Diagnostics;
@@ -522,7 +522,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             }
         }
         IsNextToBell = false;
-        if(C.RetainerSense && Svc.ClientState.LocalPlayer != null && Svc.ClientState.LocalPlayer.HomeWorld.Id == Svc.ClientState.LocalPlayer.CurrentWorld.Id)
+        if(C.RetainerSense && Svc.ClientState.LocalPlayer != null && Svc.ClientState.LocalPlayer.HomeWorld.RowId == Svc.ClientState.LocalPlayer.CurrentWorld.RowId)
         {
             if(!IPC.Suppressed && !IsOccupied() && !C.OldRetainerSense && !TaskManager.IsBusy && !Utils.MultiModeOrArtisan && !Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BoundByDuty] && Utils.IsAnyRetainersCompletedVenture())
             {
@@ -735,7 +735,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         }
     }
 
-    private void Logout()
+    private void Logout(int _, int __)
     {
         if(Player.Available)
         {

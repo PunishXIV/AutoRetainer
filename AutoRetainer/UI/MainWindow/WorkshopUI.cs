@@ -7,6 +7,7 @@ using AutoRetainer.UI.MainWindow.MultiModeTab;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game;
 using Dalamud.Interface.Components;
+using Lumina.Excel.Sheets;
 using PunishLib.ImGuiMethods;
 
 namespace AutoRetainer.UI.MainWindow;
@@ -418,10 +419,10 @@ internal static unsafe class WorkshopUI
             {
                 if(x != 0)
                 {
-                    var d = Svc.Data.GetExcelSheet<SubmarineExplorationPretty>(ClientLanguage.Japanese).GetRow(x);
-                    if(d != null && d.Location.ToString().Length > 0)
+                    var d = Svc.Data.GetExcelSheet<SubmarineExploration>(ClientLanguage.Japanese).GetRowOrDefault(x);
+                    if(d != null && d.Value.Location.ToString().Length > 0)
                     {
-                        points.Add(d.Location.ToString());
+                        points.Add(d.Value.Location.ToString());
                     }
                 }
             }

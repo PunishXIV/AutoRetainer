@@ -11,7 +11,7 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Info;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace AutoRetainer.Modules;
 
@@ -66,9 +66,9 @@ internal static unsafe class OfflineDataManager
             };
             C.OfflineData.Add(data);
         }
-        data.World = ExcelWorldHelper.GetName(Svc.ClientState.LocalPlayer.HomeWorld.Id);
+        data.World = ExcelWorldHelper.GetName(Svc.ClientState.LocalPlayer.HomeWorld.RowId);
         data.Name = Svc.ClientState.LocalPlayer.Name.ToString();
-        if(Player.Object.CurrentWorld.GameData.DataCenter.Row != Player.Object.HomeWorld.GameData.DataCenter.Row)
+        if(Player.Object.CurrentWorld.RowId != Player.Object.HomeWorld.RowId)
         {
             data.WorldOverride = Player.CurrentWorld;
         }

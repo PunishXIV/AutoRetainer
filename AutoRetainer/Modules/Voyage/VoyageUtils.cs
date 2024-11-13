@@ -12,7 +12,7 @@ using ECommons.Interop;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace AutoRetainer.Modules.Voyage;
 
@@ -89,19 +89,19 @@ internal static unsafe class VoyageUtils
         return false;
     }
 
-    internal static SubmarineExplorationPretty GetSubmarineExploration(uint id)
+    internal static SubmarineExploration? GetSubmarineExploration(uint id)
     {
-        return Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(id);
+        return Svc.Data.GetExcelSheet<SubmarineExploration>().GetRowOrDefault(id);
     }
 
     internal static string GetSubmarineExplorationName(uint id)
     {
-        return GetSubmarineExploration(id)?.ConvertDestination();
+        return GetSubmarineExploration(id)?.Pretty().ConvertDestination();
     }
 
     internal static string GetMapName(uint id)
     {
-        return Svc.Data.GetExcelSheet<SubmarineMap>().GetRow(id)?.Name.ToString();
+        return Svc.Data.GetExcelSheet<SubmarineMap>().GetRowOrDefault(id)?.Name.ToString();
     }
 
     internal static int? GetVesselIndex(string name, VoyageType type)
@@ -165,7 +165,7 @@ internal static unsafe class VoyageUtils
 
         foreach(var x in Unlocks.PointToUnlockPoint.Where(z => z.Value.Point < 9000 && !plan.ExcludedRoutes.Contains(z.Key)))
         {
-            if(ret.Count > 0 && Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(ret.First().point).Map.Row != Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(x.Key).Map.Row) break;
+            if(ret.Count > 0 && Svc.Data.GetExcelSheet<SubmarineExploration>().GetRow(ret.First().point).Map.RowId != Svc.Data.GetExcelSheet<SubmarineExploration>().GetRow(x.Key).Map.RowId) break;
             if(!P.SubmarineUnlockPlanUI.IsMapUnlocked(x.Key, true) && P.SubmarineUnlockPlanUI.IsMapUnlocked(x.Value.Point, true) && !ret.Any(z => z.point == x.Value.Point))
             {
                 ret.Add((x.Value.Point, $"{VoyageUtils.GetSubmarineExplorationName(x.Key)} not unlocked"));
@@ -184,10 +184,10 @@ internal static unsafe class VoyageUtils
         return C.SubmarinePointPlans.FirstOrDefault(x => x.GUID == guid);
     }
 
-    internal static SubmarineMap GetMap(this SubmarinePointPlan plan)
+    internal static SubmarineMap? GetMap(this SubmarinePointPlan plan)
     {
         if(plan.Points.Count == 0) return null;
-        return GetSubmarineExploration(plan.Points[0]).Map.Value;
+        return GetSubmarineExploration(plan.Points[0])?.Map.Value;
     }
 
     internal static string GetPointPlanName(this SubmarinePointPlan plan)
@@ -195,7 +195,7 @@ internal static unsafe class VoyageUtils
         if(plan == null) return "No or unknown plan selected";
         if(plan.Name.Length > 0) return plan.Name;
         if(plan.Points.Count == 0) return $"Plan {plan.GUID}";
-        return $"{plan.GetMap()?.Name}: {plan.Points.Select(x => Svc.Data.GetExcelSheet<SubmarineExplorationPretty>(ClientLanguage.Japanese).GetRow(x).Location.ToString()).Join("→")}";
+        return $"{plan.GetMap()?.Name}: {plan.Points.Select(x => Svc.Data.GetExcelSheet<SubmarineExploration>(ClientLanguage.Japanese).GetRow(x).Location.ToString()).Join("→")}";
     }
 
     internal static uint GetMapId(this SubmarinePointPlan plan) => GetMap(plan)?.RowId ?? 0;

@@ -4,7 +4,7 @@ using AutoRetainerAPI.Configuration;
 using Dalamud.Memory;
 using Dalamud.Utility;
 using ECommons.ExcelServices;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace AutoRetainer.Helpers;
 
@@ -135,15 +135,15 @@ internal static unsafe class VentureUtils
         }
         var adata = Utils.GetAdditionalData(data.CID, retainer.Name);
 
-        var param = task.RetainerTaskParameter.Value;
+        var param = task.RetainerTaskParameter.ValueNullable;
         if(param == null) return 0;
-        var normal = Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRow(task.Task);
-        if(task.Task == 0 || normal == null) return 0;
+        var normal = Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRowOrDefault(task.Task.RowId);
+        if(task.Task.RowId == 0 || normal == null) return 0;
         if(retainer.Job == (uint)Job.FSH)
         {
-            for(var i = 0; i < param.PerceptionFSH.Length; i++)
+            for(var i = 0; i < param?.PerceptionFSH.Count; i++)
             {
-                if(adata.Perception >= param.PerceptionFSH[i])
+                if(adata.Perception >= param?.PerceptionFSH[i])
                 {
                     index = i + 1;
                 }
@@ -151,9 +151,9 @@ internal static unsafe class VentureUtils
         }
         else if(IsDoL(retainer.Job))
         {
-            for(var i = 0; i < param.PerceptionDoL.Length; i++)
+            for(var i = 0; i < param?.PerceptionDoL.Count; i++)
             {
-                if(adata.Perception >= param.PerceptionDoL[i])
+                if(adata.Perception >= param?.PerceptionDoL[i])
                 {
                     index = i + 1;
                 }
@@ -161,21 +161,21 @@ internal static unsafe class VentureUtils
         }
         else
         {
-            for(var i = 0; i < param.ItemLevelDoW.Length; i++)
+            for(var i = 0; i < param?.ItemLevelDoW.Count; i++)
             {
-                if(adata.Ilvl >= param.ItemLevelDoW[i])
+                if(adata.Ilvl >= param?.ItemLevelDoW[i])
                 {
                     index = i + 1;
                 }
             }
         }
-        if(index >= normal.Quantity.Length) return 0;
-        return normal.Quantity[index];
+        if(index >= normal?.Quantity.Count) return 0;
+        return normal?.Quantity[index] ?? 0;
     }
 
     internal static int GetVentureRequitement(this RetainerTask task)
     {
-        if(IsDoL(task.ClassJobCategory.Row))
+        if(IsDoL(task.ClassJobCategory.RowId))
         {
             return task.RequiredGathering;
         }
@@ -188,36 +188,36 @@ internal static unsafe class VentureUtils
     internal static (int[] Stat, int[] Amount) GetVentureAmounts(this RetainerTask task, OfflineRetainerData retainer)
     {
         var param = task.RetainerTaskParameter.Value;
-        var normal = Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRow(task.Task);
+        var normal = Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRowOrDefault(task.Task.RowId);
         List<int> stat =
         [
             0
         ];
         List<int> amount =
         [
-            normal.Quantity[0]
+            normal?.Quantity[0] ?? 0
         ];
         if(retainer.Job == (uint)Job.FSH)
         {
-            for(var i = 0; i < param.PerceptionFSH.Length; i++)
+            for(var i = 0; i < param.PerceptionFSH.Count; i++)
             {
-                amount.Add(normal.Quantity[i + 1]);
+                amount.Add(normal?.Quantity[i + 1] ?? 0);
                 stat.Add(param.PerceptionFSH[i]);
             }
         }
         else if(IsDoL(retainer.Job))
         {
-            for(var i = 0; i < param.PerceptionDoL.Length; i++)
+            for(var i = 0; i < param.PerceptionDoL.Count; i++)
             {
-                amount.Add(normal.Quantity[i + 1]);
+                amount.Add(normal?.Quantity[i + 1] ?? 0);
                 stat.Add(param.PerceptionDoL[i]);
             }
         }
         else
         {
-            for(var i = 0; i < param.ItemLevelDoW.Length; i++)
+            for(var i = 0; i < param.ItemLevelDoW.Count; i++)
             {
-                amount.Add(normal.Quantity[i + 1]);
+                amount.Add(normal?.Quantity[i + 1] ?? 0);
                 stat.Add(param.ItemLevelDoW[i]);
             }
         }
@@ -247,7 +247,7 @@ internal static unsafe class VentureUtils
         var lvls = r.Level == 0 ? "" : $"{Lang.CharLevel}{r.Level} ";
         right = r.Yield == 0 ? "" : $"x{r.Yield} {r.YieldStars}";
         left = $"{left}{lvls}{r.Name}";
-        var ret = (C.Verbose ? $"#{Task.RowId}->{Task.GetAdjustedRetainerTask((Job)retainer.Job).RowId}/{Task.ClassJobCategory.Value.GetShortName()} " : "") + left + " " + right;
+        var ret = (C.Verbose ? $"#{Task.RowId}->{Task.GetAdjustedRetainerTask((Job)retainer.Job)?.RowId}/{Task.ClassJobCategory.Value.GetShortName()} " : "") + left + " " + right;
         FancyVentureNameCache[signature] = new(ret, Available, left, right);
         return ret;
     }
@@ -255,7 +255,7 @@ internal static unsafe class VentureUtils
     internal static string GetShortName(this ClassJobCategory cat)
     {
         if(cat.RowId == GetCategory((uint)Job.BRD)) return "DoW";
-        return cat.Name;
+        return cat.Name.ToString();
     }
 
     internal static (string UnavailabilitySymbols, int Level, string Name, int Yield, int YieldRate, string YieldStars) GetFancyVentureNameParts(this RetainerTask Task, OfflineCharacterData data, OfflineRetainerData retainer, out bool Available)
@@ -264,7 +264,7 @@ internal static unsafe class VentureUtils
         var adata = Utils.GetAdditionalData(data.CID, retainer.Name);
         var UnavailabilitySymbol = "";
         var canNotGather = Task.RequiredGathering > 0 && adata.Gathering < Task.RequiredGathering && adata.Gathering > -1;
-        if(!Task.IsFieldExploration() && IsDoL(Task.ClassJobCategory.Row))
+        if(!Task.IsFieldExploration() && IsDoL(Task.ClassJobCategory.RowId))
         {
             var gathered = data.UnlockedGatheringItems.Count == 0 || data.UnlockedGatheringItems.Contains(VentureUtils.GetGatheringItemByItemID(Task.GetVentureItemId()));
             if(gathered)
@@ -338,12 +338,13 @@ internal static unsafe class VentureUtils
         return retp;
     }
 
-    internal static uint GetAdjustedRetainerTask(uint task, Job job) => GetAdjustedRetainerTask(Svc.Data.GetExcelSheet<RetainerTask>().GetRow(task), job).RowId;
+    internal static uint GetAdjustedRetainerTask(uint task, Job job) => GetAdjustedRetainerTask(Svc.Data.GetExcelSheet<RetainerTask>().GetRowOrDefault(task), job)?.RowId ?? 0;
 
-    internal static RetainerTask GetAdjustedRetainerTask(this RetainerTask task, Job job)
+    internal static RetainerTask? GetAdjustedRetainerTask(this RetainerTask task, Job job) => GetAdjustedRetainerTask((RetainerTask?)task, job);
+    internal static RetainerTask? GetAdjustedRetainerTask(this RetainerTask? task, Job job)
     {
         if(task.GetVentureItemId() == 0) return task;
-        var n = Svc.Data.GetExcelSheet<RetainerTask>().FirstOrDefault(x => x.GetVentureItemId() == task.GetVentureItemId() && x.ClassJobCategory.Value.RowId == GetCategory((uint)job));
+        var n = Svc.Data.GetExcelSheet<RetainerTask>().Cast<RetainerTask?>().FirstOrDefault(x => x?.GetVentureItemId() == task.GetVentureItemId() && x?.ClassJobCategory.Value.RowId == GetCategory((uint)job));
         return n ?? task;
     }
 
@@ -381,7 +382,7 @@ internal static unsafe class VentureUtils
 
     internal static uint GetGatheringItemByItemID(uint itemID)
     {
-        return Svc.Data.GetExcelSheet<GatheringItem>().FirstOrDefault(x => x.Item == itemID)?.RowId ?? 0;
+        return Svc.Data.GetExcelSheet<GatheringItem>().AsNullable().FirstOrDefault(x => x?.Item.RowId == itemID)?.RowId ?? 0;
     }
 
     internal static RetainerTask GetVentureById(uint id)
@@ -414,27 +415,30 @@ internal static unsafe class VentureUtils
 
     internal static string GetVentureName(uint id) => GetVentureName(Svc.Data.GetExcelSheet<RetainerTask>().GetRow(id));
 
-    internal static string GetVentureName(this RetainerTask Task)
+    internal static string GetVentureName(this RetainerTask task) => GetVentureName((RetainerTask?)task);
+    internal static string GetVentureName(this RetainerTask? task)
     {
-        if(Task == null) return null;
-        if(Task.IsRandom)
+        if(task == null) return null;
+        if(task.Value.IsRandom)
         {
-            return $"{Svc.Data.GetExcelSheet<RetainerTaskRandom>().GetRow(Task.Task)?.Name.ToDalamudString().ExtractText()}";
+            return $"{Svc.Data.GetExcelSheet<RetainerTaskRandom>().GetRowOrDefault(task.Value.Task.RowId)?.Name.ToDalamudString().ExtractText()}";
         }
         else
         {
-            return $"{Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRow(Task.Task)?.Item.Value?.Name.ToDalamudString().ExtractText()}";
+            return $"{Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRowOrDefault(task.Value.Task.RowId)?.Item.ValueNullable?.Name.ToDalamudString().ExtractText()}";
         }
     }
 
-    internal static uint GetVentureItemId(this RetainerTask Task)
+    internal static uint GetVentureItemId(this RetainerTask task) => GetVentureItemId((RetainerTask?)task);
+    internal static uint GetVentureItemId(this RetainerTask? task)
     {
-        return Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRow(Task.Task)?.Item.Value.RowId ?? 0;
+        return Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRowOrDefault(task.Value.Task.RowId)?.Item.Value.RowId ?? 0;
     }
 
-    internal static Item GetVentureItem(this RetainerTask Task)
+    internal static Item? GetVentureItem(this RetainerTask task) => GetVentureItem((RetainerTask?)task);
+    internal static Item? GetVentureItem(this RetainerTask? task)
     {
-        return Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRow(Task.Task)?.Item.Value;
+        return Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRowOrDefault(task.Value.Task.RowId)?.Item.Value;
     }
 
     internal static List<string> GetAvailableVentureNames()

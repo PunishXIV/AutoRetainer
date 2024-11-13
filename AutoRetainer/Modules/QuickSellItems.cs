@@ -7,7 +7,7 @@ using ECommons.MathHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
 
 namespace AutoRetainer.Modules;
@@ -51,13 +51,13 @@ public unsafe class QuickSellItems : IDisposable
     public QuickSellItems()
     {
         //5480	Have Retainer Sell Items
-        retainerSellText = Svc.Data.GetExcelSheet<Addon>()?.GetRow(5480)?.Text?.RawString ?? "Have Retainer Sell Items";
+        retainerSellText = Svc.Data.GetExcelSheet<Addon>()?.GetRow(5480).Text.ToString() ?? "Have Retainer Sell Items";
         //97	Entrust to Retainer
-        entrustToRetainerText = Svc.Data.GetExcelSheet<Addon>()?.GetRow(97)?.Text?.RawString ?? "Entrust to Retainer";
+        entrustToRetainerText = Svc.Data.GetExcelSheet<Addon>()?.GetRow(97).Text.ToString() ?? "Entrust to Retainer";
         //98	Retrieve from Retainer
-        retrieveFromRetainerText = Svc.Data.GetExcelSheet<Addon>()?.GetRow(98)?.Text?.RawString ?? "Retrieve from Retainer";
+        retrieveFromRetainerText = Svc.Data.GetExcelSheet<Addon>()?.GetRow(98).Text.ToString() ?? "Retrieve from Retainer";
         //99	Put Up for Sale
-        putUpForSaleText = Svc.Data.GetExcelSheet<Addon>()?.GetRow(99)?.Text?.RawString ?? "Put Up for Sale";
+        putUpForSaleText = Svc.Data.GetExcelSheet<Addon>()?.GetRow(99).Text.ToString() ?? "Put Up for Sale";
         Svc.Hook.InitializeFromAttributes(this);
         Toggle();
     }

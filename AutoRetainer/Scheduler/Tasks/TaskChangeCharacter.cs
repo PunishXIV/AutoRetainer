@@ -5,7 +5,7 @@ using ECommons.GameHelpers;
 using ECommons.Throttlers;
 using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace AutoRetainer.Scheduler.Tasks;
 public static unsafe class TaskChangeCharacter
@@ -28,7 +28,7 @@ public static unsafe class TaskChangeCharacter
     public static void EnqueueLogin(string currentWorld, string charaName, string charaWorld, int account)
     {
         BailoutManager.IsLogOnTitleEnabled = false;
-        var dc = (int)ExcelWorldHelper.Get(currentWorld).DataCenter.Row;
+        var dc = (int)ExcelWorldHelper.Get(currentWorld).Value.DataCenter.RowId;
         if((int)Svc.Data.Language < 4)
         {
             P.TaskManager.Enqueue(ClickSelectDataCenter, new(timeLimitMS: 1000000));
@@ -46,7 +46,7 @@ public static unsafe class TaskChangeCharacter
     public static bool? SelectYesLogout()
     {
         if(!Svc.ClientState.IsLoggedIn) return true;
-        var addon = Utils.GetSpecificYesno(Svc.Data.GetExcelSheet<Addon>()?.GetRow(115)?.Text.ToDalamudString().ExtractText());
+        var addon = Utils.GetSpecificYesno(Svc.Data.GetExcelSheet<Addon>()?.GetRow(115).Text.ToDalamudString().ExtractText());
         if(addon == null || !IsAddonReady(addon)) return false;
         if(Utils.GenericThrottle && EzThrottler.Throttle("ConfirmLogout"))
         {
@@ -59,7 +59,7 @@ public static unsafe class TaskChangeCharacter
     public static bool? Logout()
     {
         if(C.DontLogout) return null;
-        var addon = Utils.GetSpecificYesno(Svc.Data.GetExcelSheet<Addon>()?.GetRow(115)?.Text.ToDalamudString().ExtractText());
+        var addon = Utils.GetSpecificYesno(Svc.Data.GetExcelSheet<Addon>()?.GetRow(115).Text.ToDalamudString().ExtractText());
         if(addon != null) return true;
         var isLoggedIn = Svc.Condition.Any();
         if(!isLoggedIn) return true;
@@ -80,7 +80,7 @@ public static unsafe class TaskChangeCharacter
         }
         if(TryGetAddonMaster<AddonMaster.SelectString>(out var m) && m.IsAddonReady)
         {
-            var compareTo = Svc.Data.GetExcelSheet<Lobby>()?.GetRow(11)?.Text.ExtractText();
+            var compareTo = Svc.Data.GetExcelSheet<Lobby>()?.GetRow(11).Text.ExtractText();
             if(m.Text == compareTo)
             {
                 m.Entries[account].Select();

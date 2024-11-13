@@ -2,6 +2,7 @@
 using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using AutoRetainerAPI.Configuration;
 using ECommons.GameHelpers;
+using Lumina.Excel.Sheets;
 using Newtonsoft.Json;
 
 namespace AutoRetainer.UI.Windows;
@@ -90,7 +91,7 @@ internal unsafe class SubmarinePointPlanUI : Window
             ImGui.SameLine();
             ImGuiEx.SetNextItemFullWidth();
             ImGui.InputText($"##planname", ref SelectedPlan.Name, 100);
-            ImGuiEx.ImGuiLineCentered($"planbuttons", () =>
+            ImGuiEx.LineCentered($"planbuttons", () =>
             {
                 ImGuiEx.TextV($"Apply this plan to:");
                 ImGui.SameLine();
@@ -109,7 +110,7 @@ internal unsafe class SubmarinePointPlanUI : Window
                     C.OfflineData.Each(x => x.AdditionalSubmarineData.Where(s => s.Value.SelectedPointPlan == SelectedPlanGuid).Each(s => s.Value.SelectedPointPlan = Guid.Empty.ToString()));
                 }
             });
-            ImGuiEx.ImGuiLineCentered($"planbuttons2", () =>
+            ImGuiEx.LineCentered($"planbuttons2", () =>
             {
                 if(ImGui.Button($"Copy plan settings"))
                 {
@@ -141,7 +142,7 @@ internal unsafe class SubmarinePointPlanUI : Window
                 {
                     if(ImGui.BeginChild("col1"))
                     {
-                        foreach(var x in Svc.Data.GetExcelSheet<SubmarineExplorationPretty>())
+                        foreach(var x in Svc.Data.GetExcelSheet<SubmarineExploration>())
                         {
                             if(x.Destination.ExtractText() == "")
                             {
@@ -152,10 +153,10 @@ internal unsafe class SubmarinePointPlanUI : Window
                                 }
                                 continue;
                             }
-                            var disabled = !SelectedPlan.GetMapId().EqualsAny(0u, x.Map.Row) || SelectedPlan.Points.Count >= 5 && !SelectedPlan.Points.Contains(x.RowId);
+                            var disabled = !SelectedPlan.GetMapId().EqualsAny(0u, x.Map.RowId) || SelectedPlan.Points.Count >= 5 && !SelectedPlan.Points.Contains(x.RowId);
                             if (disabled) ImGui.BeginDisabled();
                             var cont = SelectedPlan.Points.Contains(x.RowId);
-                            if (ImGui.Selectable(x.FancyDestination(), cont))
+                            if (ImGui.Selectable(x.Pretty().FancyDestination(), cont))
                             {
                                 SelectedPlan.Points.Toggle(x.RowId);
                             }
@@ -170,7 +171,7 @@ internal unsafe class SubmarinePointPlanUI : Window
                         var map = SelectedPlan.GetMap();
                         if(map != null)
                         {
-                            ImGuiEx.Text($"{map.Name}:");
+                            ImGuiEx.Text($"{map.Value.Name}:");
                         }
                         var toRem = -1;
                         for (var i = 0; i < SelectedPlan.Points.Count; i++)
@@ -191,7 +192,7 @@ internal unsafe class SubmarinePointPlanUI : Window
                                 toRem = i;
                             }
                             ImGui.SameLine();
-                            ImGuiEx.Text($"{VoyageUtils.GetSubmarineExploration(SelectedPlan.Points[i]).FancyDestination()}");
+                            ImGuiEx.Text($"{VoyageUtils.GetSubmarineExploration(SelectedPlan.Points[i])?.Pretty().FancyDestination()}");
                             ImGui.PopID();
                         }
                         if(toRem > -1)

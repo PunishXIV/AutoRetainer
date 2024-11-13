@@ -27,12 +27,12 @@ internal static unsafe class TaskDeployOnUnlockRoute
         VoyageUtils.Log($"GetPrioritizedPointList: {points.Select(x => $"{x.point}/{x.justification}").Join("\n")}");
         var numPoints = mode == UnlockMode.SpamOne ? 1 : 5;
         var subLevel = CurrentSubmarine.Get()->RankId;
-        var adjustedPoints = points.Where(x => subLevel >= VoyageUtils.GetSubmarineExploration(x.point).RankReq).Take(numPoints);
+        var adjustedPoints = points.Where(x => subLevel >= VoyageUtils.GetSubmarineExploration(x.point)?.RankReq).Take(numPoints);
         VoyageUtils.Log($"Adjusted points: {adjustedPoints.Select(x => $"{x.point}/{x.justification}").Join("\n")}");
         if(adjustedPoints.Any())
         {
             TaskCalculateAndPickBestExpRoute.Stop = true;
-            TaskPickSubmarineRoute.EnqueueImmediate(VoyageUtils.GetSubmarineExploration(adjustedPoints.First().point).Map.Row, adjustedPoints.Select(x => x.point).ToArray());
+            TaskPickSubmarineRoute.EnqueueImmediate(VoyageUtils.GetSubmarineExploration(adjustedPoints.First().point).Value.Map.RowId, adjustedPoints.Select(x => x.point).ToArray());
         }
     }
 }

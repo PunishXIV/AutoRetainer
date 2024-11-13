@@ -8,7 +8,7 @@ using ECommons.GameHelpers;
 using ECommons.Reflection;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;
 
@@ -54,7 +54,7 @@ internal unsafe class DebugMulti : DebugSectionBase
         ImGuiEx.Text($"Occupied: {IsOccupied()}");
         ImGuiEx.Text($"Casting: {Player.Object?.IsCasting}");
         ImGuiEx.TextCopy($"CID: {Player.CID}");
-        ImGuiEx.Text($"{Svc.Data.GetExcelSheet<Addon>()?.GetRow(115)?.Text.ToDalamudString().ExtractText()}");
+        ImGuiEx.Text($"{Svc.Data.GetExcelSheet<Addon>()?.GetRow(115).Text.ToDalamudString().ExtractText()}");
         ImGuiEx.Text($"Server time: {CSFramework.GetServerTime()}");
         ImGuiEx.Text($"PC time: {DateTimeOffset.Now.ToUnixTimeSeconds()}");
         if(ImGui.CollapsingHeader("HET"))

@@ -1,4 +1,5 @@
 ﻿using ECommons.ExcelServices;
+using ECommons.MathHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 
 namespace AutoRetainer.Internal.InventoryManagement;
@@ -10,7 +11,7 @@ public class SellSlotTask
     public uint ItemID;
     public uint Quantity;
 
-    public SellSlotTask(InventoryType inventoryType, uint slot, uint itemID, uint quantity)
+    public SellSlotTask(InventoryType inventoryType, Number slot, Number itemID, Number quantity)
     {
         InventoryType = inventoryType;
         Slot = slot;

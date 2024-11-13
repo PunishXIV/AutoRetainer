@@ -4,7 +4,7 @@ using ECommons.GameFunctions;
 using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;
 public unsafe class DebugInventoryManagement : DebugSectionBase
@@ -60,7 +60,7 @@ public unsafe class DebugInventoryManagement : DebugSectionBase
         {
             foreach(var x in Vendors)
             {
-                ImGuiEx.Text(Whitelist.Contains(x) ? EColor.GreenBright : null, $"{x}: {Svc.Data.GetExcelSheet<ENpcResident>().GetRow(x)?.Plural}");
+                ImGuiEx.Text(Whitelist.Contains(x) ? EColor.GreenBright : null, $"{x}: {Svc.Data.GetExcelSheet<ENpcResident>().GetRowOrDefault(x)?.Plural}");
                 if(ImGui.IsItemHovered())
                 {
                     if(ImGuiEx.Ctrl)
@@ -78,12 +78,12 @@ public unsafe class DebugInventoryManagement : DebugSectionBase
     {
         get
         {
-            foreach(var x in Svc.Data.GetExcelSheet<HousingEmploymentNpcList>())
+            foreach(var x in Svc.Data.GetSubrowExcelSheet<HousingEmploymentNpcList>())
             {
-                for(var i = 0; i < x.ENpcBase.Length; i++)
+                for(var i = 0; i < x.Count; i++)
                 {
-                    var ret = x.ENpcBase[i];
-                    if(ret.Row != 0) yield return ret.Row;
+                    var ret = x[i];
+                    if(ret.RowId != 0) yield return ret.RowId;
                 }
             }
         }

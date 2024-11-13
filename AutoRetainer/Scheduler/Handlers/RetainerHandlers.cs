@@ -9,7 +9,7 @@ using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace AutoRetainer.Scheduler.Handlers;
 
@@ -41,7 +41,7 @@ internal static unsafe class RetainerHandlers
 
     internal static bool? SelectAssignVenture()
     {
-        var text = new string[] { Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(2386).Text.ToDalamudString().ExtractText(), Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(2387).Text.ToDalamudString().ExtractText() };
+        var text = new string[] { Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(2386).Text.ToDalamudString().ExtractText(), Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(2387).Text.ToDalamudString().ExtractText() };
         return Utils.TrySelectSpecificEntry(text);
     }
 
@@ -56,7 +56,7 @@ internal static unsafe class RetainerHandlers
             }
             return false;
         }
-        var text = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(2383).Text.ToDalamudString().ExtractText();
+        var text = Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(2383).Text.ToDalamudString().ExtractText();
         return Utils.TrySelectSpecificEntry(text);
     }
 
@@ -65,7 +65,7 @@ internal static unsafe class RetainerHandlers
     {
         EnforceSelectStringThrottle();
         //2385	View venture report. (Complete)
-        var text = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(2385).Text.ToDalamudString().ExtractText();
+        var text = Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(2385).Text.ToDalamudString().ExtractText();
         return Utils.TrySelectSpecificEntry(text);
     }
 
@@ -183,14 +183,14 @@ internal static unsafe class RetainerHandlers
     internal static bool? SelectEntrustItems()
     {
         //2378	Entrust or withdraw items.
-        var text = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(2378).Text.ToDalamudString().ExtractText(true);
+        var text = Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(2378).Text.ToDalamudString().ExtractText(true);
         return Utils.TrySelectSpecificEntry(text);
     }
 
     internal static bool? SelectEntrustGil()
     {
         //2379	Entrust or withdraw gil.
-        var text = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(2379).Text.ToDalamudString().ExtractText(true);
+        var text = Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(2379).Text.ToDalamudString().ExtractText(true);
         return Utils.TrySelectSpecificEntry(text);
     }
 
@@ -237,7 +237,7 @@ internal static unsafe class RetainerHandlers
     internal static bool? ClickCloseEntrustWindow()
     {
         //13530	Close Window
-        var text = Svc.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Addon>().GetRow(13530).Text.ToDalamudString().ExtractText();
+        var text = Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(13530).Text.ToDalamudString().ExtractText();
         if(TryGetAddonByName<AtkUnitBase>("RetainerItemTransferProgress", out var addon) && IsAddonReady(addon))
         {
             var button = (AtkComponentButton*)addon->UldManager.NodeList[2]->GetComponent();

@@ -1,6 +1,6 @@
 ﻿using AutoRetainer.Modules.Statistics;
 using ECommons.Configuration;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using System.IO;
 
 namespace AutoRetainer.UI.Statistics;

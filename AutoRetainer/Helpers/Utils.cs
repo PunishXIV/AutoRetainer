@@ -1,5 +1,6 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage;
+using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using AutoRetainer.Scheduler.Handlers;
 using AutoRetainer.Scheduler.Tasks;
 using AutoRetainerAPI.Configuration;
@@ -20,8 +21,10 @@ using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using FFXIVClientStructs.FFXIV.Common.Component.Excel;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
+using Lumina.Text.ReadOnly;
 using System.Text.RegularExpressions;
 using CharaData = (string Name, ushort World);
 
@@ -103,7 +106,7 @@ internal static unsafe class Utils
             for(var i = 0; i < inv->Size; i++)
             {
                 var item = InventoryManager.Instance()->GetInventorySlot(type, i);
-                ret.Add((item->ItemId, item->Quantity));
+                ret.Add((item->ItemId, (uint)item->Quantity));
             }
         }
         return ret;
@@ -169,7 +172,7 @@ internal static unsafe class Utils
         var data = ExcelItemHelper.Get(itemId);
         debugData = [];
         if(data == null) return 0;
-        if(data.ItemUICategory.Row == 59)//crystal special handling
+        if(data.Value.ItemUICategory.RowId == 59)//crystal special handling
         {
             foreach(var type in inventoryTypes)
             {
@@ -179,13 +182,13 @@ internal static unsafe class Utils
                     var item = InventoryManager.Instance()->GetInventorySlot(type, i);
                     if(item->ItemId == itemId)
                     {
-                        ret += data.StackSize - item->Quantity;
+                        ret += (uint)(data.Value.StackSize - item->Quantity);
                         debugData.Add($"[TED] [CrystalDebugData] in {type} slot {i} found incomplete stack: {ExcelItemHelper.GetName(itemId, true)} q={item->Quantity} canFit={ret}");
                         return ret;
                     }
                 }
             }
-            return data.StackSize;
+            return data.Value.StackSize;
         }
         else
         {
@@ -198,14 +201,14 @@ internal static unsafe class Utils
                     var item = InventoryManager.Instance()->GetInventorySlot(type, i);
                     if(item->ItemId == itemId && item->Flags.HasFlag(InventoryItem.ItemFlags.HighQuality) == isHq && !item->Flags.HasFlag(InventoryItem.ItemFlags.Collectable))
                     {
-                        if(data.IsUnique) return 0;
+                        if(data.Value.IsUnique) return 0;
                         debugData.Add($"[TED] [DebugData] in {type} slot {i} found incomplete stack: {ExcelItemHelper.GetName(itemId, true)} q={item->Quantity} canFit={ret}");
-                        ret += data.StackSize - item->Quantity;
+                        ret += (uint)(data.Value.StackSize - item->Quantity);
                     }
                     else if(item->ItemId == 0)
                     {
-                        debugData.Add($"[TED] [DebugData] in {type} slot {i} is empty, canFit={data.StackSize}");
-                        ret += data.StackSize;
+                        debugData.Add($"[TED] [DebugData] in {type} slot {i} is empty, canFit={data.Value.StackSize}");
+                        ret += data.Value.StackSize;
                     }
                 }
             }
@@ -213,7 +216,7 @@ internal static unsafe class Utils
         return ret;
     }
 
-    public static bool IsItemSellableByHardList(uint item, uint quantity)
+    public static bool IsItemSellableByHardList(Number item, Number quantity)
     {
         if(C.IMProtectList.Contains(item)) return false;
         if(C.IMAutoVendorHard.Contains(item))
@@ -313,12 +316,12 @@ internal static unsafe class Utils
 
     internal static int GetJobLevel(this OfflineCharacterData data, uint job)
     {
-        var d = Svc.Data.GetExcelSheet<ClassJob>().GetRow(job);
+        var d = Svc.Data.GetExcelSheet<ClassJob>().GetRowOrDefault(job);
         if(d != null)
         {
             try
             {
-                return data.ClassJobLevelArray[d.ExpArrayIndex];
+                return data.ClassJobLevelArray[d.Value.ExpArrayIndex];
             }
             catch(Exception) { }
         }
@@ -534,7 +537,21 @@ internal static unsafe class Utils
         return key;
     }
 
-    public static string UpperCaseStr(Lumina.Text.SeString s, sbyte article = 0)
+    public static SubmarineExplorationPretty Pretty(this SubmarineExploration row)
+    {
+        return (SubmarineExplorationPretty)row;
+    }
+
+    public static SubmarineExplorationPretty GetPretty(this Lumina.Excel.ExcelSheet<SubmarineExploration> row, uint value)
+    {
+        if(row.TryGetRow(value, out var ret))
+        {
+            return ret;
+        }
+        return null;
+    }
+
+    public static string UpperCaseStr(ReadOnlySeString s, sbyte article = 0)
     {
         if(article == 1)
             return s.ToDalamudString().ToString();

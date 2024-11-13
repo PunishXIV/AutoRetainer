@@ -1,5 +1,5 @@
 ﻿using Lumina.Excel;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace AutoRetainer.Modules.Voyage.VoyageCalculator;
 
@@ -18,7 +18,7 @@ public static class Voyage
 
     public static uint SectorToMap(uint sector)
     {
-        return ExplorationSheet.GetRow(FindVoyageStartPoint(sector))!.Map.Row;
+        return ExplorationSheet.GetRow(FindVoyageStartPoint(sector))!.Map.RowId;
     }
 
     public static uint FindVoyageStartPoint(uint point)
@@ -32,12 +32,12 @@ public static class Voyage
     }
 
     #region Optimizer
-    public static uint CalculateDuration(IEnumerable<SubmarineExplorationPretty> walkingPoints, Build.SubmarineBuild build)
+    public static uint CalculateDuration(IEnumerable<SubmarineExploration> walkingPoints, Build.SubmarineBuild build)
     {
         var walkWay = walkingPoints.ToArray();
         var start = walkWay.First();
 
-        var points = new List<SubmarineExplorationPretty>();
+        var points = new List<SubmarineExploration>();
         foreach(var p in walkWay.Skip(1))
             points.Add(p);
 
@@ -67,33 +67,33 @@ public static class Voyage
         return (uint)allDurations.Sum() + FixedVoyageTime;
     }
 
-    public static (int Distance, List<SubmarineExplorationPretty> Points) CalculateDistance(IEnumerable<SubmarineExplorationPretty> walkingPoints)
+    public static (int Distance, List<SubmarineExploration> Points) CalculateDistance(IEnumerable<SubmarineExploration> walkingPoints)
     {
         var walkWay = walkingPoints.ToArray();
         var start = walkWay.First();
 
-        var points = new List<SubmarineExplorationPretty>();
+        var points = new List<SubmarineExploration>();
         foreach(var p in walkWay.Skip(1))
             points.Add(p);
 
 
         // zero
         if(points.Count == 0)
-            return (0, new List<SubmarineExplorationPretty>());
+            return (0, new List<SubmarineExploration>());
 
         // 1 point makes no sense to optimize, so just return distance
         if(points.Count == 1)
         {
             var onlyPoint = points[0];
             var distance = BestDistance(start, onlyPoint) + onlyPoint.SurveyDistance;
-            return ((int)distance, new List<SubmarineExplorationPretty> { onlyPoint });
+            return ((int)distance, new List<SubmarineExploration> { onlyPoint });
         }
 
         // More than 5 points isn't allowed ingame
         if(points.Count > 5)
-            return (0, new List<SubmarineExplorationPretty>());
+            return (0, new List<SubmarineExploration>());
 
-        List<(SubmarineExplorationPretty Key, uint Start, Dictionary<uint, uint> Distances)> AllDis = [];
+        List<(SubmarineExploration Key, uint Start, Dictionary<uint, uint> Distances)> AllDis = [];
         foreach(var (point, idx) in points.Select((val, i) => (val, i)))
         {
             AllDis.Add((point, BestDistance(start, point), []));
@@ -107,7 +107,7 @@ public static class Voyage
             }
         }
 
-        List<(uint Way, List<SubmarineExplorationPretty> Points)> MinimalWays = [];
+        List<(uint Way, List<SubmarineExploration> Points)> MinimalWays = [];
         try
         {
             foreach(var (point, idx) in AllDis.Select((val, i) => (val, i)))
@@ -141,9 +141,9 @@ public static class Voyage
         return ((int)min.Way + surveyD, min.Points);
     }
 
-    public static (uint Distance, List<SubmarineExplorationPretty> Points) PathWalker((SubmarineExplorationPretty Key, uint Start, Dictionary<uint, uint> Distances) point, Dictionary<uint, Dictionary<uint, uint>> otherPoints, SubmarineExplorationPretty[] allPoints)
+    public static (uint Distance, List<SubmarineExploration> Points) PathWalker((SubmarineExploration Key, uint Start, Dictionary<uint, uint> Distances) point, Dictionary<uint, Dictionary<uint, uint>> otherPoints, SubmarineExploration[] allPoints)
     {
-        List<(uint Distance, List<SubmarineExplorationPretty> Points)> possibleDistances = [];
+        List<(uint Distance, List<SubmarineExploration> Points)> possibleDistances = [];
         foreach(var pos1 in otherPoints)
         {
             if(point.Key.RowId == pos1.Key)
@@ -153,7 +153,7 @@ public static class Voyage
 
             if(otherPoints.Count == 1)
             {
-                possibleDistances.Add((startToFirst, new List<SubmarineExplorationPretty> { point.Key, allPoints.First(t => t.RowId == pos1.Key), }));
+                possibleDistances.Add((startToFirst, new List<SubmarineExploration> { point.Key, allPoints.First(t => t.RowId == pos1.Key), }));
                 continue;
             }
 
@@ -166,7 +166,7 @@ public static class Voyage
 
                 if(otherPoints.Count == 2)
                 {
-                    possibleDistances.Add((startToSecond, new List<SubmarineExplorationPretty> { point.Key, allPoints.First(t => t.RowId == pos1.Key), allPoints.First(t => t.RowId == pos2.Key), }));
+                    possibleDistances.Add((startToSecond, new List<SubmarineExploration> { point.Key, allPoints.First(t => t.RowId == pos1.Key), allPoints.First(t => t.RowId == pos2.Key), }));
                     continue;
                 }
 
@@ -179,7 +179,7 @@ public static class Voyage
 
                     if(otherPoints.Count == 3)
                     {
-                        possibleDistances.Add((startToThird, new List<SubmarineExplorationPretty> { point.Key, allPoints.First(t => t.RowId == pos1.Key), allPoints.First(t => t.RowId == pos2.Key), allPoints.First(t => t.RowId == pos3.Key), }));
+                        possibleDistances.Add((startToThird, new List<SubmarineExploration> { point.Key, allPoints.First(t => t.RowId == pos1.Key), allPoints.First(t => t.RowId == pos2.Key), allPoints.First(t => t.RowId == pos3.Key), }));
                         continue;
                     }
 
@@ -190,7 +190,7 @@ public static class Voyage
 
                         var startToLast = startToThird + otherPoints[pos3.Key][pos4.Key];
 
-                        possibleDistances.Add((startToLast, new List<SubmarineExplorationPretty> { point.Key, allPoints.First(t => t.RowId == pos1.Key), allPoints.First(t => t.RowId == pos2.Key), allPoints.First(t => t.RowId == pos3.Key), allPoints.First(t => t.RowId == pos4.Key), }));
+                        possibleDistances.Add((startToLast, new List<SubmarineExploration> { point.Key, allPoints.First(t => t.RowId == pos1.Key), allPoints.First(t => t.RowId == pos2.Key), allPoints.First(t => t.RowId == pos3.Key), allPoints.First(t => t.RowId == pos4.Key), }));
                     }
                 }
             }
@@ -199,19 +199,19 @@ public static class Voyage
         return possibleDistances.MinBy(a => a.Distance);
     }
 
-    public static uint BestDistance(SubmarineExplorationPretty pointA, SubmarineExplorationPretty pointB)
+    public static uint BestDistance(SubmarineExploration pointA, SubmarineExploration pointB)
     {
-        return pointA.GetDistance(pointB);
+        return pointA.Pretty().GetDistance(pointB);
     }
 
-    public static uint VoyageTime(SubmarineExplorationPretty pointA, SubmarineExplorationPretty pointB, short speed)
+    public static uint VoyageTime(SubmarineExploration pointA, SubmarineExploration pointB, short speed)
     {
-        return pointA.GetVoyageTime(pointB, speed);
+        return pointA.Pretty().GetVoyageTime(pointB, speed);
     }
 
-    public static uint SurveyTime(SubmarineExplorationPretty point, short speed)
+    public static uint SurveyTime(SubmarineExploration point, short speed)
     {
-        return point.GetSurveyTime(speed);
+        return point.Pretty().GetSurveyTime(speed);
     }
     #endregion
 }

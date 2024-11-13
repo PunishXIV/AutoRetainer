@@ -2,7 +2,7 @@
 using ECommons.ExcelServices;
 using ECommons.Reflection;
 using ECommons.Throttlers;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries;
 public class EntrustManager : InventoryManagemenrBase
@@ -107,7 +107,7 @@ public class EntrustManager : InventoryManagemenrBase
                             ImGui.Image(icon.ImGuiHandle, new(ImGui.GetFrameHeight()));
                         }
                         ImGui.TableNextColumn();
-                        if(ImGui.Checkbox(x.Name, ref contains))
+                        if(ImGui.Checkbox(x.Name.ToString(), ref contains))
                         {
                             if(contains)
                             {

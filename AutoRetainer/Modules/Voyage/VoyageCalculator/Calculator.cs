@@ -1,16 +1,15 @@
-﻿using System.Collections.Concurrent;
+﻿using Lumina.Excel.Sheets;
+using System.Collections.Concurrent;
 using static AutoRetainer.Modules.Voyage.VoyageCalculator.Build;
 
 namespace AutoRetainer.Modules.Voyage.VoyageCalculator;
 
 internal unsafe class Calculator
 {
-    public List<SubmarineExplorationPretty> MustInclude = [];
+    public List<SubmarineExploration> MustInclude = [];
 
     private uint[] BestPath = Array.Empty<uint>();
-    private List<SubmarineExplorationPretty> AllowedSectors = [];
-
-    private Lumina.Excel.ExcelSheet<SubmarineExplorationPretty> ExplorationSheet => Svc.Data.GetExcelSheet<SubmarineExplorationPretty>();
+    private List<SubmarineExploration> AllowedSectors = [];
 
     internal SubmarineBuild? CurrentBuild;
     internal RouteBuild? RouteBuild;
@@ -30,20 +29,20 @@ internal unsafe class Calculator
             if(CurrentBuild != null)
             {
                 VoyageUtils.Log($"Starting to get best path for map {mapId}");
-                var mapDictionary = new ConcurrentDictionary<int, (int, List<SubmarineExplorationPretty>)[]>();
+                var mapDictionary = new ConcurrentDictionary<int, (int, List<SubmarineExploration>)[]>();
 
-                List<SubmarineExplorationPretty> valid;
+                List<SubmarineExploration> valid;
                 int highestRank;
                 try
                 {
-                    valid = ExplorationSheet
-                            .Where(r => r.Map.Row == mapId && !r.StartingPoint && r.RankReq <= routeBuild.Rank)
+                    valid = Svc.Data.GetExcelSheet<SubmarineExploration>()
+                            .Where(r => r.Map.RowId == mapId && !r.StartingPoint && r.RankReq <= routeBuild.Rank)
                             .Where(r => CurrentSubmarine.GetUnlockedSectors().Contains(r.RowId))
                             .ToList();
                     if(AllowedSectors.Any())
                     {
-                        valid = ExplorationSheet
-                                .Where(r => r.Map.Row == mapId && !r.StartingPoint && r.RankReq <= routeBuild.Rank)
+                        valid = Svc.Data.GetExcelSheet<SubmarineExploration>()
+                                .Where(r => r.Map.RowId == mapId && !r.StartingPoint && r.RankReq <= routeBuild.Rank)
                                 .Where(r => AllowedSectors.Contains(r))
                                 .ToList();
                     }
@@ -54,8 +53,8 @@ internal unsafe class Calculator
                     return null;
                 }
 
-                var startPoint = ExplorationSheet.First(r => r.Map.Row == mapId);
-                if(!mapDictionary.TryGetValue(highestRank, out var distances) || !distances.Any(t => t.Item2.ContainsAllItems(MustInclude)))
+                var startPoint = Svc.Data.GetExcelSheet<SubmarineExploration>().First(r => r.Map.RowId == mapId);
+                if(!mapDictionary.TryGetValue(highestRank, out var distances) || !distances.Any(t => t.Item2.ContainsAllItems<SubmarineExploration>(MustInclude)))
                 {
                     var paths = valid.Select(t => new[] { startPoint.RowId, t.RowId }.ToList()).ToHashSet(new ListComparer());
                     if(MustInclude.Any())
@@ -75,7 +74,7 @@ internal unsafe class Calculator
                         }
                     }
 
-                    var allPaths = C.VoyageDisableCalcParallel ? paths.Select(t => t.Select(f => valid.FirstOrDefault(k => k.RowId == f) ?? startPoint)).ToList() : paths.AsParallel().Select(t => t.Select(f => valid.FirstOrDefault(k => k.RowId == f) ?? startPoint)).ToList();
+                    var allPaths = C.VoyageDisableCalcParallel ? paths.Select(t => t.Select(f => valid.Cast<SubmarineExploration?>().FirstOrDefault(k => k?.RowId == f) ?? startPoint)).ToList() : paths.AsParallel().Select(t => t.Select(f => valid.Cast<SubmarineExploration?>().FirstOrDefault(k => k?.RowId == f) ?? startPoint)).ToList();
 
                     if(!allPaths.Any())
                     {

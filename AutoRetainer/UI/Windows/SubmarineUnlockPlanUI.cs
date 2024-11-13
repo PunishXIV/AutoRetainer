@@ -4,6 +4,7 @@ using AutoRetainerAPI.Configuration;
 using ECommons.GameHelpers;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
+using Lumina.Excel.Sheets;
 using Newtonsoft.Json;
 
 namespace AutoRetainer.UI.Windows;
@@ -223,14 +224,14 @@ internal unsafe class SubmarineUnlockPlanUI : Window
                             ImGui.TableNextRow();
                             ImGui.TableNextColumn();
                             if(col) ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.ParsedGreen);
-                            var data = Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(x.Key);
-                            ImGuiEx.CollectionCheckbox($"{data?.FancyDestination()}", x.Key, SelectedPlan.ExcludedRoutes, true);
+                            var data = Svc.Data.GetExcelSheet<SubmarineExploration>().GetRowOrDefault(x.Key);
+                            ImGuiEx.CollectionCheckbox($"{data?.Pretty().FancyDestination()}", x.Key, SelectedPlan.ExcludedRoutes, true);
                             if(col) ImGui.PopStyleColor();
                             ImGui.TableNextColumn();
-                            ImGuiEx.TextV($"{data.Map?.Value?.Name}");
+                            ImGuiEx.TextV($"{data?.Map.ValueNullable?.Name}");
                             ImGui.TableNextColumn();
                             var notEnabled = !SelectedPlan.ExcludedRoutes.Contains(x.Key) && SelectedPlan.ExcludedRoutes.Contains(x.Value.Point);
-                            ImGuiEx.TextV(notEnabled ? ImGuiColors.DalamudRed : null, $"{Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(x.Value.Point)?.FancyDestination()}");
+                            ImGuiEx.TextV(notEnabled ? ImGuiColors.DalamudRed : null, $"{Svc.Data.GetExcelSheet<SubmarineExploration>().GetRowOrDefault(x.Value.Point)?.Pretty().FancyDestination()}");
                             ImGui.PopID();
                         }
                     }
@@ -238,7 +239,7 @@ internal unsafe class SubmarineUnlockPlanUI : Window
                 }
                 if(ImGui.CollapsingHeader("Display current point exploration order"))
                 {
-                    ImGuiEx.Text(SelectedPlan.GetPrioritizedPointList().Select(x => $"{Svc.Data.GetExcelSheet<SubmarineExplorationPretty>().GetRow(x.point).Destination} ({x.justification})").Join("\n"));
+                    ImGuiEx.Text(SelectedPlan.GetPrioritizedPointList().Select(x => $"{Svc.Data.GetExcelSheet<SubmarineExploration>().GetRow(x.point).Destination} ({x.justification})").Join("\n"));
                 }
             }
             ImGui.EndChild();
