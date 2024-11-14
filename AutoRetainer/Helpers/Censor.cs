@@ -1,4 +1,5 @@
 ﻿using Lumina.Misc;
+using System.Xml.Linq;
 
 namespace AutoRetainer.Helpers;
 
@@ -16,6 +17,8 @@ internal static class Censor
 
     internal static string Character(string name, string world)
     {
+        name ??= string.Empty;
+        world ??= string.Empty;
         if(C.NoNames)
         {
             var n1 = Crc32.Get(Seed + name) % Adjectives.Length;
@@ -31,6 +34,7 @@ internal static class Censor
 
     internal static string Character(string name)
     {
+        name ??= string.Empty;
         if(C.NoNames)
         {
             if(name.Contains('@'))
@@ -50,6 +54,7 @@ internal static class Censor
 
     internal static string World(string world)
     {
+        world ??= string.Empty;
         if(C.NoNames)
         {
             var w = Crc32.Get(Seed + world) % Worlds.Length;

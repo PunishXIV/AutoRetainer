@@ -96,7 +96,7 @@ internal static unsafe class VoyageUtils
 
     internal static string GetSubmarineExplorationName(uint id)
     {
-        return GetSubmarineExploration(id)?.Pretty().ConvertDestination();
+        return GetSubmarineExploration(id)?.ConvertDestination();
     }
 
     internal static string GetMapName(uint id)
@@ -208,7 +208,7 @@ internal static unsafe class VoyageUtils
             {
                 return PanelType.TypeSelector;
             }
-            var text = MemoryHelper.ReadSeString(&addon->UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText).ExtractText();
+            var text = GenericHelpers.ReadSeString(&addon->UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText).ExtractText();
             if(text.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.PanelSubmersible))
             {
                 return PanelType.Submersible;
@@ -391,7 +391,7 @@ internal static unsafe class VoyageUtils
     internal static VoyageType? DetectAddonType(AtkUnitBase* addon)
     {
         var textptr = addon->UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText;
-        var text = MemoryHelper.ReadSeString(&textptr).ExtractText();
+        var text = GenericHelpers.ReadSeString(&textptr).ExtractText();
         if(text.Contains("Select an airship."))
         {
             return VoyageType.Airship;

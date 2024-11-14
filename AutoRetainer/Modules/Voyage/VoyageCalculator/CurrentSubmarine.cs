@@ -57,7 +57,7 @@ internal static unsafe class CurrentSubmarine
                 var best = calc.FindBestPath(x);
                 if(best != null)
                 {
-                    DuoLog.Information($"Map {x}: {best.Value.path.Select(z => $"{z}/{Svc.Data.GetExcelSheet<SubmarineExploration>().GetPretty(z).Row.Location}").Print()}, {best.Value.duration}, {best.Value.exp} / ");
+                    DuoLog.Information($"Map {x}: {best.Value.path.Select(z => $"{z}/{Svc.Data.GetExcelSheet<SubmarineExploration>().GetRowOrDefault(z)?.Location}").Print()}, {best.Value.duration}, {best.Value.exp} / ");
                 }
             }
             VoyageMain.WaitOverlay.IsProcessing = false;

@@ -29,6 +29,18 @@ public static unsafe class TaskChangeCharacter
     {
         BailoutManager.IsLogOnTitleEnabled = false;
         var dc = (int)ExcelWorldHelper.Get(currentWorld).Value.DataCenter.RowId;
+        PluginLog.Information($"Enqueue login: world={currentWorld}, charaName: {charaName}, charaWorld={charaWorld}, acc={account}, dc={dc}");
+        if(dc == 0)
+        {
+            DuoLog.Warning($"Invalid data for {charaName}@{charaWorld}. Attempting to auto-fix...");
+            currentWorld = charaWorld;
+            dc = (int)ExcelWorldHelper.Get(currentWorld).Value.DataCenter.RowId;
+            if(dc == 0)
+            {
+                DuoLog.Error("Failed to fix world data. Log in manually.");
+                return;
+            }
+        }
         if((int)Svc.Data.Language < 4)
         {
             P.TaskManager.Enqueue(ClickSelectDataCenter, new(timeLimitMS: 1000000));

@@ -111,7 +111,7 @@ internal static unsafe class AutoGCHandin
         {
             if(addon->YesButton->IsEnabled)
             {
-                var str = MemoryHelper.ReadSeString(&addon->PromptText->NodeText).ExtractText().Replace(" ", "");
+                var str = GenericHelpers.ReadSeString(&addon->PromptText->NodeText).ExtractText().Replace(" ", "");
                 DebugLog($"SelectYesno encountered: {str}");
                 //102434	Do you really want to trade a high-quality item?
                 if(str.Equals(Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(102434).Text.ExtractText().Replace(" ", "")))
@@ -252,7 +252,7 @@ internal static unsafe class AutoGCHandin
         var step1 = addon->UldManager.NodeList[14];
         var step2 = step1->GetAsAtkComponentNode()->Component->UldManager.NodeList[1];
         var step3 = step2->GetAsAtkComponentNode()->Component->UldManager.NodeList[2];
-        var text = MemoryHelper.ReadSeString(&step3->GetAsAtkTextNode()->NodeText).ExtractText();
+        var text = GenericHelpers.ReadSeString(&step3->GetAsAtkTextNode()->NodeText).ExtractText();
         //4619	Hide Armoury Chest Items
         //4618	Hide Gear Set Items
         //4617	Show All Items

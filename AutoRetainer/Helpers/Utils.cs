@@ -537,20 +537,6 @@ internal static unsafe class Utils
         return key;
     }
 
-    public static SubmarineExplorationPretty Pretty(this SubmarineExploration row)
-    {
-        return (SubmarineExplorationPretty)row;
-    }
-
-    public static SubmarineExplorationPretty GetPretty(this Lumina.Excel.ExcelSheet<SubmarineExploration> row, uint value)
-    {
-        if(row.TryGetRow(value, out var ret))
-        {
-            return ret;
-        }
-        return null;
-    }
-
     public static string UpperCaseStr(ReadOnlySeString s, sbyte article = 0)
     {
         if(article == 1)
@@ -739,7 +725,7 @@ internal static unsafe class Utils
                 if(IsAddonReady(addon))
                 {
                     var textNode = addon->UldManager.NodeList[15]->GetAsAtkTextNode();
-                    var text = MemoryHelper.ReadSeString(&textNode->NodeText).ExtractText();
+                    var text = GenericHelpers.ReadSeString(&textNode->NodeText).ExtractText();
                     if(compare(text))
                     {
                         PluginLog.Verbose($"SelectYesno {text} addon {i} by predicate");
@@ -767,7 +753,7 @@ internal static unsafe class Utils
                 if(IsAddonReady(addon))
                 {
                     var textNode = addon->UldManager.NodeList[15]->GetAsAtkTextNode();
-                    var text = MemoryHelper.ReadSeString(&textNode->NodeText).ExtractText().Replace(" ", "").Replace("\n", "");
+                    var text = GenericHelpers.ReadSeString(&textNode->NodeText).ExtractText().Replace(" ", "").Replace("\n", "");
                     if(text.ContainsAny(s.Select(x => x.Replace(" ", "").Replace("\n", ""))))
                     {
                         PluginLog.Verbose($"SelectYesno {s.Print()} addon {i}");

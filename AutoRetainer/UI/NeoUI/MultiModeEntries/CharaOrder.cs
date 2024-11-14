@@ -1,4 +1,5 @@
-﻿using ECommons.ExcelServices;
+﻿using AutoRetainerAPI.Configuration;
+using ECommons.ExcelServices;
 using FFXIVClientStructs;
 using PunishLib.ImGuiMethods;
 
@@ -8,7 +9,7 @@ public class CharaOrder : NeoUIEntry
     public override string Path => "Multi Mode/Exclusions and Order";
 
     private static string Search = "";
-    private static ImGuiEx.RealtimeDragDrop DragDrop = new("CharaOrder");
+    private static ImGuiEx.RealtimeDragDrop<OfflineCharacterData> DragDrop = new("CharaOrder", x => x.Identity);
 
     public override bool NoFrame { get; set; } = true;
 
@@ -38,9 +39,8 @@ public class CharaOrder : NeoUIEntry
                     DragDrop.SetRowColor(chr.Identity);
                     ImGui.TableNextColumn();
                     DragDrop.NextRow();
-                    DragDrop.DrawButtonDummy(chr, index, C.OfflineData, s => s.Identity);
+                    DragDrop.DrawButtonDummy(chr, C.OfflineData, index);
                     ImGui.TableNextColumn();
-                    if(chr.World.IsNullOrEmpty()) continue;
                     ImGuiEx.TextV((Search != "" && ($"{chr.Name}@{chr.World}").Contains(Search, StringComparison.OrdinalIgnoreCase)) ? ImGuiColors.ParsedGreen : (Search == ""?null:ImGuiColors.DalamudGrey3), Censor.Character(chr.Name, chr.World));
                     ImGui.TableNextColumn();
                     if(ImGuiEx.ButtonCheckbox(FontAwesomeIcon.Users, ref chr.ExcludeRetainer, inverted:true))
@@ -63,6 +63,12 @@ public class CharaOrder : NeoUIEntry
                     ImGui.SameLine();
                     ImGuiEx.ButtonCheckbox(FontAwesomeIcon.Coins, ref chr.NoGilTrack, inverted: true);
                     ImGuiEx.Tooltip("Count gil on this character towards total");
+                    ImGui.SameLine();
+                    if(ImGuiEx.IconButton(FontAwesomeIcon.Trash, enabled: ImGuiEx.Ctrl))
+                    {
+                        new TickScheduler(() => C.OfflineData.Remove(chr));
+                    }
+                    ImGuiEx.Tooltip($"Hold CTRL and click to delete stored character data. It will be recreated once you relog back.");
                     ImGui.SameLine();
                     if(ImGuiEx.IconButton("\uf057", enabled:ImGuiEx.Ctrl))
                     {

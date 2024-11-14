@@ -107,6 +107,8 @@ internal unsafe class Memory : IDisposable
         }
     }
 
+    //48 89 6C 24 ?? 48 89 74 24 ?? 57 48 83 EC 20 8B F2 8B E9
+    //let it fail for now
     private delegate void SellItemDelegate(uint a1, InventoryType a2);
     [EzHook("48 89 5C 24 ?? 48 89 6C 24 ?? 56 48 83 EC 20 8B E9", false)]
     private EzHook<SellItemDelegate> SellItemHook;

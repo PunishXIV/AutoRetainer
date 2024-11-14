@@ -241,7 +241,7 @@ internal static unsafe class RetainerHandlers
         if(TryGetAddonByName<AtkUnitBase>("RetainerItemTransferProgress", out var addon) && IsAddonReady(addon))
         {
             var button = (AtkComponentButton*)addon->UldManager.NodeList[2]->GetComponent();
-            var nodetext = MemoryHelper.ReadSeString(&addon->UldManager.NodeList[2]->GetComponent()->UldManager.NodeList[2]->GetAsAtkTextNode()->NodeText).ExtractText();
+            var nodetext = GenericHelpers.ReadSeString(&addon->UldManager.NodeList[2]->GetComponent()->UldManager.NodeList[2]->GetAsAtkTextNode()->NodeText).ExtractText();
             if(nodetext == text && addon->UldManager.NodeList[2]->IsVisible() && button->IsEnabled && Utils.GenericThrottle)
             {
                 button->ClickAddonButton(addon);
@@ -272,7 +272,7 @@ internal static unsafe class RetainerHandlers
         if(TryGetAddonByName<AtkUnitBase>("Bank", out var addon) && IsAddonReady(addon) && Utils.TryGetCurrentRetainer(out var name) && Utils.TryGetRetainerByName(name, out var retainer))
         {
             if(percent < 1 || percent > 100) throw new ArgumentOutOfRangeException(nameof(percent), percent, "Percent must be between 1 and 100");
-            if(uint.TryParse(MemoryHelper.ReadSeString(&addon->UldManager.NodeList[27]->GetAsAtkTextNode()->NodeText).ExtractText().RemoveOtherChars("0123456789"), out var numGil))
+            if(uint.TryParse(GenericHelpers.ReadSeString(&addon->UldManager.NodeList[27]->GetAsAtkTextNode()->NodeText).ExtractText().RemoveOtherChars("0123456789"), out var numGil))
             {
                 DebugLog($"Gil: {numGil}");
                 var gilToWithdraw = (uint)(percent == 100 ? numGil : numGil / 100f * percent);
@@ -552,7 +552,7 @@ internal static unsafe class RetainerHandlers
                     for(var i = 0; i < Math.Min(list->ListLength, 16); i++)
                     {
                         var el = list->AtkComponentBase.UldManager.NodeList[2 + i];
-                        var text = MemoryHelper.ReadSeString(&el->GetAsAtkComponentNode()->Component->UldManager.NodeList[9]->GetAsAtkTextNode()->NodeText).ExtractText();
+                        var text = GenericHelpers.ReadSeString(&el->GetAsAtkComponentNode()->Component->UldManager.NodeList[9]->GetAsAtkTextNode()->NodeText).ExtractText();
                         PluginLog.Debug($"Text: {text}, name: {name}");
                         if(text == name)
                         {

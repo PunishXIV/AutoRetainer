@@ -201,17 +201,17 @@ public static class Voyage
 
     public static uint BestDistance(SubmarineExploration pointA, SubmarineExploration pointB)
     {
-        return pointA.Pretty().GetDistance(pointB);
+        return pointA.GetDistance(pointB);
     }
 
     public static uint VoyageTime(SubmarineExploration pointA, SubmarineExploration pointB, short speed)
     {
-        return pointA.Pretty().GetVoyageTime(pointB, speed);
+        return pointA.GetVoyageTime(pointB, speed);
     }
 
     public static uint SurveyTime(SubmarineExploration point, short speed)
     {
-        return point.Pretty().GetSurveyTime(speed);
+        return point.GetSurveyTime(speed);
     }
     #endregion
 }

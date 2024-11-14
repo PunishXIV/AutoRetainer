@@ -219,19 +219,29 @@ internal unsafe class SubmarineUnlockPlanUI : Window
                     {
                         if(x.Value.Point < 9000)
                         {
-                            var col = IsMapUnlocked(x.Key);
                             ImGui.PushID($"{x.Key}");
                             ImGui.TableNextRow();
                             ImGui.TableNextColumn();
-                            if(col) ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.ParsedGreen);
                             var data = Svc.Data.GetExcelSheet<SubmarineExploration>().GetRowOrDefault(x.Key);
-                            ImGuiEx.CollectionCheckbox($"{data?.Pretty().FancyDestination()}", x.Key, SelectedPlan.ExcludedRoutes, true);
-                            if(col) ImGui.PopStyleColor();
-                            ImGui.TableNextColumn();
-                            ImGuiEx.TextV($"{data?.Map.ValueNullable?.Name}");
-                            ImGui.TableNextColumn();
-                            var notEnabled = !SelectedPlan.ExcludedRoutes.Contains(x.Key) && SelectedPlan.ExcludedRoutes.Contains(x.Value.Point);
-                            ImGuiEx.TextV(notEnabled ? ImGuiColors.DalamudRed : null, $"{Svc.Data.GetExcelSheet<SubmarineExploration>().GetRowOrDefault(x.Value.Point)?.Pretty().FancyDestination()}");
+                            if(data != null)
+                            {
+                                try
+                                {
+                                    var col = IsMapUnlocked(x.Key);
+                                    ImGuiEx.CollectionCheckbox($"{data?.FancyDestination()}", x.Key, SelectedPlan.ExcludedRoutes, true);
+                                    if(col) ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.ParsedGreen);
+                                    if(col) ImGui.PopStyleColor();
+                                    ImGui.TableNextColumn();
+                                    ImGuiEx.TextV($"{data?.Map.ValueNullable?.Name}");
+                                    ImGui.TableNextColumn();
+                                    var notEnabled = !SelectedPlan.ExcludedRoutes.Contains(x.Key) && SelectedPlan.ExcludedRoutes.Contains(x.Value.Point);
+                                    ImGuiEx.TextV(notEnabled ? ImGuiColors.DalamudRed : null, $"{Svc.Data.GetExcelSheet<SubmarineExploration>().GetRowOrDefault(x.Value.Point)?.FancyDestination()}");
+                                }
+                                catch(Exception e)
+                                {
+                                    e.Log();
+                                }
+                            }
                             ImGui.PopID();
                         }
                     }

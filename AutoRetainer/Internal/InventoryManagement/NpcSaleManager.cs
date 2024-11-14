@@ -14,6 +14,8 @@ public static unsafe class NpcSaleManager
     internal static List<(uint ID, uint Quantity)> CapturedInventoryState = [];
     public static void EnqueueIfItemsPresent()
     {
+        DuoLog.Error("NpcSaleManager Unsupported");
+        return;
         if(GetValidNPC() == null) return;
         if(!C.IMEnableNpcSell) return;
         foreach(var type in InventorySpaceManager.GetAllowedToSellInventoryTypes())

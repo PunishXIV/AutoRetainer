@@ -120,11 +120,11 @@ public static class Build
         public int OriginalSub = 0;
 
         public int OptimizedDistance = 0;
-        public List<SubmarineExplorationPretty> OptimizedRoute = [];
+        public List<SubmarineExploration> OptimizedRoute = [];
         public SubmarineBuild GetSubmarineBuild => new(this);
         public static RouteBuild Empty => new();
 
-        public int FuelCost => OptimizedRoute.Any() ? OptimizedRoute.Select(p => (int)p.Row.CeruleumTankReq).Sum() : 0;
+        public int FuelCost => OptimizedRoute.Any() ? OptimizedRoute.Select(p => (int)p.CeruleumTankReq).Sum() : 0;
 
         public string HullIdentifier => ToIdentifier((ushort)Hull);
         public string SternIdentifier => ToIdentifier((ushort)Stern);
@@ -151,7 +151,7 @@ public static class Build
             OptimizedRoute = [];
         }
 
-        public void UpdateOptimized((int Distance, List<SubmarineExplorationPretty> Points) optimized)
+        public void UpdateOptimized((int Distance, List<SubmarineExploration> Points) optimized)
         {
             OptimizedDistance = optimized.Distance;
             OptimizedRoute = optimized.Points;
@@ -187,7 +187,7 @@ public static class Build
             {
                 var damaged = 0;
                 foreach(var sector in OptimizedRoute)
-                    damaged += (335 + sector.Row.RankReq - PartSheet.GetRow((uint)part)!.Rank) * 7;
+                    damaged += (335 + sector.RankReq - PartSheet.GetRow((uint)part)!.Rank) * 7;
 
                 if(highestDamage < damaged)
                     highestDamage = damaged;

@@ -158,7 +158,7 @@ internal unsafe class DebugScheduler : DebugSectionBase
             if(TryGetAddonByName<AddonSelectString>("SelectString", out var select) && IsAddonReady(&select->AtkUnitBase))
             {
                 var textNode = (AtkTextNode*)select->AtkUnitBase.UldManager.NodeList[3];
-                var text = MemoryHelper.ReadSeString(&textNode->NodeText);
+                var text = GenericHelpers.ReadSeString(&textNode->NodeText);
                 foreach(var x in text.Payloads)
                 {
                     PluginLog.Information($"{x.Type}: {x.ToString()}");

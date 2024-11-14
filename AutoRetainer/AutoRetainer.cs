@@ -82,6 +82,13 @@ public unsafe class AutoRetainer : IDalamudPlugin
         {
             P = this;
             ECommonsMain.Init(pi, this, Module.DalamudReflector);
+#if CUSTOMCS
+            PluginLog.Warning($"Using custom FFXIVClientStructs");
+            var gameVersion = DalamudReflector.TryGetDalamudStartInfo(out var ver) ? ver.GameVersion.ToString() : "unknown";
+            InteropGenerator.Runtime.Resolver.GetInstance.Setup(Svc.SigScanner.SearchBase, gameVersion, new(Svc.PluginInterface.ConfigDirectory.FullName + "/cs.json"));
+            FFXIVClientStructs.Interop.Generated.Addresses.Register();
+            InteropGenerator.Runtime.Resolver.GetInstance.Resolve();
+#endif
             PunishLibMain.Init(pi, Name, PunishOption.DefaultKoFi); // Default button
             var cnt = FFXIVInstanceMonitor.GetFFXIVCNT();
             PluginLog.Information($"FFXIV instances: {cnt}");

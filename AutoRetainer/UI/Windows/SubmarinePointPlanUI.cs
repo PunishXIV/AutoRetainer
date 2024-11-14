@@ -156,7 +156,7 @@ internal unsafe class SubmarinePointPlanUI : Window
                             var disabled = !SelectedPlan.GetMapId().EqualsAny(0u, x.Map.RowId) || SelectedPlan.Points.Count >= 5 && !SelectedPlan.Points.Contains(x.RowId);
                             if (disabled) ImGui.BeginDisabled();
                             var cont = SelectedPlan.Points.Contains(x.RowId);
-                            if (ImGui.Selectable(x.Pretty().FancyDestination(), cont))
+                            if (ImGui.Selectable(x.FancyDestination(), cont))
                             {
                                 SelectedPlan.Points.Toggle(x.RowId);
                             }
@@ -192,7 +192,7 @@ internal unsafe class SubmarinePointPlanUI : Window
                                 toRem = i;
                             }
                             ImGui.SameLine();
-                            ImGuiEx.Text($"{VoyageUtils.GetSubmarineExploration(SelectedPlan.Points[i])?.Pretty().FancyDestination()}");
+                            ImGuiEx.Text($"{VoyageUtils.GetSubmarineExploration(SelectedPlan.Points[i])?.FancyDestination()}");
                             ImGui.PopID();
                         }
                         if(toRem > -1)
