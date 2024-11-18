@@ -107,16 +107,14 @@ internal unsafe class Memory : IDisposable
         }
     }
 
-    //48 89 6C 24 ?? 48 89 74 24 ?? 57 48 83 EC 20 8B F2 8B E9
-    //let it fail for now
-    private delegate void SellItemDelegate(uint a1, InventoryType a2);
-    [EzHook("48 89 5C 24 ?? 48 89 6C 24 ?? 56 48 83 EC 20 8B E9", false)]
+    private delegate void SellItemDelegate(uint a1, InventoryType a2, uint a3);
+    [EzHook("48 89 6C 24 ?? 48 89 74 24 ?? 57 48 83 EC 20 8B F2 8B E9", false)]
     private EzHook<SellItemDelegate> SellItemHook;
 
-    private void SellItemDetour(uint inventorySlot, InventoryType a2)
+    private void SellItemDetour(uint inventorySlot, InventoryType a2, uint a3)
     {
-        PluginLog.Debug($"SellItemDetour: {inventorySlot}, {a2}");
-        SellItemHook.Original(inventorySlot, a2);
+        PluginLog.Debug($"SellItemDetour: {inventorySlot}, {a2}, {a3}");
+        SellItemHook.Original(inventorySlot, a2, a3);
     }
 
     public void SellItemToShop(InventoryType type, int slot)
@@ -127,7 +125,7 @@ internal unsafe class Memory : IDisposable
             if(slotPtr->ItemId != 0)
             {
                 if(C.IMProtectList.Contains(slotPtr->ItemId)) throw new InvalidOperationException($"Attempted to sell protected item: {ExcelItemHelper.GetName(slotPtr->ItemId)}");
-                SellItemDetour((uint)slot, type);
+                SellItemDetour((uint)slot, type, 0);
             }
             else
             {

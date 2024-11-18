@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<Authors>Puni.sh</Authors>
-		<Version>4.4.2.4</Version>
+		<Version>4.4.2.7</Version>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -23,7 +23,7 @@
 		<Nullable>disable</Nullable>
 		<NoWarn>CS1591;CS0419</NoWarn>
       <Deterministic>true</Deterministic>
-      <CustomCS>true</CustomCS>
+      <CustomCS>false</CustomCS>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Release'">

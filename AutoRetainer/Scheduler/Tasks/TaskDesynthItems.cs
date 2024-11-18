@@ -41,7 +41,7 @@ public static unsafe class TaskDesynthItems
     private static bool? RecursivelyDesynthItems()
     {
         if(!QuestManager.IsQuestComplete(65688)) return true;
-        _salvageItem = Marshal.GetDelegateForFunctionPointer<SalvageItemDelegate>(Svc.SigScanner.ScanText("E8 ?? ?? ?? ?? EB 46 48 8B 03"));
+        _salvageItem = Marshal.GetDelegateForFunctionPointer<SalvageItemDelegate>(Svc.SigScanner.ScanText("E8 ?? ?? ?? ?? EB 5A 48 8B 07"));
 
         var eligibleItems = GetEligibleItems();
         if(eligibleItems.Count == 0) return true;

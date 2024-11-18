@@ -29,7 +29,7 @@ internal unsafe class DebugGCAuto : DebugSectionBase
                 var reader = new ReaderGrandCompanySupplyList(addon);
                 if(reader.IsLoaded)
                 {
-                    var ptr = (GCExpectEntry*)*(nint*)((nint)addon + 624);
+                    var ptr = (GCExpectEntry*)*(nint*)((nint)addon + 648);
                     for(var i = 0; i < reader.NumItems; i++)
                     {
                         var entry = ptr[i];

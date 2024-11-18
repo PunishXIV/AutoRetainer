@@ -165,17 +165,17 @@ public static unsafe class TaskNeoHET
 
     public static IGameObject GetHouseEntranceFromMarkers(IEnumerable<uint> markers)
     {
-        var entrance = Svc.Objects.Where(x => x.IsTargetable && x.Name.ToString().EqualsIgnoreCaseAny([.. Lang.Entrance, Lang.ApartmentEntrance])).OrderBy(Player.DistanceTo).FirstOrDefault();
+        /*var entrance = Svc.Objects.Where(x => x.IsTargetable && x.Name.ToString().EqualsIgnoreCaseAny([.. Lang.Entrance, Lang.ApartmentEntrance])).OrderBy(Player.DistanceTo).FirstOrDefault();
         PluginLog.Warning($"Temporary HUD bypass is being applied");
-        return entrance;
-        /*var hud = AgentHUD.Instance();
+        return entrance;*/
+        var hud = AgentHUD.Instance();
         if(hud->MapMarkers.Where(x => x.IconId.EqualsAny(markers)).OrderBy(x => Player.DistanceTo(new Vector2(x.X, x.Z))).TryGetFirst(out var marker))
         {
             var mpos = new Vector2(marker.X, marker.Z);
             var entrance = Svc.Objects.Where(x => x.IsTargetable && x.Name.ToString().EqualsIgnoreCaseAny([.. Lang.Entrance, Lang.ApartmentEntrance])).OrderBy(x => Vector2.Distance(x.Position.ToVector2(), mpos)).FirstOrDefault(x => Vector2.Distance(mpos, x.Position.ToVector2()) < ValidPlayerToApartmentDistance);
             return entrance;
         }
-        return null;*/
+        return null;
     }
 
     public static bool IsInMarkerHousingPlot(IEnumerable<uint> markers)

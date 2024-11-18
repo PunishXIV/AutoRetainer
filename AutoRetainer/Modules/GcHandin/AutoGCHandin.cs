@@ -67,10 +67,12 @@ internal static unsafe class AutoGCHandin
             Safety.Check();
             if(Operation && HandleConfirmation())
             {
+                PluginLog.Debug($"Handle 1");
                 //
             }
             else if(Operation && HandleYesno())
             {
+                PluginLog.Debug($"Handle 2");
                 //
             }
             else
@@ -294,7 +296,7 @@ internal static unsafe class AutoGCHandin
     {
         if(TryGetAddonByName<AtkUnitBase>("GrandCompanySupplyList", out var addon) && IsAddonReady(addon))
         {
-            return !addon->GetComponentListById(23)->IsUpdatePending;
+            return true;
         }
         return false;
     }
@@ -321,7 +323,7 @@ internal static unsafe class AutoGCHandin
             var reader = new ReaderGrandCompanySupplyList(addon);
             if(IsListReady())
             {
-                var ptr = (GCExpectEntry*)*(nint*)((nint)(addon) + 640);
+                var ptr = (GCExpectEntry*)*(nint*)((nint)(addon) + 648);
                 for(var i = 0; i < reader.NumItems; i++)
                 {
                     var entry = ptr[i];
