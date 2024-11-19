@@ -10,7 +10,7 @@ public static unsafe class GameRetainerManager
         {
             var ret = new List<Retainer>();
             var m = RetainerManager.Instance();
-            for (int i = 0; i < m->Retainers.Length; i++)
+            for(var i = 0; i < m->Retainers.Length; i++)
             {
                 var x = m->Retainers[i];
                 if(x.RetainerId != 0 && x.Name[0] != 0)

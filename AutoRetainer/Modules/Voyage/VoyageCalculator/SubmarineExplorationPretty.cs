@@ -13,7 +13,7 @@ public static class SubmarineSheetUtils
     {
         return new(Row.X, Row.Y, Row.Z);
     }
-    
+
     public static uint GetSurveyTime(this SubmarineExploration Row, float speed)
     {
         if(speed < 1)

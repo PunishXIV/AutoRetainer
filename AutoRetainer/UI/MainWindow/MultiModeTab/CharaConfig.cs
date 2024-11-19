@@ -41,7 +41,7 @@ public class CharaConfig
                 ImGuiComponents.HelpMarker("Prevent processing this character until all enabled deployables have returned from their voyages.");
             });
         }
-        b = b.Section("Teleport overrides", data.GetAreTeleportSettingsOverriden() ? ImGui.GetStyle().Colors[(int)ImGuiCol.FrameBg] with { X = 1f} :null, true)
+        b = b.Section("Teleport overrides", data.GetAreTeleportSettingsOverriden() ? ImGui.GetStyle().Colors[(int)ImGuiCol.FrameBg] with { X = 1f } : null, true)
         .Widget(() =>
         {
             ImGuiEx.Text($"You can override teleport settings per character.");

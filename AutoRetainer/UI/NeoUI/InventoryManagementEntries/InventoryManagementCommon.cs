@@ -180,8 +180,8 @@ public static unsafe class InventoryManagementCommon
             {
                 if(!ItemsByCategories.TryGetValue(data.Value.ItemUICategory.RowId, out var lst))
                 {
-                    ItemsByCategories[data.Value.ItemUICategory.RowId ] = [];
-                    lst = ItemsByCategories[data.Value.ItemUICategory.RowId ];
+                    ItemsByCategories[data.Value.ItemUICategory.RowId] = [];
+                    lst = ItemsByCategories[data.Value.ItemUICategory.RowId];
                 }
                 lst.Add(data.Value);
             }
@@ -296,10 +296,10 @@ public static unsafe class InventoryManagementCommon
             var data = Svc.Data.GetExcelSheet<Item>().GetRowOrDefault(x);
             if(data != null)
             {
-                if(!ListByCategories.TryGetValue(data.Value.ItemUICategory.RowId , out var list))
+                if(!ListByCategories.TryGetValue(data.Value.ItemUICategory.RowId, out var list))
                 {
                     list = [];
-                    ListByCategories[data.Value.ItemUICategory.RowId ] = list;
+                    ListByCategories[data.Value.ItemUICategory.RowId] = list;
                 }
                 list.Add(data.Value);
             }

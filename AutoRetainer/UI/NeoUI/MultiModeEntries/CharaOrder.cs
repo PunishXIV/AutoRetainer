@@ -41,16 +41,16 @@ public class CharaOrder : NeoUIEntry
                     DragDrop.NextRow();
                     DragDrop.DrawButtonDummy(chr, C.OfflineData, index);
                     ImGui.TableNextColumn();
-                    ImGuiEx.TextV((Search != "" && ($"{chr.Name}@{chr.World}").Contains(Search, StringComparison.OrdinalIgnoreCase)) ? ImGuiColors.ParsedGreen : (Search == ""?null:ImGuiColors.DalamudGrey3), Censor.Character(chr.Name, chr.World));
+                    ImGuiEx.TextV((Search != "" && ($"{chr.Name}@{chr.World}").Contains(Search, StringComparison.OrdinalIgnoreCase)) ? ImGuiColors.ParsedGreen : (Search == "" ? null : ImGuiColors.DalamudGrey3), Censor.Character(chr.Name, chr.World));
                     ImGui.TableNextColumn();
-                    if(ImGuiEx.ButtonCheckbox(FontAwesomeIcon.Users, ref chr.ExcludeRetainer, inverted:true))
+                    if(ImGuiEx.ButtonCheckbox(FontAwesomeIcon.Users, ref chr.ExcludeRetainer, inverted: true))
                     {
                         chr.Enabled = false;
                         C.SelectedRetainers.Remove(chr.CID);
                     }
                     ImGuiEx.Tooltip("Enable retainers");
                     ImGui.SameLine();
-                    if(ImGuiEx.ButtonCheckbox(FontAwesomeIcon.Ship, ref chr.ExcludeWorkshop, inverted:true))
+                    if(ImGuiEx.ButtonCheckbox(FontAwesomeIcon.Ship, ref chr.ExcludeWorkshop, inverted: true))
                     {
                         chr.WorkshopEnabled = false;
                         chr.EnabledSubs.Clear();
@@ -70,7 +70,7 @@ public class CharaOrder : NeoUIEntry
                     }
                     ImGuiEx.Tooltip($"Hold CTRL and click to delete stored character data. It will be recreated once you relog back.");
                     ImGui.SameLine();
-                    if(ImGuiEx.IconButton("\uf057", enabled:ImGuiEx.Ctrl))
+                    if(ImGuiEx.IconButton("\uf057", enabled: ImGuiEx.Ctrl))
                     {
                         C.Blacklist.Add((chr.CID, chr.Name));
                     }

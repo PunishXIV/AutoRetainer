@@ -51,7 +51,7 @@ internal static class SharedUI
 
     internal static void DrawExcludeReset(OfflineCharacterData data)
     {
-        new NuiBuilder().Section("Character Data Expunge/Reset", collapsible:true)
+        new NuiBuilder().Section("Character Data Expunge/Reset", collapsible: true)
         .Widget(() =>
         {
             if(ImGuiEx.ButtonCtrl("Exclude Character"))

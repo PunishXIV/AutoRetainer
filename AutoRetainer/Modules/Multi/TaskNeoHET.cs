@@ -112,7 +112,7 @@ public static unsafe class TaskNeoHET
                     new(CloseFCChest)
                     ]);
                 }
-                P.TaskManager.InsertMulti([..tasks]);
+                P.TaskManager.InsertMulti([.. tasks]);
             }
             else
             {
