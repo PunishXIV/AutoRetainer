@@ -204,7 +204,7 @@ internal static unsafe class VoyageScheduler
                 var entries = Utils.GetEntries(addon);
                 if(index.Value < entries.Count && entries[index.Value].Contains(name))
                 {
-                    if(index >= 0 && Utils.IsSelectItemEnabled(addon, index.Value) && Utils.GenericThrottle && EzThrottler.Throttle("SelectVesselByName"))
+                    if(index >= 0 && Utils.GenericThrottle && EzThrottler.Throttle("SelectVesselByName"))
                     {
                         DebugLog($"Selecting vessel {name}/{type}/{entries[index.Value]}/{index}");
                         new AddonMaster.SelectString(addon).Entries[index.Value].Select();

@@ -13,6 +13,10 @@ internal unsafe class DebugMisc : DebugSectionBase
 {
     public override void Draw()
     {
+        if(ImGui.Button("Test Haseltweaks"))
+        {
+            Utils.EnsureEnhancedLoginIsOff();
+        }
         if(ImGui.Button("Write config via external process"))
         {
             ExternalWriter.PlaceWriteOrder(new(System.IO.Path.Combine(Svc.PluginInterface.ConfigDirectory.FullName, "WriterTest.json"), EzConfig.DefaultSerializationFactory.Serialize(C, true)));

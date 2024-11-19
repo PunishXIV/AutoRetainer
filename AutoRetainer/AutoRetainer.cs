@@ -515,6 +515,10 @@ public unsafe class AutoRetainer : IDalamudPlugin
         //if(C.RetryItemSearch) RetryItemSearch.Tick();
         if(SchedulerMain.PluginEnabled || MultiMode.Enabled || TaskManager.IsBusy)
         {
+            if(EzThrottler.Throttle("CheckHTweaks"))
+            {
+                Utils.EnsureEnhancedLoginIsOff();
+            }
             if(Svc.ClientState.TerritoryType == Prisons.Mordion_Gaol)
             {
                 Process.GetCurrentProcess().Kill();

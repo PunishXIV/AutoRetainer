@@ -16,6 +16,7 @@ using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
 using ECommons.MathHelpers;
 using ECommons.Reflection;
+using ECommons.SimpleGui;
 using ECommons.Throttlers;
 using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.Game;
@@ -37,6 +38,39 @@ internal static unsafe class Utils
     internal static int FCPoints => *(int*)((nint)AgentModule.Instance()->GetAgentByInternalId(AgentId.FreeCompanyCreditShop) + 256);
     internal static float AnimationLock => Player.AnimationLock;
     private static bool IsNullOrEmpty(this string s) => GenericHelpers.IsNullOrEmpty(s);
+
+    public static void EnsureEnhancedLoginIsOff()
+    {
+        try
+        {
+            if(Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "HaselTweaks" && x.IsLoaded))
+            {
+                if(DalamudReflector.TryGetDalamudPlugin("HaselTweaks", out var instance, out var context, false, true))
+                {
+                    var configWindow = ReflectionHelper.CallStatic(context.Assemblies, "HaselCommon.Service", [], "Get", ["HaselTweaks.Windows.PluginWindow"], []);
+                    var tweaks = (System.Collections.IEnumerable)configWindow.GetFoP("Tweaks");
+                    foreach(var x in tweaks)
+                    {
+                        if(x.GetFoP<string>("InternalName") == "EnhancedLoginLogout" && x.GetFoP<int>("Status") == 5)
+                        {
+                            configWindow.GetFoP("TweakManager").Call("UserDisableTweak", [x], true);
+                            new PopupWindow(() =>
+                            {
+                                ImGuiEx.Text($"""
+                                    Enhanced Login/Logout from HaselTweaks plugin has been detected.
+                                    It is not compatible with AutoRetainer and has been disabled.
+                                    """);
+                            });
+                        }
+                    }
+                }
+            }
+        }
+        catch(Exception e)
+        {
+            e.Log();
+        }
+    }
 
     public static bool ShouldWaitForAllWhenLoggedIn(this OfflineCharacterData data)
     {
@@ -605,7 +639,7 @@ internal static unsafe class Utils
         {
             if(new AddonMaster.SelectString(addon).Entries.TryGetFirst(x => inputTextTest(x.Text), out var entry))
             {
-                if(IsSelectItemEnabled(addon, entry.Index) && (Throttler?.Invoke() ?? GenericThrottle))
+                if((Throttler?.Invoke() ?? GenericThrottle))
                 {
                     entry.Select();
                     DebugLog($"TrySelectSpecificEntry: selecting {entry}");
@@ -618,15 +652,6 @@ internal static unsafe class Utils
             RethrottleGeneric();
         }
         return false;
-    }
-
-    internal static bool IsSelectItemEnabled(AddonSelectString* addon, int index)
-    {
-        var step1 = (AtkTextNode*)addon->AtkUnitBase
-                    .UldManager.NodeList[2]
-                    ->GetComponent()->UldManager.NodeList[index + 1]
-                    ->GetComponent()->UldManager.NodeList[3];
-        return GenericHelpers.IsSelectItemEnabled(step1);
     }
 
     internal static List<string> GetEntries(AddonSelectString* addon)
