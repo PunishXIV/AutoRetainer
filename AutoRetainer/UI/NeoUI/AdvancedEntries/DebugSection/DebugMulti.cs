@@ -7,7 +7,6 @@ using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
 using ECommons.Reflection;
 using FFXIVClientStructs.FFXIV.Client.Game;
-using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using Lumina.Excel.Sheets;
 
@@ -71,7 +70,7 @@ internal unsafe class DebugMulti : DebugSectionBase
             ImGuiEx.Text(ResidentalAreas.List.Select(x => GenericHelpers.GetTerritoryName(x)).Join("\n"));
             ImGuiEx.Text($"In residental area: {ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType)}");
         }
-        ImGuiEx.Text($"Is in sanctuary: {TerritoryInfo.Instance()->InSanctuary}");
+        ImGuiEx.Text($"Is in sanctuary: {GameMain.IsInSanctuary()}");
         ImGuiEx.Text($"Is in sanctuary ExcelTerritoryHelper: {ExcelTerritoryHelper.IsSanctuary(Svc.ClientState.TerritoryType)}");
         ImGui.Checkbox($"Bypass sanctuary check", ref C.BypassSanctuaryCheck);
         if(Svc.ClientState.LocalPlayer != null && Svc.Targets.Target != null)

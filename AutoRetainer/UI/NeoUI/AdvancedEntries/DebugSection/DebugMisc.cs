@@ -6,6 +6,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PInvoke;
 using System.IO;
+using ItemLevel = AutoRetainer.Helpers.ItemLevel;
 
 namespace AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;
 
@@ -80,6 +81,7 @@ internal unsafe class DebugMisc : DebugSectionBase
         }
 
         ImGuiEx.Text($"{Utils.TryGetCurrentRetainer(out var n)}/{n}");
+        ImGuiEx.Text($"{ItemLevel.Calculate(out var g, out var p)}/{g}/{p}");
         if(ImGui.Button("Regenerate censor seed"))
         {
             C.CensorSeed = Guid.NewGuid().ToString();

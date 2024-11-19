@@ -36,6 +36,17 @@ internal static unsafe class OfflineDataManager
             {
                 WriteOfflineData(false, false);
             }
+            if(EzThrottler.Throttle("Periodic.CalculateItemLevel") && Utils.TryGetCurrentRetainer(out var ret))
+            {
+                var adata = Utils.GetAdditionalData(Player.CID, ret);
+                var result = Helpers.ItemLevel.Calculate(out var g, out var p);
+                if(result != null)
+                {
+                    adata.Ilvl = result.Value;
+                    adata.Gathering = g;
+                    adata.Perception = p;
+                }
+            }
         }
         if((MultiMode.Active || AutoGCHandin.Operation || Utils.IsBusy || P.AutoRetainerWindow.IsOpen || Svc.Condition[ConditionFlag.LoggingOut] || Svc.Condition[ConditionFlag.OccupiedSummoningBell]) && EzThrottler.Throttle("Periodic.WriteOfflineData", 1000))
         {

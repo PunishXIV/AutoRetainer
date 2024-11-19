@@ -86,6 +86,14 @@ public static unsafe class RetainerTable
                     ImGui.SameLine(0, 2);
                     var level = $"{Lang.CharLevel}{ret.Level}";
                     var add = "";
+                    if(adata.Ilvl > -1 && !VentureUtils.IsDoL(ret.Job))
+                    {
+                        add += $"{Lang.CharItemLevel}{adata.Ilvl}";
+                    }
+                    if((adata.Gathering > -1 || adata.Perception > -1) && VentureUtils.IsDoL(ret.Job))
+                    {
+                        add += $"{Lang.CharPlant}{adata.Gathering}/{adata.Perception}";
+                    }
                     var cap = ret.Level < Player.MaxLevel && data.GetJobLevel(ret.Job) == ret.Level;
                     if(cap) ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
                     ImGuiEx.TextV(level.ReplaceByChar(Lang.Digits.Normal, Lang.Digits.GameFont));
@@ -103,7 +111,8 @@ public static unsafe class RetainerTable
                     var parts = VentureUtils.GetVentureById(ret.VentureID).GetFancyVentureNameParts(data, ret, out _);
                     if(!parts.Name.IsNullOrEmpty())
                     {
-                        ImGuiEx.Text($"{(parts.Level != 0 ? $"{Lang.CharLevel}{parts.Level} " : "")}{parts.Name}");
+                        var c = parts.YieldRate == 4 ? ImGuiColors.ParsedGreen : ImGui.GetStyle().Colors[(int)ImGuiCol.Text];
+                        ImGuiEx.Text(c, $"{(parts.Level != 0 ? $"{Lang.CharLevel}{parts.Level} " : "")}{parts.Name}");
                         ImGui.SameLine();
                     }
                 }
