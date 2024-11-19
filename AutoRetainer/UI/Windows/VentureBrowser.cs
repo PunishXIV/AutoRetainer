@@ -69,11 +69,11 @@ internal class VentureBrowser : Window
             var adata = Utils.GetAdditionalData(SelectedCharacter.CID, SelectedRetainer.Name);
             if(VentureUtils.IsDoL(SelectedRetainer.Job))
             {
-                ImGuiEx.TextCentered($"{Lang.CharLevel}{SelectedRetainer.Level} {ExcelJobHelper.GetJobNameById(SelectedRetainer.Job)} | Gathering: {adata.Gathering} ({adata.Gathering / (float)MaxGathering:P0}) | Perception: {adata.Perception} ({adata.Perception / (float)MaxPerception:P0})");
+                ImGuiEx.TextCentered($"{Lang.CharLevel}{SelectedRetainer.Level} {ExcelJobHelper.GetJobNameById(SelectedRetainer.Job)} ");
             }
             else
             {
-                ImGuiEx.TextCentered($"{Lang.CharLevel}{SelectedRetainer.Level} {ExcelJobHelper.GetJobNameById(SelectedRetainer.Job)} | Item Level: {adata.Ilvl} ({adata.Ilvl / (float)MaxPerception:P0})");
+                ImGuiEx.TextCentered($"{Lang.CharLevel}{SelectedRetainer.Level} {ExcelJobHelper.GetJobNameById(SelectedRetainer.Job)}");
             }
             ImGuiEx.InputWithRightButtonsArea("VBrowser", delegate
             {
@@ -90,7 +90,7 @@ internal class VentureBrowser : Window
                 ImGuiEx.SetNextItemWidthScaled(50f);
                 ImGui.DragInt("##maxL", ref maxLevel, 1, 1, Player.MaxLevel);
             });
-            if(adata.Gathering == -1 || adata.Perception == -1 || adata.Ilvl == -1 || SelectedRetainer.Level == 0)
+            if(SelectedRetainer.Level == 0)
             {
                 ImGuiEx.TextWrapped($"Data is absent for this retainer. Access retainer bell and select that retainer to populate data.");
             }
@@ -105,9 +105,8 @@ internal class VentureBrowser : Window
                         {
                             VentureName = parts.Name,
                             VentureLevel = v.RetainerLevel,
-                            AvailableByGear = VentureUtils.IsDoL(SelectedRetainer.Job) ? adata.Gathering >= v.RequiredGathering : adata.Ilvl >= v.RequiredItemLevel,
+                            AvailableByGear = true,
                             Gathered = SelectedCharacter.UnlockedGatheringItems.Contains(VentureUtils.GetGatheringItemByItemID(v.GetVentureItemId())),
-                            CurrentIndex = parts.YieldRate,
                             IsDol = VentureUtils.IsDoL(SelectedRetainer.Job),
                             IlvlGathering = VentureUtils.IsDoL(SelectedRetainer.Job) ? v.RequiredGathering : v.RequiredItemLevel,
                             Available = avail,
@@ -153,32 +152,27 @@ internal class VentureBrowser : Window
                             Svc.Commands.ProcessCommand($"/pmb {x.ItemID}");
                         }
                         ImGui.TableNextColumn();
-                        ImGuiEx.TextCentered(x.AvailableByGear ? ImGuiColors.ParsedGreen : ImGuiColors.DalamudRed, $"{x.IlvlGathering}");
+                        ImGuiEx.TextCentered($"{x.IlvlGathering}");
                         ImGui.TableNextColumn();
 
-                        Vector4? col = x.AvailableByGear && x.CurrentIndex == 0 ? ImGuiColors.ParsedGreen : null;
-                        ImGuiEx.TextCentered(col, $"  {n} < {x.Requirements[1]}  ");
-                        ImGuiEx.TextCentered(col, $"  {x.Amounts[0].FancyDigits()}  ");
+                        ImGuiEx.TextCentered(null, $"  {n} < {x.Requirements[1]}  ");
+                        ImGuiEx.TextCentered(null, $"  {x.Amounts[0].FancyDigits()}  ");
                         ImGui.TableNextColumn();
 
-                        col = x.AvailableByGear && x.CurrentIndex == 1 ? ImGuiColors.ParsedGreen : null;
-                        ImGuiEx.TextCentered(col, $"  {n} {x.Requirements[1]} - {x.Requirements[2] - 1}  ");
-                        ImGuiEx.TextCentered(col, $"  {x.Amounts[1].FancyDigits()}  ");
+                        ImGuiEx.TextCentered(null, $"  {n} {x.Requirements[1]} - {x.Requirements[2] - 1}  ");
+                        ImGuiEx.TextCentered(null, $"  {x.Amounts[1].FancyDigits()}  ");
                         ImGui.TableNextColumn();
 
-                        col = x.AvailableByGear && x.CurrentIndex == 2 ? ImGuiColors.ParsedGreen : null;
-                        ImGuiEx.TextCentered(col, $"  {n} {x.Requirements[2]} - {x.Requirements[3] - 1}  ");
-                        ImGuiEx.TextCentered(col, $"  {x.Amounts[2].FancyDigits()}  ");
+                        ImGuiEx.TextCentered(null, $"  {n} {x.Requirements[2]} - {x.Requirements[3] - 1}  ");
+                        ImGuiEx.TextCentered(null, $"  {x.Amounts[2].FancyDigits()}  ");
                         ImGui.TableNextColumn();
 
-                        col = x.AvailableByGear && x.CurrentIndex == 3 ? ImGuiColors.ParsedGreen : null;
-                        ImGuiEx.TextCentered(col, $"  {n} {x.Requirements[3]} - {x.Requirements[4] - 1}  ");
-                        ImGuiEx.TextCentered(col, $"  {x.Amounts[3].FancyDigits()}  ");
+                        ImGuiEx.TextCentered(null, $"  {n} {x.Requirements[3]} - {x.Requirements[4] - 1}  ");
+                        ImGuiEx.TextCentered(null, $"  {x.Amounts[3].FancyDigits()}  ");
                         ImGui.TableNextColumn();
 
-                        col = x.AvailableByGear && x.CurrentIndex == 4 ? ImGuiColors.ParsedGreen : null;
-                        ImGuiEx.TextCentered(col, $"{n} {x.Requirements[4]}+");
-                        ImGuiEx.TextCentered(col, $"  {x.Amounts[4].FancyDigits()}  ");
+                        ImGuiEx.TextCentered(null, $"{n} {x.Requirements[4]}+");
+                        ImGuiEx.TextCentered(null, $"  {x.Amounts[4].FancyDigits()}  ");
                         ImGui.TableNextColumn();
 
                         if(x.IsDol)

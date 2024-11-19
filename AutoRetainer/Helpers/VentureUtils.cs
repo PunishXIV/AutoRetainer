@@ -121,58 +121,6 @@ internal static unsafe class VentureUtils
         }
     }
 
-    internal static int GetVentureItemAmount(uint Task, OfflineCharacterData data, OfflineRetainerData retainer, out int index)
-    {
-        return GetVentureById(Task).GetVentureItemAmount(data, retainer, out index);
-    }
-
-    internal static int GetVentureItemAmount(this RetainerTask task, OfflineCharacterData data, OfflineRetainerData retainer, out int index)
-    {
-        index = 0;
-        if(task.IsRandom)
-        {
-            return 0;
-        }
-        var adata = Utils.GetAdditionalData(data.CID, retainer.Name);
-
-        var param = task.RetainerTaskParameter.ValueNullable;
-        if(param == null) return 0;
-        var normal = Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRowOrDefault(task.Task.RowId);
-        if(task.Task.RowId == 0 || normal == null) return 0;
-        if(retainer.Job == (uint)Job.FSH)
-        {
-            for(var i = 0; i < param?.PerceptionFSH.Count; i++)
-            {
-                if(adata.Perception >= param?.PerceptionFSH[i])
-                {
-                    index = i + 1;
-                }
-            }
-        }
-        else if(IsDoL(retainer.Job))
-        {
-            for(var i = 0; i < param?.PerceptionDoL.Count; i++)
-            {
-                if(adata.Perception >= param?.PerceptionDoL[i])
-                {
-                    index = i + 1;
-                }
-            }
-        }
-        else
-        {
-            for(var i = 0; i < param?.ItemLevelDoW.Count; i++)
-            {
-                if(adata.Ilvl >= param?.ItemLevelDoW[i])
-                {
-                    index = i + 1;
-                }
-            }
-        }
-        if(index >= normal?.Quantity.Count) return 0;
-        return normal?.Quantity[index] ?? 0;
-    }
-
     internal static int GetVentureRequitement(this RetainerTask task)
     {
         if(IsDoL(task.ClassJobCategory.RowId))
@@ -229,26 +177,24 @@ internal static unsafe class VentureUtils
         return GetVentureById(Task).GetFancyVentureName(data, retainer, out Available);
     }
 
-    internal static string GetFancyVentureName(this RetainerTask Task, OfflineCharacterData data, OfflineRetainerData retainer, out bool Available) => GetFancyVentureName(Task, data, retainer, out Available, out _, out _);
+    internal static string GetFancyVentureName(this RetainerTask Task, OfflineCharacterData data, OfflineRetainerData retainer, out bool Available) => GetFancyVentureName(Task, data, retainer, out Available, out _);
 
     private static Dictionary<string, FancyVentureCacheEntry> FancyVentureNameCache = [];
-    internal static string GetFancyVentureName(this RetainerTask Task, OfflineCharacterData data, OfflineRetainerData retainer, out bool Available, out string left, out string right)
+    internal static string GetFancyVentureName(this RetainerTask Task, OfflineCharacterData data, OfflineRetainerData retainer, out bool Available, out string left)
     {
         var signature = $"{Task.RowId}/{data.Identity}/{retainer.Identity}";
         if(FancyVentureNameCache.TryGetValue(signature, out var cached) && cached.IsValid)
         {
             left = cached.Left;
-            right = cached.Right;
             Available = cached.Avail;
             return cached.Entry;
         }
         var r = Task.GetFancyVentureNameParts(data, retainer, out Available);
         left = Available ? "" : Lang.CharDeny + r.UnavailabilitySymbols + " ";
         var lvls = r.Level == 0 ? "" : $"{Lang.CharLevel}{r.Level} ";
-        right = r.Yield == 0 ? "" : $"x{r.Yield} {r.YieldStars}";
         left = $"{left}{lvls}{r.Name}";
-        var ret = (C.Verbose ? $"#{Task.RowId}->{Task.GetAdjustedRetainerTask((Job)retainer.Job)?.RowId}/{Task.ClassJobCategory.Value.GetShortName()} " : "") + left + " " + right;
-        FancyVentureNameCache[signature] = new(ret, Available, left, right);
+        var ret = (C.Verbose ? $"#{Task.RowId}->{Task.GetAdjustedRetainerTask((Job)retainer.Job)?.RowId}/{Task.ClassJobCategory.Value.GetShortName()} " : "") + left;
+        FancyVentureNameCache[signature] = new(ret, Available, left);
         return ret;
     }
 
@@ -258,12 +204,12 @@ internal static unsafe class VentureUtils
         return cat.Name.ToString();
     }
 
-    internal static (string UnavailabilitySymbols, int Level, string Name, int Yield, int YieldRate, string YieldStars) GetFancyVentureNameParts(this RetainerTask Task, OfflineCharacterData data, OfflineRetainerData retainer, out bool Available)
+    internal static (string UnavailabilitySymbols, int Level, string Name) GetFancyVentureNameParts(this RetainerTask Task, OfflineCharacterData data, OfflineRetainerData retainer, out bool Available)
     {
-        (string UnavailabilitySymbols, int Level, string Name, int Yield, int YieldRate, string YieldStars) retp = ("", 0, "", 0, 0, "");
+        (string UnavailabilitySymbols, int Level, string Name) retp = ("", 0, "");
         var adata = Utils.GetAdditionalData(data.CID, retainer.Name);
         var UnavailabilitySymbol = "";
-        var canNotGather = Task.RequiredGathering > 0 && adata.Gathering < Task.RequiredGathering && adata.Gathering > -1;
+        var canNotGather = false;
         if(!Task.IsFieldExploration() && IsDoL(Task.ClassJobCategory.RowId))
         {
             var gathered = data.UnlockedGatheringItems.Count == 0 || data.UnlockedGatheringItems.Contains(VentureUtils.GetGatheringItemByItemID(Task.GetVentureItemId()));
@@ -294,21 +240,7 @@ internal static unsafe class VentureUtils
         }
         else
         {
-            //PluginLog.Information($"{Task.GetVentureName()}, {Task.RequiredItemLevel} > {adata.Ilvl}, {Task.RequiredGathering} > {adata.Gathering}");
-            if(Task.RequiredItemLevel > 0 && adata.Ilvl > -1)
-            {
-                Available = Task.RequiredItemLevel <= adata.Ilvl;
-                if(!Available) UnavailabilitySymbol = Lang.CharItemLevel;
-            }
-            else if(Task.RequiredGathering > 0 && adata.Gathering > -1)
-            {
-                Available = !canNotGather;
-                if(!Available) UnavailabilitySymbol = Lang.CharPlant;
-            }
-            else
-            {
-                Available = true;
-            }
+            Available = true;
         }
         retp.Name = Task.GetVentureName();
         if(Task.RetainerLevel == 0)
@@ -328,12 +260,6 @@ internal static unsafe class VentureUtils
         {
             retp.UnavailabilitySymbols = UnavailabilitySymbol;
 
-        }
-        if(!Task.IsRandom)
-        {
-            var amount = Task.GetVentureItemAmount(data, retainer, out retp.YieldRate);
-            retp.Yield = amount;
-            retp.YieldStars = $"{"★".Repeat(retp.YieldRate)}{"☆".Repeat(4 - retp.YieldRate)}";
         }
         return retp;
     }

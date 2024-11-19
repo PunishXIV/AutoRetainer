@@ -11,7 +11,7 @@ public sealed class VenturePlanner : Window
     private string search = "";
     private int minLevel = 1;
     private int maxLevel = Player.MaxLevel;
-    private Dictionary<uint, (string l, string r, bool avail)> Cache = [];
+    private Dictionary<uint, (string l, bool avail)> Cache = [];
 
     public VenturePlanner() : base("Venture Planner")
     {
@@ -237,27 +237,21 @@ public sealed class VenturePlanner : Window
                             foreach(var item in VentureUtils.GetHunts(SelectedRetainer.Job).Where(x => search.IsNullOrEmpty() || x.GetVentureName().Contains(search, StringComparison.OrdinalIgnoreCase)).Where(x => x.RetainerLevel >= minLevel && x.RetainerLevel <= maxLevel))
                             {
                                 var l = "";
-                                var r = "";
                                 bool Avail;
                                 if(Cache.TryGetValue(item.RowId, out var result))
                                 {
                                     l = result.l;
-                                    r = result.r;
                                     Avail = result.avail;
                                 }
                                 else
                                 {
-                                    item.GetFancyVentureName(SelectedCharacter, SelectedRetainer, out Avail, out l, out r);
-                                    Cache[item.RowId] = (l, r, Avail);
+                                    item.GetFancyVentureName(SelectedCharacter, SelectedRetainer, out Avail, out l);
+                                    Cache[item.RowId] = (l, Avail);
                                 }
                                 if(Avail || C.UnavailableVentureDisplay != UnavailableVentureDisplay.Hide)
                                 {
                                     var d = !Avail && C.UnavailableVentureDisplay != UnavailableVentureDisplay.Allow_selection;
                                     if(d) ImGui.BeginDisabled();
-                                    var cur = ImGui.GetCursorPos();
-                                    ImGui.SetCursorPosX(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail().X - ImGui.CalcTextSize(r).X);
-                                    ImGuiEx.Text(r);
-                                    ImGui.SetCursorPos(cur);
                                     if(ImGui.Selectable(l, adata.VenturePlan.List.Any(x => x.ID == item.RowId), ImGuiSelectableFlags.DontClosePopups))
                                     {
                                         adata.VenturePlan.List.Add(new(item));
