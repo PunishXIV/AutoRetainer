@@ -41,7 +41,7 @@ internal static unsafe class Utils
 
     public static void EnsureEnhancedLoginIsOff()
     {
-        try
+        /*try
         {
             if(Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "HaselTweaks" && x.IsLoaded))
             {
@@ -69,7 +69,7 @@ internal static unsafe class Utils
         catch(Exception e)
         {
             e.Log();
-        }
+        }*/
     }
 
     public static bool ShouldWaitForAllWhenLoggedIn(this OfflineCharacterData data)
