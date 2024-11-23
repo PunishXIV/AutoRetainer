@@ -1,4 +1,4 @@
-﻿using AutoRetainer.Internal;
+using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage;
 using ECommons.EzIpcManager;
 using FFXIVClientStructs.FFXIV.Client.Game;
@@ -22,6 +22,7 @@ public class IPC_PluginState
         SchedulerMain.DisablePlugin();
         VoyageScheduler.Enabled = false;
     }
+    [EzIPC] public bool GetMultiModeStatus() => MultiMode.Enabled;
     [EzIPC] public void EnableMultiMode() => Svc.Commands.ProcessCommand("/autoretainer multi enable");
     [EzIPC] public int GetInventoryFreeSlotCount() => Utils.GetInventoryFreeSlotCount();
     [EzIPC] public void EnqueueHET(Action onFailure) => TaskNeoHET.Enqueue(onFailure);
