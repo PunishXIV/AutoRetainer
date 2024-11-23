@@ -11,6 +11,8 @@ using AutoRetainer.UI.Windows;
 using AutoRetainerAPI;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Game.Gui.Toast;
+using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Utility;
 using ECommons.Automation;
 using ECommons.Automation.NeoTaskManager;
@@ -205,15 +207,15 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
     }
 
-    private void Toasts_Toast(ref Dalamud.Game.Text.SeStringHandling.SeString message, ref Dalamud.Game.Gui.Toast.ToastOptions options, ref bool isHandled)
+    private void Toasts_Toast(ref SeString message, ref ToastOptions options, ref bool isHandled)
     {
         if(Svc.Condition[ConditionFlag.OccupiedSummoningBell] && ProperOnLogin.PlayerPresent)
         {
-            var text = message.ToString();
+            var text = message.ExtractText().Cleanup();
             //4330	57	33	0	False	リテイナーベンチャー「<Value>IntegerParameter(2)</Value> <Sheet(Item,IntegerParameter(1),0)/>」を依頼しました。
             //4330	57	33	0	False	Du hast deinen Gehilfen mit der Beschaffung von <SheetDe(Item,1,IntegerParameter(1),IntegerParameter(3),3,1)/> ( <Value>IntegerParameter(2)</Value>) beauftragt.
             //4330	57	33	0	False	Vous avez confié la tâche “<SheetFr(Item,12,IntegerParameter(1),2,1)/> ( <Value>IntegerParameter(2)</Value>)” à votre servant.
-            if(text.StartsWithAny("You assign your retainer", "リテイナーベンチャー", "Du hast deinen Gehilfen mit", "Vous avez confié la tâche")
+            if(text.StartsWithAny("You assign your retainer".Cleanup(), "リテイナーベンチャー".Cleanup(), "Du hast deinen Gehilfen mit".Cleanup(), "Vous avez confié la tâche".Cleanup())
                 && Utils.TryGetCurrentRetainer(out var ret)
                 && C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var offlineData)
                 && offlineData.RetainerData.TryGetFirst(x => x.Name == ret, out var offlineRetainerData))
@@ -223,7 +225,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             }
             //4578	57	33	0	False	Gil earned from market sales has been entrusted to your retainer.<If(Equal(IntegerParameter(1),1))>
             //The amount earned exceeded your retainer's gil limit. Excess gil has been discarded.<Else/></If>
-            if(text.StartsWith(Svc.Data.GetExcelSheet<LogMessage>().GetRow(4578).Text.ToDalamudString().ExtractText(true)))
+            if(text.StartsWith(Svc.Data.GetExcelSheet<LogMessage>().GetRow(4578).Text.ExtractText(true).Cleanup()))
             {
                 TaskWithdrawGil.forceCheck = true;
                 DebugLog($"Forcing to check for gil");

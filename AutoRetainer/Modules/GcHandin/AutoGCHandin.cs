@@ -113,10 +113,10 @@ internal static unsafe class AutoGCHandin
         {
             if(addon->YesButton->IsEnabled)
             {
-                var str = GenericHelpers.ReadSeString(&addon->PromptText->NodeText).ExtractText().Replace(" ", "");
+                var str = addon->PromptText->NodeText.ExtractText().Cleanup();
                 DebugLog($"SelectYesno encountered: {str}");
                 //102434	Do you really want to trade a high-quality item?
-                if(str.Equals(Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(102434).Text.ExtractText().Replace(" ", "")))
+                if(str.Equals(Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(102434).Text.ExtractText().Cleanup()))
                 {
                     if(FrameThrottler.Throttle(Throttler, 10))
                     {

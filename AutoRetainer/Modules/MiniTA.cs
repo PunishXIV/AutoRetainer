@@ -41,7 +41,7 @@ internal static unsafe class MiniTA
         //4477  Are you certain you wish to sell this item ?
         //102433	Do you really want to trade an item with materia affixed? The materia will be lost.
         //102434	Do you really want to trade a high-quality item?
-        var x = Utils.GetSpecificYesno(s => s.ContainsAny(StringComparison.OrdinalIgnoreCase, Ref<string[]>.Get("Skip", () => ((uint[])[397, 398, 399, 4477, 102433, 102434]).Select(a => Svc.Data.GetExcelSheet<Addon>().GetRow(a).Text.ExtractText()).ToArray())));
+        var x = Utils.GetSpecificYesno(s => s.Cleanup().ContainsAny(StringComparison.OrdinalIgnoreCase, Ref<string[]>.Get("Skip", () => ((uint[])[397, 398, 399, 4477, 102433, 102434]).Select(a => Svc.Data.GetExcelSheet<Addon>().GetRow(a).Text.ExtractText().Cleanup()).ToArray())));
         if(x != null && IsAddonReady(x))
         {
             new AddonMaster.SelectYesno(x).Yes();

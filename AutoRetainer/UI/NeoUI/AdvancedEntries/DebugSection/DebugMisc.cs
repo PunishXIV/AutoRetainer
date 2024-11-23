@@ -1,5 +1,6 @@
 ﻿using ECommons.Configuration;
 using ECommons.Events;
+using ECommons.ExcelServices;
 using ECommons.MathHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
@@ -14,6 +15,16 @@ internal unsafe class DebugMisc : DebugSectionBase
 {
     public override void Draw()
     {
+        if(ImGui.CollapsingHeader("Retainer item stats"))
+        {
+            var im = InventoryManager.Instance();
+            var c = im->GetInventoryContainer(InventoryType.RetainerEquippedItems);
+            for(int i = 0; i < c->Size; i++)
+            {
+                var slot = c->GetInventorySlot(i);
+                ImGuiEx.Text($"{i} ({slot->GetItemId()}): {ExcelItemHelper.GetName(slot->GetItemId() % 1000000)}, gathering: {slot->GetStat(BaseParamEnum.Gathering)} [{slot->GetStatCap(BaseParamEnum.Gathering)}], perception: {slot->GetStat(BaseParamEnum.Perception)} [{slot->GetStatCap(BaseParamEnum.Perception)}]");
+            }
+        }
         if(ImGui.Button("Test Haseltweaks"))
         {
             Utils.EnsureEnhancedLoginIsOff();

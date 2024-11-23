@@ -291,7 +291,7 @@ internal static unsafe class Utils
     {
         foreach(var x in values)
         {
-            yield return Svc.Data.GetExcelSheet<EObjName>().GetRow(x).Singular.ToDalamudString().ExtractText();
+            yield return Svc.Data.GetExcelSheet<EObjName>().GetRow(x).Singular.ExtractText();
         }
     }
 
@@ -778,8 +778,8 @@ internal static unsafe class Utils
                 if(IsAddonReady(addon))
                 {
                     var textNode = addon->UldManager.NodeList[15]->GetAsAtkTextNode();
-                    var text = GenericHelpers.ReadSeString(&textNode->NodeText).ExtractText().Replace(" ", "").Replace("\n", "");
-                    if(text.ContainsAny(s.Select(x => x.Replace(" ", "").Replace("\n", ""))))
+                    var text = textNode->NodeText.ExtractText().Cleanup();
+                    if(text.ContainsAny(s.Select(x => x.Cleanup())))
                     {
                         PluginLog.Verbose($"SelectYesno {s.Print()} addon {i}");
                         return addon;
