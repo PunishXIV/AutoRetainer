@@ -112,13 +112,13 @@ internal unsafe class RetainerListOverlay : Window
                         }
                         else
                         {
-                            Notify.Error($"No entrust plan found for retainer {ret.Name}");
+                            //Notify.Error($"No entrust plan found for retainer {ret.Name}");
                         }
 
                     }
                 }
             }
-            ImGuiEx.Tooltip("Quick Entrust Duplicates");
+            ImGuiEx.Tooltip("Quick Entrust");
 
             ImGui.SameLine();
             if(ImGuiEx.IconButton($"{Lang.IconGil}##WithdrawGil"))

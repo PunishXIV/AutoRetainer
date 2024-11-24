@@ -80,7 +80,7 @@ internal static unsafe class VoyageMain
                 {
                     PluginLog.Debug($"Entered voyage panel");
                     IsInVoyagePanel = true;
-                    Notify.Info($"Entered voyage panel");
+                    //Notify.Info($"Entered voyage panel");
                     if(IsKeyPressed(C.Suppress))
                     {
                         Notify.Warning("No operation was requested by user");
@@ -108,7 +108,7 @@ internal static unsafe class VoyageMain
             if(IsInVoyagePanel)
             {
                 IsInVoyagePanel = false;
-                Notify.Info("Closed voyage panel");
+                //Notify.Info("Closed voyage panel");
                 VoyageScheduler.Enabled = false;
                 PluginLog.Debug($"<!> Exited voyage panel, disabled voyage scheduler");
             }
