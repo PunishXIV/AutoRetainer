@@ -216,6 +216,7 @@ internal unsafe class Config : IEzConfig
     public int ConnectionErrorsRetry = 10;
     public bool ConnectionErrorsBlacklist = true;
     public bool EnableEntrustManager = true;
+    public bool EnableEntrustChat = false;
 
     public bool HETWhenDisabled = false;
     public bool UseTitleScreenButton = false;

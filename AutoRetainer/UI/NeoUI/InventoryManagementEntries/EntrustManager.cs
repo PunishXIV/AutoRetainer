@@ -15,6 +15,7 @@ public class EntrustManager : InventoryManagemenrBase
     {
         ImGuiEx.TextWrapped("Use advanced entrust manager to entrust specific items to specific retainers. In this window you can configure specific plans; then, you can assign entrust plans to your retainers in retainer configuration window.");
         ImGui.Checkbox("Enable", ref C.EnableEntrustManager);
+        ImGui.Checkbox("Output entrusted items into chat", ref C.EnableEntrustChat);
         var selectedPlan = C.EntrustPlans.FirstOrDefault(x => x.Guid == SelectedGuid);
 
         ImGuiEx.InputWithRightButtonsArea(() =>

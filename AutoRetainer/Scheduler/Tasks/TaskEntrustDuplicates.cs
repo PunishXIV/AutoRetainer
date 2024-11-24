@@ -1,5 +1,8 @@
 ﻿using AutoRetainer.Internal.InventoryManagement;
 using AutoRetainer.Scheduler.Handlers;
+using Dalamud.Game.Text.SeStringHandling;
+using Dalamud.Game.Text.SeStringHandling.Payloads;
+using ECommons.Automation;
 using ECommons.ExcelServices;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
@@ -188,12 +191,17 @@ internal static unsafe class TaskEntrustDuplicates
         else
         {
             var slot = InventoryManager.Instance()->GetInventoryContainer(type)->GetInventorySlot(i);
+            void printToChat()
+            {
+                if(C.EnableEntrustChat && ExcelItemHelper.Get(slot->ItemId) != null) Svc.Chat.Print(new SeStringBuilder().Append("Entrusting: ").Append([new ItemPayload(slot->ItemId, slot->Flags.HasFlag(InventoryItem.ItemFlags.HighQuality))]).Append(ExcelItemHelper.GetName(slot->ItemId)).Append([RawPayload.LinkTerminator]).Build());
+            }
             if(type == InventoryType.Crystals)
             {
                 RequestEntrustQuantity = (int)toEntrustFromStack;
                 CapturedInventoryState = Utils.GetCapturedInventoryState(allowedPlayerInventories);
                 EzThrottler.Throttle("InventoryTimeout", 5000, true);
-                PluginLog.Information($"Entrusting crystals from slot: {i}/{type} - {ExcelItemHelper.GetName(slot->ItemId, true)} quantuity = {toEntrustFromStack}");
+                PluginLog.Debug($"Entrusting crystals from slot: {i}/{type} - {ExcelItemHelper.GetName(slot->ItemId, true)} quantuity = {toEntrustFromStack}");
+                printToChat();
                 P.Memory.RetainerItemCommandDetour(InventorySpaceManager.AgentRetainerItemCommandModule, (uint)i, type, 0, RetainerItemCommand.EntrustToRetainer);
             }
             else
@@ -202,7 +210,8 @@ internal static unsafe class TaskEntrustDuplicates
                 {
                     CapturedInventoryState = Utils.GetCapturedInventoryState(allowedPlayerInventories);
                     EzThrottler.Throttle("InventoryTimeout", 5000, true);
-                    PluginLog.Information($"Entrusting from slot: {i}/{type} - {ExcelItemHelper.GetName(slot->ItemId, true)} quantuity = all");
+                    PluginLog.Debug($"Entrusting from slot: {i}/{type} - {ExcelItemHelper.GetName(slot->ItemId, true)} quantuity = all");
+                    printToChat();
                     P.Memory.RetainerItemCommandDetour(InventorySpaceManager.AgentRetainerItemCommandModule, (uint)i, type, 0, RetainerItemCommand.EntrustToRetainer);
                 }
                 else
@@ -211,7 +220,8 @@ internal static unsafe class TaskEntrustDuplicates
                     RequestEntrustQuantity = (int)toEntrustFromStack;
                     CapturedInventoryState = Utils.GetCapturedInventoryState(allowedPlayerInventories);
                     EzThrottler.Throttle("InventoryTimeout", 5000, true);
-                    PluginLog.Information($"Entrusting from slot: {i}/{type} - {ExcelItemHelper.GetName(slot->ItemId, true)} quantuity = {toEntrustFromStack}");
+                    PluginLog.Debug($"Entrusting from slot: {i}/{type} - {ExcelItemHelper.GetName(slot->ItemId, true)} quantuity = {toEntrustFromStack}");
+                    printToChat();
                     P.Memory.RetainerItemCommandDetour(InventorySpaceManager.AgentRetainerItemCommandModule, (uint)i, type, 0, RetainerItemCommand.EntrustQuantity);
                 }
             }

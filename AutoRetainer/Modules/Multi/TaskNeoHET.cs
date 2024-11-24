@@ -181,8 +181,8 @@ public static unsafe class TaskNeoHET
     public static bool IsInMarkerHousingPlot(IEnumerable<uint> markers)
     {
         if(HousingManager.Instance()->GetCurrentPlot() < 0) return false;
-        PluginLog.Warning($"Temporary HUD bypass is being applied (2)");
-        return true;
+        /*PluginLog.Warning($"Temporary HUD bypass is being applied (2)");
+        return true;*/
         var hud = AgentHUD.Instance();
         if(hud->MapMarkers.Where(x => x.IconId.EqualsAny(markers)).TryGetFirst(x => Player.DistanceTo(new Vector2(x.X, x.Z)) < ValidPlayerToApartmentDistance, out var marker))
         {
