@@ -1,4 +1,6 @@
-﻿using AutoRetainerAPI;
+﻿using AutoRetainer.Scheduler.Handlers;
+using AutoRetainer.Scheduler.Tasks;
+using AutoRetainerAPI;
 using AutoRetainerAPI.Configuration;
 using ECommons.GameHelpers;
 
@@ -44,7 +46,20 @@ public static unsafe class RetainerTable
                         if(!C.EnableEntrustManager) c = ImGuiColors.DalamudRed;
                         ImGuiEx.Text(c, Lang.IconDuplicate);
                         ImGui.PopFont();
-                        ImGuiEx.Tooltip($"Entrust plan \"{plan.Name}\" is active." + (plan.ManualPlan ? "\nThis is manual processing plan" : ""));
+                        ImGuiEx.Tooltip($"Entrust plan \"{plan.Name}\" is active." + (plan.ManualPlan ? "\nThis is manual processing plan" : "") + (Utils.GetReachableRetainerBell(false) != null ? "\nClick to Entrust." : ""));
+                        if (ImGui.IsItemClicked())
+                        {
+                            if (!Svc.Condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.OccupiedSummoningBell])
+                                TaskInteractWithNearestBell.Enqueue();
+
+                            P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
+                            TaskEntrustDuplicates.EnqueueNew(plan);
+                            if (C.RetainerMenuDelay > 0)
+                            {
+                                TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
+                            }
+                            P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
+                        }
                     }
                 }
                 if(adata.WithdrawGil)
