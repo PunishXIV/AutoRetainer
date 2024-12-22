@@ -14,11 +14,12 @@ public class GeneralSettings : InventoryManagemenrBase
             .Checkbox($"Enable selling items to retainer", () => ref C.IMEnableAutoVendor)
             .Checkbox($"Enable selling items to housing NPC", () => ref C.IMEnableNpcSell, "Place any shop NPC in a way that you can interact with it after entering the house")
             .Indent()
+            .Checkbox($"Ignore NPC if retainer is available", () => ref C.IMSkipVendorIfRetainer)
             .Widget("Sell now", (x) =>
             {
                 if(ImGuiEx.Button(x, Player.Interactable && C.IMEnableNpcSell && NpcSaleManager.GetValidNPC() != null && !IsOccupied() && !P.TaskManager.IsBusy))
                 {
-                    NpcSaleManager.EnqueueIfItemsPresent();
+                    NpcSaleManager.EnqueueIfItemsPresent(true);
                 }
             })
             .Unindent()

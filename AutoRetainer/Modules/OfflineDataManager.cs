@@ -58,6 +58,7 @@ internal static unsafe class OfflineDataManager
     {
         if(!ProperOnLogin.PlayerPresent) return;
         if(C.Blacklist.Any(x => x.CID == Svc.ClientState.LocalContentId)) return;
+        if(Svc.Condition[ConditionFlag.DutyRecorderPlayback]) return;
         if(!C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
         {
             data = new()

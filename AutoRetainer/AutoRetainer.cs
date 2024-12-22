@@ -318,7 +318,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             {
                 if(NpcSaleManager.GetValidNPC() != null && C.IMEnableNpcSell)
                 {
-                    NpcSaleManager.EnqueueIfItemsPresent();
+                    NpcSaleManager.EnqueueIfItemsPresent(true);
                 }
                 else if(C.IMEnableAutoVendor && Utils.GetReachableRetainerBell(true) != null && Player.IsInHomeWorld)
                 {

@@ -175,6 +175,7 @@ public static class TaskTeleportToProperty
     public static bool ShouldVoidHET()
     {
         if(!Player.Available) return false;
+        if(Data == null) return true;
         var subsSoon = Data.WorkshopEnabled && Data.AnyEnabledVesselsAvailable() && MultiMode.EnabledSubmarines && (!Data.ShouldWaitForAllWhenLoggedIn() || Data.AreAnyEnabledVesselsReturnInNext(1, true));
         var retainersSoon = MultiMode.AnyRetainersAvailable(0) && MultiMode.EnabledRetainers;
         var blockHet = subsSoon || retainersSoon;

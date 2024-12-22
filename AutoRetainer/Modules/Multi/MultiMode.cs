@@ -249,7 +249,7 @@ internal static unsafe class MultiMode
                         }
                     }
                 }
-                else if(!IsOccupied() && !Utils.IsBusy)
+                else if(!IsOccupied() && !Utils.IsBusy && Data != null)
                 {
                     if(Data.WorkshopEnabled && Data.AnyEnabledVesselsAvailable() && MultiMode.EnabledSubmarines)
                     {
@@ -525,12 +525,16 @@ internal static unsafe class MultiMode
             if(Utils.GetVenturesAmount() < 2 || !Utils.IsInventoryFree()) return true;
             return !IsAnySelectedRetainerFinishesWithin(5 * 60);
         }
-        return false;
+        else
+        {
+            return true;
+        }
     }
 
     internal static bool IsCurrentCharacterCaptainDone()
     {
         if(!EnabledSubmarines) return true;
+        if(Data == null) return true;
         if(!Data.WorkshopEnabled) return true;
         return !Data.AreAnyEnabledVesselsReturnInNext(5 * 60, Data.ShouldWaitForAllWhenLoggedIn());
     }

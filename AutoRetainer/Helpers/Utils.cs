@@ -1,6 +1,5 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage;
-using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using AutoRetainer.Scheduler.Handlers;
 using AutoRetainer.Scheduler.Tasks;
 using AutoRetainerAPI.Configuration;
@@ -16,13 +15,11 @@ using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
 using ECommons.MathHelpers;
 using ECommons.Reflection;
-using ECommons.SimpleGui;
 using ECommons.Throttlers;
 using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using FFXIVClientStructs.FFXIV.Common.Component.Excel;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.Sheets;
 using Lumina.Text.ReadOnly;
@@ -37,6 +34,18 @@ internal static unsafe class Utils
     internal static bool IsCN => Svc.ClientState.ClientLanguage == (ClientLanguage)4;
     internal static int FCPoints => *(int*)((nint)AgentModule.Instance()->GetAgentByInternalId(AgentId.FreeCompanyCreditShop) + 256);
     internal static float AnimationLock => Player.AnimationLock;
+
+    public static bool ShouldSkipNPCVendor()
+    {
+        if(!C.IMSkipVendorIfRetainer) return false;
+        if(!C.IMEnableAutoVendor) return false;
+        if(C.MultiModeType == MultiModeType.Submersibles) return false;
+        if(Data == null) return false;
+        if(!Data.Enabled) return false;
+        if(Data.GetEnabledRetainers().Length == 0) return false;
+        return true;
+    }
+
     private static bool IsNullOrEmpty(this string s) => GenericHelpers.IsNullOrEmpty(s);
 
     public static void EnsureEnhancedLoginIsOff()
