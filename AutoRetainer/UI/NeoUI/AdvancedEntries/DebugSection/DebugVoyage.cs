@@ -109,6 +109,8 @@ internal unsafe class DebugVoyage : DebugSectionBase
                     {
                         TaskCalculateAndPickBestExpRoute.Enqueue();
                     }
+                    ImGuiEx.Text($"Points: {CurrentSubmarine.Get()->CurrentExplorationPoints.ToArray().Print()}");
+                    ImGuiEx.Text($"Points: {CurrentSubmarine.Get()->CurrentExplorationPoints.ToArray().Select(x => VoyageUtils.GetSubmarineExplorationName(x)).Print()}");
                 }
             }
             catch(Exception e)

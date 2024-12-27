@@ -209,6 +209,9 @@ internal unsafe class SubmarineUnlockPlanUI : Window
                 }
                 ImGui.Checkbox($"Unlock submarine slots. Current slots: {GetNumUnlockedSubs()?.ToString() ?? "Unknown"}/4", ref SelectedPlan.UnlockSubs);
                 ImGuiEx.TextWrapped($"Unlocking slots is always prioritized over unlocking routes.");
+                ImGui.Checkbox("Enforce Spam one destination mode in Deep sea site.", ref SelectedPlan.EnforceDSSSinglePoint);
+                ImGui.Checkbox("Set this plan as enforced.", ref SelectedPlan.EnforcePlan);
+                ImGuiEx.HelpMarker("Any point selected for unlock in this map will be executed by every single eligible submarine until everything is actually unlocked");
                 if(ImGui.BeginTable("##planTable", 3, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg))
                 {
                     ImGui.TableSetupColumn("Zone", ImGuiTableColumnFlags.WidthStretch);

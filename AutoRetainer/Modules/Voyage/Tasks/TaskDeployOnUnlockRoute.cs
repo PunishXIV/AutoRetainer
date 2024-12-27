@@ -23,16 +23,21 @@ internal static unsafe class TaskDeployOnUnlockRoute
 
     internal static void PickFromPlanOrCalc(SubmarineUnlockPlan unlock, UnlockMode mode)
     {
+        var adjustedPoints = GetUnlockPointsFromPlan(unlock, mode);
+        if(adjustedPoints.Length > 0)
+        {
+            TaskCalculateAndPickBestExpRoute.Stop = true;
+            TaskPickSubmarineRoute.EnqueueImmediate(VoyageUtils.GetSubmarineExploration(adjustedPoints.First().point).Value.Map.RowId, adjustedPoints.Select(x => x.point).ToArray());
+        }
+    }
+
+    internal static (uint point, string justification)[] GetUnlockPointsFromPlan(SubmarineUnlockPlan unlock, UnlockMode mode)
+    {
         var points = unlock.GetPrioritizedPointList();
         VoyageUtils.Log($"GetPrioritizedPointList: {points.Select(x => $"{x.point}/{x.justification}").Join("\n")}");
         var numPoints = mode == UnlockMode.SpamOne ? 1 : 5;
         var subLevel = CurrentSubmarine.Get()->RankId;
         var adjustedPoints = points.Where(x => subLevel >= VoyageUtils.GetSubmarineExploration(x.point)?.RankReq).Take(numPoints);
-        VoyageUtils.Log($"Adjusted points: {adjustedPoints.Select(x => $"{x.point}/{x.justification}").Join("\n")}");
-        if(adjustedPoints.Any())
-        {
-            TaskCalculateAndPickBestExpRoute.Stop = true;
-            TaskPickSubmarineRoute.EnqueueImmediate(VoyageUtils.GetSubmarineExploration(adjustedPoints.First().point).Value.Map.RowId, adjustedPoints.Select(x => x.point).ToArray());
-        }
+        return adjustedPoints.ToArray();
     }
 }

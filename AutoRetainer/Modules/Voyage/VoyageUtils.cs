@@ -55,6 +55,23 @@ internal static unsafe class VoyageUtils
         return false;
     }
 
+    internal static bool AreAnyInvalidRedeploysActive(this OfflineCharacterData data)
+    {
+        if(C.SubmarineUnlockPlans.Any(x => x.EnforcePlan))
+        {
+            var v = data.GetVesselData(VoyageType.Submersible).Where(x => data.GetEnabledVesselsData(VoyageType.Submersible).Contains(x.Name));
+            foreach(var s in v)
+            {
+                var adata = data.GetAdditionalVesselData(s.Name, VoyageType.Submersible);
+                if(adata.VesselBehavior == VesselBehavior.Redeploy)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     internal static bool IsUnoptimalBuild(this AdditionalVesselData adata, out string justification)
     {
         var conf = adata.GetSubmarineBuild().Trim();

@@ -84,19 +84,22 @@ public class DeployablesTab : NeoUIEntry
         ImGuiEx.SetNextItemFullWidth();
         if(ImGui.BeginCombo($"##sel", $"Selected {SelectedVessels.Count}", ImGuiComboFlags.HeightLarge))
         {
+            ref var search = ref Ref<string>.Get("Search");
+            ImGui.InputTextWithHint("##searchSubs", "Character search", ref search, 100);
             foreach(var x in C.OfflineData)
             {
+                if(search.Length > 0 && !$"{x.Name}@{x.World}".Contains(search, StringComparison.OrdinalIgnoreCase)) continue;
                 if(x.OfflineSubmarineData.Count > 0)
                 {
-                    ImGuiEx.Text(Censor.Character(x.Name, x.World));
-                    ImGui.Indent();
                     ImGui.PushID(x.CID.ToString());
+                    ImGuiEx.CollectionCheckbox(Censor.Character(x.Name, x.World), x.OfflineSubmarineData.Select(v => (x.CID, v.Name)), SelectedVessels);
+                    ImGui.Indent();
                     foreach(var v in x.OfflineSubmarineData)
                     {
                         ImGuiEx.CollectionCheckbox($"{v.Name}", (x.CID, v.Name), SelectedVessels);
                     }
-                    ImGui.PopID();
                     ImGui.Unindent();
+                    ImGui.PopID();
                 }
             }
             ImGui.EndCombo();
@@ -139,6 +142,7 @@ public class DeployablesTab : NeoUIEntry
         ImGui.Separator();
         ImGui.SetNextItemWidth(150f);
         ImGuiEx.EnumCombo("##behavior", ref MassBehavior);
+        ImGui.SameLine();
         if(ImGuiEx.IconButtonWithText((FontAwesomeIcon)'\uf018', "Set behavior"))
         {
             var num = 0;
@@ -159,6 +163,7 @@ public class DeployablesTab : NeoUIEntry
         ImGui.Separator();
         ImGui.SetNextItemWidth(150f);
         ImGuiEx.EnumCombo("##unlockmode", ref MassUnlockMode, Lang.UnlockModeNames);
+        ImGui.SameLine();
         if(ImGuiEx.IconButtonWithText((FontAwesomeIcon)'\uf09c', "Set unlock mode"))
         {
             var num = 0;
@@ -190,6 +195,7 @@ public class DeployablesTab : NeoUIEntry
             }
             ImGui.EndCombo();
         }
+        ImGui.SameLine();
         if(ImGuiEx.IconButtonWithText((FontAwesomeIcon)'\uf3c1', "Set unlock plan", SelectedUnlockPlan != null))
         {
             var num = 0;
@@ -209,17 +215,18 @@ public class DeployablesTab : NeoUIEntry
         ImGui.Separator();
 
         ImGui.SetNextItemWidth(150f);
-        if(ImGui.BeginCombo("##uplan2", "Point plan: " + (SelectedPointPlan?.Name ?? "not selected", ImGuiComboFlags.HeightLarge)))
+        if(ImGui.BeginCombo("##uplan2", "Point plan: " + (VoyageUtils.GetPointPlanName(SelectedPointPlan) ?? "not selected"), ImGuiComboFlags.HeightLarge))
         {
             foreach(var plan in C.SubmarinePointPlans)
             {
-                if(ImGui.Selectable($"{plan.Name}##{plan.GUID}"))
+                if(ImGui.Selectable($"{VoyageUtils.GetPointPlanName(plan)}##{plan.GUID}"))
                 {
                     SelectedPointPlan = plan;
                 }
             }
             ImGui.EndCombo();
         }
+        ImGui.SameLine();
         if(ImGuiEx.IconButtonWithText((FontAwesomeIcon)'\uf55b', "Set point plan", SelectedPointPlan != null))
         {
             var num = 0;

@@ -3,7 +3,11 @@ using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game.Text.SeStringHandling;
+using ECommons.MathHelpers;
 using ECommons.Throttlers;
+using FFXIVClientStructs.FFXIV.Client.Game;
+using ImGuizmoNET;
+using System.Numerics;
 
 namespace AutoRetainer.Modules.Voyage;
 
@@ -204,41 +208,86 @@ internal static unsafe class VoyageMain
                         {
                             TaskSelectVesselByName.Enqueue(next, type);
                         }
-                        if(adata.VesselBehavior == VesselBehavior.LevelUp)
-                        {
-                            TaskDeployOnBestExpVoyage.Enqueue(next, type);
-                        }
-                        else if(adata.VesselBehavior == VesselBehavior.Unlock)
-                        {
-                            if(adata.UnlockMode == UnlockMode.WhileLevelling)
+                        P.TaskManager.EnqueueMulti(
+                            new(() => CurrentSubmarine.Get() != null),
+                            new(() =>
                             {
-                                TaskDeployOnBestExpVoyage.Enqueue(next, type, VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan) ?? VoyageUtils.GetDefaultSubmarineUnlockPlan());
-                            }
-                            else if(adata.UnlockMode.EqualsAny(UnlockMode.SpamOne, UnlockMode.MultiSelect))
-                            {
-                                TaskDeployOnUnlockRoute.Enqueue(next, type, VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan) ?? VoyageUtils.GetDefaultSubmarineUnlockPlan(), adata.UnlockMode);
-                            }
-                            else
-                            {
-                                throw new ArgumentOutOfRangeException(nameof(adata.UnlockMode));
-                            }
-                        }
-                        else if(adata.VesselBehavior == VesselBehavior.Use_plan)
-                        {
-                            var plan = VoyageUtils.GetSubmarinePointPlanByGuid(adata.SelectedPointPlan);
-                            if(plan != null && plan.Points.Count >= 1 && plan.Points.Count <= 5)
-                            {
-                                TaskDeployOnPointPlan.Enqueue(next, type, plan);
-                            }
-                            else
-                            {
-                                DuoLog.Error($"Invalid plan selected (Points.Count={plan.Points.Count})");
-                            }
-                        }
-                        else if(adata.VesselBehavior == VesselBehavior.Redeploy)
-                        {
-                            TaskRedeployVessel.Enqueue(next, type);
-                        }
+                                P.TaskManager.BeginStack();
+                                try
+                                {
+                                    foreach(var x in C.SubmarineUnlockPlans)
+                                    {
+                                        if(x.EnforcePlan)
+                                        {
+                                            PluginLog.Information($"Unlock plan {x.Name} is set as enforced");
+                                            if(TaskDeployOnUnlockRoute.GetUnlockPointsFromPlan(x, UnlockMode.SpamOne).TryGetFirst(out var unlockPoint))
+                                            {
+                                                PluginLog.Information($"Enforcing plan {x.Name} on current submarine");
+                                                TaskDeployOnUnlockRoute.Enqueue(next, type, x, UnlockMode.SpamOne);
+                                                goto EndTask;
+                                            }
+                                        }
+                                    }
+                                    if(adata.VesselBehavior == VesselBehavior.LevelUp)
+                                    {
+                                        TaskDeployOnBestExpVoyage.Enqueue(next, type);
+                                    }
+                                    else if(adata.VesselBehavior == VesselBehavior.Unlock)
+                                    {
+                                        var mode = adata.UnlockMode;
+                                        var plan = VoyageUtils.GetSubmarineUnlockPlanByGuid(adata.SelectedUnlockPlan) ?? VoyageUtils.GetDefaultSubmarineUnlockPlan();
+                                        if(plan.EnforceDSSSinglePoint && TaskDeployOnUnlockRoute.GetUnlockPointsFromPlan(plan, UnlockMode.SpamOne).TryGetFirst(out var unlockPoint) && VoyageUtils.GetSubmarineExploration(unlockPoint.point).Value.Map.RowId == 1)
+                                        {
+                                            PluginLog.Information($"Override unlock mode to {UnlockMode.SpamOne}");
+                                            mode = UnlockMode.SpamOne;
+                                        }
+                                        if(mode == UnlockMode.WhileLevelling)
+                                        {
+                                            TaskDeployOnBestExpVoyage.Enqueue(next, type, plan);
+                                        }
+                                        else if(mode.EqualsAny(UnlockMode.SpamOne, UnlockMode.MultiSelect))
+                                        {
+                                            TaskDeployOnUnlockRoute.Enqueue(next, type, plan, mode);
+                                        }
+                                        else
+                                        {
+                                            throw new ArgumentOutOfRangeException(nameof(mode));
+                                        }
+                                    }
+                                    else if(adata.VesselBehavior == VesselBehavior.Use_plan)
+                                    {
+                                        var plan = VoyageUtils.GetSubmarinePointPlanByGuid(adata.SelectedPointPlan);
+                                        if(plan != null && plan.Points.Count >= 1 && plan.Points.Count <= 5)
+                                        {
+                                            var current = CurrentSubmarine.Get()->CurrentExplorationPoints.ToArray().Select(x => (uint)x).Where(x => x != 0);
+                                            if(!current.SequenceEqual(plan.Points))
+                                            {
+                                                TaskDeployOnPointPlan.Enqueue(next, type, plan);
+                                            }
+                                            else
+                                            {
+                                                TaskRedeployVessel.Enqueue(next, type);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            DuoLog.Error($"Invalid plan selected (Points.Count={plan.Points.Count})");
+                                        }
+                                    }
+                                    else if(adata.VesselBehavior == VesselBehavior.Redeploy)
+                                    {
+                                        TaskRedeployVessel.Enqueue(next, type);
+                                    }
+                                }
+                                catch(Exception e)
+                                {
+                                    e.Log();
+                                }
+                            EndTask:
+                                P.TaskManager.InsertStack();
+                            })
+                        );
+
                     }
                 }
             }

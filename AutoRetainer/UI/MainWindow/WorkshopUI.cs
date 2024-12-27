@@ -7,6 +7,7 @@ using AutoRetainer.UI.MainWindow.MultiModeTab;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game;
 using Dalamud.Interface.Components;
+using ECommons.MathHelpers;
 using Lumina.Excel.Sheets;
 using PunishLib.ImGuiMethods;
 
@@ -109,6 +110,15 @@ internal static unsafe class WorkshopUI
                 ImGuiEx.TextV(ImGuiColors.DalamudOrange, "\uf0ad");
                 ImGui.PopFont();
                 ImGuiEx.Tooltip($"Unoptimal configurations are found");
+                ImGui.SameLine(0, 3);
+            }
+
+            if(data.AreAnyInvalidRedeploysActive())
+            {
+                ImGui.PushFont(UiBuilder.IconFont);
+                ImGuiEx.TextV(ImGuiColors.DalamudRed, FontAwesomeIcon.ArrowsSpin.ToIconString());
+                ImGui.PopFont();
+                ImGuiEx.Tooltip($"Redeploy is active while some unlock plans are set as enforced.");
                 ImGui.SameLine(0, 3);
             }
 
@@ -371,7 +381,12 @@ internal static unsafe class WorkshopUI
         }
         else if(adata.VesselBehavior == VesselBehavior.Use_plan)
         {
-            ImGuiEx.Text(Lang.IconPlanner);
+            var plan = VoyageUtils.GetSubmarinePointPlanByGuid(adata.SelectedPointPlan);
+            var valid = plan != null && plan.Points.Count.InRange(1, 5, true);
+            ImGuiEx.Text(valid?null:EColor.RedBright, Lang.IconPlanner);
+            ImGui.PushFont(UiBuilder.DefaultFont);
+            if(valid)ImGuiEx.Tooltip(plan.Points.Select(x => $"{VoyageUtils.GetSubmarineExploration(x)?.FancyDestination()}").Print("\n"));
+            ImGui.PopFont();
         }
         else
         {
