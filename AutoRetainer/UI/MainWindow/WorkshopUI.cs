@@ -11,6 +11,7 @@ using ECommons.MathHelpers;
 using Lumina.Excel.Sheets;
 using PunishLib.ImGuiMethods;
 
+
 namespace AutoRetainer.UI.MainWindow;
 
 internal static unsafe class WorkshopUI
@@ -144,6 +145,7 @@ internal static unsafe class WorkshopUI
 
             data.DrawDCV();
             UIUtils.DrawTeleportIcons(data.CID);
+            SharedUI.DrawLockout(data);
 
             var initCurpos = ImGui.GetCursorPos();
             var lst = data.GetVesselData(VoyageType.Airship).Where(s => data.GetEnabledVesselsData(VoyageType.Airship).Contains(s.Name))
@@ -383,7 +385,8 @@ internal static unsafe class WorkshopUI
         {
             var plan = VoyageUtils.GetSubmarinePointPlanByGuid(adata.SelectedPointPlan);
             var valid = plan != null && plan.Points.Count.InRange(1, 5, true);
-            ImGuiEx.Text(valid?null:EColor.RedBright, Lang.IconPlanner);
+            var fast = plan != null && plan.Points.SequenceEqual(adata.Points.Where(x => x != 0).Select(x => (uint)x));
+            ImGuiEx.Text(valid?(fast?EColor.GreenBright:null) :EColor.RedBright, Lang.IconPlanner);
             ImGui.PushFont(UiBuilder.DefaultFont);
             if(valid)ImGuiEx.Tooltip(plan.Points.Select(x => $"{VoyageUtils.GetSubmarineExploration(x)?.FancyDestination()}").Print("\n"));
             ImGui.PopFont();

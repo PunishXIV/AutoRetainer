@@ -20,6 +20,7 @@ public sealed class NeoWindow : Window
         new MultiModeContingency(),
         new CharaOrder(),
         new MultiModeFPSLimiter(),
+        new MultiModeLockout(),
 
         ..ConfigFileSystemHelpers.CreateInstancesOf<InventoryManagemenrBase>(),
 

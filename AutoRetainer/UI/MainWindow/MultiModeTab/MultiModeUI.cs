@@ -88,6 +88,7 @@ internal static unsafe class MultiModeUI
             }
             data.DrawDCV();
             UIUtils.DrawTeleportIcons(data.CID);
+            SharedUI.DrawLockout(data);
 
             var initCurpos = ImGui.GetCursorPos();
             var lowestRetainer = C.MultiModeRetainerConfiguration.MultiWaitForAll ? data.GetEnabledRetainers().OrderBy(z => z.GetVentureSecondsRemaining()).LastOrDefault() : data.GetEnabledRetainers().OrderBy(z => z.GetVentureSecondsRemaining()).FirstOrDefault();

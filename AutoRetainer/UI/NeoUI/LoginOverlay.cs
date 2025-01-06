@@ -15,5 +15,6 @@ public class LoginOverlay : NeoUIEntry
             {
                 ImGuiEx.SetNextItemWidthScaled(150f);
                 if(ImGuiEx.SliderFloat(x, ref C.LoginOverlayBPadding.ValidateRange(0.5f, 5f), 1f, 1.5f)) P.LoginOverlay.bWidth = 0;
-            });
+            })
+        .Checkbox("Display hidden characters when searching", () => ref C.LoginOverlayAllSearch);
 }

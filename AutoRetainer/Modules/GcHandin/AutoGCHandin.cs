@@ -1,6 +1,5 @@
 ﻿using AutoRetainer.UI.Overlays;
 using AutoRetainerAPI.Configuration;
-
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Memory;
 using Dalamud.Utility;
@@ -116,7 +115,7 @@ internal static unsafe class AutoGCHandin
                 var str = addon->PromptText->NodeText.ExtractText().Cleanup();
                 DebugLog($"SelectYesno encountered: {str}");
                 //102434	Do you really want to trade a high-quality item?
-                if(str.Equals(Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(102434).Text.ExtractText().Cleanup()))
+                if(str.Equals(GenericHelpers.ExtractText(Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(102434).Text).Cleanup()))
                 {
                     if(FrameThrottler.Throttle(Throttler, 10))
                     {

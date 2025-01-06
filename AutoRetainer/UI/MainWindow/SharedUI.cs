@@ -1,11 +1,22 @@
 ﻿using AutoRetainerAPI.Configuration;
 using Dalamud.Interface.Components;
+using NotificationMasterAPI;
 using PunishLib.ImGuiMethods;
 
 namespace AutoRetainer.UI.MainWindow;
 
 internal static class SharedUI
 {
+    internal static void DrawLockout(OfflineCharacterData data)
+    {
+        if(data.IsLockedOut())
+        {
+            FontAwesome.PrintV(EColor.RedBright, FontAwesomeIcon.Lock);
+            ImGuiEx.Tooltip("This character is located on a data center which you have temporarily disabled. Navigate to configuration to remove it.");
+            ImGui.SameLine();
+        }
+    }
+
     internal static void DrawMultiModeHeader(OfflineCharacterData data, string overrideTitle = null)
     {
         var b = true;

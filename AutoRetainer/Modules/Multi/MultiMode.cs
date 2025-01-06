@@ -205,7 +205,7 @@ internal static unsafe class MultiMode
                 }
             }
             if(ProperOnLogin.PlayerPresent && !P.TaskManager.IsBusy && IsInteractionAllowed()
-                && (!Synchronize || C.OfflineData.All(x => x.GetEnabledRetainers().All(z => z.GetVentureSecondsRemaining() <= C.UnsyncCompensation))))
+                && (!Synchronize || C.OfflineData.Where(x => !x.IsLockedOut()).All(x => x.GetEnabledRetainers().All(z => z.GetVentureSecondsRemaining() <= C.UnsyncCompensation))))
             {
                 Synchronize = false;
                 if(IsCurrentCharacterDone() && !IsOccupied())
@@ -308,7 +308,7 @@ internal static unsafe class MultiMode
 
     internal static IEnumerable<OfflineCharacterData> GetEnabledOfflineData()
     {
-        return C.OfflineData.Where(x => x.Enabled);
+        return C.OfflineData.Where(x => x.Enabled).Where(x => !x.IsLockedOut());
     }
 
     internal static bool AnyRetainersAvailable(int advanceSeconds = 0)
@@ -441,7 +441,7 @@ internal static unsafe class MultiMode
 
     internal static OfflineCharacterData GetCurrentTargetCharacter()
     {
-        var data = C.OfflineData.ToList();
+        var data = C.OfflineData.Where(x => !x.IsLockedOut()).ToList();
         if(C.CharEqualize)
         {
             data = [.. data.OrderBy(x => CharaCnt.GetOrDefault(x.CID))];
@@ -594,11 +594,11 @@ internal static unsafe class MultiMode
                 OfflineCharacterData data;
                 if(C.AutoLogin == "~")
                 {
-                    data = C.OfflineData.FirstOrDefault(s => s.CID == C.LastLoggedInChara);
+                    data = C.OfflineData.Where(x => !x.IsLockedOut()).FirstOrDefault(s => s.CID == C.LastLoggedInChara);
                 }
                 else
                 {
-                    data = C.OfflineData.First(s => $"{s.Name}@{s.World}" == C.AutoLogin);
+                    data = C.OfflineData.Where(x => !x.IsLockedOut()).First(s => $"{s.Name}@{s.World}" == C.AutoLogin);
                 }
                 if(data == null) return true;
                 if(Utils.CanAutoLoginFromTaskManager())

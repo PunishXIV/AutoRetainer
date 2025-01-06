@@ -35,6 +35,16 @@ internal static unsafe class Utils
     internal static int FCPoints => *(int*)((nint)AgentModule.Instance()->GetAgentByInternalId(AgentId.FreeCompanyCreditShop) + 256);
     internal static float AnimationLock => Player.AnimationLock;
 
+    public static bool IsLockedOut(this OfflineCharacterData characterData)
+    {
+        var world = ExcelWorldHelper.Get(characterData.WorldOverride ?? characterData.World);
+        if(world != null)
+        {
+            return DateTimeOffset.Now.ToUnixTimeSeconds() < C.LockoutTime.SafeSelect(world.Value.GetRegion(), 0);
+        }
+        return false;
+    }
+
     public static bool ShouldSkipNPCVendor()
     {
         if(!C.IMSkipVendorIfRetainer) return false;

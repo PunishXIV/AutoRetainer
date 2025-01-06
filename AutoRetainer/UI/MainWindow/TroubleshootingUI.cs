@@ -21,6 +21,18 @@ public static unsafe class TroubleshootingUI
             Error("DontLogout debug option is enabled");
         }
 
+        foreach(var x in C.OfflineData)
+        {
+            if(x.WorkshopEnabled)
+            {
+                var a = x.OfflineSubmarineData.Select(x => x.Name);
+                if(a.Count() > a.Distinct().Count())
+                {
+                    Error($"Character {Censor.Character(x.Name, x.World)} has duplicate submersible names. Submersible names must be unique.");
+                }
+            }
+        }
+
         if((C.GlobalTeleportOptions.Enabled || C.OfflineData.Any(x => x.TeleportOptionsOverride.Enabled == true)) && !Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "Lifestream" && x.IsLoaded))
         {
             Error("\"Teleportation is enabled but Lifestream plugin is not installed/loaded. AutoRetainer can not function in this configuration. Either disable teleportation or install Lifestream plugin.");

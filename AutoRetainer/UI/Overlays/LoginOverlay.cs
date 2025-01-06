@@ -40,7 +40,7 @@ internal unsafe class LoginOverlay : Window
         }
         ImGui.SetWindowFontScale(C.LoginOverlayScale);
         //ImGui.PushFont(Svc.PluginInterface.UiBuilder.GetGameFontHandle(new GameFontStyle(GameFontFamilyAndSize.MiedingerMid18)).ImFont);
-        foreach(var x in C.OfflineData.Where(x => !x.Name.IsNullOrEmpty() && !x.ExcludeOverlay))
+        foreach(var x in C.OfflineData.Where(x => !x.Name.IsNullOrEmpty() && (!x.ExcludeOverlay || (C.LoginOverlayAllSearch && Search != ""))))
         {
             if(sacc > -1 && x.ServiceAccount != sacc) continue;
             if(Search != "" && !$"{x.Name}@{x.World}".Contains(Search, StringComparison.OrdinalIgnoreCase)) continue;

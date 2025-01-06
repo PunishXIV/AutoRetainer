@@ -1,5 +1,6 @@
 ﻿using AutoRetainerAPI.Configuration;
 using ECommons.Configuration;
+using ECommons.ExcelServices;
 using ECommons.Interop;
 
 namespace AutoRetainer.Configuration;
@@ -37,6 +38,7 @@ internal unsafe class Config : IEzConfig
     public bool LoginOverlay = false;
     public float LoginOverlayScale = 1f;
     public float LoginOverlayBPadding = 1.35f;
+    public bool LoginOverlayAllSearch = false;
 
     public OpenBellBehavior OpenBellBehaviorNoVentures = OpenBellBehavior.Enable_AutoRetainer;
     public OpenBellBehavior OpenBellBehaviorWithVentures = OpenBellBehavior.Enable_AutoRetainer;
@@ -229,4 +231,5 @@ internal unsafe class Config : IEzConfig
     public bool FCChestGilCheck = false;
     public int FCChestGilCheckCd = 24;
     public Dictionary<ulong, long> FCChestGilCheckTimes = [];
+    public Dictionary<ExcelWorldHelper.Region, long> LockoutTime = []; 
 }
