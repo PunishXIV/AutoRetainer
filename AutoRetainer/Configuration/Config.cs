@@ -32,6 +32,8 @@ internal unsafe class Config : IEzConfig
     public bool HideOverlayIcons = false;
     public bool UnsafeProtection = false;
     public bool CharEqualize = false;
+    public bool LongestVentureFirst = false;
+    public bool CappedLevelsLast = false;
     public bool TimerAllowNegative = false;
     public bool MarketCooldownOverlay = false;
 

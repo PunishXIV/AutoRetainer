@@ -7,6 +7,7 @@ using AutoRetainerAPI.Configuration;
 using Dalamud.Game.Config;
 using Dalamud.Interface.ImGuiNotification;
 using ECommons.CircularBuffers;
+using ECommons.Configuration;
 using ECommons.Events;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.EzSharedDataManager;
@@ -14,6 +15,7 @@ using ECommons.GameHelpers;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using Newtonsoft.Json;
 using static AutoRetainer.Modules.OfflineDataManager;
 
 namespace AutoRetainer.Modules.Multi;
@@ -439,12 +441,52 @@ internal static unsafe class MultiMode
         return false;
     }
 
-    internal static OfflineCharacterData GetCurrentTargetCharacter()
+    internal static List<OfflineCharacterData> GetRetainerSortedOfflineDatas(bool sort)
     {
         var data = C.OfflineData.Where(x => !x.IsLockedOut()).ToList();
-        if(C.CharEqualize)
+        if(sort)
         {
-            data = [.. data.OrderBy(x => CharaCnt.GetOrDefault(x.CID))];
+            if(C.CharEqualize)
+            {
+                data = [.. data.OrderBy(x => CharaCnt.GetOrDefault(x.CID))];
+            }
+            if(C.LongestVentureFirst)
+            {
+                data = [.. data.OrderBy(x => x.GetEnabledRetainers().OrderBy(r => r.VentureEndsAt).FirstOrDefault()?.VentureEndsAt ?? long.MaxValue)];
+            }
+            if(C.CappedLevelsLast)
+            {
+                List<OfflineCharacterData> capped = [];
+                List<OfflineCharacterData> levelling = [];
+                foreach(var x in data)
+                {
+                    var e = x.GetEnabledRetainers();
+                    foreach(var ret in e)
+                    {
+                        var cap = ret.Level < Player.MaxLevel && x.GetJobLevel(ret.Job) == ret.Level;
+                        if(!cap) goto Getout;
+                    }
+                    capped.Add(x);
+                Getout:
+                    continue;
+                }
+                data.RemoveAll(capped.Contains);
+                foreach(var x in data)
+                {
+                    var e = x.GetEnabledRetainers();
+                    foreach(var ret in e)
+                    {
+                        var canLevel = ret.Level < Player.MaxLevel && x.GetJobLevel(ret.Job) > ret.Level;
+                        if(canLevel) continue;
+                        goto Add;
+                    }
+                    continue;
+                Add:
+                    levelling.Add(x);
+                }
+                data.RemoveAll(levelling.Contains);
+                data = [.. levelling, .. data, .. capped];
+            }
         }
         if(C.MultiPreferredCharLast)
         {
@@ -455,8 +497,14 @@ internal static unsafe class MultiMode
                 data.Add(pref);
             }
         }
+        return data;
+    } 
+
+    internal static OfflineCharacterData GetCurrentTargetCharacter()
+    {
         if(EnabledSubmarines)
         {
+            var data = GetRetainerSortedOfflineDatas(false);
             foreach(var x in data)
             {
                 if(x.CID == Player.CID) continue;
@@ -482,6 +530,7 @@ internal static unsafe class MultiMode
         }
         if(EnabledRetainers)
         {
+            var data = GetRetainerSortedOfflineDatas(true);
             foreach(var x in data)
             {
                 if(x.CID == Player.CID) continue;

@@ -38,6 +38,22 @@ public static unsafe class TroubleshootingUI
             Error("\"Teleportation is enabled but Lifestream plugin is not installed/loaded. AutoRetainer can not function in this configuration. Either disable teleportation or install Lifestream plugin.");
         }
 
+        foreach(var x in C.SubmarineUnlockPlans)
+        {
+            if(x.EnforcePlan)
+            {
+                Info($"Submarine unlock plan {x.Name.NullWhenEmpty() ?? x.GUID} is set as enforced and will override any submarine settings if there is anything to unlock.");
+            }
+        }
+
+        foreach(var x in C.SubmarineUnlockPlans)
+        {
+            if(x.EnforceDSSSinglePoint)
+            {
+                Info($"Submarine unlock plan {x.Name.NullWhenEmpty() ?? x.GUID} is set to deploy on single point in Deep sea site, and it will ignore unlock behavior that is manually set.");
+            }
+        }
+
         try
         {
             if(DalamudReflector.IsOnStaging())

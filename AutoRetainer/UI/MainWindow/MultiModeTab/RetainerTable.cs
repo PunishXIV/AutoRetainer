@@ -112,6 +112,13 @@ public static unsafe class RetainerTable
                     var cap = ret.Level < Player.MaxLevel && data.GetJobLevel(ret.Job) == ret.Level;
                     if(cap) ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
                     ImGuiEx.TextV(level.ReplaceByChar(Lang.Digits.Normal, Lang.Digits.GameFont));
+                    if(!cap && ret.Level < Player.MaxLevel)
+                    {
+                        ImGui.SameLine(0, 0);
+                        ImGuiEx.TextV("/");
+                        ImGui.SameLine(0, 0);
+                        ImGuiEx.TextV(data.GetJobLevel(ret.Job).ToString().ReplaceByChar(Lang.Digits.Normal, Lang.Digits.GameFont));
+                    }
                     if(cap) ImGui.PopStyleColor();
                     if(C.ShowAdditionalInfo && add != "")
                     {

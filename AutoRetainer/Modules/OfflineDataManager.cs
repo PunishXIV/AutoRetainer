@@ -5,6 +5,8 @@ using Dalamud.Game.Text.SeStringHandling;
 using ECommons.Configuration;
 using ECommons.Events;
 using ECommons.ExcelServices;
+using ECommons.EzIpcManager;
+using ECommons.GameFunctions;
 using ECommons.GameHelpers;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
@@ -32,10 +34,7 @@ internal static unsafe class OfflineDataManager
     {
         if(Svc.Condition[ConditionFlag.OccupiedSummoningBell])
         {
-            if(GameRetainerManager.Ready)
-            {
-                WriteOfflineData(false, false);
-            }
+            WriteOfflineData(false, false);
             if(EzThrottler.Throttle("Periodic.CalculateItemLevel") && Utils.TryGetCurrentRetainer(out var ret))
             {
                 var adata = Utils.GetAdditionalData(Player.CID, ret);
@@ -124,12 +123,13 @@ internal static unsafe class OfflineDataManager
                 });
             }
         }
-        if(Player.IsInHomeWorld)
+        if(Player.IsInHomeWorld && Player.Available)
         {
             var fc = InfoModule.Instance()->GetInfoProxyFreeCompany();
+            if(Player.Object.Struct()->FreeCompanyTagString != "" && (fc->Id == 0 || fc->NameString == "")) return;
             data.FCID = fc->Id;
             if(!C.FCData.ContainsKey(fc->Id)) C.FCData[fc->Id] = new();
-            C.FCData[fc->Id].Name = fc->Name.Read();
+            C.FCData[fc->Id].Name = fc->NameString;
             var numArray = UIModule.Instance()->GetRaptureAtkModule()->AtkModule.GetNumberArrayData(58);
             if(numArray != null)
             {

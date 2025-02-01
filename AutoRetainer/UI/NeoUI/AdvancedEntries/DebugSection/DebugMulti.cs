@@ -17,6 +17,10 @@ internal unsafe class DebugMulti : DebugSectionBase
 {
     public override void Draw()
     {
+        if(ImGui.CollapsingHeader("Sorted data"))
+        {
+            ImGuiEx.Text($"{MultiMode.GetRetainerSortedOfflineDatas(true).Where(x => !x.ExcludeRetainer).Select(x => $"{x.Name}@{x.World}").Print("\n")}");
+        }
         if(ImGui.CollapsingHeader("NeoHET"))
         {
             if(ImGui.Button("Enqueue HET")) TaskNeoHET.Enqueue(null);
