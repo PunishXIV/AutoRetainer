@@ -9,6 +9,7 @@ internal static unsafe class TaskFinalizeVessel
     {
         VoyageUtils.Log($"Task enqueued: {nameof(TaskFinalizeVessel)} name={name}, type={type}, quit={quit}");
         TaskSelectVesselByName.Enqueue(name, type);
+        P.TaskManager.Enqueue(VoyageScheduler.WaitUntilFinalizeDeployAddonExists);
         P.TaskManager.Enqueue(VoyageScheduler.FinalizeVessel);
         P.TaskManager.Enqueue(() => TryGetAddonByName<AtkUnitBase>("SelectString", out var addon) && IsAddonReady(addon), "WaitForSelectStringAddon");
         TaskIntelligentRepair.Enqueue(name, type);

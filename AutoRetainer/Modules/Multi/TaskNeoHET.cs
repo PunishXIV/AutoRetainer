@@ -24,7 +24,7 @@ public static unsafe class TaskNeoHET
     public static readonly uint[] ApartmentMarkers = Enum.GetValues<ApartmentHousingMarker>().Select(x => (uint)x).ToArray();
     public static readonly float ValidPlayerToApartmentDistance = 24f;
 
-    public static void Enqueue(Action onFailure)
+    public static void Enqueue(Action onFailure, bool tryForceWorkshop = false)
     {
         PluginLog.Debug($"Enqueued HouseEnterTask from {new StackTrace().GetFrames().Select(x => x.GetMethod()?.Name).Prepend("      ").Print("\n")}");
         P.TaskManager.EnqueueTask(NeoTasks.WaitForNotOccupied(new(timeLimitMS: 10 * 60 * 1000)));
@@ -43,7 +43,7 @@ public static unsafe class TaskNeoHET
                     new(NpcSaleManager.EnqueueIfItemsPresent),
                     new(() =>
                     {
-                        if(GetWorkshopEntrance() != null && Utils.GetReachableRetainerBell(false) == null)
+                        if(GetWorkshopEntrance() != null && (tryForceWorkshop || Utils.GetReachableRetainerBell(false) == null))
                         {
                             P.TaskManager.BeginStack();
                             try

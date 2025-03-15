@@ -53,6 +53,21 @@ internal static unsafe class OfflineDataManager
         }
     }
 
+    internal static void CreateLoggedOutOfflineData(string name, uint world, ulong cid)
+    {
+        if(C.Blacklist.Any(x => x.CID == cid)) return;
+        if(!C.OfflineData.TryGetFirst(x => x.CID == cid, out var data))
+        {
+            data = new()
+            {
+                CID = cid,
+            };
+            C.OfflineData.Add(data);
+        }
+        data.World = ExcelWorldHelper.GetName(world);
+        data.Name = name;
+    }
+
     internal static void WriteOfflineData(bool writeGatherables, bool saveConfig)
     {
         if(!ProperOnLogin.PlayerPresent) return;

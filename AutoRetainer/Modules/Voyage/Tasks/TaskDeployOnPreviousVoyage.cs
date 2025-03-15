@@ -9,6 +9,7 @@ internal static class TaskDeployOnPreviousVoyage
         VoyageUtils.Log($"Task enqueued: {nameof(TaskDeployOnPreviousVoyage)}");
         TaskIntelligentRepair.Enqueue(name, type);
         P.TaskManager.Enqueue(VoyageScheduler.SelectViewPreviousLog);
+        P.TaskManager.Enqueue(VoyageScheduler.WaitUntilFinalizeDeployAddonExists);
         P.TaskManager.Enqueue(VoyageScheduler.RedeployVessel);
         TaskDeployAndSkipCutscene.Enqueue();
     }

@@ -211,7 +211,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     {
         if(Svc.Condition[ConditionFlag.OccupiedSummoningBell] && ProperOnLogin.PlayerPresent)
         {
-            var text = message.ExtractText().Cleanup();
+            var text = message.GetText().Cleanup();
             //4330	57	33	0	False	リテイナーベンチャー「<Value>IntegerParameter(2)</Value> <Sheet(Item,IntegerParameter(1),0)/>」を依頼しました。
             //4330	57	33	0	False	Du hast deinen Gehilfen mit der Beschaffung von <SheetDe(Item,1,IntegerParameter(1),IntegerParameter(3),3,1)/> ( <Value>IntegerParameter(2)</Value>) beauftragt.
             //4330	57	33	0	False	Vous avez confié la tâche “<SheetFr(Item,12,IntegerParameter(1),2,1)/> ( <Value>IntegerParameter(2)</Value>)” à votre servant.
@@ -225,7 +225,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             }
             //4578	57	33	0	False	Gil earned from market sales has been entrusted to your retainer.<If(Equal(IntegerParameter(1),1))>
             //The amount earned exceeded your retainer's gil limit. Excess gil has been discarded.<Else/></If>
-            if(text.StartsWith(Svc.Data.GetExcelSheet<LogMessage>().GetRow(4578).Text.ExtractText(true).Cleanup()))
+            if(text.StartsWith(Svc.Data.GetExcelSheet<LogMessage>().GetRow(4578).Text.GetText(true).Cleanup()))
             {
                 TaskWithdrawGil.forceCheck = true;
                 DebugLog($"Forcing to check for gil");
@@ -307,6 +307,17 @@ public unsafe class AutoRetainer : IDalamudPlugin
         else if(arguments.EqualsIgnoreCase("het"))
         {
             TaskNeoHET.Enqueue(() => DuoLog.Error("Failed to find suitable house"));
+        }
+        else if(arguments.EqualsIgnoreCase("wet"))
+        {
+            if(TaskNeoHET.GetWorkshopEntrance() != null)
+            {
+                TaskNeoHET.TryEnterWorkshop(() => DuoLog.Error("Failed to enter workshop"));
+            }
+            else
+            {
+                TaskNeoHET.Enqueue(() => DuoLog.Error("Failed to find suitable house"), true);
+            }
         }
         else if(arguments.EqualsIgnoreCaseAny("deliver"))
         {
@@ -665,6 +676,14 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
     private void ConditionChange(ConditionFlag flag, bool value)
     {
+        if(flag == ConditionFlag.LoggingOut && value)
+        {
+            if(Player.Available)
+            {
+                PluginLog.Verbose($"Writing logout offline data...");
+                OfflineDataManager.WriteOfflineData(true, true);
+            }
+        }
         if(flag == ConditionFlag.OccupiedSummoningBell)
         {
             OfflineDataManager.WriteOfflineData(true, true);
@@ -750,11 +769,6 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
     private void Logout(int _, int __)
     {
-        if(Player.Available)
-        {
-            PluginLog.Verbose($"Writing logout offline data...");
-            OfflineDataManager.WriteOfflineData(true, true);
-        }
         SchedulerMain.DisablePlugin();
 
         if(!P.TaskManager.IsBusy)

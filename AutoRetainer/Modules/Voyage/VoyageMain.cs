@@ -29,7 +29,7 @@ internal static unsafe class VoyageMain
     {
         if(MultiMode.Active || P.TaskManager.IsBusy)
         {
-            var txt = message.ExtractText();
+            var txt = message.GetText();
             if(txt == Lang.VoyageInventoryError)
             {
                 DuoLog.Warning($"[Voyage] Your inventory is full!");

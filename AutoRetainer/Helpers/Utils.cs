@@ -310,7 +310,7 @@ internal static unsafe class Utils
     {
         foreach(var x in values)
         {
-            yield return Svc.Data.GetExcelSheet<EObjName>().GetRow(x).Singular.ExtractText();
+            yield return Svc.Data.GetExcelSheet<EObjName>().GetRow(x).Singular.GetText();
         }
     }
 
@@ -343,7 +343,7 @@ internal static unsafe class Utils
                 var item = data->StringArray[i];
                 if (item != null)
                 {
-                    var str = MemoryHelper.ReadSeStringNullTerminated((nint)item).ExtractText();
+                    var str = MemoryHelper.ReadSeStringNullTerminated((nint)item).GetText();
                     if (str == "") break;
                     ret.Add(str);
                 }
@@ -374,7 +374,7 @@ internal static unsafe class Utils
         {
             try
             {
-                return data.ClassJobLevelArray[d.Value.ExpArrayIndex];
+                return data.ClassJobLevelArray.SafeSelect(d.Value.ExpArrayIndex);
             }
             catch(Exception) { }
         }
@@ -678,7 +678,7 @@ internal static unsafe class Utils
         var list = new List<string>();
         for(var i = 0; i < addon->PopupMenu.PopupMenu.EntryCount; i++)
         {
-            list.Add(MemoryHelper.ReadSeStringNullTerminated((nint)addon->PopupMenu.PopupMenu.EntryNames[i]).ExtractText());
+            list.Add(MemoryHelper.ReadSeStringNullTerminated((nint)addon->PopupMenu.PopupMenu.EntryNames[i]).GetText());
         }
         return list;
     }
@@ -769,7 +769,7 @@ internal static unsafe class Utils
                 if(IsAddonReady(addon))
                 {
                     var textNode = addon->UldManager.NodeList[15]->GetAsAtkTextNode();
-                    var text = GenericHelpers.ReadSeString(&textNode->NodeText).ExtractText();
+                    var text = GenericHelpers.ReadSeString(&textNode->NodeText).GetText();
                     if(compare(text))
                     {
                         PluginLog.Verbose($"SelectYesno {text} addon {i} by predicate");
@@ -797,7 +797,7 @@ internal static unsafe class Utils
                 if(IsAddonReady(addon))
                 {
                     var textNode = addon->UldManager.NodeList[15]->GetAsAtkTextNode();
-                    var text = textNode->NodeText.ExtractText().Cleanup();
+                    var text = textNode->NodeText.GetText().Cleanup();
                     if(text.ContainsAny(s.Select(x => x.Cleanup())))
                     {
                         PluginLog.Verbose($"SelectYesno {s.Print()} addon {i}");

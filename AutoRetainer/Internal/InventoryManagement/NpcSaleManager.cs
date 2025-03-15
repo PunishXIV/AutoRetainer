@@ -123,7 +123,7 @@ public static unsafe class NpcSaleManager
         {
             foreach(var entry in m.Entries)
             {
-                if(Svc.Data.GetExcelSheet<GilShop>().Select(x => x.Name.ExtractText()).Contains(entry.Text))
+                if(Svc.Data.GetExcelSheet<GilShop>().Select(x => x.Name.GetText()).Contains(entry.Text))
                 {
                     if(EzThrottler.Throttle("SelectStringSell", 2000))
                     {

@@ -12,6 +12,7 @@ internal static unsafe class TaskRedeployPreviousLog
         VoyageUtils.Log($"Task enqueued: {nameof(TaskRedeployPreviousLog)}");
         TaskIntelligentRepair.Enqueue(name, type);
         P.TaskManager.Enqueue(VoyageScheduler.SelectViewPreviousLog);
+        P.TaskManager.Enqueue(VoyageScheduler.WaitUntilFinalizeDeployAddonExists);
         P.TaskManager.Enqueue(VoyageScheduler.RedeployVessel);
         P.TaskManager.EnqueueDelay(10, true);
         P.TaskManager.Enqueue(CheckForFuel);
@@ -45,6 +46,7 @@ internal static unsafe class TaskRedeployPreviousLog
                         }
                         P.TaskManager.BeginStack();
                         P.TaskManager.Enqueue(VoyageScheduler.CancelDeployVessel);
+                        P.TaskManager.Enqueue(VoyageScheduler.WaitUntilFinalizeDeployAddonExists);
                         P.TaskManager.Enqueue(VoyageScheduler.FinalizeVessel);
                         P.TaskManager.Enqueue(VoyageScheduler.SelectQuitVesselMenu);
                         P.TaskManager.Enqueue(VoyageScheduler.SelectQuitVesselSelectorMenu);

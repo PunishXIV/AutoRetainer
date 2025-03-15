@@ -56,7 +56,7 @@ internal static unsafe class GCContinuation
     {
         if(TryGetAddonByName<AtkUnitBase>("ShopExchangeCurrencyDialog", out var addon) && IsAddonReady(addon) && TryGetAddonByName<AtkUnitBase>("GrandCompanyExchange", out var gca) && IsAddonReady(gca))
         {
-            var num = GenericHelpers.ReadSeString(&gca->UldManager.NodeList[52]->GetAsAtkTextNode()->NodeText).ExtractText().Replace(" ", "").Replace(",", "").Replace(".", "").ParseInt();
+            var num = GenericHelpers.ReadSeString(&gca->UldManager.NodeList[52]->GetAsAtkTextNode()->NodeText).GetText().Replace(" ", "").Replace(",", "").Replace(".", "").ParseInt();
             if(num != null && EzThrottler.Throttle("GC SetMaxVenturesExchange"))
             {
                 var numeric = (AtkComponentNumericInput*)addon->UldManager.NodeList[8]->GetComponent();

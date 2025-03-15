@@ -34,7 +34,7 @@ internal static class Lang
     internal const string IconPath = "\uf55b";
     internal const string IconFire = "\uf06d";
 
-    internal static string LogOutAndExitGame => Svc.Data.GetExcelSheet<Addon>().GetRow(116).Text.ExtractText(true).Cleanup();
+    internal static string LogOutAndExitGame => Svc.Data.GetExcelSheet<Addon>().GetRow(116).Text.GetText(true).Cleanup();
 
     internal static readonly ReadOnlyDictionary<UnlockMode, string> UnlockModeNames = new(new Dictionary<UnlockMode, string>()
     {
@@ -143,7 +143,7 @@ internal static class Lang
         "Select a category."
     ];
 
-    internal static string[] BellName => [Svc.Data.GetExcelSheet<EObjName>().GetRow(2000401).Singular.ExtractText(), "リテイナーベル"];
+    internal static string[] BellName => [Svc.Data.GetExcelSheet<EObjName>().GetRow(2000401).Singular.GetText(), "リテイナーベル"];
 
     //0	TEXT_HOUFIXMANSIONENTRANCE_00359_HOUSINGAREA_MENU_ENTER_MYROOM	Go to your apartment
     //0	TEXT_HOUFIXMANSIONENTRANCE_00359_HOUSINGAREA_MENU_ENTER_MYROOM	自分の部屋に移動する
@@ -189,15 +189,15 @@ internal static class Lang
     //2004353	entrance to additional chambers	0	entrances to additional chambers	0	1	1	0	0
     internal static string[] AdditionalChambersEntrance =>
     [
-        Svc.Data.GetExcelSheet<EObjName>().GetRow(2004353).Singular.ExtractText(),
-        Regex.Replace(Svc.Data.GetExcelSheet<EObjName>().GetRow(2004353).Singular.ExtractText(), @"\[.*?\]", "")
+        Svc.Data.GetExcelSheet<EObjName>().GetRow(2004353).Singular.GetText(),
+        Regex.Replace(Svc.Data.GetExcelSheet<EObjName>().GetRow(2004353).Singular.GetText(), @"\[.*?\]", "")
     ];
 
     //2005274	voyage control panel	0	voyage control panels	0	0	1	0	0
-    internal static string PanelName => Svc.Data.GetExcelSheet<EObjName>().GetRow(2005274).Singular.ExtractText();
+    internal static string PanelName => Svc.Data.GetExcelSheet<EObjName>().GetRow(2005274).Singular.GetText();
 
     //4160	60	9	0	False	Unable to retrieve extracted items. Insufficient inventory/crystal inventory space.
-    internal static string VoyageInventoryError => Svc.Data.GetExcelSheet<LogMessage>().GetRow(4160).Text.ToDalamudString().ExtractText();
+    internal static string VoyageInventoryError => Svc.Data.GetExcelSheet<LogMessage>().GetRow(4160).Text.ToDalamudString().GetText();
 
     internal static string[] UnableToVisitWorld = ["Unable to execute command. Character is currently visiting the", "他のデータセンター", "无法进行该操作，其他玩家正在操作该潜水艇。", "無法進行該操作，其他玩家正在操作該潛水艇。", "Der Vorgang kann nicht ausgeführt werden, da der Charakter gerade das Datenzentrum", "Impossible d'exécuter cette commande. Le personnage se trouve dans un autre centre de traitement de données"];
 

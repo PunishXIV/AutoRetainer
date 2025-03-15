@@ -1,6 +1,8 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage;
 using AutoRetainerAPI.Configuration;
+using ECommons.Events;
+using ECommons.GameHelpers;
 using ECommons.MathHelpers;
 using VesselDescriptor = (ulong CID, string VesselName);
 
@@ -88,6 +90,7 @@ public class DeployablesTab : NeoUIEntry
             ImGui.InputTextWithHint("##searchSubs", "Character search", ref search, 100);
             foreach(var x in C.OfflineData)
             {
+                if(x.ExcludeWorkshop) continue;
                 if(search.Length > 0 && !$"{x.Name}@{x.World}".Contains(search, StringComparison.OrdinalIgnoreCase)) continue;
                 if(x.OfflineSubmarineData.Count > 0)
                 {
@@ -242,6 +245,78 @@ public class DeployablesTab : NeoUIEntry
                 }
             }
             Notify.Success($"Affected {num} submarines");
+        }
+
+        ImGui.Separator();
+
+        if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Check, "Enable selected submersibles"))
+        {
+            var num = 0;
+            foreach(var x in SelectedVessels)
+            {
+                var odata = C.OfflineData.FirstOrDefault(z => z.CID == x.CID);
+                if(odata != null)
+                {
+                    if(odata.EnabledSubs.Add(x.VesselName))
+                    {
+                        num++;
+                    }
+                }
+            }
+            Notify.Success($"Affected {num} submarines");
+        }
+
+        ImGui.Separator();
+
+        if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Times, "Disable selected submersibles"))
+        {
+            var num = 0;
+            foreach(var x in SelectedVessels)
+            {
+                var odata = C.OfflineData.FirstOrDefault(z => z.CID == x.CID);
+                if(odata != null)
+                {
+                    if(odata.EnabledSubs.Remove(x.VesselName))
+                    {
+                        num++;
+                    }
+                }
+            }
+            Notify.Success($"Affected {num} submarines");
+        }
+
+        ImGui.Separator();
+
+        if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.CheckCircle, "Enable deployables multi mode for owners of selected submersibles"))
+        {
+            var num = 0;
+            foreach(var x in SelectedVessels)
+            {
+                var odata = C.OfflineData.FirstOrDefault(z => z.CID == x.CID);
+                if(odata != null && !odata.WorkshopEnabled)
+                {
+                    odata.WorkshopEnabled = true;
+                    num++;
+                }
+            }
+            Notify.Success($"Affected {num} characters");
+        }
+
+        ImGui.Separator();
+
+        if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.TimesCircle, "Disable deployables multi mode for owners of selected submersibles"))
+        {
+            var num = 0;
+            foreach(var x in SelectedVessels)
+            {
+                var odata = C.OfflineData.FirstOrDefault(z => z.CID == x.CID);
+                if(odata != null && odata.WorkshopEnabled)
+                {
+                    odata.WorkshopEnabled = false;
+                    num++;
+                }
+            }
+            Notify.Success($"Affected {num} characters");
         }
     }
 }

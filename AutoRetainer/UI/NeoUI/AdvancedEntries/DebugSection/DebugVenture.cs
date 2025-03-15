@@ -61,7 +61,7 @@ internal unsafe class DebugVenture : DebugSectionBase
                     if(item != null)
                     {
                         var str = MemoryHelper.ReadSeStringNullTerminated((nint)item);
-                        ImGuiEx.Text($"{i}: {str.ExtractText()}");
+                        ImGuiEx.Text($"{i}: {str.GetText()}");
                     }
                     else
                     {

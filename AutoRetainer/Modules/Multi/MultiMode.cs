@@ -477,8 +477,7 @@ internal static unsafe class MultiMode
                     foreach(var ret in e)
                     {
                         var canLevel = ret.Level < Player.MaxLevel && x.GetJobLevel(ret.Job) > ret.Level;
-                        if(canLevel) continue;
-                        goto Add;
+                        if(canLevel) goto Add;
                     }
                     continue;
                 Add:

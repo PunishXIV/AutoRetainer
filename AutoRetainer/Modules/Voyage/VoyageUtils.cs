@@ -225,7 +225,7 @@ internal static unsafe class VoyageUtils
             {
                 return PanelType.TypeSelector;
             }
-            var text = GenericHelpers.ReadSeString(&addon->UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText).ExtractText();
+            var text = GenericHelpers.ReadSeString(&addon->UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText).GetText();
             if(text.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.PanelSubmersible))
             {
                 return PanelType.Submersible;
@@ -318,6 +318,7 @@ internal static unsafe class VoyageUtils
 
     internal static void WriteOfflineData()
     {
+        //PluginLog.Debug($"WriteOfflineDataSub");
         if(HousingManager.Instance()->WorkshopTerritory != null && C.OfflineData.TryGetFirst(x => x.CID == Player.CID, out var ocd))
         {
             ocd.WriteOfflineInventoryData();
@@ -408,7 +409,7 @@ internal static unsafe class VoyageUtils
     internal static VoyageType? DetectAddonType(AtkUnitBase* addon)
     {
         var textptr = addon->UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText;
-        var text = GenericHelpers.ReadSeString(&textptr).ExtractText();
+        var text = GenericHelpers.ReadSeString(&textptr).GetText();
         if(text.Contains("Select an airship."))
         {
             return VoyageType.Airship;

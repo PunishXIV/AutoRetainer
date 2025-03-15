@@ -15,8 +15,8 @@ internal unsafe class ReaderAirShipExploration(AtkUnitBase* UnitBase, int BeginO
     internal unsafe class Destination(nint UnitBasePtr, int BeginOffset = 0) : AtkReader(UnitBasePtr, BeginOffset)
     {
         internal uint Unknown0 => ReadUInt(0) ?? 0;
-        internal string NameFull => ReadSeString(1).ExtractText().Trim();
-        internal string NameShort => ReadSeString(2).ExtractText().Trim();
+        internal string NameFull => ReadSeString(1).GetText().Trim();
+        internal string NameShort => ReadSeString(2).GetText().Trim();
         internal uint Unknown3 => ReadUInt(3) ?? 0;
         internal uint RequiredRank => ReadUInt(4) ?? uint.MaxValue;
         internal uint Unknown5 => ReadUInt(5) ?? 0;

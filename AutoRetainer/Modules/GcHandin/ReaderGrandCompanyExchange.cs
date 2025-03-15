@@ -9,7 +9,7 @@ public unsafe class ReaderGrandCompanyExchange(AtkUnitBase* UnitBase, int BeginO
 
     public unsafe class ItemInfo(nint UnitBasePtr, int BeginOffset = 0) : AtkReader(UnitBasePtr, BeginOffset)
     {
-        public string Name => ReadSeString(0)?.ExtractText();
+        public string Name => ReadSeString(0)?.GetText();
         public uint Seals => ReadUInt(50) ?? 0;
         public uint Bag => ReadUInt(100) ?? 0;
         public uint IconID => ReadUInt(150) ?? 0;

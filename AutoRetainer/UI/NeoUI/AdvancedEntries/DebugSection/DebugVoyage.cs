@@ -176,6 +176,7 @@ internal unsafe class DebugVoyage : DebugSectionBase
                 P.TaskManager.Enqueue(VoyageScheduler.InteractWithVoyagePanel);
                 P.TaskManager.Enqueue(VoyageScheduler.SelectAirshipManagement);
                 P.TaskManager.Enqueue(() => VoyageScheduler.SelectVesselByName(data1, VoyageType.Airship));
+                P.TaskManager.Enqueue(VoyageScheduler.WaitUntilFinalizeDeployAddonExists);
                 P.TaskManager.Enqueue(VoyageScheduler.RedeployVessel);
                 P.TaskManager.Enqueue(VoyageScheduler.DeployVessel);
             }

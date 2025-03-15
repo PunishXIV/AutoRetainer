@@ -112,10 +112,10 @@ internal static unsafe class AutoGCHandin
         {
             if(addon->YesButton->IsEnabled)
             {
-                var str = addon->PromptText->NodeText.ExtractText().Cleanup();
+                var str = addon->PromptText->NodeText.GetText().Cleanup();
                 DebugLog($"SelectYesno encountered: {str}");
                 //102434	Do you really want to trade a high-quality item?
-                if(str.Equals(GenericHelpers.ExtractText(Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(102434).Text).Cleanup()))
+                if(str.Equals(GenericHelpers.GetText(Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(102434).Text).Cleanup()))
                 {
                     if(FrameThrottler.Throttle(Throttler, 10))
                     {
@@ -253,13 +253,13 @@ internal static unsafe class AutoGCHandin
         var step1 = addon->UldManager.NodeList[14];
         var step2 = step1->GetAsAtkComponentNode()->Component->UldManager.NodeList[1];
         var step3 = step2->GetAsAtkComponentNode()->Component->UldManager.NodeList[2];
-        var text = GenericHelpers.ReadSeString(&step3->GetAsAtkTextNode()->NodeText).ExtractText();
+        var text = GenericHelpers.ReadSeString(&step3->GetAsAtkTextNode()->NodeText).GetText();
         //4619	Hide Armoury Chest Items
         //4618	Hide Gear Set Items
         //4617	Show All Items
-        var hideArmory = Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(4619).Text.ToDalamudString().ExtractText();
-        var hideGearSet = Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(4618).Text.ToDalamudString().ExtractText();
-        var showAll = Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(4617).Text.ToDalamudString().ExtractText();
+        var hideArmory = Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(4619).Text.ToDalamudString().GetText();
+        var hideGearSet = Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(4618).Text.ToDalamudString().GetText();
+        var showAll = Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(4617).Text.ToDalamudString().GetText();
         if(text.Equals(hideArmory))
         {
             return true;

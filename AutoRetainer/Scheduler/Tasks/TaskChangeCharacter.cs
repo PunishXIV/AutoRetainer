@@ -28,21 +28,21 @@ public static unsafe class TaskChangeCharacter
     public static void EnqueueLogin(string currentWorld, string charaName, string charaWorld, int account)
     {
         BailoutManager.IsLogOnTitleEnabled = false;
-        var dc = (int)ExcelWorldHelper.Get(currentWorld).Value.DataCenter.RowId;
-        PluginLog.Information($"Enqueue login: world={currentWorld}, charaName: {charaName}, charaWorld={charaWorld}, acc={account}, dc={dc}");
-        if(dc == 0)
-        {
-            DuoLog.Warning($"Invalid data for {charaName}@{charaWorld}. Attempting to auto-fix...");
-            currentWorld = charaWorld;
-            dc = (int)ExcelWorldHelper.Get(currentWorld).Value.DataCenter.RowId;
-            if(dc == 0)
-            {
-                DuoLog.Error("Failed to fix world data. Log in manually.");
-                return;
-            }
-        }
         if((int)Svc.Data.Language < 4)
         {
+            var dc = (int)ExcelWorldHelper.Get(currentWorld).Value.DataCenter.RowId;
+            PluginLog.Information($"Enqueue login: world={currentWorld}, charaName: {charaName}, charaWorld={charaWorld}, acc={account}, dc={dc}");
+            if(dc == 0)
+            {
+                DuoLog.Warning($"Invalid data for {charaName}@{charaWorld}. Attempting to auto-fix...");
+                currentWorld = charaWorld;
+                dc = (int)ExcelWorldHelper.Get(currentWorld).Value.DataCenter.RowId;
+                if(dc == 0)
+                {
+                    DuoLog.Error("Failed to fix world data. Log in manually.");
+                    return;
+                }
+            }
             P.TaskManager.Enqueue(ClickSelectDataCenter, new(timeLimitMS: 1000000));
             P.TaskManager.Enqueue(() => SelectDataCenter(dc), $"Connect to DC {dc}");
             P.TaskManager.Enqueue(() => SelectServiceAccount(account), $"SelectServiceAccount {account}");
@@ -58,7 +58,7 @@ public static unsafe class TaskChangeCharacter
     public static bool? SelectYesLogout()
     {
         if(!Svc.ClientState.IsLoggedIn) return true;
-        var addon = Utils.GetSpecificYesno(Svc.Data.GetExcelSheet<Addon>()?.GetRow(115).Text.ToDalamudString().ExtractText());
+        var addon = Utils.GetSpecificYesno(Svc.Data.GetExcelSheet<Addon>()?.GetRow(115).Text.ToDalamudString().GetText());
         if(addon == null || !IsAddonReady(addon)) return false;
         if(Utils.GenericThrottle && EzThrottler.Throttle("ConfirmLogout"))
         {
@@ -71,7 +71,7 @@ public static unsafe class TaskChangeCharacter
     public static bool? Logout()
     {
         if(C.DontLogout) return null;
-        var addon = Utils.GetSpecificYesno(Svc.Data.GetExcelSheet<Addon>()?.GetRow(115).Text.ToDalamudString().ExtractText());
+        var addon = Utils.GetSpecificYesno(Svc.Data.GetExcelSheet<Addon>()?.GetRow(115).Text.ToDalamudString().GetText());
         if(addon != null) return true;
         var isLoggedIn = Svc.Condition.Any();
         if(!isLoggedIn) return true;
@@ -92,7 +92,7 @@ public static unsafe class TaskChangeCharacter
         }
         if(TryGetAddonMaster<AddonMaster.SelectString>(out var m) && m.IsAddonReady)
         {
-            var compareTo = Svc.Data.GetExcelSheet<Lobby>()?.GetRow(11).Text.ExtractText();
+            var compareTo = Svc.Data.GetExcelSheet<Lobby>()?.GetRow(11).Text.GetText();
             if(m.Text == compareTo)
             {
                 m.Entries[account].Select();

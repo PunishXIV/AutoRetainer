@@ -306,7 +306,7 @@ public static unsafe class InventoryManagementCommon
         }
         foreach(var x in ListByCategories)
         {
-            ImGui.Selectable($"{Svc.Data.GetExcelSheet<ItemUICategory>().GetRowOrDefault(x.Key)?.Name.ExtractText() ?? x.Key.ToString()}", true);
+            ImGui.Selectable($"{Svc.Data.GetExcelSheet<ItemUICategory>().GetRowOrDefault(x.Key)?.Name.GetText() ?? x.Key.ToString()}", true);
             foreach(var data in x.Value)
             {
                 if(ThreadLoadImageHandler.TryGetIconTextureWrap(data.Icon, false, out var tex))

@@ -226,8 +226,15 @@ internal static unsafe class VoyageScheduler
         return Utils.TrySelectSpecificEntry(Lang.ViewPrevVoyageLog, () => Utils.GenericThrottle && EzThrottler.Throttle("Voyage.SelectViewPreviousLog", 1000));
     }
 
+    internal static bool WaitUntilFinalizeDeployAddonExists()
+    {
+        return TryGetAddonByName<AtkUnitBase>("AirShipExplorationResult", out var addon) && IsAddonReady(addon);
+    }
+
     internal static bool? RedeployVessel()
     {
+        if(!TryGetAddonByName<AtkUnitBase>("AirShipExplorationResult", out _)) return true;
+        if(TryGetAddonByName<AtkUnitBase>("AirShipExplorationDetail", out _)) return true;
         if(TryGetAddonByName<AtkUnitBase>("AirShipExplorationResult", out var addon) && IsAddonReady(addon))
         {
             var button = addon->UldManager.NodeList[3]->GetAsAtkComponentButton();
@@ -238,10 +245,10 @@ internal static unsafe class VoyageScheduler
             }
             else
             {
-                if(Utils.GenericThrottle && EzThrottler.Throttle("Voyage.Redeploy"))
+                if(Utils.GenericThrottle && EzThrottler.Throttle($"Voyage.Redeploy_{(nint)addon}", 5000))
                 {
                     Callback.Fire(addon, true, 1);
-                    return true;
+                    return false;
                 }
             }
         }
@@ -254,12 +261,13 @@ internal static unsafe class VoyageScheduler
 
     internal static bool? FinalizeVessel()
     {
+        if(!TryGetAddonByName<AtkUnitBase>("AirShipExplorationResult", out _)) return true;
         if(TryGetAddonByName<AtkUnitBase>("AirShipExplorationResult", out var addon) && IsAddonReady(addon))
         {
-            if(Utils.GenericThrottle && EzThrottler.Throttle("Voyage.Redeploy"))
+            if(Utils.GenericThrottle && EzThrottler.Throttle($"Voyage.Redeploy_{(nint)addon}", 1000))
             {
                 Callback.Fire(addon, true, 0);
-                return true;
+                return false;
             }
         }
         else

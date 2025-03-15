@@ -144,9 +144,9 @@ internal unsafe class SubmarinePointPlanUI : Window
                     {
                         foreach(var x in Svc.Data.GetExcelSheet<SubmarineExploration>())
                         {
-                            if(x.Destination.ExtractText() == "")
+                            if(x.Destination.GetText() == "")
                             {
-                                if(x.Map.Value.Name.ExtractText() != "")
+                                if(x.Map.Value.Name.GetText() != "")
                                 {
                                     ImGui.Separator();
                                     ImGuiEx.Text($"{x.Map.Value.Name}:");

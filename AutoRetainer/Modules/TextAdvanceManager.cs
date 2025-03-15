@@ -7,7 +7,7 @@ internal static class TextAdvanceManager
 {
     private static bool WasChanged = false;
 
-    private static bool IsBusy => Utils.IsBusy || VoyageScheduler.Enabled;
+    private static bool IsBusy => (Utils.IsBusy || VoyageScheduler.Enabled) && !SchedulerMain.CharacterPostProcessLocked;
     internal static void Tick()
     {
         if(WasChanged)

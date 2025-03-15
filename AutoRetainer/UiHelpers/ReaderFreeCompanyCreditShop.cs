@@ -27,7 +27,7 @@ public unsafe class ReaderFreeCompanyCreditShop : AtkReader
         {
         }
 
-        public string Name => ReadSeString(0)?.ExtractText();
+        public string Name => ReadSeString(0)?.GetText();
         public uint ItemID => ReadUInt(20) ?? 0;
         public int IconID => ReadInt(40) ?? 0;
         public uint RankReq => ReadUInt(60) ?? 0;

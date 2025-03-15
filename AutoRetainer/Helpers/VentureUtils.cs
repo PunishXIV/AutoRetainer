@@ -421,11 +421,11 @@ internal static unsafe class VentureUtils
         if(task == null) return null;
         if(task.Value.IsRandom)
         {
-            return $"{Svc.Data.GetExcelSheet<RetainerTaskRandom>().GetRowOrDefault(task.Value.Task.RowId)?.Name.ToDalamudString().ExtractText()}";
+            return $"{Svc.Data.GetExcelSheet<RetainerTaskRandom>().GetRowOrDefault(task.Value.Task.RowId)?.Name.ToDalamudString().GetText()}";
         }
         else
         {
-            return $"{Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRowOrDefault(task.Value.Task.RowId)?.Item.ValueNullable?.Name.ToDalamudString().ExtractText()}";
+            return $"{Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRowOrDefault(task.Value.Task.RowId)?.Item.ValueNullable?.Name.ToDalamudString().GetText()}";
         }
     }
 
@@ -455,7 +455,7 @@ internal static unsafe class VentureUtils
                 if(item != null)
                 {
                     var str = MemoryHelper.ReadSeStringNullTerminated((nint)item);
-                    ret.Add(str.ExtractText());
+                    ret.Add(str.GetText());
                 }
             }
         }
