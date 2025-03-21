@@ -24,26 +24,31 @@ internal static unsafe class TaskDeployOnBestExpVoyage
 
     internal static bool? Deploy()
     {
-        if(TryGetAddonByName<AtkUnitBase>("AirShipExploration", out var addon) && IsAddonReady(addon))
         {
-            var button = addon->UldManager.NodeList[2]->GetAsAtkComponentButton();
-            if(!button->IsEnabled)
+            if(TryGetAddonByName<AtkUnitBase>("AirShipExplorationDetail", out var addon) && addon->IsReady()) return true;
+        }
+        {
+            if(TryGetAddonByName<AtkUnitBase>("AirShipExploration", out var addon) && IsAddonReady(addon))
             {
-                EzThrottler.Throttle("Voyage.Deploy", 500, true);
-                return false;
+                var button = addon->UldManager.NodeList[2]->GetAsAtkComponentButton();
+                if(!button->IsEnabled)
+                {
+                    EzThrottler.Throttle("Voyage.Deploy", 500, true);
+                    return false;
+                }
+                else
+                {
+                    if(Utils.GenericThrottle && EzThrottler.Throttle("Voyage.Deploy"))
+                    {
+                        Callback.Fire(addon, true, 0);
+                        return false;
+                    }
+                }
             }
             else
             {
-                if(Utils.GenericThrottle && EzThrottler.Throttle("Voyage.Deploy"))
-                {
-                    Callback.Fire(addon, true, 0);
-                    return true;
-                }
+                Utils.RethrottleGeneric();
             }
-        }
-        else
-        {
-            Utils.RethrottleGeneric();
         }
         return false;
     }

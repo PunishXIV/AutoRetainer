@@ -446,7 +446,15 @@ internal static unsafe class WorkshopUI
             }
             ImGuiEx.Text(points.Join(""));
             ImGui.SameLine();
-            ImGuiEx.Text(vessel.GetRemainingSeconds() > 0 ? $"{VoyageUtils.Seconds2Time(vessel.GetRemainingSeconds())}" : "Voyage completed");
+            if(C.TimerAllowNegative)
+            {
+                ImGuiEx.Text($"{VoyageUtils.Seconds2Time(vessel.GetRemainingSeconds())}");
+            }
+            else
+            {
+                ImGuiEx.Text(vessel.GetRemainingSeconds() > 0 ? $"{VoyageUtils.Seconds2Time(vessel.GetRemainingSeconds())}" : "Voyage completed");
+            }
+                
         }
         ImGui.TableNextColumn();
         ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);

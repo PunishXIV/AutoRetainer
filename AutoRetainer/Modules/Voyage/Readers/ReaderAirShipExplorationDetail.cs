@@ -22,7 +22,10 @@ internal unsafe class ReaderAirShipExplorationDetail(AtkUnitBase* UnitBase, int 
                 var maxD = int.Parse(d[1]);
                 return curF > 0 && maxF > 0 && curD > 0 && maxD > 0 && curF <= maxF && curD <= maxD;
             }
-            catch(Exception) { }
+            catch(Exception e) 
+            {
+                e.LogDebug();
+            }
             return false;
         }
     }
