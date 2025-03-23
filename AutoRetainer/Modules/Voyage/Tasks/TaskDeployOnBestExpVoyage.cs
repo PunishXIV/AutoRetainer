@@ -25,7 +25,7 @@ internal static unsafe class TaskDeployOnBestExpVoyage
     internal static bool? Deploy()
     {
         {
-            if(TryGetAddonByName<AtkUnitBase>("AirShipExplorationDetail", out var addon) && addon->IsReady()) return true;
+            if(TryGetAddonByName<AtkUnitBase>("AirShipExplorationDetail", out _)) return true;
         }
         {
             if(TryGetAddonByName<AtkUnitBase>("AirShipExploration", out var addon) && IsAddonReady(addon))
