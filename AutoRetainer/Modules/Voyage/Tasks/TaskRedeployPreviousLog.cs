@@ -28,7 +28,7 @@ internal static unsafe class TaskRedeployPreviousLog
             var fuel = addon->AtkValues[1].String;
             if(fuel != null)
             {
-                var values = MemoryHelper.ReadStringNullTerminated((nint)fuel).Split("/");
+                var values = MemoryHelper.ReadStringNullTerminated((nint)fuel.Value).Split("/");
                 if(values.Length == 2 && uint.TryParse(values[0], out var req) && uint.TryParse(values[1], out var have))
                 {
                     if(req > have)

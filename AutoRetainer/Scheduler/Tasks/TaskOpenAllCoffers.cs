@@ -1,5 +1,6 @@
 ﻿using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
 namespace AutoRetainer.Scheduler.Tasks;
@@ -39,7 +40,7 @@ public static unsafe class TaskOpenAllCoffers
 
     public static void OpenCoffer()
     {
-        AgentInventoryContext.Instance()->UseItem(32161, 0x270F, 0, 0);
+        AgentInventoryContext.Instance()->UseItem(32161, (InventoryType)0x270F, 0, 0);
     }
 
 }

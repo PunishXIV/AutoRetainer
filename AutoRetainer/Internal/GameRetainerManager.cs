@@ -3,7 +3,7 @@
 namespace AutoRetainer.Internal;
 public static unsafe class GameRetainerManager
 {
-    public static bool Ready => RetainerManager.Instance()->Ready != 0;
+    public static bool Ready => RetainerManager.Instance()->IsReady != false;
     public static List<Retainer> Retainers
     {
         get

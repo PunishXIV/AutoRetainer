@@ -38,7 +38,7 @@ internal unsafe class DebugMisc : DebugSectionBase
         {
             var h = HousingManager.Instance();
             ImGuiEx.Text($"GetCurrentDivision {h->GetCurrentDivision()}");
-            ImGuiEx.Text($"GetCurrentHouseId {h->GetCurrentHouseId()}");
+            ImGuiEx.Text($"GetCurrentHouseId {h->GetCurrentIndoorHouseId()}");
             ImGuiEx.Text($"GetCurrentPlot {h->GetCurrentPlot()}");
             ImGuiEx.Text($"GetCurrentRoom {h->GetCurrentRoom()}");
             ImGuiEx.Text($"GetCurrentWard {h->GetCurrentWard()}");

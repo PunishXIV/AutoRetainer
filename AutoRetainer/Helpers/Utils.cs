@@ -319,7 +319,7 @@ internal static unsafe class Utils
         var ret = 1f;
         if(Player.Available)
         {
-            if(Player.Object.StatusList.TryGetFirst(x => x.StatusId == 414, out var s)) ret = 1f + (float)s.StackCount / 100f;
+            if(Player.Object.StatusList.TryGetFirst(x => x.StatusId == 414, out var s)) ret = 1f + (float)s.Param / 100f;
             if(Player.Object.StatusList.Any(x => x.StatusId == 1078)) ret = 1.15f;
         }
         return ret > 1f ? ret : 1f;
@@ -678,7 +678,7 @@ internal static unsafe class Utils
         var list = new List<string>();
         for(var i = 0; i < addon->PopupMenu.PopupMenu.EntryCount; i++)
         {
-            list.Add(MemoryHelper.ReadSeStringNullTerminated((nint)addon->PopupMenu.PopupMenu.EntryNames[i]).GetText());
+            list.Add(MemoryHelper.ReadSeStringNullTerminated((nint)addon->PopupMenu.PopupMenu.EntryNames[i].Value).GetText());
         }
         return list;
     }

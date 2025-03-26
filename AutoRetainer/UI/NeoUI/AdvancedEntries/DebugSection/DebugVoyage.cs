@@ -119,7 +119,7 @@ internal unsafe class DebugVoyage : DebugSectionBase
             }
             var curPlotId = (long*)(Process.GetCurrentProcess().MainModule.BaseAddress + 0x215FB68);
             ImGuiEx.TextCopy($"Plot ID: {*curPlotId:X16}");
-            ImGuiEx.Text($"HID: {HousingManager.Instance()->GetCurrentHouseId()}");
+            ImGuiEx.Text($"HID: {HousingManager.Instance()->GetCurrentIndoorHouseId()}");
             if(HousingManager.Instance()->WorkshopTerritory != null)
             {
                 ImGuiEx.Text($"Num air: {HousingManager.Instance()->WorkshopTerritory->Airship.AirshipCount}");
