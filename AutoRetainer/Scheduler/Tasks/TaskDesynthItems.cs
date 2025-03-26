@@ -11,8 +11,6 @@ using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
 namespace AutoRetainer.Scheduler.Tasks;
 public static unsafe class TaskDesynthItems
 {
-    private unsafe delegate void SalvageItemDelegate(AgentSalvage* thisPtr, InventoryItem* item, int addonId, byte a4);
-    private static SalvageItemDelegate _salvageItem = null!;
     private static readonly InventoryType[] DesynthableInventories =
     [
         InventoryType.Inventory1,
@@ -41,7 +39,6 @@ public static unsafe class TaskDesynthItems
     private static bool? RecursivelyDesynthItems()
     {
         if(!QuestManager.IsQuestComplete(65688)) return true;
-        _salvageItem ??= Marshal.GetDelegateForFunctionPointer<SalvageItemDelegate>(Svc.SigScanner.ScanText("E8 ?? ?? ?? ?? EB 5A 48 8B 07"));
 
         var eligibleItems = GetEligibleItems();
         if(eligibleItems.Count == 0) return true;
@@ -86,7 +83,7 @@ public static unsafe class TaskDesynthItems
     private static void DesynthItem(InventoryItem* item)
     {
         Svc.Log.Info($"Desynthing {ExcelItemHelper.GetName(ExcelItemHelper.Get(item->ItemId), true)} [Container={item->Container},Slot={item->Slot}]");
-        _salvageItem(AgentSalvage.Instance(), item, 0, 0);
+        AgentSalvage.Instance()->SalvageItem(item);
         var retval = new AtkValue();
         Span<AtkValue> param = [
             new AtkValue { Type = ValueType.Int, Int = 0 },
