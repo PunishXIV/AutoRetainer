@@ -134,6 +134,13 @@ public static class Unlocks
     { 120, new UnlockedFrom(118) },                         // E    South Indigo Deep 1           <-       North Delphinium Seashelf
     { 121, new UnlockedFrom(117) },                         // F    The Central Blue              <-       Voyagers' Reprieve
     { 122, new UnlockedFrom(118) },                         // G    South Indigo Deep 2           <-       North Delphinium Seashelf
+    
+    { 123, new UnlockedFrom(122) },                         // H    The Talon                     <-       South Indigo Deep 2
+    { 124, new UnlockedFrom(121) },                         // I    Southern Central Blue         <-       The Central Blue
+    { 125, new UnlockedFrom(122) },                         // J    South Indigo Deep 3           <-       South Indigo Deep 2
+    { 126, new UnlockedFrom(123) },                         // K    the Talonspoint Depths        <-       The Talon
+    { 127, new UnlockedFrom(124) },                         // L    Saltfarer's Eye               <-       Southern Central Blue
+    { 128, new UnlockedFrom(9876) },                        // M    Startail Shallows             <-       XXX
 };
 
     public static List<(uint, UnlockedFrom)> FindUnlockPath(uint finalPoint)
