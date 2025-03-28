@@ -15,13 +15,9 @@ public class TitleScreenButton : IDisposable
 
     private void RegisterTitleIcon(object f)
     {
-        if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "autoretainer.png"), out var icon))
-        {
-            Svc.Framework.Update -= RegisterTitleIcon;
-            var duplicate = icon.CreateWrapSharingLowLevelResource();
-            Purgatory.Add(duplicate.Dispose);
-            TitleScreenMenuEntryButton = Svc.TitleScreenMenu.AddEntry(Svc.PluginInterface.Manifest.Name, duplicate, () => P.AutoRetainerWindow.IsOpen = true);
-        }
+        Svc.Framework.Update -= RegisterTitleIcon;
+        var tex = Svc.Texture.GetFromGame(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "autoretainer.png"));
+        TitleScreenMenuEntryButton = Svc.TitleScreenMenu.AddEntry(Svc.PluginInterface.Manifest.Name, tex, () => P.AutoRetainerWindow.IsOpen = true);
     }
 
     public void Dispose()
