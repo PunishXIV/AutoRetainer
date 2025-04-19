@@ -70,7 +70,11 @@ internal static class Lang
         "平地探索委託（需要2枚探險幣）",
         "山岳探索委託（需要2枚探險幣）",
         "森林探索委託（需要2枚探險幣）",
-        "水岸探索委託（需要2枚探險幣）"
+        "水岸探索委託（需要2枚探險幣）",
+        "탐색수행: 평지 (필요한 집사 급료: 2개)",
+        "탐색수행: 산악 (필요한 집사 급료: 2개)",
+        "탐색수행: 삼림 (필요한 집사 급료: 2개)",
+        "탐색수행: 물가 (필요한 집사 급료: 2개)",
     ];
 
     internal static readonly string[] HuntingVentureNames =
@@ -98,7 +102,11 @@ internal static class Lang
         "狩獵籌集委託（需要1枚探險幣）",
         "採礦籌集委託（需要1枚探險幣）",
         "採伐籌集委託（需要1枚探險幣）",
-        "捕魚籌集委託（需要1枚探險幣）"
+        "捕魚籌集委託（需要1枚探險幣）",
+        "조달수행: 사냥 (필요한 집사 급료: 1개)",
+        "조달수행: 광부 (필요한 집사 급료: 1개)",
+        "조달수행: 원예가 (필요한 집사 급료: 1개)",
+        "조달수행: 어부 (필요한 집사 급료: 1개)",
     ];
 
     internal static readonly string[] QuickExploration =
@@ -108,7 +116,8 @@ internal static class Lang
         "Schneller Streifzug (2 Wertmarken)",
         "Tâche improvisée (2 jetons)",
         "自由探索委托（需要2枚探险币）",
-        "自由探索委託（需要2枚探險幣）"
+        "自由探索委託（需要2枚探險幣）",
+        "발굴수행 (필요한 집사 급료: 2개)",
     ];
 
     internal static readonly string[] Entrance =
@@ -118,7 +127,8 @@ internal static class Lang
         "進入房屋",
         "Eingang",
         "Entrée",
-        "Entrance"
+        "Entrance",
+        "주택으로 들어가기",
     ];
 
     internal static string ApartmentEntrance => Svc.Data.GetExcelSheet<EObjName>().GetRow(2007402).Singular.ToString();
@@ -130,7 +140,8 @@ internal static class Lang
         "要進入這間房屋嗎？",
         "Das Gebäude betreten?",
         "Entrer dans la maison ?",
-        "Enter the estate hall?"
+        "Enter the estate hall?",
+        "'주택'으로 들어가시겠습니까?",
     ];
 
     internal static readonly string[] RetainerAskCategoryText =
@@ -140,7 +151,8 @@ internal static class Lang
         "請選擇要委託的探險",
         "Wähle eine Unternehmung, auf die du den Gehilfen schicken möchtest.",
         "Choisissez un type de tâche :",
-        "Select a category."
+        "Select a category.",
+        "집사 수행의 종류를 선택하십시오.",
     ];
 
     internal static string[] BellName => [Svc.Data.GetExcelSheet<EObjName>().GetRow(2000401).Singular.GetText(), "リテイナーベル"];
@@ -157,7 +169,8 @@ internal static class Lang
         "移动到自己的房间",
         "移動到自己的房間",
         "Die eigene Wohnung betreten",
-        "Aller dans votre appartement"
+        "Aller dans votre appartement",
+        "자신의 방으로 이동",
     ];
 
     internal static readonly string[] SkipCutsceneStr =
@@ -167,24 +180,25 @@ internal static class Lang
         "要跳過這段過場動畫嗎？",
         "Videosequenz überspringen?",
         "Passer la scène cinématique ?",
-        "このカットシーンをスキップしますか？"
+        "このカットシーンをスキップしますか？",
+        "영상을 건너뛰시겠습니까?",
     ];
     //11	TEXT_CMNDEFHOUSINGPERSONALROOMENTRANCE_00178_GOTO_WORKSHOP	Move to the company workshop
     //11	TEXT_CMNDEFHOUSINGPERSONALROOMENTRANCE_00178_GOTO_WORKSHOP	地下工房に移動する
     //11	TEXT_CMNDEFHOUSINGPERSONALROOMENTRANCE_00178_GOTO_WORKSHOP	Die Ge<SoftHyphen/>sell<SoftHyphen/>schaftswerkstätte betreten
     //11	TEXT_CMNDEFHOUSINGPERSONALROOMENTRANCE_00178_GOTO_WORKSHOP	Aller dans l'atelier de compagnie
-    internal static readonly string[] EnterWorkshop = ["Move to the company workshop", "地下工房に移動する", "移动到部队工房", "移動到部隊工房", "Die Gesellschaftswerkstätte betreten", "Aller dans l'atelier de compagnie"];
+    internal static readonly string[] EnterWorkshop = ["Move to the company workshop", "地下工房に移動する", "移动到部队工房", "移動到部隊工房", "Die Gesellschaftswerkstätte betreten", "Aller dans l'atelier de compagnie", "지하공방으로 이동"];
 
-    internal static readonly string[] AirshipManagement = ["Airship Management", "飛空艇の管理", "管理飞空艇", "管理飛空艇", "Luftschiff verwalten", "Contrôle aérien"];
-    internal static readonly string[] SubmarineManagement = ["Submersible Management", "潜水艦の管理", "管理潜水艇", "管理潛水艇", "Tauchboot verwalten", "Contrôle sous-marin"];
-    internal static readonly string[] CancelVoyage = ["Cancel", "キャンセル", "取消", "Abbrechen", "Annuler"];
-    internal static readonly string[] NothingVoyage = ["Nothing.", "やめる", "取消", "Nichts", "Annuler"];
-    internal static readonly string[] DeployOnSubaquaticVoyage = ["Deploy submersible on subaquatic voyage", "ボイジャー出港", "出发", "出發", "Auf Erkundung gehen", "Expédier le sous-marin"];
-    internal static readonly string[] ViewPrevVoyageLog = ["View previous voyage log", "前回のボイジャー報告", "上次的远航报告", "上次的遠航報告", "Bericht der letzten Erkundung", "Consulter le journal de la précédente expédition"];
-    internal static readonly string[] VoyageQuitEntry = ["Quit", "やめる", "取消", "Beenden", "Annuler"];
+    internal static readonly string[] AirshipManagement = ["Airship Management", "飛空艇の管理", "管理飞空艇", "管理飛空艇", "Luftschiff verwalten", "Contrôle aérien", "비공정 관리"];
+    internal static readonly string[] SubmarineManagement = ["Submersible Management", "潜水艦の管理", "管理潜水艇", "管理潛水艇", "Tauchboot verwalten", "Contrôle sous-marin", "잠수함 관리"];
+    internal static readonly string[] CancelVoyage = ["Cancel", "キャンセル", "取消", "Abbrechen", "Annuler", "취소"];
+    internal static readonly string[] NothingVoyage = ["Nothing.", "やめる", "取消", "Nichts", "Annuler", "그만두기"];
+    internal static readonly string[] DeployOnSubaquaticVoyage = ["Deploy submersible on subaquatic voyage", "ボイジャー出港", "出发", "出發", "Auf Erkundung gehen", "Expédier le sous-marin", "탐사 출항"];
+    internal static readonly string[] ViewPrevVoyageLog = ["View previous voyage log", "前回のボイジャー報告", "上次的远航报告", "上次的遠航報告", "Bericht der letzten Erkundung", "Consulter le journal de la précédente expédition", "이전 탐사 보고서"];
+    internal static readonly string[] VoyageQuitEntry = ["Quit", "やめる", "取消", "Beenden", "Annuler", "그만두기"];
 
-    internal static readonly string[] PanelAirship = ["Select an airship.", "飛空艇を選択してください。", "请选择飞空艇。", "請選擇飛空艇。", "Wähle ein Luftschiff.", "Choisissez un aéronef."];
-    internal static readonly string[] PanelSubmersible = ["Select a submersible.", "潜水艦を選択してください。", "请选择潜水艇。", "請選擇潛水艇。", "Wähle ein Tauchboot.", "Choisissez un sous-marin."];
+    internal static readonly string[] PanelAirship = ["Select an airship.", "飛空艇を選択してください。", "请选择飞空艇。", "請選擇飛空艇。", "Wähle ein Luftschiff.", "Choisissez un aéronef.", "비공정을 선택하십시오."];
+    internal static readonly string[] PanelSubmersible = ["Select a submersible.", "潜水艦を選択してください。", "请选择潜水艇。", "請選擇潛水艇。", "Wähle ein Tauchboot.", "Choisissez un sous-marin.", "잠수함을 선택하십시오."];
 
     //2004353	entrance to additional chambers	0	entrances to additional chambers	0	1	1	0	0
     internal static string[] AdditionalChambersEntrance =>
@@ -199,7 +213,7 @@ internal static class Lang
     //4160	60	9	0	False	Unable to retrieve extracted items. Insufficient inventory/crystal inventory space.
     internal static string VoyageInventoryError => Svc.Data.GetExcelSheet<LogMessage>().GetRow(4160).Text.ToDalamudString().GetText();
 
-    internal static string[] UnableToVisitWorld = ["Unable to execute command. Character is currently visiting the", "他のデータセンター", "无法进行该操作，其他玩家正在操作该潜水艇。", "無法進行該操作，其他玩家正在操作該潛水艇。", "Der Vorgang kann nicht ausgeführt werden, da der Charakter gerade das Datenzentrum", "Impossible d'exécuter cette commande. Le personnage se trouve dans un autre centre de traitement de données"];
+    internal static string[] UnableToVisitWorld = ["Unable to execute command. Character is currently visiting the", "他のデータセンター", "无法进行该操作，其他玩家正在操作该潜水艇。", "無法進行該操作，其他玩家正在操作該潛水艇。", "Der Vorgang kann nicht ausgeführt werden, da der Charakter gerade das Datenzentrum", "Impossible d'exécuter cette commande. Le personnage se trouve dans un autre centre de traitement de données", "다른 데이터 센터"];
 
     //4169	60	9	0	False	Unable to repair vessel component without the required <SheetEn(Item,3,IntegerParameter(1),1,1)/>.
     //4272	60	9	0	False Unable to repair vessel.Insufficient<SheetEn(Item,3,IntegerParameter(1),3,1)/>.
@@ -212,7 +226,7 @@ internal static class Lang
     //4169	60	9	0	False	Réparation impossible. Vous n'avez pas <SheetFr(Item,2,IntegerParameter(1),1,1)/> nécessaire.
     //4272	60	9	0	False	Vous n'avez pas <SheetFr(Item,2,IntegerParameter(1),1,1)/> nécessaire à la réparation.
 
-    internal static readonly string[] UnableToRepairVessel = ["修理に必要な", "修理所必需的", "Unable to repair vessel", "Du hast nicht genug", "Für die Reparatur ist", "Réparation impossible. Vous n'avez pas", "nécessaire à la réparation"];
+    internal static readonly string[] UnableToRepairVessel = ["修理に必要な", "修理所必需的", "Unable to repair vessel", "Du hast nicht genug", "Für die Reparatur ist", "Réparation impossible. Vous n'avez pas", "nécessaire à la réparation", "수리에 필요한"];
 
     //11	TEXT_HOUFIXCOMPANYSUBMARINE_00447_SUBMARINE_CMD_REPAIR_PARTS	パーツの修理
     //11	TEXT_HOUFIXCOMPANYSUBMARINE_00447_SUBMARINE_CMD_REPAIR_PARTS	Bauteile reparieren
@@ -233,7 +247,8 @@ internal static class Lang
         "パーツの修理",
         "Bauteile reparieren",
         "Réparer des éléments",
-        "修理配件"
+        "修理配件",
+        "부품 수리",
     ];
 
     //Use <If(Equal(IntegerParameter(4),1))>your last <SheetEn(Item,3,IntegerParameter(2),1,1)/><Else/><Value>IntegerParameter(3)</Value> of your <Value>IntegerParameter(4)</Value> <SheetEn(Item,3,IntegerParameter(2),2,1)/></If> to repair your vessel's <SheetEn(Item,3,IntegerParameter(1),1,1)/>?
@@ -252,7 +267,8 @@ internal static class Lang
             "réparer",
             "要修理下列部件吗",
             "要修理下列部件嗎",
-            "要修理下列元件嗎"
+            "要修理下列元件嗎",
+            "수리하시겠습니까?",
         ];
 
     //Your retainer will be unable to process item buyback requests once recalled. Are you sure you wish to proceed?
@@ -265,8 +281,9 @@ internal static class Lang
         "Renvoyer le servant effacera la liste de rachat. Confirmer",
         "Wenn du deinen Gehilfen wegschickst, kannst du die von ihm verkauften Gegenstände nicht mehr zurückkaufen. Möchtest du trotzdem fortfahren",
         "让雇员返回后将无法购回委托卖掉的道具",
-        "讓僱員返回後將無法購回委託賣掉的道具"
+        "讓僱員返回後將無法購回委託賣掉的道具",
+        "집사를 돌려보내면 판매 의뢰한 아이템을 재매입할 수 없게 됩니다. 계속하시겠습니까?",
         ];
 
-    internal static readonly string[] LogInPartialText = ["Logging in with", "Log in with", "でログインします。", "einloggen?", "eingeloggt.", "Se connecter avec", "Vous allez vous connecter avec", "Souhaitez-vous vous connecter avec", "登入吗", "登入嗎", "登录吗"];
+    internal static readonly string[] LogInPartialText = ["Logging in with", "Log in with", "でログインします。", "einloggen?", "eingeloggt.", "Se connecter avec", "Vous allez vous connecter avec", "Souhaitez-vous vous connecter avec", "登入吗", "登入嗎", "登录吗", "접속하시겠습니까?"];
 }
