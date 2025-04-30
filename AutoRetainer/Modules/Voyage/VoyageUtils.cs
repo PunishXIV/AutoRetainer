@@ -13,6 +13,7 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.Sheets;
+using static Lumina.Data.Parsing.Uld.UldRoot;
 
 namespace AutoRetainer.Modules.Voyage;
 
@@ -406,6 +407,20 @@ internal static unsafe class VoyageUtils
         return "";
     }
 
+    internal static string GetPlanBuild(this LevelAndPartsData data)
+    {
+        if (data.Part1 != 0 && data.Part2 != 0 && data.Part3 != 0 && data.Part4 != 0)
+        {
+            var str = Build.ToIdentifier((ushort)((Items)data.Part1).GetPartId())
+                    + Build.ToIdentifier((ushort)((Items)data.Part2).GetPartId())
+                    + Build.ToIdentifier((ushort)((Items)data.Part3).GetPartId())
+                    + Build.ToIdentifier((ushort)((Items)data.Part4).GetPartId());
+            if (str.Length == 8) str = str.Replace("+", "") + "++";
+            return " " + str;
+        }
+        return "";
+    }
+
     internal static VoyageType? DetectAddonType(AtkUnitBase* addon)
     {
         var textptr = addon->UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText;
@@ -444,6 +459,78 @@ internal static unsafe class VoyageUtils
         }
         return ret;
     }
+
+    internal static List<(int, uint)> GetIsVesselNeedsPartsSwap(string name, VoyageType type, out List<string> log) => GetIsVesselNeedsPartsSwap(GetVesselIndexByName(name, type), type, out log);
+
+    internal static List<(int, uint)> GetIsVesselNeedsPartsSwap(int num, VoyageType type, out List<string> log)
+    {
+        log = new List<string>();
+        var workshop = HousingManager.Instance()->WorkshopTerritory;
+
+        PluginLog.Debug($"Change - Num: {num}");
+        int vesselLevel = (int)workshop->Submersible.Data[num].RankId;
+
+        CheckAndLogParts(num, type, GetPlanInLevelRange(vesselLevel), log, out List<(int, uint)> requiredChanges);
+
+        return AreRequiredPartsAvailable(requiredChanges) ? requiredChanges : new List<(int, uint)>();
+    }
+
+    internal static LevelAndPartsData GetPlanInLevelRange(int vesselLevel)
+    {
+        foreach (var partsData in C.LevelAndPartsData)
+        {
+            if (IsLevelInRange(vesselLevel, partsData.MinLevel, partsData.MaxLevel))
+            {
+                PluginLog.Debug($"Change - {partsData.GUID}");
+
+                return partsData;
+            }
+        }
+
+        return new LevelAndPartsData();
+    }
+
+    internal static bool IsLevelInRange(int level, int minLevel, int maxLevel) =>
+        minLevel <= level && level <= maxLevel;
+
+    internal static void CheckAndLogParts(int num, VoyageType type, LevelAndPartsData partsData, List<string> log, out List<(int, uint)> changes)
+    {
+        changes = new List<(int, uint)>();
+        for (int slotIndex = 0; slotIndex < 4; slotIndex++)
+        {
+            var slot = GetVesselComponent(num, type, slotIndex);
+            uint requiredPart = GetRequiredPart(partsData, slotIndex);
+
+            if (slot->ItemId != requiredPart)
+            {
+                log.Add($"index: {slotIndex}, id: {slot->ItemId}, swap: {requiredPart}");
+                changes.Add((slotIndex, requiredPart));
+            }
+        }
+    }
+
+    internal static uint GetRequiredPart(LevelAndPartsData partsData, int slotIndex) =>
+        slotIndex switch
+        {
+            0 => (uint)partsData.Part1,
+            1 => (uint)partsData.Part2,
+            2 => (uint)partsData.Part3,
+            3 => (uint)partsData.Part4,
+            _ => throw new ArgumentOutOfRangeException(nameof(slotIndex), "Invalid slot index")
+        };
+
+    internal static uint GetSubPart(string name, int slotIndex) =>
+            slotIndex switch
+            {
+                    0 => (uint)Data.AdditionalSubmarineData[name].Part1, 
+                    1 => (uint)Data.AdditionalSubmarineData[name].Part2, 
+                    2 => (uint)Data.AdditionalSubmarineData[name].Part3, 
+                    3 => (uint)Data.AdditionalSubmarineData[name].Part4, 
+                    _     => throw new ArgumentOutOfRangeException(nameof(slotIndex), "Invalid slot index")
+            };
+
+    internal static bool AreRequiredPartsAvailable(List<(int, uint)> requiredChanges) =>
+        requiredChanges.All(change => InventoryManager.Instance()->GetInventoryItemCount(change.Item2) > 0);
 
     internal static InventoryItem* GetVesselComponent(int vesselIndex, VoyageType type, int slotIndex)
     {
