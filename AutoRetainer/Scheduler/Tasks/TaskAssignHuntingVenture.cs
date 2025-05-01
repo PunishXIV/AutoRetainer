@@ -1,10 +1,13 @@
 ﻿using AutoRetainer.Scheduler.Handlers;
+using ECommons.Throttlers;
+using FFXIVClientStructs.FFXIV.Component.GUI;
+using Lumina.Excel.Sheets;
 
 namespace AutoRetainer.Scheduler.Tasks;
 
-internal static class TaskAssignHuntingVenture
+public static unsafe class TaskAssignHuntingVenture
 {
-    internal static void Enqueue(uint VentureID)
+    public static void Enqueue(uint ventureId)
     {
         P.TaskManager.Enqueue(NewYesAlreadyManager.WaitForYesAlreadyDisabledTask);
         if(C.RetainerMenuDelay > 0)
@@ -13,22 +16,49 @@ internal static class TaskAssignHuntingVenture
         }
         P.TaskManager.Enqueue(RetainerHandlers.SelectAssignVenture);
         P.TaskManager.Enqueue(() => RetainerHandlers.GenericSelectByName(Lang.HuntingVentureNames), $"GenericSelectByName({Lang.HuntingVentureNames})");
-        //P.TaskManager.Enqueue(() => RetainerHandlers.GenericSelectByName(VentureUtils.GetVentureLevelCategory(VentureID)), $"GenericSelectByName(VentureUtils.GetVentureLevelCategory({VentureID})");
-        //P.TaskManager.Enqueue(() => RetainerHandlers.SelectSpecificVenture(VentureID), $"SelectSpecificVenture({VentureID})");
-        //P.TaskManager.Enqueue(() => RetainerHandlers.SearchVentureByName(VentureID));
         P.TaskManager.Enqueue(RetainerHandlers.WaitForVentureListUpdate);
         P.TaskManager.EnqueueDelay(Utils.FrameDelay, true);
-        P.TaskManager.Enqueue(RetainerHandlers.ClearTaskSupplylist);
-        for(var i = 0; i < 20; i++)
-        {
-            P.TaskManager.Enqueue(() => RetainerHandlers.ForceSearchVentureByName(VentureID), $"ForceSearchVentureByName({VentureID})/{i}");
-        }
-        P.TaskManager.Enqueue(() => RetainerHandlers.SelectSpecificVentureByName(VentureID), $"SelectSpecificVentureByName({VentureID})");
-        /*if (!C.NoErrorCheckPlanner2)
-        {
-            P.TaskManager.DelayNext(10, true);
-            P.TaskManager.Enqueue(() => RetainerHandlers.CheckForErrorAssignedVenture(VentureID), 500, false, "FirstErrorCheck");
-        }*/
+        P.TaskManager.Enqueue(() => OpenAssignVentureWindow(ventureId));
         P.TaskManager.Enqueue(RetainerHandlers.ClickAskAssign);
+    }
+
+    public static bool OpenAssignVentureWindow(uint ventureId)
+    {
+        if(!FrameThrottler.Check("OpenAssignVentureWindow")) return false;
+        if(TryGetAddonByName<AtkUnitBase>("RetainerTaskAsk", out _)) return true;
+        if(TryGetAddonByName<AtkUnitBase>("RetainerTaskSupply", out var addon) && addon->IsReady())
+        {
+            for(int i = 0; i < addon->AtkValues[107].UInt; i++)
+            {
+                var ptr = (nint)addon->AtkValues[42 + i].Pointer;
+                var id = *(uint*)ptr;
+                if(id == ventureId && Utils.GenericThrottle)
+                {
+                    rethrottle();
+                    Callback.Fire(addon, true, 5, i, Callback.ZeroAtkValue);
+                    return false;
+                }
+            }
+            if(Svc.Data.GetExcelSheet<RetainerTask>().TryGetRow(ventureId, out var task))
+            {
+                var level = task.RetainerLevel;
+                var levelIndex = (level-1) / 5;
+                var listIndex = addon->AtkValues[40].Int - levelIndex - 1;
+                if(listIndex >= 0 && Utils.GenericThrottle)
+                {
+                    rethrottle();
+                    Callback.Fire(addon, true, 4, listIndex, Callback.ZeroAtkValue);
+                    return false;
+                }
+            }
+        }
+        else
+        {
+            rethrottle();
+        }
+
+        return false;
+
+        void rethrottle() => FrameThrottler.Throttle("OpenAssignVentureWindow", Utils.FrameDelay, true);
     }
 }

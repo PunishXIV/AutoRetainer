@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.Internal;
+using AutoRetainer.Modules.Voyage.PartSwapper;
 using AutoRetainerAPI.Configuration;
 using ECommons.Automation.NeoTaskManager;
 using static FFXIVClientStructs.FFXIV.Client.UI.RaptureAtkHistory.Delegates;
@@ -12,7 +13,7 @@ internal static class TaskIntelligentComponentsChange
         VoyageUtils.Log($"Task enqueued: {nameof(TaskIntelligentComponentsChange)}, name={name}, type={type}");
         P.TaskManager.Enqueue(() =>
         {
-            var rep = VoyageUtils.GetIsVesselNeedsPartsSwap(name, type, out var log);
+            var rep = PartSwapperUtils.GetIsVesselNeedsPartsSwap(name, type, out var log);
             if(rep.Count > 0)
             {
                 TaskChangeComponents.EnqueueImmediate(rep, name, type);

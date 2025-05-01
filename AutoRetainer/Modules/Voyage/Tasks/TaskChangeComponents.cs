@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.Internal;
+using AutoRetainer.Modules.Voyage.PartSwapper;
 using AutoRetainerAPI.Configuration;
 using ECommons.Throttlers;
 using System.Xml.Linq;
@@ -19,14 +20,14 @@ internal static unsafe class TaskChangeComponents
             Name = vesselName;
             Type = type;
             Abort = false;
-            P.TaskManager.Enqueue(VoyageScheduler.SelectChangeComponents, "SelectChangeComponents");
+            P.TaskManager.Enqueue(PartSwapperTasks.SelectChangeComponents, "SelectChangeComponents");
             foreach(var index in indexes)
             {
                 if(index.Item1 < 0 || index.Item1 > 3) throw new ArgumentOutOfRangeException(nameof(index));
-                P.TaskManager.Enqueue(() => VoyageScheduler.ChangeComponent(index.Item1, index.Item2, Name), $"Change {index}");
+                P.TaskManager.Enqueue(() => PartSwapperTasks.ChangeComponent(index.Item1, index.Item2, Name), $"Change {index}");
                 P.TaskManager.EnqueueDelay(Utils.FrameDelay * 2, true);
             }
-            P.TaskManager.Enqueue(VoyageScheduler.CloseChangeComponents, "CloseChangeComponents");
+            P.TaskManager.Enqueue(PartSwapperTasks.CloseChangeComponents, "CloseChangeComponents");
         }
         catch(Exception e) { e.Log(); }
         P.TaskManager.InsertStack();

@@ -84,7 +84,7 @@ public static unsafe class PartSwapperTasks
         var t = $"VoyageScheduler.ChangeComponent{slot}";
         if(EzThrottler.Check(t))
         {
-            if(!string.IsNullOrEmpty(name) && VoyageUtils.GetSubPart(name, slot) == componentId)
+            if(!string.IsNullOrEmpty(name) && PartSwapperUtils.GetSubPart(name, slot) == componentId)
                 return true;
 
             if(TryGetAddonByName<AddonContextIconMenu>("ContextIconMenu", out var addon) && IsAddonReady(&addon->AtkUnitBase))

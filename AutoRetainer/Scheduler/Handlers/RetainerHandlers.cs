@@ -532,11 +532,13 @@ internal static unsafe class RetainerHandlers
         return false;
     }*/
 
+    [Obsolete]
     public static bool? SelectSpecificVentureByName(uint id)
     {
         return SelectSpecificVentureByName(VentureUtils.GetVentureName(id));
     }
 
+    [Obsolete]
     public static bool? ForceSearchVentureByName(uint id)
     {
         return ForceSearchVentureByName(VentureUtils.GetVentureName(id));
@@ -619,6 +621,7 @@ internal static unsafe class RetainerHandlers
         return false;
     }
 
+    [Obsolete]
     internal static bool? ClearTaskSupplylist()
     {
         if(TryGetAddonByName<AtkUnitBase>("RetainerTaskSupply", out var addon) && IsAddonReady(addon))
