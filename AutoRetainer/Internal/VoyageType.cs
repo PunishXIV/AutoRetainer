@@ -1,6 +1,6 @@
 ﻿namespace AutoRetainer.Internal;
 
-internal enum VoyageType
+public enum VoyageType
 {
     Airship, Submersible
 }

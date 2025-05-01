@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.Internal;
+using AutoRetainer.Modules.Voyage.PartSwapper;
 using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using AutoRetainerAPI.Configuration;
@@ -210,29 +211,7 @@ internal static unsafe class VoyageMain
                             TaskSelectVesselByName.Enqueue(next, type);
                         }
 
-                        if(C.EnableAutomaticComponentsAndPlanChange)
-                        {
-                            TaskIntelligentComponentsChange.Enqueue(next, type);
-
-                            var plan = VoyageUtils.GetPlanInLevelRange(Data.GetAdditionalVesselData(next, type).Level);
-
-                            if(VoyageUtils.GetIsVesselNeedsPartsSwap(next, VoyageType.Submersible, out _).Count == 0)
-                                if(plan.FirstSubDifferent && VoyageUtils.GetVesselIndexByName(next, VoyageType.Submersible) == 0)
-                                {
-                                    Data.AdditionalSubmarineData[next].UnlockMode = plan.FirstSubUnlockMode;
-                                    Data.AdditionalSubmarineData[next].SelectedUnlockPlan = plan.FirstSubSelectedUnlockPlan;
-                                    Data.AdditionalSubmarineData[next].VesselBehavior = plan.FirstSubVesselBehavior;
-                                    Data.AdditionalSubmarineData[next].SelectedPointPlan = plan.FirstSubSelectedPointPlan;
-                                }
-                                else
-                                {
-                                    Data.AdditionalSubmarineData[next].UnlockMode = plan.UnlockMode;
-                                    Data.AdditionalSubmarineData[next].SelectedUnlockPlan = plan.SelectedUnlockPlan;
-                                    Data.AdditionalSubmarineData[next].VesselBehavior = plan.VesselBehavior;
-                                    Data.AdditionalSubmarineData[next].SelectedPointPlan = plan.SelectedPointPlan;
-                                }
-                        }
-
+                        PartSwapperScheduler.EnqueuePartSwappingIfNeeded(next, type);
 
                         P.TaskManager.EnqueueMulti(
                             new(() => CurrentSubmarine.Get() != null),
@@ -320,22 +299,9 @@ internal static unsafe class VoyageMain
         }
         else
         {
-            var neededParts = new[] { (uint)Hull.Shark, (uint)Stern.Shark, (uint)Bow.Shark, (uint)Bridge.Shark };
-            if(C.EnableAutomaticSubRegistration && Data.AdditionalSubmarineData.Count < Data.NumSubSlots && neededParts.All(part => InventoryManager.Instance()->GetInventoryItemCount((uint)part) > 0) && InventoryManager.Instance()->GetInventoryItemCount((uint)Items.DiveCredits) >= (2 * Data.NumSubSlots) - 1)
+            if(PartSwapperScheduler.EnqueueSubmersibleRegistrationIfPossible())
             {
-                P.TaskManager.Enqueue(VoyageScheduler.SelectRegisterSub);
-                if(EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResendNewSubs", 1000))
-                {
-                    for(var i = 0; i < 4; i++)
-                    {
-                        var slot = i;
-                        P.TaskManager.Enqueue(() => VoyageScheduler.ChangeComponent(slot, neededParts[slot]), $"ChangeTo{neededParts[slot]}");
-                    }
-
-                    P.TaskManager.Enqueue(VoyageScheduler.RegisterSub);
-                    P.TaskManager.Enqueue(VoyageScheduler.SetupNewSub);
-                    P.TaskManager.Enqueue(VoyageScheduler.SelectQuitVesselMenu);
-                }
+                PluginLog.Information($"Enqueued submersible registration");
             }
             else if(!Data.AreAnyEnabledVesselsReturnInNext(type, 1 * 60))
             {
