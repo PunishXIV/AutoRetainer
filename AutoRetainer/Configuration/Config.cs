@@ -196,8 +196,12 @@ internal unsafe class Config : IEzConfig
         AdvanceTimer = 120,
     };
 
-    public bool StatusBarMSI = false;
-    public int StatusBarIconWidth = 96;
+    public List<LevelAndPartsData> LevelAndPartsData               = [];
+    public bool                    EnableAutomaticSubRegistration  = false;
+    public bool                    EnableAutomaticComponentsAndPlanChange = false;
+
+    public bool StatusBarMSI              = false;
+    public int StatusBarIconWidth        = 96;
 
     public bool IMEnableCofferAutoOpen = false;
     public bool IMEnableAutoVendor = false;
