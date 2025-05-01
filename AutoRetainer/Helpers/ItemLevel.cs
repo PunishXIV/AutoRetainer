@@ -38,7 +38,7 @@ internal static unsafe class ItemLevel
                 sum += item.LevelItem.RowId;
                 i++;
             }
-            
+
             gathering += slot->GetStat(BaseParamEnum.Gathering);
             perception += slot->GetStat(BaseParamEnum.Perception);
 

@@ -62,7 +62,7 @@ internal static unsafe class MiniTA
     internal static void ConfirmRegister()
     {
         var x = Utils.GetSpecificYesno((s) => s.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.WorkshopRegisterConfirm));
-        if (x != null && Utils.GenericThrottle)
+        if(x != null && Utils.GenericThrottle)
         {
             VoyageUtils.Log("Confirming registration");
             new AddonMaster.SelectYesno((nint)x).Yes();

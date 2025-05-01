@@ -497,7 +497,7 @@ internal static unsafe class MultiMode
             }
         }
         return data;
-    } 
+    }
 
     internal static OfflineCharacterData GetCurrentTargetCharacter()
     {

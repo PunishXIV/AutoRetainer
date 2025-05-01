@@ -60,7 +60,7 @@ public class IPC_PluginState
         return null;
     }
 
-    [EzIPC] 
+    [EzIPC]
     public bool IsItemProtected(uint itemId)
     {
         return C.IMProtectList.Contains(itemId);

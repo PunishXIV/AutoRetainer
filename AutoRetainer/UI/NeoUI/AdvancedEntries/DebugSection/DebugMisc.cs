@@ -19,7 +19,7 @@ internal unsafe class DebugMisc : DebugSectionBase
         {
             var im = InventoryManager.Instance();
             var c = im->GetInventoryContainer(InventoryType.RetainerEquippedItems);
-            for(int i = 0; i < c->Size; i++)
+            for(var i = 0; i < c->Size; i++)
             {
                 var slot = c->GetInventorySlot(i);
                 ImGuiEx.Text($"{i} ({slot->GetItemId()}): {ExcelItemHelper.GetName(slot->GetItemId() % 1000000)}, gathering: {slot->GetStat(BaseParamEnum.Gathering)} [{slot->GetStatCap(BaseParamEnum.Gathering)}], perception: {slot->GetStat(BaseParamEnum.Perception)} [{slot->GetStatCap(BaseParamEnum.Perception)}]");

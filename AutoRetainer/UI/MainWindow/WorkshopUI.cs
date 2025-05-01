@@ -386,9 +386,9 @@ internal static unsafe class WorkshopUI
             var plan = VoyageUtils.GetSubmarinePointPlanByGuid(adata.SelectedPointPlan);
             var valid = plan != null && plan.Points.Count.InRange(1, 5, true);
             var fast = plan != null && plan.Points.SequenceEqual(adata.Points.Where(x => x != 0).Select(x => (uint)x));
-            ImGuiEx.Text(valid?(fast?EColor.GreenBright:null) :EColor.RedBright, Lang.IconPlanner);
+            ImGuiEx.Text(valid ? (fast ? EColor.GreenBright : null) : EColor.RedBright, Lang.IconPlanner);
             ImGui.PushFont(UiBuilder.DefaultFont);
-            if(valid)ImGuiEx.Tooltip(plan.Points.Select(x => $"{VoyageUtils.GetSubmarineExploration(x)?.FancyDestination()}").Print("\n"));
+            if(valid) ImGuiEx.Tooltip(plan.Points.Select(x => $"{VoyageUtils.GetSubmarineExploration(x)?.FancyDestination()}").Print("\n"));
             ImGui.PopFont();
         }
         else
@@ -454,7 +454,7 @@ internal static unsafe class WorkshopUI
             {
                 ImGuiEx.Text(vessel.GetRemainingSeconds() > 0 ? $"{VoyageUtils.Seconds2Time(vessel.GetRemainingSeconds())}" : "Voyage completed");
             }
-                
+
         }
         ImGui.TableNextColumn();
         ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, 0);

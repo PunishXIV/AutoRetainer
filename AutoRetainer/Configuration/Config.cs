@@ -196,12 +196,12 @@ internal unsafe class Config : IEzConfig
         AdvanceTimer = 120,
     };
 
-    public List<LevelAndPartsData> LevelAndPartsData               = [];
-    public bool                    EnableAutomaticSubRegistration  = false;
-    public bool                    EnableAutomaticComponentsAndPlanChange = false;
+    public List<LevelAndPartsData> LevelAndPartsData = [];
+    public bool EnableAutomaticSubRegistration = false;
+    public bool EnableAutomaticComponentsAndPlanChange = false;
 
-    public bool StatusBarMSI              = false;
-    public int StatusBarIconWidth        = 96;
+    public bool StatusBarMSI = false;
+    public int StatusBarIconWidth = 96;
 
     public bool IMEnableCofferAutoOpen = false;
     public bool IMEnableAutoVendor = false;
@@ -237,5 +237,5 @@ internal unsafe class Config : IEzConfig
     public bool FCChestGilCheck = false;
     public int FCChestGilCheckCd = 24;
     public Dictionary<ulong, long> FCChestGilCheckTimes = [];
-    public Dictionary<ExcelWorldHelper.Region, long> LockoutTime = []; 
+    public Dictionary<ExcelWorldHelper.Region, long> LockoutTime = [];
 }

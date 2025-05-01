@@ -11,7 +11,7 @@ public class MultiModeLockout : NeoUIEntry
 {
     public override string Path => "Multi Mode/Region Lock";
 
-    int Num = 12;
+    private int Num = 12;
 
     public override void Draw()
     {

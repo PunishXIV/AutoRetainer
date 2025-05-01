@@ -327,10 +327,10 @@ public class DeployablesTab : NeoUIEntry
         ImGui.Checkbox("Enable automatic sub registration", ref C.EnableAutomaticSubRegistration);
         ImGui.Checkbox("Enable automatic components and plan change", ref C.EnableAutomaticComponentsAndPlanChange);
         ImGuiEx.Text("Ranges:");
-        for (var index = C.LevelAndPartsData.Count - 1; index >= 0; index--)
+        for(var index = C.LevelAndPartsData.Count - 1; index >= 0; index--)
         {
-            LevelAndPartsData? entry = C.LevelAndPartsData[index];
-            if (ImGui.CollapsingHeader($"{entry.GetPlanBuild()}: {entry.MinLevel} - {entry.MaxLevel} ###{entry.GUID}"))
+            var entry = C.LevelAndPartsData[index];
+            if(ImGui.CollapsingHeader($"{entry.GetPlanBuild()}: {entry.MinLevel} - {entry.MaxLevel} ###{entry.GUID}"))
             {
                 ImGui.Separator();
                 ImGui.Text("Level range:");
@@ -373,17 +373,17 @@ public class DeployablesTab : NeoUIEntry
                 ImGuiEx.EnumCombo($"##behavior{entry.GUID}", ref entry.VesselBehavior);
                 ImGui.Text("Plan:");
                 ImGui.SameLine(60f);
-                if (entry.VesselBehavior == VesselBehavior.Unlock)
+                if(entry.VesselBehavior == VesselBehavior.Unlock)
                 {
                     ImGui.SetNextItemWidth(150f);
-                    if (ImGui.BeginCombo($"##unlockplan{entry.GUID}", C.SubmarineUnlockPlans.Any(x => x.GUID == entry.SelectedUnlockPlan)
+                    if(ImGui.BeginCombo($"##unlockplan{entry.GUID}", C.SubmarineUnlockPlans.Any(x => x.GUID == entry.SelectedUnlockPlan)
                                                                               ? C.SubmarineUnlockPlans.First(x => x.GUID == entry.SelectedUnlockPlan)
                                                                                  .Name
                                                                               : "Non selected", ImGuiComboFlags.HeightLarge))
                     {
-                        foreach (var plan in C.SubmarineUnlockPlans)
+                        foreach(var plan in C.SubmarineUnlockPlans)
                         {
-                            if (ImGui.Selectable($"{plan.Name}##{entry.GUID}"))
+                            if(ImGui.Selectable($"{plan.Name}##{entry.GUID}"))
                             {
                                 entry.SelectedUnlockPlan = plan.GUID;
                             }
@@ -397,17 +397,17 @@ public class DeployablesTab : NeoUIEntry
                     ImGui.SetNextItemWidth(150f);
                     ImGuiEx.EnumCombo($"##unlockmode{entry.GUID}", ref entry.UnlockMode);
                 }
-                else if (entry.VesselBehavior == VesselBehavior.Use_plan)
+                else if(entry.VesselBehavior == VesselBehavior.Use_plan)
                 {
                     ImGui.SetNextItemWidth(150f);
-                    if (ImGui.BeginCombo($"##pointplan{entry.GUID}", C.SubmarinePointPlans.Any(x => x.GUID == entry.SelectedPointPlan)
+                    if(ImGui.BeginCombo($"##pointplan{entry.GUID}", C.SubmarinePointPlans.Any(x => x.GUID == entry.SelectedPointPlan)
                                                                              ? C.SubmarinePointPlans.First(x => x.GUID == entry.SelectedPointPlan)
                                                                                 .Name
                                                                              : "Non selected", ImGuiComboFlags.HeightLarge))
                     {
-                        foreach (var plan in C.SubmarinePointPlans)
+                        foreach(var plan in C.SubmarinePointPlans)
                         {
-                            if (ImGui.Selectable($"{plan.Name}##{entry.GUID}"))
+                            if(ImGui.Selectable($"{plan.Name}##{entry.GUID}"))
                             {
                                 entry.SelectedPointPlan = plan.GUID;
                             }
@@ -419,7 +419,7 @@ public class DeployablesTab : NeoUIEntry
 
                 ImGui.Separator();
                 ImGui.Checkbox($"Different setup for first Submersible###firstSubDifferent{entry.GUID}", ref entry.FirstSubDifferent);
-                if (entry.FirstSubDifferent)
+                if(entry.FirstSubDifferent)
                 {
                     ImGui.Text("First Sub Behavior:");
                     ImGui.SameLine(150f);
@@ -427,17 +427,17 @@ public class DeployablesTab : NeoUIEntry
                     ImGuiEx.EnumCombo($"##firstSubBehavior{entry.GUID}", ref entry.FirstSubVesselBehavior);
                     ImGui.Text("First Sub Plan:");
                     ImGui.SameLine(150f);
-                    if (entry.FirstSubVesselBehavior == VesselBehavior.Unlock)
+                    if(entry.FirstSubVesselBehavior == VesselBehavior.Unlock)
                     {
                         ImGui.SetNextItemWidth(150f);
-                        if (ImGui.BeginCombo($"##firstSubUnlockplan{entry.GUID}", C.SubmarineUnlockPlans.Any(x => x.GUID == entry.FirstSubSelectedUnlockPlan)
+                        if(ImGui.BeginCombo($"##firstSubUnlockplan{entry.GUID}", C.SubmarineUnlockPlans.Any(x => x.GUID == entry.FirstSubSelectedUnlockPlan)
                                                      ? C.SubmarineUnlockPlans.First(x => x.GUID == entry.FirstSubSelectedUnlockPlan)
                                                         .Name
                                                      : "Non selected", ImGuiComboFlags.HeightLarge))
                         {
-                            foreach (var plan in C.SubmarineUnlockPlans)
+                            foreach(var plan in C.SubmarineUnlockPlans)
                             {
-                                if (ImGui.Selectable($"{plan.Name}##firstSub{entry.GUID}"))
+                                if(ImGui.Selectable($"{plan.Name}##firstSub{entry.GUID}"))
                                 {
                                     entry.FirstSubSelectedUnlockPlan = plan.GUID;
                                 }
@@ -451,17 +451,17 @@ public class DeployablesTab : NeoUIEntry
                         ImGui.SetNextItemWidth(150f);
                         ImGuiEx.EnumCombo($"##firstSubUnlockmode{entry.GUID}", ref entry.FirstSubUnlockMode);
                     }
-                    else if (entry.FirstSubVesselBehavior == VesselBehavior.Use_plan)
+                    else if(entry.FirstSubVesselBehavior == VesselBehavior.Use_plan)
                     {
                         ImGui.SetNextItemWidth(150f);
-                        if (ImGui.BeginCombo($"##firstSubPointplan{entry.GUID}", C.SubmarinePointPlans.Any(x => x.GUID == entry.FirstSubSelectedPointPlan)
+                        if(ImGui.BeginCombo($"##firstSubPointplan{entry.GUID}", C.SubmarinePointPlans.Any(x => x.GUID == entry.FirstSubSelectedPointPlan)
                                                      ? C.SubmarinePointPlans.First(x => x.GUID == entry.FirstSubSelectedPointPlan)
                                                         .Name
                                                      : "Non selected", ImGuiComboFlags.HeightLarge))
                         {
-                            foreach (var plan in C.SubmarinePointPlans)
+                            foreach(var plan in C.SubmarinePointPlans)
                             {
-                                if (ImGui.Selectable($"{plan.Name}##firstSub{entry.GUID}"))
+                                if(ImGui.Selectable($"{plan.Name}##firstSub{entry.GUID}"))
                                 {
                                     entry.FirstSubSelectedPointPlan = plan.GUID;
                                 }
@@ -473,7 +473,7 @@ public class DeployablesTab : NeoUIEntry
                 }
 
                 ImGui.NewLine();
-                if (ImGui.Button($"Delete##{entry.GUID}"))
+                if(ImGui.Button($"Delete##{entry.GUID}"))
                 {
                     C.LevelAndPartsData.RemoveAt(index);
                 }
@@ -481,7 +481,7 @@ public class DeployablesTab : NeoUIEntry
         }
 
         ImGui.Separator();
-        if (ImGui.Button("Add"))
+        if(ImGui.Button("Add"))
         {
             C.LevelAndPartsData.Insert(0, new());
         }

@@ -47,14 +47,14 @@ public static unsafe class RetainerTable
                         ImGuiEx.Text(c, Lang.IconDuplicate);
                         ImGui.PopFont();
                         ImGuiEx.Tooltip($"Entrust plan \"{plan.Name}\" is active." + (plan.ManualPlan ? "\nThis is manual processing plan" : "") + (Utils.GetReachableRetainerBell(false) != null ? "\nClick to Entrust." : ""));
-                        if (ImGui.IsItemClicked())
+                        if(ImGui.IsItemClicked())
                         {
-                            if (!Svc.Condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.OccupiedSummoningBell])
+                            if(!Svc.Condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.OccupiedSummoningBell])
                                 TaskInteractWithNearestBell.Enqueue();
 
                             P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
                             TaskEntrustDuplicates.EnqueueNew(plan);
-                            if (C.RetainerMenuDelay > 0)
+                            if(C.RetainerMenuDelay > 0)
                             {
                                 TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
                             }

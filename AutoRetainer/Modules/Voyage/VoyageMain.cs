@@ -210,14 +210,14 @@ internal static unsafe class VoyageMain
                             TaskSelectVesselByName.Enqueue(next, type);
                         }
 
-                        if (C.EnableAutomaticComponentsAndPlanChange)
+                        if(C.EnableAutomaticComponentsAndPlanChange)
                         {
                             TaskIntelligentComponentsChange.Enqueue(next, type);
 
                             var plan = VoyageUtils.GetPlanInLevelRange(Data.GetAdditionalVesselData(next, type).Level);
 
                             if(VoyageUtils.GetIsVesselNeedsPartsSwap(next, VoyageType.Submersible, out _).Count == 0)
-                                if (plan.FirstSubDifferent && VoyageUtils.GetVesselIndexByName(next, VoyageType.Submersible) == 0)
+                                if(plan.FirstSubDifferent && VoyageUtils.GetVesselIndexByName(next, VoyageType.Submersible) == 0)
                                 {
                                     Data.AdditionalSubmarineData[next].UnlockMode = plan.FirstSubUnlockMode;
                                     Data.AdditionalSubmarineData[next].SelectedUnlockPlan = plan.FirstSubSelectedUnlockPlan;
@@ -309,7 +309,7 @@ internal static unsafe class VoyageMain
                                 {
                                     e.Log();
                                 }
-                                EndTask:
+                            EndTask:
                                 P.TaskManager.InsertStack();
                             })
                         );
@@ -321,14 +321,14 @@ internal static unsafe class VoyageMain
         else
         {
             var neededParts = new[] { (uint)Hull.Shark, (uint)Stern.Shark, (uint)Bow.Shark, (uint)Bridge.Shark };
-            if (C.EnableAutomaticSubRegistration && Data.AdditionalSubmarineData.Count < Data.NumSubSlots && neededParts.All(part => InventoryManager.Instance()->GetInventoryItemCount((uint)part) > 0) && InventoryManager.Instance()->GetInventoryItemCount((uint)Items.DiveCredits) >= (2 * Data.NumSubSlots) - 1)
+            if(C.EnableAutomaticSubRegistration && Data.AdditionalSubmarineData.Count < Data.NumSubSlots && neededParts.All(part => InventoryManager.Instance()->GetInventoryItemCount((uint)part) > 0) && InventoryManager.Instance()->GetInventoryItemCount((uint)Items.DiveCredits) >= (2 * Data.NumSubSlots) - 1)
             {
                 P.TaskManager.Enqueue(VoyageScheduler.SelectRegisterSub);
-                if (EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResendNewSubs", 1000))
+                if(EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResendNewSubs", 1000))
                 {
-                    for (var i = 0; i < 4; i++)
+                    for(var i = 0; i < 4; i++)
                     {
-                        int slot = i;
+                        var slot = i;
                         P.TaskManager.Enqueue(() => VoyageScheduler.ChangeComponent(slot, neededParts[slot]), $"ChangeTo{neededParts[slot]}");
                     }
 
@@ -337,9 +337,9 @@ internal static unsafe class VoyageMain
                     P.TaskManager.Enqueue(VoyageScheduler.SelectQuitVesselMenu);
                 }
             }
-            else if (!Data.AreAnyEnabledVesselsReturnInNext(type, 1 * 60))
+            else if(!Data.AreAnyEnabledVesselsReturnInNext(type, 1 * 60))
             {
-                if (EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResendQuitPanel", 1000))
+                if(EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResendQuitPanel", 1000))
                 {
                     TaskQuitMenu.Enqueue();
                 }

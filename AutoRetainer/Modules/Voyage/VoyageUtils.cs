@@ -409,13 +409,13 @@ internal static unsafe class VoyageUtils
 
     internal static string GetPlanBuild(this LevelAndPartsData data)
     {
-        if (data.Part1 != 0 && data.Part2 != 0 && data.Part3 != 0 && data.Part4 != 0)
+        if(data.Part1 != 0 && data.Part2 != 0 && data.Part3 != 0 && data.Part4 != 0)
         {
             var str = Build.ToIdentifier((ushort)((Items)data.Part1).GetPartId())
                     + Build.ToIdentifier((ushort)((Items)data.Part2).GetPartId())
                     + Build.ToIdentifier((ushort)((Items)data.Part3).GetPartId())
                     + Build.ToIdentifier((ushort)((Items)data.Part4).GetPartId());
-            if (str.Length == 8) str = str.Replace("+", "") + "++";
+            if(str.Length == 8) str = str.Replace("+", "") + "++";
             return " " + str;
         }
         return "";
@@ -464,22 +464,22 @@ internal static unsafe class VoyageUtils
 
     internal static List<(int, uint)> GetIsVesselNeedsPartsSwap(int num, VoyageType type, out List<string> log)
     {
-        log = new List<string>();
+        log = [];
         var workshop = HousingManager.Instance()->WorkshopTerritory;
 
         PluginLog.Debug($"Change - Num: {num}");
-        int vesselLevel = (int)workshop->Submersible.Data[num].RankId;
+        var vesselLevel = (int)workshop->Submersible.Data[num].RankId;
 
-        CheckAndLogParts(num, type, GetPlanInLevelRange(vesselLevel), log, out List<(int, uint)> requiredChanges);
+        CheckAndLogParts(num, type, GetPlanInLevelRange(vesselLevel), log, out var requiredChanges);
 
-        return AreRequiredPartsAvailable(requiredChanges) ? requiredChanges : new List<(int, uint)>();
+        return AreRequiredPartsAvailable(requiredChanges) ? requiredChanges : [];
     }
 
     internal static LevelAndPartsData GetPlanInLevelRange(int vesselLevel)
     {
-        foreach (var partsData in C.LevelAndPartsData)
+        foreach(var partsData in C.LevelAndPartsData)
         {
-            if (IsLevelInRange(vesselLevel, partsData.MinLevel, partsData.MaxLevel))
+            if(IsLevelInRange(vesselLevel, partsData.MinLevel, partsData.MaxLevel))
             {
                 PluginLog.Debug($"Change - {partsData.GUID}");
 
@@ -495,13 +495,13 @@ internal static unsafe class VoyageUtils
 
     internal static void CheckAndLogParts(int num, VoyageType type, LevelAndPartsData partsData, List<string> log, out List<(int, uint)> changes)
     {
-        changes = new List<(int, uint)>();
-        for (int slotIndex = 0; slotIndex < 4; slotIndex++)
+        changes = [];
+        for(var slotIndex = 0; slotIndex < 4; slotIndex++)
         {
             var slot = GetVesselComponent(num, type, slotIndex);
-            uint requiredPart = GetRequiredPart(partsData, slotIndex);
+            var requiredPart = GetRequiredPart(partsData, slotIndex);
 
-            if (slot->ItemId != requiredPart)
+            if(slot->ItemId != requiredPart)
             {
                 log.Add($"index: {slotIndex}, id: {slot->ItemId}, swap: {requiredPart}");
                 changes.Add((slotIndex, requiredPart));
@@ -522,11 +522,11 @@ internal static unsafe class VoyageUtils
     internal static uint GetSubPart(string name, int slotIndex) =>
             slotIndex switch
             {
-                    0 => (uint)Data.AdditionalSubmarineData[name].Part1, 
-                    1 => (uint)Data.AdditionalSubmarineData[name].Part2, 
-                    2 => (uint)Data.AdditionalSubmarineData[name].Part3, 
-                    3 => (uint)Data.AdditionalSubmarineData[name].Part4, 
-                    _     => throw new ArgumentOutOfRangeException(nameof(slotIndex), "Invalid slot index")
+                0 => (uint)Data.AdditionalSubmarineData[name].Part1,
+                1 => (uint)Data.AdditionalSubmarineData[name].Part2,
+                2 => (uint)Data.AdditionalSubmarineData[name].Part3,
+                3 => (uint)Data.AdditionalSubmarineData[name].Part4,
+                _ => throw new ArgumentOutOfRangeException(nameof(slotIndex), "Invalid slot index")
             };
 
     internal static bool AreRequiredPartsAvailable(List<(int, uint)> requiredChanges) =>
