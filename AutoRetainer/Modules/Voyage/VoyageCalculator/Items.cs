@@ -7,6 +7,7 @@ public enum Items : uint
 {
     Tanks = 10155,
     Kits = 10373,
+    DiveCredits = 22317,
 
     // Frames
     SharkClassBoFrame = 26508,

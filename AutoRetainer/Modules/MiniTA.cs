@@ -18,6 +18,7 @@ internal static unsafe class MiniTA
             {
                 ConfirmCutsceneSkip();
                 ConfirmRepair();
+                ConfirmRegister();
             }
             if(P.TaskManager.IsBusy || (Svc.Condition[ConditionFlag.OccupiedSummoningBell] && (SchedulerMain.PluginEnabled || P.TaskManager.IsBusy || P.ConditionWasEnabled)))
             {
@@ -54,6 +55,16 @@ internal static unsafe class MiniTA
         if(x != null && Utils.GenericThrottle)
         {
             VoyageUtils.Log("Confirming repair");
+            new AddonMaster.SelectYesno((nint)x).Yes();
+        }
+    }
+
+    internal static void ConfirmRegister()
+    {
+        var x = Utils.GetSpecificYesno((s) => s.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.WorkshopRegisterConfirm));
+        if (x != null && Utils.GenericThrottle)
+        {
+            VoyageUtils.Log("Confirming registration");
             new AddonMaster.SelectYesno((nint)x).Yes();
         }
     }
