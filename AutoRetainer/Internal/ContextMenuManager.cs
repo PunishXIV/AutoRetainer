@@ -24,8 +24,8 @@ internal unsafe class ContextMenuManager
         if(!C.IMEnableContextMenu) return;
         if(args.MenuType == ContextMenuType.Inventory && args.Target is MenuTargetInventory inv && inv.TargetItem != null)
         {
-            var id = inv.TargetItem.Value.ItemId;
-            if(id != 0)
+            var id = inv.TargetItem.Value.ItemId % 1_000_000;
+            if(id != 0 && inv.TargetItem.Value.ItemId < 2_000_000)
             {
                 if(C.IMProtectList.Contains(id))
                 {
