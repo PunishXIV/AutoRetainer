@@ -120,5 +120,8 @@ internal static unsafe class TaskCalculateAndPickBestExpRoute
         }
     }
 
-    internal static bool? WaitUntilCalculationStopped() => !Calculating;
+    internal static bool? WaitUntilCalculationStopped()
+    {
+        return !Calculating;
+    }
 }

@@ -12,7 +12,11 @@ namespace AutoRetainer.Internal.InventoryManagement;
 public static unsafe class NpcSaleManager
 {
     internal static List<(uint ID, uint Quantity)> CapturedInventoryState = [];
-    public static void EnqueueIfItemsPresent() => EnqueueIfItemsPresent(false);
+    public static void EnqueueIfItemsPresent()
+    {
+        EnqueueIfItemsPresent(false);
+    }
+
     public static void EnqueueIfItemsPresent(bool ignoreRestriction)
     {
         if(Utils.ShouldSkipNPCVendor() && !ignoreRestriction) return;

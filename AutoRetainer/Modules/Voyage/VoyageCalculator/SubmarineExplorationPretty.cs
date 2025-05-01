@@ -33,6 +33,13 @@ public static class SubmarineSheetUtils
         return (uint)Math.Floor(Vector3.Distance(Row.Position(), other.Position()) * 0.035);
     }
 
-    public static string ConvertDestination(this SubmarineExploration Row) => Utils.UpperCaseStr(Row.Destination);
-    public static string FancyDestination(this SubmarineExploration Row) => $"[{Svc.Data.GetExcelSheet<SubmarineExploration>(ClientLanguage.Japanese).GetRow(Row.RowId).Location}] " + Utils.UpperCaseStr(Row.Destination);
+    public static string ConvertDestination(this SubmarineExploration Row)
+    {
+        return Utils.UpperCaseStr(Row.Destination);
+    }
+
+    public static string FancyDestination(this SubmarineExploration Row)
+    {
+        return $"[{Svc.Data.GetExcelSheet<SubmarineExploration>(ClientLanguage.Japanese).GetRow(Row.RowId).Location}] " + Utils.UpperCaseStr(Row.Destination);
+    }
 }

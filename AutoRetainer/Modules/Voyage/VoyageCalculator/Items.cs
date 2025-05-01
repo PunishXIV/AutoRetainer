@@ -90,10 +90,20 @@ public enum Items : uint
 internal static class ImportantItemsMethods
 {
     private static ExcelSheet<Item> Item = null!;
-    public static void Initialize() => Item = Svc.Data.GetExcelSheet<Item>()!;
+    public static void Initialize()
+    {
+        Item = Svc.Data.GetExcelSheet<Item>()!;
+    }
 
-    public static Item GetItem(this Items item) => Item.GetRow((uint)item)!;
-    public static int GetPartId(this Items item) => PartIdToItemId.First(d => d.Value == (uint)item).Key;
+    public static Item GetItem(this Items item)
+    {
+        return Item.GetRow((uint)item)!;
+    }
+
+    public static int GetPartId(this Items item)
+    {
+        return PartIdToItemId.First(d => d.Value == (uint)item).Key;
+    }
 
     public static readonly Dictionary<ushort, uint> PartIdToItemId = new()
 {

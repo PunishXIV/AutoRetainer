@@ -23,7 +23,10 @@ internal static unsafe class VoyageUtils
 
     internal static uint[] Workshops = [Houses.Company_Workshop_Empyreum, Houses.Company_Workshop_The_Goblet, Houses.Company_Workshop_Mist, Houses.Company_Workshop_Shirogane, Houses.Company_Workshop_The_Lavender_Beds];
 
-    internal static bool ShouldEnterWorkshop() => ((Data.WorkshopEnabled && Data.AreAnyEnabledVesselsReturnInNext(5 * 60, Data.ShouldWaitForAllWhenLoggedIn())) || (Utils.GetReachableRetainerBell(false) == null)) && Player.IsInHomeWorld;
+    internal static bool ShouldEnterWorkshop()
+    {
+        return ((Data.WorkshopEnabled && Data.AreAnyEnabledVesselsReturnInNext(5 * 60, Data.ShouldWaitForAllWhenLoggedIn())) || (Utils.GetReachableRetainerBell(false) == null)) && Player.IsInHomeWorld;
+    }
 
     internal static SubmarineUnlockPlan GetDefaultSubmarineUnlockPlan(bool New = true)
     {
@@ -216,7 +219,10 @@ internal static unsafe class VoyageUtils
         return $"{plan.GetMap()?.Name}: {plan.Points.Select(x => Svc.Data.GetExcelSheet<SubmarineExploration>(ClientLanguage.Japanese).GetRow(x).Location.ToString()).Join("→")}";
     }
 
-    internal static uint GetMapId(this SubmarinePointPlan plan) => GetMap(plan)?.RowId ?? 0;
+    internal static uint GetMapId(this SubmarinePointPlan plan)
+    {
+        return GetMap(plan)?.RowId ?? 0;
+    }
 
     internal static PanelType GetCurrentWorkshopPanelType()
     {
@@ -436,7 +442,10 @@ internal static unsafe class VoyageUtils
         return null;
     }
 
-    internal static List<int> GetIsVesselNeedsRepair(string name, VoyageType type, out List<string> log) => GetIsVesselNeedsRepair(GetVesselIndexByName(name, type), type, out log);
+    internal static List<int> GetIsVesselNeedsRepair(string name, VoyageType type, out List<string> log)
+    {
+        return GetIsVesselNeedsRepair(GetVesselIndexByName(name, type), type, out log);
+    }
 
     internal static List<int> GetIsVesselNeedsRepair(int num, VoyageType type, out List<string> log)
     {
@@ -575,7 +584,10 @@ internal static unsafe class VoyageUtils
         return x.ReturnTime == 0;
     }
 
-    internal static bool AreAnyEnabledVesselsNotDeployed(this OfflineCharacterData data) => AreAnyEnabledVesselsNotDeployed(data, VoyageType.Airship) && AreAnyEnabledVesselsNotDeployed(data, VoyageType.Submersible);
+    internal static bool AreAnyEnabledVesselsNotDeployed(this OfflineCharacterData data)
+    {
+        return AreAnyEnabledVesselsNotDeployed(data, VoyageType.Airship) && AreAnyEnabledVesselsNotDeployed(data, VoyageType.Submersible);
+    }
 
     internal static bool AreAnyEnabledVesselsNotDeployed(this OfflineCharacterData data, VoyageType type)
     {
@@ -595,7 +607,10 @@ internal static unsafe class VoyageUtils
         return null;
     }
 
-    internal static bool AreAnyEnabledVesselsReturnInNext(this OfflineCharacterData data, int seconds, bool all = false, bool ignorePerCharaSetting = false) => data.AreAnyEnabledVesselsReturnInNext(VoyageType.Airship, seconds, all, ignorePerCharaSetting) || data.AreAnyEnabledVesselsReturnInNext(VoyageType.Submersible, seconds, all, ignorePerCharaSetting);
+    internal static bool AreAnyEnabledVesselsReturnInNext(this OfflineCharacterData data, int seconds, bool all = false, bool ignorePerCharaSetting = false)
+    {
+        return data.AreAnyEnabledVesselsReturnInNext(VoyageType.Airship, seconds, all, ignorePerCharaSetting) || data.AreAnyEnabledVesselsReturnInNext(VoyageType.Submersible, seconds, all, ignorePerCharaSetting);
+    }
 
     internal static bool CheckVesselForWaitTreshold(this OfflineCharacterData data, VoyageType type, int seconds)
     {

@@ -74,9 +74,15 @@ public static unsafe class TaskNeoHET
         }, "TaskNeoHET");
     }
 
-    public static bool HasEntranceNearby() => GetApartmentEntrance() != null || GetFcOrPrivateEntranceFromMarkers() != null;
+    public static bool HasEntranceNearby()
+    {
+        return GetApartmentEntrance() != null || GetFcOrPrivateEntranceFromMarkers() != null;
+    }
 
-    public static IGameObject GetApartmentEntrance() => GetHouseEntranceFromMarkers(ApartmentMarkers);
+    public static IGameObject GetApartmentEntrance()
+    {
+        return GetHouseEntranceFromMarkers(ApartmentMarkers);
+    }
 
     public static void TryEnterWorkshop(Action onFailure)
     {
@@ -159,9 +165,15 @@ public static unsafe class TaskNeoHET
         }
     }
 
-    public static IGameObject GetWorkshopEntrance() => Svc.Objects.FirstOrDefault(x => x.IsTargetable && x.Name.ToString().EqualsIgnoreCaseAny(Lang.AdditionalChambersEntrance));
+    public static IGameObject GetWorkshopEntrance()
+    {
+        return Svc.Objects.FirstOrDefault(x => x.IsTargetable && x.Name.ToString().EqualsIgnoreCaseAny(Lang.AdditionalChambersEntrance));
+    }
 
-    public static IGameObject GetFcOrPrivateEntranceFromMarkers() => GetHouseEntranceFromMarkers([.. PrivateMarkers, .. FcMarkers, .. (C.SharedHET ? TaskNeoHET.SharedMarkers : [])]);
+    public static IGameObject GetFcOrPrivateEntranceFromMarkers()
+    {
+        return GetHouseEntranceFromMarkers([.. PrivateMarkers, .. FcMarkers, .. (C.SharedHET ? TaskNeoHET.SharedMarkers : [])]);
+    }
 
     public static IGameObject GetHouseEntranceFromMarkers(IEnumerable<uint> markers)
     {

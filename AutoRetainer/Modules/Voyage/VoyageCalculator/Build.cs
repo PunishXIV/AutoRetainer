@@ -34,7 +34,10 @@ public static class Build
             Bridge = GetPart(build.Bridge);
         }
 
-        public void UpdateRank(int rank) => Bonus = GetRank(rank);
+        public void UpdateRank(int rank)
+        {
+            Bonus = GetRank(rank);
+        }
 
         public int Surveillance => Bonus.SurveillanceBonus + Hull.Surveillance + Stern.Surveillance + Bow.Surveillance + Bridge.Surveillance;
         public int Retrieval => Bonus.RetrievalBonus + Hull.Retrieval + Stern.Retrieval + Bow.Retrieval + Bridge.Retrieval;
@@ -44,11 +47,25 @@ public static class Build
         public int RepairCosts => Hull.RepairMaterials + Stern.RepairMaterials + Bow.RepairMaterials + Bridge.RepairMaterials;
         public int BuildCost => Hull.Components + Stern.Components + Bow.Components + Bridge.Components;
 
-        public int HighestRankPart() => new[] { Hull.Rank, Stern.Rank, Bow.Rank, Bridge.Rank }.Max();
-        public byte[] GetPartRanks() => new[] { Hull.Rank, Stern.Rank, Bow.Rank, Bridge.Rank };
+        public int HighestRankPart()
+        {
+            return new[] { Hull.Rank, Stern.Rank, Bow.Rank, Bridge.Rank }.Max();
+        }
 
-        private SubmarineRank GetRank(int rank) => RankSheet.GetRow((uint)rank)!;
-        private SubmarinePart GetPart(int partId) => PartSheet.GetRow((uint)partId)!;
+        public byte[] GetPartRanks()
+        {
+            return new[] { Hull.Rank, Stern.Rank, Bow.Rank, Bridge.Rank };
+        }
+
+        private SubmarineRank GetRank(int rank)
+        {
+            return RankSheet.GetRow((uint)rank)!;
+        }
+
+        private SubmarinePart GetPart(int partId)
+        {
+            return PartSheet.GetRow((uint)partId)!;
+        }
 
         public string HullIdentifier => ToIdentifier((ushort)Hull.RowId);
         public string SternIdentifier => ToIdentifier((ushort)Stern.RowId);
@@ -201,7 +218,10 @@ public static class Build
             return Hull == other.Hull && Stern == other.Stern && Bow == other.Bow && Bridge == other.Bridge;
         }
 
-        public string ToStringWithRank() => $"{Rank} - {this}";
+        public string ToStringWithRank()
+        {
+            return $"{Rank} - {this}";
+        }
 
         public override string ToString()
         {

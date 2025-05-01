@@ -60,7 +60,11 @@ internal static unsafe class RetainerHandlers
         return Utils.TrySelectSpecificEntry(text);
     }
 
-    internal static void EnforceSelectStringThrottle() => EzThrottler.Throttle("EnforceSelectString", 3000, true);
+    internal static void EnforceSelectStringThrottle()
+    {
+        EzThrottler.Throttle("EnforceSelectString", 3000, true);
+    }
+
     internal static bool? SelectViewVentureReport()
     {
         EnforceSelectStringThrottle();
@@ -528,8 +532,15 @@ internal static unsafe class RetainerHandlers
         return false;
     }*/
 
-    public static bool? SelectSpecificVentureByName(uint id) => SelectSpecificVentureByName(VentureUtils.GetVentureName(id));
-    public static bool? ForceSearchVentureByName(uint id) => ForceSearchVentureByName(VentureUtils.GetVentureName(id));
+    public static bool? SelectSpecificVentureByName(uint id)
+    {
+        return SelectSpecificVentureByName(VentureUtils.GetVentureName(id));
+    }
+
+    public static bool? ForceSearchVentureByName(uint id)
+    {
+        return ForceSearchVentureByName(VentureUtils.GetVentureName(id));
+    }
 
     public static bool? SelectSpecificVentureByName(string name)
     {

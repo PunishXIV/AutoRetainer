@@ -117,7 +117,10 @@ public unsafe class AutoRetainer : IDalamudPlugin
         //);
     }
 
-    internal void SetConfig(Config c) => config = c;
+    internal void SetConfig(Config c)
+    {
+        config = c;
+    }
 
     public void Load()
     {

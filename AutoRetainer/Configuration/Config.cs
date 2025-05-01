@@ -19,7 +19,11 @@ internal unsafe class Config : IEzConfig
     public bool StatsUnifyHQ = false;
     public bool RecordStats = true;
     public bool AutoGCContinuation = false;
-    public bool ShouldSerializeEnableAutoGCHandin() => false;
+    public bool ShouldSerializeEnableAutoGCHandin()
+    {
+        return false;
+    }
+
     public bool GCHandinNotify = false;
     internal bool BypassSanctuaryCheck = false;
     public bool MultiHETOnEnable = true;

@@ -11,10 +11,30 @@ public class IPC_PluginState
         EzIPC.Init(this, $"{Svc.PluginInterface.InternalName}.PluginState");
     }
 
-    [EzIPC] public bool IsBusy() => Utils.IsBusy;
-    [EzIPC] public Dictionary<ulong, HashSet<string>> GetEnabledRetainers() => C.SelectedRetainers;
-    [EzIPC] public bool AreAnyRetainersAvailableForCurrentChara() => Utils.AnyRetainersAvailableCurrentChara();
-    [EzIPC] public void AbortAllTasks() => P.TaskManager.Abort();
+    [EzIPC]
+    public bool IsBusy()
+    {
+        return Utils.IsBusy;
+    }
+
+    [EzIPC]
+    public Dictionary<ulong, HashSet<string>> GetEnabledRetainers()
+    {
+        return C.SelectedRetainers;
+    }
+
+    [EzIPC]
+    public bool AreAnyRetainersAvailableForCurrentChara()
+    {
+        return Utils.AnyRetainersAvailableCurrentChara();
+    }
+
+    [EzIPC]
+    public void AbortAllTasks()
+    {
+        P.TaskManager.Abort();
+    }
+
     [EzIPC]
     public void DisableAllFunctions()
     {
@@ -22,11 +42,36 @@ public class IPC_PluginState
         SchedulerMain.DisablePlugin();
         VoyageScheduler.Enabled = false;
     }
-    [EzIPC] public bool GetMultiModeStatus() => MultiMode.Enabled;
-    [EzIPC] public void EnableMultiMode() => Svc.Commands.ProcessCommand("/autoretainer multi enable");
-    [EzIPC] public int GetInventoryFreeSlotCount() => Utils.GetInventoryFreeSlotCount();
-    [EzIPC] public void EnqueueHET(Action onFailure) => TaskNeoHET.Enqueue(onFailure);
-    [EzIPC] public bool CanAutoLogin() => Utils.CanAutoLogin();
+    [EzIPC]
+    public bool GetMultiModeStatus()
+    {
+        return MultiMode.Enabled;
+    }
+
+    [EzIPC]
+    public void EnableMultiMode()
+    {
+        Svc.Commands.ProcessCommand("/autoretainer multi enable");
+    }
+
+    [EzIPC]
+    public int GetInventoryFreeSlotCount()
+    {
+        return Utils.GetInventoryFreeSlotCount();
+    }
+
+    [EzIPC]
+    public void EnqueueHET(Action onFailure)
+    {
+        TaskNeoHET.Enqueue(onFailure);
+    }
+
+    [EzIPC]
+    public bool CanAutoLogin()
+    {
+        return Utils.CanAutoLogin();
+    }
+
     [EzIPC]
     public bool Relog(string charaNameWithWorld)
     {
@@ -42,10 +87,30 @@ public class IPC_PluginState
         return false;
     }
 
-    [EzIPC] public bool GetOptionRetainerSense() => C.RetainerSense;
-    [EzIPC] public void SetOptionRetainerSense(bool value) => C.RetainerSense = value;
-    [EzIPC] public int GetOptionRetainerSenseThreshold() => C.RetainerSenseThreshold;
-    [EzIPC] public void SetOptionRetainerSenseThreshold(int value) => C.RetainerSenseThreshold = value;
+    [EzIPC]
+    public bool GetOptionRetainerSense()
+    {
+        return C.RetainerSense;
+    }
+
+    [EzIPC]
+    public void SetOptionRetainerSense(bool value)
+    {
+        C.RetainerSense = value;
+    }
+
+    [EzIPC]
+    public int GetOptionRetainerSenseThreshold()
+    {
+        return C.RetainerSenseThreshold;
+    }
+
+    [EzIPC]
+    public void SetOptionRetainerSenseThreshold(int value)
+    {
+        C.RetainerSenseThreshold = value;
+    }
+
     [EzIPC]
     public long? GetClosestRetainerVentureSecondsRemaining(ulong CID)
     {

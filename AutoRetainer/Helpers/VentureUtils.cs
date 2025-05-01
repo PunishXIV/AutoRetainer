@@ -12,7 +12,10 @@ internal static unsafe class VentureUtils
 {
     internal const uint QuickExplorationID = 395;
 
-    private static bool IsNullOrEmpty(this string s) => GenericHelpers.IsNullOrEmpty(s);
+    private static bool IsNullOrEmpty(this string s)
+    {
+        return GenericHelpers.IsNullOrEmpty(s);
+    }
 
     internal static void BuildUnwrappedList(AdditionalRetainerData adata, OfflineCharacterData data, OfflineRetainerData ret)
     {
@@ -229,7 +232,10 @@ internal static unsafe class VentureUtils
         return GetVentureById(Task).GetFancyVentureName(data, retainer, out Available);
     }
 
-    internal static string GetFancyVentureName(this RetainerTask Task, OfflineCharacterData data, OfflineRetainerData retainer, out bool Available) => GetFancyVentureName(Task, data, retainer, out Available, out _, out _);
+    internal static string GetFancyVentureName(this RetainerTask Task, OfflineCharacterData data, OfflineRetainerData retainer, out bool Available)
+    {
+        return GetFancyVentureName(Task, data, retainer, out Available, out _, out _);
+    }
 
     private static Dictionary<string, FancyVentureCacheEntry> FancyVentureNameCache = [];
     internal static string GetFancyVentureName(this RetainerTask Task, OfflineCharacterData data, OfflineRetainerData retainer, out bool Available, out string left, out string right)
@@ -338,9 +344,16 @@ internal static unsafe class VentureUtils
         return retp;
     }
 
-    internal static uint GetAdjustedRetainerTask(uint task, Job job) => GetAdjustedRetainerTask(Svc.Data.GetExcelSheet<RetainerTask>().GetRowOrDefault(task), job)?.RowId ?? 0;
+    internal static uint GetAdjustedRetainerTask(uint task, Job job)
+    {
+        return GetAdjustedRetainerTask(Svc.Data.GetExcelSheet<RetainerTask>().GetRowOrDefault(task), job)?.RowId ?? 0;
+    }
 
-    internal static RetainerTask? GetAdjustedRetainerTask(this RetainerTask task, Job job) => GetAdjustedRetainerTask((RetainerTask?)task, job);
+    internal static RetainerTask? GetAdjustedRetainerTask(this RetainerTask task, Job job)
+    {
+        return GetAdjustedRetainerTask((RetainerTask?)task, job);
+    }
+
     internal static RetainerTask? GetAdjustedRetainerTask(this RetainerTask? task, Job job)
     {
         if(task.GetVentureItemId() == 0) return task;
@@ -404,18 +417,31 @@ internal static unsafe class VentureUtils
 
     internal static RetainerTask QuickExploration => Svc.Data.GetExcelSheet<RetainerTask>().GetRow(QuickExplorationID);
 
-    internal static bool IsFieldExploration(this RetainerTask task) => task.MaxTimemin == 1080;
+    internal static bool IsFieldExploration(this RetainerTask task)
+    {
+        return task.MaxTimemin == 1080;
+    }
 
-    internal static bool IsQuickExploration(this RetainerTask task) => task.RowId == QuickExplorationID;
+    internal static bool IsQuickExploration(this RetainerTask task)
+    {
+        return task.RowId == QuickExplorationID;
+    }
 
     internal static IEnumerable<RetainerTask> GetAvailableVentures(this IEnumerable<RetainerTask> tasks, OfflineRetainerData data)
     {
         return tasks.Where(x => x.RetainerLevel <= data.Level);
     }
 
-    internal static string GetVentureName(uint id) => GetVentureName(Svc.Data.GetExcelSheet<RetainerTask>().GetRow(id));
+    internal static string GetVentureName(uint id)
+    {
+        return GetVentureName(Svc.Data.GetExcelSheet<RetainerTask>().GetRow(id));
+    }
 
-    internal static string GetVentureName(this RetainerTask task) => GetVentureName((RetainerTask?)task);
+    internal static string GetVentureName(this RetainerTask task)
+    {
+        return GetVentureName((RetainerTask?)task);
+    }
+
     internal static string GetVentureName(this RetainerTask? task)
     {
         if(task == null) return null;
@@ -429,13 +455,21 @@ internal static unsafe class VentureUtils
         }
     }
 
-    internal static uint GetVentureItemId(this RetainerTask task) => GetVentureItemId((RetainerTask?)task);
+    internal static uint GetVentureItemId(this RetainerTask task)
+    {
+        return GetVentureItemId((RetainerTask?)task);
+    }
+
     internal static uint GetVentureItemId(this RetainerTask? task)
     {
         return Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRowOrDefault(task.Value.Task.RowId)?.Item.Value.RowId ?? 0;
     }
 
-    internal static Item? GetVentureItem(this RetainerTask task) => GetVentureItem((RetainerTask?)task);
+    internal static Item? GetVentureItem(this RetainerTask task)
+    {
+        return GetVentureItem((RetainerTask?)task);
+    }
+
     internal static Item? GetVentureItem(this RetainerTask? task)
     {
         return Svc.Data.GetExcelSheet<RetainerTaskNormal>().GetRowOrDefault(task.Value.Task.RowId)?.Item.Value;

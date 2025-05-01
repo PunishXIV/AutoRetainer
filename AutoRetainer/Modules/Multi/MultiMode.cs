@@ -306,7 +306,10 @@ internal static unsafe class MultiMode
         }
     }
 
-    internal static bool CheckInventoryValidity() => Svc.ClientState.LocalPlayer.HomeWorld.RowId == Svc.ClientState.LocalPlayer.CurrentWorld.RowId && Utils.GetVenturesAmount() >= Data.GetNeededVentureAmount() && Utils.IsInventoryFree();
+    internal static bool CheckInventoryValidity()
+    {
+        return Svc.ClientState.LocalPlayer.HomeWorld.RowId == Svc.ClientState.LocalPlayer.CurrentWorld.RowId && Utils.GetVenturesAmount() >= Data.GetNeededVentureAmount() && Utils.IsInventoryFree();
+    }
 
     internal static IEnumerable<OfflineCharacterData> GetEnabledOfflineData()
     {
@@ -561,7 +564,10 @@ internal static unsafe class MultiMode
         return null;
     }
 
-    internal static bool IsCurrentCharacterDone() => IsCurrentCharacterRetainersDone() && IsCurrentCharacterCaptainDone();
+    internal static bool IsCurrentCharacterDone()
+    {
+        return IsCurrentCharacterRetainersDone() && IsCurrentCharacterCaptainDone();
+    }
 
     internal static bool IsCurrentCharacterRetainersDone()
     {

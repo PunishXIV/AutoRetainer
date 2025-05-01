@@ -10,7 +10,10 @@ using System.Threading.Tasks;
 namespace AutoRetainer.Modules.Voyage.PartSwapper;
 public unsafe static class PartSwapperUtils
 {
-    internal static List<(int, uint)> GetIsVesselNeedsPartsSwap(string name, VoyageType type, out List<string> log) => GetIsVesselNeedsPartsSwap(VoyageUtils.GetVesselIndexByName(name, type), type, out log);
+    internal static List<(int, uint)> GetIsVesselNeedsPartsSwap(string name, VoyageType type, out List<string> log)
+    {
+        return GetIsVesselNeedsPartsSwap(VoyageUtils.GetVesselIndexByName(name, type), type, out log);
+    }
 
     internal static List<(int, uint)> GetIsVesselNeedsPartsSwap(int num, VoyageType type, out List<string> log)
     {
@@ -40,8 +43,10 @@ public unsafe static class PartSwapperUtils
         return new LevelAndPartsData();
     }
 
-    internal static bool IsLevelInRange(int level, int minLevel, int maxLevel) =>
-        minLevel <= level && level <= maxLevel;
+    internal static bool IsLevelInRange(int level, int minLevel, int maxLevel)
+    {
+        return minLevel <= level && level <= maxLevel;
+    }
 
     internal static void CheckAndLogParts(int num, VoyageType type, LevelAndPartsData partsData, List<string> log, out List<(int, uint)> changes)
     {
@@ -59,8 +64,9 @@ public unsafe static class PartSwapperUtils
         }
     }
 
-    internal static uint GetRequiredPart(LevelAndPartsData partsData, int slotIndex) =>
-        slotIndex switch
+    internal static uint GetRequiredPart(LevelAndPartsData partsData, int slotIndex)
+    {
+        return slotIndex switch
         {
             0 => (uint)partsData.Part1,
             1 => (uint)partsData.Part2,
@@ -68,17 +74,22 @@ public unsafe static class PartSwapperUtils
             3 => (uint)partsData.Part4,
             _ => throw new ArgumentOutOfRangeException(nameof(slotIndex), "Invalid slot index")
         };
+    }
 
-    internal static uint GetSubPart(string name, int slotIndex) =>
-            slotIndex switch
-            {
-                0 => (uint)Data.AdditionalSubmarineData[name].Part1,
-                1 => (uint)Data.AdditionalSubmarineData[name].Part2,
-                2 => (uint)Data.AdditionalSubmarineData[name].Part3,
-                3 => (uint)Data.AdditionalSubmarineData[name].Part4,
-                _ => throw new ArgumentOutOfRangeException(nameof(slotIndex), "Invalid slot index")
-            };
+    internal static uint GetSubPart(string name, int slotIndex)
+    {
+        return slotIndex switch
+        {
+            0 => (uint)Data.AdditionalSubmarineData[name].Part1,
+            1 => (uint)Data.AdditionalSubmarineData[name].Part2,
+            2 => (uint)Data.AdditionalSubmarineData[name].Part3,
+            3 => (uint)Data.AdditionalSubmarineData[name].Part4,
+            _ => throw new ArgumentOutOfRangeException(nameof(slotIndex), "Invalid slot index")
+        };
+    }
 
-    internal static bool AreRequiredPartsAvailable(List<(int, uint)> requiredChanges) =>
-        requiredChanges.All(change => InventoryManager.Instance()->GetInventoryItemCount(change.Item2) > 0);
+    internal static bool AreRequiredPartsAvailable(List<(int, uint)> requiredChanges)
+    {
+        return requiredChanges.All(change => InventoryManager.Instance()->GetInventoryItemCount(change.Item2) > 0);
+    }
 }

@@ -56,7 +56,10 @@ internal static unsafe class Utils
         return true;
     }
 
-    private static bool IsNullOrEmpty(this string s) => GenericHelpers.IsNullOrEmpty(s);
+    private static bool IsNullOrEmpty(this string s)
+    {
+        return GenericHelpers.IsNullOrEmpty(s);
+    }
 
     public static void EnsureEnhancedLoginIsOff()
     {
@@ -117,15 +120,35 @@ internal static unsafe class Utils
         }
     }
 
-    public static bool GetAllowFcTeleportForRetainers(this OfflineCharacterData data) => data.IsTeleportEnabled() && data.GetIsTeleportEnabledForRetainers() && (data.TeleportOptionsOverride.RetainersFC ?? C.GlobalTeleportOptions.RetainersFC);
-    public static bool GetAllowPrivateTeleportForRetainers(this OfflineCharacterData data) => data.IsTeleportEnabled() && data.GetIsTeleportEnabledForRetainers() && (data.TeleportOptionsOverride.RetainersPrivate ?? C.GlobalTeleportOptions.RetainersPrivate);
-    public static bool GetAllowApartmentTeleportForRetainers(this OfflineCharacterData data) => data.IsTeleportEnabled() && data.GetIsTeleportEnabledForRetainers() && (data.TeleportOptionsOverride.RetainersApartment ?? C.GlobalTeleportOptions.RetainersApartment);
+    public static bool GetAllowFcTeleportForRetainers(this OfflineCharacterData data)
+    {
+        return data.IsTeleportEnabled() && data.GetIsTeleportEnabledForRetainers() && (data.TeleportOptionsOverride.RetainersFC ?? C.GlobalTeleportOptions.RetainersFC);
+    }
 
-    public static bool GetAllowFcTeleportForSubs(this OfflineCharacterData data) => data.IsTeleportEnabled() && (data.TeleportOptionsOverride.Deployables ?? C.GlobalTeleportOptions.Deployables);
+    public static bool GetAllowPrivateTeleportForRetainers(this OfflineCharacterData data)
+    {
+        return data.IsTeleportEnabled() && data.GetIsTeleportEnabledForRetainers() && (data.TeleportOptionsOverride.RetainersPrivate ?? C.GlobalTeleportOptions.RetainersPrivate);
+    }
 
-    public static bool IsTeleportEnabled(this OfflineCharacterData data) => data.TeleportOptionsOverride.Enabled ?? C.GlobalTeleportOptions.Enabled;
+    public static bool GetAllowApartmentTeleportForRetainers(this OfflineCharacterData data)
+    {
+        return data.IsTeleportEnabled() && data.GetIsTeleportEnabledForRetainers() && (data.TeleportOptionsOverride.RetainersApartment ?? C.GlobalTeleportOptions.RetainersApartment);
+    }
 
-    public static bool GetIsTeleportEnabledForRetainers(this OfflineCharacterData data) => data.TeleportOptionsOverride.Retainers ?? C.GlobalTeleportOptions.Retainers;
+    public static bool GetAllowFcTeleportForSubs(this OfflineCharacterData data)
+    {
+        return data.IsTeleportEnabled() && (data.TeleportOptionsOverride.Deployables ?? C.GlobalTeleportOptions.Deployables);
+    }
+
+    public static bool IsTeleportEnabled(this OfflineCharacterData data)
+    {
+        return data.TeleportOptionsOverride.Enabled ?? C.GlobalTeleportOptions.Enabled;
+    }
+
+    public static bool GetIsTeleportEnabledForRetainers(this OfflineCharacterData data)
+    {
+        return data.TeleportOptionsOverride.Retainers ?? C.GlobalTeleportOptions.Retainers;
+    }
 
     public static bool GetAreTeleportSettingsOverriden(this OfflineCharacterData data)
     {
@@ -137,7 +160,10 @@ internal static unsafe class Utils
             || data.TeleportOptionsOverride.RetainersPrivate != null;
     }
 
-    public static long GetRemainingSessionMiliSeconds() => P.TimeLaunched[0] + 3 * 24 * 60 * 60 * 1000 - DateTimeOffset.Now.ToUnixTimeMilliseconds();
+    public static long GetRemainingSessionMiliSeconds()
+    {
+        return P.TimeLaunched[0] + 3 * 24 * 60 * 60 * 1000 - DateTimeOffset.Now.ToUnixTimeMilliseconds();
+    }
 
     public static readonly InventoryType[] RetainerInventories = [InventoryType.RetainerPage1, InventoryType.RetainerPage2, InventoryType.RetainerPage3, InventoryType.RetainerPage4, InventoryType.RetainerPage5, InventoryType.RetainerPage6, InventoryType.RetainerPage7];
     public static readonly InventoryType[] RetainerInventoriesWithCrystals = [InventoryType.RetainerPage1, InventoryType.RetainerPage2, InventoryType.RetainerPage3, InventoryType.RetainerPage4, InventoryType.RetainerPage5, InventoryType.RetainerPage6, InventoryType.RetainerPage7, InventoryType.RetainerCrystals];
@@ -283,7 +309,10 @@ internal static unsafe class Utils
         }
     }
 
-    public static bool? WaitForScreen() => IsScreenReady();
+    public static bool? WaitForScreen()
+    {
+        return IsScreenReady();
+    }
 
     internal static void ExtraLog(string s)
     {

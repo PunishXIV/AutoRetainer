@@ -10,9 +10,20 @@ internal static class Artisan
     internal static bool IsListPaused => Svc.PluginInterface.GetIpcSubscriber<bool>("Artisan.IsListPaused").InvokeFunc();
     internal static bool GetStopRequest => Svc.PluginInterface.GetIpcSubscriber<bool>("Artisan.GetStopRequest").InvokeFunc();
     internal static bool GetEnduranceStatus => Svc.PluginInterface.GetIpcSubscriber<bool>("Artisan.GetEnduranceStatus").InvokeFunc();
-    internal static void SetEnduranceStatus(bool b) => Svc.PluginInterface.GetIpcSubscriber<bool, object>("Artisan.IsListRunning").InvokeAction(b);
-    internal static void SetListPause(bool b) => Svc.PluginInterface.GetIpcSubscriber<bool, object>("Artisan.SetListPause").InvokeAction(b);
-    internal static void SetStopRequest(bool b) => Svc.PluginInterface.GetIpcSubscriber<bool, object>("Artisan.SetStopRequest").InvokeAction(b);
+    internal static void SetEnduranceStatus(bool b)
+    {
+        Svc.PluginInterface.GetIpcSubscriber<bool, object>("Artisan.IsListRunning").InvokeAction(b);
+    }
+
+    internal static void SetListPause(bool b)
+    {
+        Svc.PluginInterface.GetIpcSubscriber<bool, object>("Artisan.SetListPause").InvokeAction(b);
+    }
+
+    internal static void SetStopRequest(bool b)
+    {
+        Svc.PluginInterface.GetIpcSubscriber<bool, object>("Artisan.SetStopRequest").InvokeAction(b);
+    }
 
     internal static bool WasPaused = false;
 

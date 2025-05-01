@@ -74,11 +74,16 @@ public static unsafe class TaskDesynthItems
     }
 
     public static bool DesynthEligible(uint itemID)
-        => C.IMEnableItemDesynthesis
-        && ExcelItemHelper.Get(itemID).Value.Desynth > 0
-        && PlayerState.Instance()->ClassJobLevels[ExcelItemHelper.Get(itemID).Value.ClassJobRepair.Value.ExpArrayIndex] >= 30;
+    {
+        return C.IMEnableItemDesynthesis
+            && ExcelItemHelper.Get(itemID).Value.Desynth > 0
+            && PlayerState.Instance()->ClassJobLevels[ExcelItemHelper.Get(itemID).Value.ClassJobRepair.Value.ExpArrayIndex] >= 30;
+    }
 
-    private static bool IsOnIMList(uint itemID) => !C.IMProtectList.Contains(itemID) && C.IMAutoVendorHard.Contains(itemID);
+    private static bool IsOnIMList(uint itemID)
+    {
+        return !C.IMProtectList.Contains(itemID) && C.IMAutoVendorHard.Contains(itemID);
+    }
 
     private static void DesynthItem(InventoryItem* item)
     {

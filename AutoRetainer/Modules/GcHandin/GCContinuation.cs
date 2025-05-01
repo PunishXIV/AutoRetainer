@@ -127,9 +127,15 @@ internal static unsafe class GCContinuation
         return null;
     }
 
-    internal static bool? InteractWithExchange() => InteractWithDataID(GetGCInfo().Value.ExchangeDataID);
+    internal static bool? InteractWithExchange()
+    {
+        return InteractWithDataID(GetGCInfo().Value.ExchangeDataID);
+    }
 
-    internal static bool? InteractWithShop() => InteractWithDataID(GetGCInfo().Value.ShopDataID);
+    internal static bool? InteractWithShop()
+    {
+        return InteractWithDataID(GetGCInfo().Value.ShopDataID);
+    }
 
     private static bool? InteractWithDataID(uint dataID)
     {
@@ -157,7 +163,10 @@ internal static unsafe class GCContinuation
         return false;
     }
 
-    internal static bool? WaitUntilNotOccupied() => !IsOccupied();
+    internal static bool? WaitUntilNotOccupied()
+    {
+        return !IsOccupied();
+    }
 
     internal static bool? SelectProvisioningMission()
     {

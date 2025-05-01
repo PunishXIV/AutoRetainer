@@ -17,9 +17,16 @@ namespace AutoRetainer.Modules.Voyage;
 
 internal static unsafe class VoyageScheduler
 {
-    internal static void Log(string t) => VoyageUtils.Log(t);
+    internal static void Log(string t)
+    {
+        VoyageUtils.Log(t);
+    }
+
     internal static bool Enabled = false;
-    internal static bool? SelectQuitVesselMenu() => Utils.TrySelectSpecificEntry(Lang.VoyageQuitEntry);
+    internal static bool? SelectQuitVesselMenu()
+    {
+        return Utils.TrySelectSpecificEntry(Lang.VoyageQuitEntry);
+    }
 
     internal static bool? CloseRepair()
     {

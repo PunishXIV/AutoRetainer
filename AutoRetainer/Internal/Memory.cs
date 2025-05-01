@@ -34,7 +34,10 @@ internal unsafe class Memory : IDisposable
     internal delegate void RetainerItemCommandDelegate(nint AgentRetainerItemCommandModule, uint slot, InventoryType inventoryType, uint a4, RetainerItemCommand command);
     internal EzHook<RetainerItemCommandDelegate> RetainerItemCommandHook;
 
-    internal bool IsGatheringItemGathered(uint item) => GetIsGatheringItemGathered((ushort)item) != 0;
+    internal bool IsGatheringItemGathered(uint item)
+    {
+        return GetIsGatheringItemGathered((ushort)item) != 0;
+    }
 
     internal Memory()
     {

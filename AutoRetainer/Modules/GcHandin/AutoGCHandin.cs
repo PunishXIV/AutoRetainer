@@ -333,11 +333,20 @@ internal static unsafe class AutoGCHandin
         return ret;
     }
 
-    public static uint GetSeals() => GetGC() == 0 ? 0 : InventoryManager.Instance()->GetCompanySeals(GetGC());
+    public static uint GetSeals()
+    {
+        return GetGC() == 0 ? 0 : InventoryManager.Instance()->GetCompanySeals(GetGC());
+    }
 
-    public static uint GetMaxSeals() => GetGC() == 0 ? 0 : InventoryManager.Instance()->GetMaxCompanySeals(GetGC());
+    public static uint GetMaxSeals()
+    {
+        return GetGC() == 0 ? 0 : InventoryManager.Instance()->GetMaxCompanySeals(GetGC());
+    }
 
-    public static byte GetGC() => PlayerState.Instance()->GrandCompany;
+    public static byte GetGC()
+    {
+        return PlayerState.Instance()->GrandCompany;
+    }
 
     public static byte GetRank()
     {

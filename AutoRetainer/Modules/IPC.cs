@@ -8,7 +8,11 @@ namespace AutoRetainer.Modules;
 
 internal static class IPC
 {
-    private static void Log(string s) => DebugLog($"[IPC] {s}");
+    private static void Log(string s)
+    {
+        DebugLog($"[IPC] {s}");
+    }
+
     internal static bool Suppressed = false;
 
     internal static void Init()
@@ -157,7 +161,11 @@ internal static class IPC
         Suppressed = s;
     }
 
-    private static bool GetMultiModeEnabled() => MultiMode.Enabled;
+    private static bool GetMultiModeEnabled()
+    {
+        return MultiMode.Enabled;
+    }
+
     private static void SetMultiModeEnabled(bool s)
     {
         MultiMode.Enabled = s;

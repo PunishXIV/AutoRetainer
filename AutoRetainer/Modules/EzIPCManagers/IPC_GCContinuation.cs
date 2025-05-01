@@ -8,6 +8,15 @@ public class IPC_GCContinuation
         EzIPC.Init(this, $"{Svc.PluginInterface.InternalName}.GC");
     }
 
-    [EzIPC] public void EnqueueInitiation() => GCContinuation.EnqueueInitiation();
-    [EzIPC] public GCInfo? GetGCInfo() => GCContinuation.GetGCInfo();
+    [EzIPC]
+    public void EnqueueInitiation()
+    {
+        GCContinuation.EnqueueInitiation();
+    }
+
+    [EzIPC]
+    public GCInfo? GetGCInfo()
+    {
+        return GCContinuation.GetGCInfo();
+    }
 }

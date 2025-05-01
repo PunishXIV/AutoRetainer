@@ -14,7 +14,11 @@ using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
 namespace AutoRetainer.Modules.Voyage.PartSwapper;
 public static unsafe class PartSwapperTasks
 {
-    public static void Log(string t) => VoyageUtils.Log(t);
+    public static void Log(string t)
+    {
+        VoyageUtils.Log(t);
+    }
+
     public static bool? SelectChangeComponents()
     {
         return Utils.TrySelectSpecificEntry(Lang.ChangeSubmersibleComponents, () => Utils.GenericThrottle && EzThrottler.Throttle("Voyage.SelectManagement", 1000));
