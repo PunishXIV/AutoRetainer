@@ -18,10 +18,11 @@ public static unsafe class PartSwapperScheduler
     {
         if(C.EnableAutomaticComponentsAndPlanChange)
         {
-            TaskIntelligentComponentsChange.Enqueue(next, type);
-
             var plan = PartSwapperUtils.GetPlanInLevelRange(Data.GetAdditionalVesselData(next, type).Level);
+            if (plan == null) return;
 
+            TaskIntelligentComponentsChange.Enqueue(next, type);
+            
             if(PartSwapperUtils.GetIsVesselNeedsPartsSwap(next, VoyageType.Submersible, out _).Count == 0)
             {
                 if(plan.FirstSubDifferent && VoyageUtils.GetVesselIndexByName(next, VoyageType.Submersible) == 0)
