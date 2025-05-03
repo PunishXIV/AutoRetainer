@@ -28,7 +28,7 @@ public unsafe static class PartSwapperUtils
         return AreRequiredPartsAvailable(requiredChanges) ? requiredChanges : [];
     }
 
-    internal static LevelAndPartsData GetPlanInLevelRange(int vesselLevel)
+    internal static LevelAndPartsData? GetPlanInLevelRange(int vesselLevel)
     {
         foreach(var partsData in C.LevelAndPartsData)
         {
@@ -40,7 +40,7 @@ public unsafe static class PartSwapperUtils
             }
         }
 
-        return new LevelAndPartsData();
+        return null;
     }
 
     internal static bool IsLevelInRange(int level, int minLevel, int maxLevel)
