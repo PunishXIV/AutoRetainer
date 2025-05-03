@@ -22,24 +22,27 @@ public static unsafe class PartSwapperScheduler
             if (plan == null) return;
 
             TaskIntelligentComponentsChange.Enqueue(next, type);
-            
-            if(PartSwapperUtils.GetIsVesselNeedsPartsSwap(next, VoyageType.Submersible, out _).Count == 0)
-            {
-                if(plan.FirstSubDifferent && VoyageUtils.GetVesselIndexByName(next, VoyageType.Submersible) == 0)
-                {
-                    Data.AdditionalSubmarineData[next].UnlockMode = plan.FirstSubUnlockMode;
-                    Data.AdditionalSubmarineData[next].SelectedUnlockPlan = plan.FirstSubSelectedUnlockPlan;
-                    Data.AdditionalSubmarineData[next].VesselBehavior = plan.FirstSubVesselBehavior;
-                    Data.AdditionalSubmarineData[next].SelectedPointPlan = plan.FirstSubSelectedPointPlan;
-                }
-                else
-                {
-                    Data.AdditionalSubmarineData[next].UnlockMode = plan.UnlockMode;
-                    Data.AdditionalSubmarineData[next].SelectedUnlockPlan = plan.SelectedUnlockPlan;
-                    Data.AdditionalSubmarineData[next].VesselBehavior = plan.VesselBehavior;
-                    Data.AdditionalSubmarineData[next].SelectedPointPlan = plan.SelectedPointPlan;
-                }
-            }
+
+            P.TaskManager.Enqueue(() =>
+                                  {
+                                      if (PartSwapperUtils.GetIsVesselNeedsPartsSwap(next, VoyageType.Submersible, out _).Count == 0)
+                                      {
+                                          if (plan.FirstSubDifferent && VoyageUtils.GetVesselIndexByName(next, VoyageType.Submersible) == 0)
+                                          {
+                                              Data.AdditionalSubmarineData[next].UnlockMode         = plan.FirstSubUnlockMode;
+                                              Data.AdditionalSubmarineData[next].SelectedUnlockPlan = plan.FirstSubSelectedUnlockPlan;
+                                              Data.AdditionalSubmarineData[next].VesselBehavior     = plan.FirstSubVesselBehavior;
+                                              Data.AdditionalSubmarineData[next].SelectedPointPlan  = plan.FirstSubSelectedPointPlan;
+                                          }
+                                          else
+                                          {
+                                              Data.AdditionalSubmarineData[next].UnlockMode         = plan.UnlockMode;
+                                              Data.AdditionalSubmarineData[next].SelectedUnlockPlan = plan.SelectedUnlockPlan;
+                                              Data.AdditionalSubmarineData[next].VesselBehavior     = plan.VesselBehavior;
+                                              Data.AdditionalSubmarineData[next].SelectedPointPlan  = plan.SelectedPointPlan;
+                                          }
+                                      }
+                                  }, "Changing submersible plan");
         }
     }
 
