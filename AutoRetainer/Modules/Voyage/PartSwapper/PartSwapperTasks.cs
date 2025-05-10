@@ -95,7 +95,7 @@ public static unsafe class PartSwapperTasks
                 for(var i = 0; i < availablePartAmount.UInt; i++)
                 {
                     var partData = Svc.Data.Excel.GetSheet<Item>().GetRow(componentId);
-                    if((addon->AtkValuesSpan[13 + (8 * i)].Type == ValueType.ManagedString || addon->AtkValuesSpan[13 + (8 * i)].Type == ValueType.String) && addon->AtkValuesSpan[13 + (8 * i)].String.ExtractText().ToLower() == partData.Singular.ToString())
+                    if((addon->AtkValuesSpan[13 + (8 * i)].Type == ValueType.ManagedString || addon->AtkValuesSpan[13 + (8 * i)].Type == ValueType.String) && addon->AtkValuesSpan[13 + (8 * i)].String.ExtractText().ToLower() == partData.Name.ToString().ToLower())
                     {
                         Callback.Fire(&addon->AtkUnitBase, true, Utils.ZeroAtkValue, i, componentId, Utils.ZeroAtkValue, Utils.ZeroAtkValue);
                         EzThrottler.Throttle(t, 1500, true);
@@ -103,6 +103,8 @@ public static unsafe class PartSwapperTasks
 
                         if(string.IsNullOrEmpty(name))
                             return true;
+
+                        break;
                     }
                 }
 
@@ -113,7 +115,7 @@ public static unsafe class PartSwapperTasks
             {
                 Callback.Fire(addon2, true, (int)2, (int)1, (int)slot, Utils.ZeroAtkValue, Utils.ZeroAtkValue, Utils.ZeroAtkValue);
                 EzThrottler.Throttle(t, 1500, true);
-                Log($"Executing ContextIconMenu change request on slot {slot} ");
+                Log($"Executing CompanyCraftSupply request on slot {slot} ");
             }
             else
             {

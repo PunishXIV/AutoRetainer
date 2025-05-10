@@ -55,12 +55,12 @@ public static unsafe class PartSwapperScheduler
             && InventoryManager.Instance()->GetInventoryItemCount((uint)Items.DiveCredits) >= (2 * Data.NumSubSlots) - 1)
         {
             P.TaskManager.Enqueue(PartSwapperTasks.SelectRegisterSub);
-            if(EzThrottler.Throttle("DoWorkshopPanelTick.ScheduleResendNewSubs", 1000))
+            if(EzThrottler.Throttle("DoWorkshopPanelTick.RegisterSub", 1000))
             {
                 for(var i = 0; i < 4; i++)
                 {
                     var slot = i;
-                    P.TaskManager.Enqueue(() => PartSwapperTasks.ChangeComponent(slot, neededParts[slot]), $"ChangeTo{neededParts[slot]}");
+                    P.TaskManager.Enqueue(() => PartSwapperTasks.ChangeComponent(slot, neededParts[slot]), $"ChangeTo {neededParts[slot]}");
                 }
 
                 P.TaskManager.Enqueue(PartSwapperTasks.RegisterSub);
