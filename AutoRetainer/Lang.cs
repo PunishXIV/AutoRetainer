@@ -273,15 +273,25 @@ internal static class Lang
             "수리하시겠습니까?",
         ];
 
+    // Use the components selected and <If(Equal(IntegerParameter(1),1))>the following item<Else/><Value>IntegerParameter(1)</Value> of the following items</If> to outfit and register your submersible?
+    /* 6886 Das Tauchboot mit den gewählten Bauteilen registrieren?
+     Verbraucht <Value>IntegerParameter(1)</Value> <If(Equal(IntegerParameter(1),1))>Exemplar<Else/>Exemplare</If> des folgenden Gegenstands:
+    */
+    // 6886 Utiliser les éléments choisis et <If(Equal(IntegerParameter(1),1))>l'objet suivant<Else/><Value>IntegerParameter(1)</Value> des objets suivants</If> pour équiper et enregistrer le sous-marin<Indent/>?
+    /*選択したパーツアイテムと以下のアイテムを
+       <Value>IntegerParameter(1)</Value>枚消費して潜水艦を登録します。
+       よろしいですか？
+    */
+
     internal static readonly string[] WorkshopRegisterConfirm =
     [
-            "outfit and register",  // can't find this in any sheet
-            "", // japanese
-            "", // german
-            "", // french
+            "to outfit and register your submersible",  
+            "枚消費して潜水艦を登録します", 
+            "Das Tauchboot mit den gewählten Bauteilen registrieren", 
+            "pour équiper et enregistrer le sous-marin",
             //"",
             //"",
-            //""    Missing chinese and korean
+            //""    Missing chinese and korean (Addonsheet - 6886)
     ];
 
     //Your retainer will be unable to process item buyback requests once recalled. Are you sure you wish to proceed?
