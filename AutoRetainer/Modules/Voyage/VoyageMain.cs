@@ -225,7 +225,7 @@ internal static unsafe class VoyageMain
                                         if(x.EnforcePlan)
                                         {
                                             PluginLog.Information($"Unlock plan {x.Name} is set as enforced");
-                                            if(TaskDeployOnUnlockRoute.GetUnlockPointsFromPlan(x, UnlockMode.SpamOne).TryGetFirst(out var unlockPoint))
+                                            if(TaskDeployOnUnlockRoute.GetUnlockPointsFromPlan(x, UnlockMode.SpamOne).TryGetFirst(out var unlockPoint) && !x.ExcludedRoutes.Any(s => s == unlockPoint.point))
                                             {
                                                 PluginLog.Information($"Enforcing plan {x.Name} on current submarine");
                                                 TaskDeployOnUnlockRoute.Enqueue(next, type, x, UnlockMode.SpamOne);

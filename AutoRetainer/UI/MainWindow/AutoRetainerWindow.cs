@@ -3,6 +3,7 @@ using AutoRetainer.UI.MainWindow.MultiModeTab;
 using AutoRetainerAPI;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Interface.Components;
+using ECommons.Automation;
 using ECommons.Configuration;
 using ECommons.Funding;
 using NightmareUI;
