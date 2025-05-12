@@ -13,12 +13,13 @@ internal static class TaskIntelligentComponentsChange
         VoyageUtils.Log($"Task enqueued: {nameof(TaskIntelligentComponentsChange)}, name={name}, type={type}");
         P.TaskManager.Enqueue(() =>
         {
+            if (PartSwapperUtils.GetPlanInLevelRange(Data.GetAdditionalVesselData(name, type).Level) == null) return;
             var rep = PartSwapperUtils.GetIsVesselNeedsPartsSwap(name, type, out var log);
             if(rep.Count > 0)
             {
                 TaskChangeComponents.EnqueueImmediate(rep, name, type);
             }
-            PluginLog.Debug($"Change check log: {log.Join(", ")}");
+            PluginLog.Debug($"Change check log: {(log.Count > 0 ? log.Join(", ") : "None")}");
         }, "IntelligentChangeTask");
     }
 }

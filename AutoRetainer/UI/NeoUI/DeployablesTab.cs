@@ -401,13 +401,12 @@ public class DeployablesTab : NeoUIEntry
                 {
                     ImGui.SetNextItemWidth(150f);
                     if(ImGui.BeginCombo($"##pointplan{entry.GUID}", C.SubmarinePointPlans.Any(x => x.GUID == entry.SelectedPointPlan)
-                                                                             ? C.SubmarinePointPlans.First(x => x.GUID == entry.SelectedPointPlan)
-                                                                                .Name
+                                                                             ? C.SubmarinePointPlans.First(x => x.GUID == entry.SelectedPointPlan).GetPointPlanName()
                                                                              : "Non selected", ImGuiComboFlags.HeightLarge))
                     {
                         foreach(var plan in C.SubmarinePointPlans)
                         {
-                            if(ImGui.Selectable($"{plan.Name}##{entry.GUID}"))
+                            if(ImGui.Selectable($"{plan.GetPointPlanName()}##{entry.GUID}"))
                             {
                                 entry.SelectedPointPlan = plan.GUID;
                             }
@@ -455,13 +454,12 @@ public class DeployablesTab : NeoUIEntry
                     {
                         ImGui.SetNextItemWidth(150f);
                         if(ImGui.BeginCombo($"##firstSubPointplan{entry.GUID}", C.SubmarinePointPlans.Any(x => x.GUID == entry.FirstSubSelectedPointPlan)
-                                                     ? C.SubmarinePointPlans.First(x => x.GUID == entry.FirstSubSelectedPointPlan)
-                                                        .Name
+                                                     ? C.SubmarinePointPlans.First(x => x.GUID == entry.FirstSubSelectedPointPlan).GetPointPlanName()
                                                      : "Non selected", ImGuiComboFlags.HeightLarge))
                         {
                             foreach(var plan in C.SubmarinePointPlans)
                             {
-                                if(ImGui.Selectable($"{plan.Name}##firstSub{entry.GUID}"))
+                                if(ImGui.Selectable($"{plan.GetPointPlanName()}##firstSub{entry.GUID}"))
                                 {
                                     entry.FirstSubSelectedPointPlan = plan.GUID;
                                 }
