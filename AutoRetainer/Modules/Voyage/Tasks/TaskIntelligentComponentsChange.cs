@@ -15,7 +15,7 @@ internal static class TaskIntelligentComponentsChange
         {
             if (PartSwapperUtils.GetPlanInLevelRange(Data.GetAdditionalVesselData(name, type).Level) == null) return;
             var rep = PartSwapperUtils.GetIsVesselNeedsPartsSwap(name, type, out var log);
-            if(rep.Count > 0)
+            if(rep is { Count: > 0 })
             {
                 TaskChangeComponents.EnqueueImmediate(rep, name, type);
             }
