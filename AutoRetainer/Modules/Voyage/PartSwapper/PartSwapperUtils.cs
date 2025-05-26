@@ -10,12 +10,12 @@ using System.Threading.Tasks;
 namespace AutoRetainer.Modules.Voyage.PartSwapper;
 public unsafe static class PartSwapperUtils
 {
-    internal static List<(int, uint)> GetIsVesselNeedsPartsSwap(string name, VoyageType type, out List<string> log)
+    internal static List<(int, uint)>? GetIsVesselNeedsPartsSwap(string name, VoyageType type, out List<string> log)
     {
         return GetIsVesselNeedsPartsSwap(VoyageUtils.GetVesselIndexByName(name, type), type, out log);
     }
 
-    internal static List<(int, uint)> GetIsVesselNeedsPartsSwap(int num, VoyageType type, out List<string> log)
+    internal static List<(int, uint)>? GetIsVesselNeedsPartsSwap(int num, VoyageType type, out List<string> log)
     {
         log = [];
         var workshop = HousingManager.Instance()->WorkshopTerritory;
@@ -25,7 +25,7 @@ public unsafe static class PartSwapperUtils
 
         CheckAndLogParts(num, type, GetPlanInLevelRange(vesselLevel), log, out var requiredChanges);
 
-        return AreRequiredPartsAvailable(requiredChanges) ? requiredChanges : [];
+        return AreRequiredPartsAvailable(requiredChanges) ? requiredChanges : null;
     }
 
     internal static LevelAndPartsData? GetPlanInLevelRange(int vesselLevel)
