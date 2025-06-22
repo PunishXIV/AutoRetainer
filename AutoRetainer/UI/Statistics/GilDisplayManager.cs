@@ -13,7 +13,11 @@ public sealed class GilDisplayManager
         ImGuiEx.SetNextItemWidthScaled(200f);
         ImGui.InputInt("Ignore characters/retainers with gil less than", ref C.MinGilDisplay.ValidateRange(0, int.MaxValue));
         ImGuiComponents.HelpMarker($"Ignored retainer gil still contributes to character/DC total. Character is ignored if their gil AND all retainers' gil is less than this value. Ignored characters do not contribute to DC total.");
+        ref var filter = ref Ref<string>.Get();
         ImGui.Checkbox("Only display character total", ref C.GilOnlyChars);
+        ImGui.SameLine();
+        ImGuiEx.SetNextItemFullWidth();
+        ImGui.InputTextWithHint("##fltr", "Filter...", ref filter, 50);
         Dictionary<ExcelWorldHelper.Region, List<OfflineCharacterData>> data = [];
         foreach(var x in C.OfflineData)
         {
@@ -34,6 +38,7 @@ public sealed class GilDisplayManager
             foreach(var c in x.Value)
             {
                 if(c.NoGilTrack) continue;
+                if(filter != "" && !$"{c.Name}@{c.World}".Contains(filter, StringComparison.OrdinalIgnoreCase)) continue;
                 FCData fcdata = null;
                 var charTotal = c.Gil + c.RetainerData.Sum(s => s.Gil);
                 foreach(var fc in C.FCData)

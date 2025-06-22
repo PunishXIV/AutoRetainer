@@ -106,7 +106,7 @@ public static unsafe class TaskNeoHET
                     new(() => VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType), "Wait Until entered workshop"),
                     NeoTasks.WaitForScreenAndPlayer(),
                     ]);
-                if(C.FCChestGilCheck && DateTimeOffset.Now.ToUnixTimeMilliseconds() - C.FCChestGilCheckTimes.GetSafe(Player.CID) > C.FCChestGilCheckCd * 60 * 60 * 1000)
+                if(C.FCChestGilCheck && DateTimeOffset.Now.ToUnixTimeMilliseconds() - C.FCChestGilCheckTimes.SafeSelect(Player.CID) > C.FCChestGilCheckCd * 60 * 60 * 1000)
                 {
                     tasks.AddRange([
                     new(UpdateGilFromChest, new(timeLimitMS:10000, abortOnTimeout:false)),

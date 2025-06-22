@@ -5,13 +5,13 @@ using RetainerDescriptor = (ulong CID, string RetainerName);
 namespace AutoRetainer.UI.NeoUI;
 public class RetainersTab : NeoUIEntry
 {
-    public override string                      Path => "Retainers";
-    private         int                         MassMinLevel = 0;
-    private         int                         MassMaxLevel = 100;
-    private         VenturePlan                 SelectedVenturePlan;
-    private         EntrustPlan                 SelectedEntrustPlan;
-    private         HashSet<RetainerDescriptor> SelectedRetainers = [];
-    
+    public override string Path => "Retainers";
+    private int MassMinLevel = 0;
+    private int MassMaxLevel = 100;
+    private VenturePlan SelectedVenturePlan;
+    private EntrustPlan SelectedEntrustPlan;
+    private HashSet<RetainerDescriptor> SelectedRetainers = [];
+
     public override NuiBuilder Builder { get; init; }
 
     public RetainersTab()
@@ -25,20 +25,20 @@ public class RetainersTab : NeoUIEntry
     {
         ImGuiEx.Text("Select retainers:");
         ImGuiEx.SetNextItemFullWidth();
-        if (ImGui.BeginCombo("##sel", $"Selected {SelectedRetainers.Count}", ImGuiComboFlags.HeightLarge))
+        if(ImGui.BeginCombo("##sel", $"Selected {SelectedRetainers.Count}", ImGuiComboFlags.HeightLarge))
         {
-            ref string search = ref Ref<string>.Get("Search");
+            ref var search = ref Ref<string>.Get("Search");
             ImGui.InputTextWithHint("##searchRetainers", "Character search", ref search, 100);
-            foreach (var x in C.OfflineData)
+            foreach(var x in C.OfflineData)
             {
-                if ((search.Length > 0 && !(x.Name + "@" + x.World).Contains(search, StringComparison.OrdinalIgnoreCase)) || x.RetainerData.Count <= 0)
+                if((search.Length > 0 && !(x.Name + "@" + x.World).Contains(search, StringComparison.OrdinalIgnoreCase)) || x.RetainerData.Count <= 0)
                 {
                     continue;
                 }
                 ImGui.PushID(x.CID.ToString());
                 ImGuiEx.CollectionCheckbox(Censor.Character(x.Name, x.World), x.RetainerData.Select(r => (x.CID, r.Name)), SelectedRetainers);
                 ImGui.Indent();
-                foreach (var r in x.RetainerData)
+                foreach(var r in x.RetainerData)
                 {
                     ImGuiEx.CollectionCheckbox(Censor.Retainer(r.Name), (x.CID, r.Name), SelectedRetainers);
                 }
@@ -47,17 +47,17 @@ public class RetainersTab : NeoUIEntry
             }
             ImGui.EndCombo();
         }
-        if (ImGuiEx.IconButtonWithText((FontAwesomeIcon)61527, "Deselect All"))
+        if(ImGuiEx.IconButtonWithText((FontAwesomeIcon)61527, "Deselect All"))
         {
             SelectedRetainers.Clear();
         }
         ImGui.SameLine();
-        if (ImGuiEx.IconButtonWithText((FontAwesomeIcon)61525, "Select All"))
+        if(ImGuiEx.IconButtonWithText((FontAwesomeIcon)61525, "Select All"))
         {
             SelectedRetainers.Clear();
-            foreach (var x in C.OfflineData)
+            foreach(var x in C.OfflineData)
             {
-                foreach (var v in x.RetainerData)
+                foreach(var v in x.RetainerData)
                 {
                     SelectedRetainers.Add((x.CID, v.Name));
                 }
@@ -73,13 +73,13 @@ public class RetainersTab : NeoUIEntry
         ImGui.SameLine();
         ImGui.SetNextItemWidth(100f);
         ImGui.DragInt("##maxlevel", ref MassMaxLevel, 0.1f);
-        if (ImGuiEx.IconButtonWithText((FontAwesomeIcon)61543, "Add retainers by level to selection"))
+        if(ImGuiEx.IconButtonWithText((FontAwesomeIcon)61543, "Add retainers by level to selection"))
         {
-            foreach (var x in C.OfflineData)
+            foreach(var x in C.OfflineData)
             {
-                foreach (var r in x.RetainerData)
+                foreach(var r in x.RetainerData)
                 {
-                    if (r.Level.InRange(MassMinLevel, MassMaxLevel, includeEnd: true))
+                    if(r.Level.InRange(MassMinLevel, MassMaxLevel, includeEnd: true))
                     {
                         SelectedRetainers.Add((x.CID, r.Name));
                     }
@@ -92,11 +92,11 @@ public class RetainersTab : NeoUIEntry
         ImGuiEx.Text("Actions:");
         ImGui.Separator();
         ImGui.SetNextItemWidth(150f);
-        if (ImGui.BeginCombo("##ventureplans", SelectedVenturePlan?.Name ?? "None selected", (ImGuiComboFlags)8))
+        if(ImGui.BeginCombo("##ventureplans", SelectedVenturePlan?.Name ?? "None selected", (ImGuiComboFlags)8))
         {
-            foreach (var plan in C.SavedPlans)
+            foreach(var plan in C.SavedPlans)
             {
-                if (ImGui.Selectable(plan.Name + "##" + plan.GUID))
+                if(ImGui.Selectable(plan.Name + "##" + plan.GUID))
                 {
                     SelectedVenturePlan = plan;
                 }
@@ -104,13 +104,13 @@ public class RetainersTab : NeoUIEntry
             ImGui.EndCombo();
         }
         ImGui.SameLine();
-        if (ImGuiEx.IconButtonWithText((FontAwesomeIcon)62073, "Enable planner with venture plan"))
+        if(ImGuiEx.IconButtonWithText((FontAwesomeIcon)62073, "Enable planner with venture plan"))
         {
             var num = 0;
-            foreach (var x in SelectedRetainers)
+            foreach(var x in SelectedRetainers)
             {
                 var odata = C.OfflineData.FirstOrDefault(z => z.CID == x.CID);
-                if (odata != null)
+                if(odata != null && SelectedVenturePlan != null)
                 {
                     var adata = Utils.GetAdditionalData(x.CID, x.RetainerName);
                     adata.VenturePlan = SelectedVenturePlan;
@@ -125,11 +125,11 @@ public class RetainersTab : NeoUIEntry
         ImGui.Separator();
 
         ImGui.SetNextItemWidth(150f);
-        if (ImGui.BeginCombo("##entrustplans", SelectedEntrustPlan?.Name ?? "None selected", ImGuiComboFlags.HeightLarge))
+        if(ImGui.BeginCombo("##entrustplans", SelectedEntrustPlan?.Name ?? "None selected", ImGuiComboFlags.HeightLarge))
         {
-            foreach (var plan in C.EntrustPlans)
+            foreach(var plan in C.EntrustPlans)
             {
-                if (ImGui.Selectable($"{plan.Name}##{plan.Guid}"))
+                if(ImGui.Selectable($"{plan.Name}##{plan.Guid}"))
                 {
                     SelectedEntrustPlan = plan;
                 }
@@ -137,13 +137,13 @@ public class RetainersTab : NeoUIEntry
             ImGui.EndCombo();
         }
         ImGui.SameLine();
-        if (ImGuiEx.IconButtonWithText((FontAwesomeIcon)62566, "Set entrust plan"))
+        if(ImGuiEx.IconButtonWithText((FontAwesomeIcon)62566, "Set entrust plan"))
         {
-            int num = 0;
-            foreach (var x in SelectedRetainers)
+            var num = 0;
+            foreach(var x in SelectedRetainers)
             {
                 var odata = C.OfflineData.FirstOrDefault(z => z.CID == x.CID);
-                if (odata != null)
+                if(odata != null)
                 {
                     var adata = Utils.GetAdditionalData(x.CID, x.RetainerName);
                     adata.EntrustPlan = SelectedEntrustPlan.Guid;
@@ -155,13 +155,13 @@ public class RetainersTab : NeoUIEntry
 
         ImGui.Separator();
 
-        if (ImGuiEx.IconButtonWithText((FontAwesomeIcon)61526, "Remove entrust plan from selected retainers"))
+        if(ImGuiEx.IconButtonWithText((FontAwesomeIcon)61526, "Remove entrust plan from selected retainers"))
         {
-            int num = 0;
-            foreach (var x in SelectedRetainers)
+            var num = 0;
+            foreach(var x in SelectedRetainers)
             {
                 var odata = C.OfflineData.FirstOrDefault(z => z.CID == x.CID);
-                if (odata != null)
+                if(odata != null)
                 {
                     var adata = Utils.GetAdditionalData(x.CID, x.RetainerName);
                     adata.EntrustPlan = Guid.Empty;
@@ -173,13 +173,13 @@ public class RetainersTab : NeoUIEntry
 
         ImGui.Separator();
 
-        if (ImGuiEx.IconButtonWithText((FontAwesomeIcon)61526, "Disable venture planner for selected retainers"))
+        if(ImGuiEx.IconButtonWithText((FontAwesomeIcon)61526, "Disable venture planner for selected retainers"))
         {
-            int num = 0;
-            foreach (var x in SelectedRetainers)
+            var num = 0;
+            foreach(var x in SelectedRetainers)
             {
                 var odata = C.OfflineData.FirstOrDefault(z => z.CID == x.CID);
-                if (odata != null)
+                if(odata != null)
                 {
                     var adata = Utils.GetAdditionalData(x.CID, x.RetainerName);
                     adata.EnablePlanner = false;
@@ -191,10 +191,10 @@ public class RetainersTab : NeoUIEntry
 
         ImGui.Separator();
 
-        if (ImGuiEx.IconButtonWithText((FontAwesomeIcon)61452, "Enable selected retainers"))
+        if(ImGuiEx.IconButtonWithText((FontAwesomeIcon)61452, "Enable selected retainers"))
         {
-            int num = 0;
-            foreach (var x in SelectedRetainers)
+            var num = 0;
+            foreach(var x in SelectedRetainers)
             {
                 var retainers = P.GetSelectedRetainers(x.CID);
                 retainers.Add(x.RetainerName);
@@ -205,10 +205,10 @@ public class RetainersTab : NeoUIEntry
 
         ImGui.Separator();
 
-        if (ImGuiEx.IconButtonWithText((FontAwesomeIcon)61453, "Disable selected retainers"))
+        if(ImGuiEx.IconButtonWithText((FontAwesomeIcon)61453, "Disable selected retainers"))
         {
             var num = 0;
-            foreach (var x in SelectedRetainers)
+            foreach(var x in SelectedRetainers)
             {
                 var retainers = P.GetSelectedRetainers(x.CID);
                 retainers.Remove(x.RetainerName);
@@ -219,13 +219,13 @@ public class RetainersTab : NeoUIEntry
 
         ImGui.Separator();
 
-        if (ImGuiEx.IconButtonWithText((FontAwesomeIcon)61528, "Enable retainer multi mode for owners of selected retainers"))
+        if(ImGuiEx.IconButtonWithText((FontAwesomeIcon)61528, "Enable retainer multi mode for owners of selected retainers"))
         {
             var num = 0;
-            foreach (var x in SelectedRetainers)
+            foreach(var x in SelectedRetainers)
             {
                 var odata = C.OfflineData.FirstOrDefault(z => z.CID == x.CID);
-                if (odata is { Enabled: false })
+                if(odata is { Enabled: false })
                 {
                     odata.Enabled = true;
                     num++;
@@ -236,13 +236,13 @@ public class RetainersTab : NeoUIEntry
 
         ImGui.Separator();
 
-        if (ImGuiEx.IconButtonWithText((FontAwesomeIcon)61527, "Disable retainer multi mode for owners of selected retainers"))
+        if(ImGuiEx.IconButtonWithText((FontAwesomeIcon)61527, "Disable retainer multi mode for owners of selected retainers"))
         {
             var num = 0;
-            foreach (var x in SelectedRetainers)
+            foreach(var x in SelectedRetainers)
             {
                 var odata = C.OfflineData.FirstOrDefault(z => z.CID == x.CID);
-                if (odata is { Enabled: true })
+                if(odata is { Enabled: true })
                 {
                     odata.Enabled = false;
                     num++;

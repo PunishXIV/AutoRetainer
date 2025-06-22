@@ -94,6 +94,7 @@ internal unsafe class AutoRetainerWindow : Window
         {
             new NuiBuilder()
                 .Section("Disclaimer")
+                .TextWrapped(ImGuiColors.DalamudYellow, "Please note that using AutoRetainer for RMT purposes is strictly prohibited. ")
                 .TextWrapped(ImGuiColors.DalamudRed, "To avoid unnecessary consequences please follow these rules when using AutoRetainer:")
                 .TextWrapped("1. Do not acknowledge your use of AutoRetainer in game chat;")
                 .TextWrapped("2. Do not leave AutoRetainer unattended for prolonged period of time;")
