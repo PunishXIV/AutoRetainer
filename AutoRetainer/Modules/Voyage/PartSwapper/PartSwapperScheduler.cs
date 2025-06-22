@@ -24,7 +24,8 @@ public static unsafe class PartSwapperScheduler
                                   {
                                       var plan = PartSwapperUtils.GetPlanInLevelRange(Data.GetAdditionalVesselData(next, type).Level);
                                       if (plan == null) return;
-                                      if (PartSwapperUtils.GetIsVesselNeedsPartsSwap(next, VoyageType.Submersible, out _).Count == 0)
+                                      var partSwapperList = PartSwapperUtils.GetIsVesselNeedsPartsSwap(next, VoyageType.Submersible, out _);
+                                      if (partSwapperList is { Count: 0 })
                                       {
                                           if (plan.FirstSubDifferent && VoyageUtils.GetVesselIndexByName(next, VoyageType.Submersible) == 0)
                                           {
