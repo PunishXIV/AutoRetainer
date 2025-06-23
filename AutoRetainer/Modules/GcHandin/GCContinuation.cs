@@ -1,6 +1,4 @@
-﻿
-using Dalamud.Memory;
-using ECommons.Automation.UIInput;
+﻿using ECommons.Automation.UIInput;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;
 using ECommons.MathHelpers;

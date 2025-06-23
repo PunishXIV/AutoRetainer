@@ -1,4 +1,4 @@
-﻿global using AutoRetainer.Configuration;
+﻿global using AutoRetainer.PluginData;
 global using AutoRetainer.Helpers;
 global using AutoRetainer.Modules;
 global using AutoRetainer.Modules.GcHandin;

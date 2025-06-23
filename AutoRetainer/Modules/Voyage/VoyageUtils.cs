@@ -5,7 +5,6 @@ using AutoRetainerAPI.Configuration;
 using Dalamud.Game;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Memory;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
 using ECommons.Interop;
@@ -13,7 +12,6 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.Sheets;
-using static Lumina.Data.Parsing.Uld.UldRoot;
 
 namespace AutoRetainer.Modules.Voyage;
 

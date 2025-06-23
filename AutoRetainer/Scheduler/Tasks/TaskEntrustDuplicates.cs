@@ -2,7 +2,6 @@
 using AutoRetainer.Scheduler.Handlers;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
-using ECommons.Automation;
 using ECommons.ExcelServices;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;

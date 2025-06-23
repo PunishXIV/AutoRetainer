@@ -1,6 +1,5 @@
 ﻿using AutoRetainerAPI.Configuration;
 using Dalamud.Interface.Components;
-using NotificationMasterAPI;
 using PunishLib.ImGuiMethods;
 
 namespace AutoRetainer.UI.MainWindow;

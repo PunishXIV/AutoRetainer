@@ -1,5 +1,4 @@
 ﻿using AutoRetainer.Modules.Voyage.Readers;
-using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using Dalamud.Utility;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Component.GUI;

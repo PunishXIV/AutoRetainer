@@ -1,7 +1,6 @@
 ﻿using AutoRetainer.UI.Overlays;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game.ClientState.Conditions;
-using Dalamud.Memory;
 using Dalamud.Utility;
 using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;

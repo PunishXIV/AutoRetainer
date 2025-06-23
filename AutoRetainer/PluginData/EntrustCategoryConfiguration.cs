@@ -1,4 +1,4 @@
-﻿namespace AutoRetainer.Configuration;
+﻿namespace AutoRetainer.PluginData;
 public class EntrustCategoryConfiguration
 {
     public uint ID;

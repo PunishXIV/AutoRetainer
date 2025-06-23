@@ -1,7 +1,4 @@
 ﻿using AutoRetainerAPI.Configuration;
-using ECommons.ExcelServices;
-using FFXIVClientStructs;
-using PunishLib.ImGuiMethods;
 
 namespace AutoRetainer.UI.NeoUI.MultiModeEntries;
 public class CharaOrder : NeoUIEntry

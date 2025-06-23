@@ -1,6 +1,5 @@
 ﻿using AutoRetainer.Scheduler.Tasks;
 using ECommons.ExcelServices;
-using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.Sheets;
 

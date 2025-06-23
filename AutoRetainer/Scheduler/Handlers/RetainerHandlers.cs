@@ -1,6 +1,4 @@
 ﻿using AutoRetainer.Scheduler.Tasks;
-
-using Dalamud.Memory;
 using Dalamud.Utility;
 using ECommons.Automation.UIInput;
 using ECommons.Throttlers;

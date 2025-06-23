@@ -1,9 +1,5 @@
 ﻿using Dalamud.Game;
-using Lumina;
-using Lumina.Data;
-using Lumina.Excel;
 using Lumina.Excel.Sheets;
-using System.Drawing.Printing;
 
 namespace AutoRetainer.Modules.Voyage.VoyageCalculator;
 

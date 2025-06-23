@@ -1,5 +1,4 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game;
-using Lumina.Excel;
 using Lumina.Excel.Sheets;
 
 namespace AutoRetainer.Modules.Voyage.VoyageCalculator;

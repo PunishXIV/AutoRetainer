@@ -1,6 +1,5 @@
 ﻿using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
-using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
 namespace AutoRetainer.Scheduler.Tasks;

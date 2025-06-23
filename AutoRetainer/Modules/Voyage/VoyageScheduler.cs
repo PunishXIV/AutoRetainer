@@ -1,7 +1,6 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage.Tasks;
 using Dalamud.Game.ClientState.Conditions;
-using Dalamud.Utility;
 using ECommons.Automation;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;
@@ -10,8 +9,6 @@ using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using Lumina.Excel.Sheets;
-using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
 
 namespace AutoRetainer.Modules.Voyage;
 

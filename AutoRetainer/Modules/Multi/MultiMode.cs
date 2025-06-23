@@ -7,7 +7,6 @@ using AutoRetainerAPI.Configuration;
 using Dalamud.Game.Config;
 using Dalamud.Interface.ImGuiNotification;
 using ECommons.CircularBuffers;
-using ECommons.Configuration;
 using ECommons.Events;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.EzSharedDataManager;
@@ -15,7 +14,6 @@ using ECommons.GameHelpers;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using Newtonsoft.Json;
 using static AutoRetainer.Modules.OfflineDataManager;
 
 namespace AutoRetainer.Modules.Multi;

@@ -1,8 +1,5 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage.PartSwapper;
-using AutoRetainerAPI.Configuration;
-using ECommons.Throttlers;
-using System.Xml.Linq;
 
 namespace AutoRetainer.Modules.Voyage.Tasks;
 

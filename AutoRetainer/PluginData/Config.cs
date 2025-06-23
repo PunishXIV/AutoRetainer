@@ -3,7 +3,7 @@ using ECommons.Configuration;
 using ECommons.ExcelServices;
 using ECommons.Interop;
 
-namespace AutoRetainer.Configuration;
+namespace AutoRetainer.PluginData;
 
 [Serializable]
 internal unsafe class Config : IEzConfig

@@ -1,6 +1,6 @@
 ﻿using ECommons.Configuration;
 
-namespace AutoRetainer.Configuration;
+namespace AutoRetainer.PluginData;
 public class ARDiscardMiniConfig : IEzConfig
 {
     public List<uint> DiscardingItems;

@@ -1,7 +1,6 @@
 using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage;
 using ECommons.EzIpcManager;
-using FFXIVClientStructs.FFXIV.Client.Game;
 
 namespace AutoRetainer.Modules.EzIPCManagers;
 public class IPC_PluginState

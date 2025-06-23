@@ -6,7 +6,6 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using PInvoke;
-using System.IO;
 using ItemLevel = AutoRetainer.Helpers.ItemLevel;
 
 namespace AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;

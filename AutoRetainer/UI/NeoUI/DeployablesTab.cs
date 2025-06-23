@@ -1,8 +1,6 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage;
 using AutoRetainerAPI.Configuration;
-using ECommons.Events;
-using ECommons.GameHelpers;
 using ECommons.MathHelpers;
 using VesselDescriptor = (ulong CID, string VesselName);
 

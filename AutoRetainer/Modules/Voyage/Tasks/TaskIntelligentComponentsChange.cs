@@ -1,8 +1,5 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage.PartSwapper;
-using AutoRetainerAPI.Configuration;
-using ECommons.Automation.NeoTaskManager;
-using static FFXIVClientStructs.FFXIV.Client.UI.RaptureAtkHistory.Delegates;
 
 namespace AutoRetainer.Modules.Voyage.Tasks;
 

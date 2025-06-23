@@ -5,7 +5,6 @@ using Dalamud.Game.Text.SeStringHandling;
 using ECommons.Configuration;
 using ECommons.Events;
 using ECommons.ExcelServices;
-using ECommons.EzIpcManager;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;
 using ECommons.Throttlers;

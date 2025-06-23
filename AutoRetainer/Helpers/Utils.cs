@@ -28,12 +28,54 @@ using CharaData = (string Name, ushort World);
 
 namespace AutoRetainer.Helpers;
 
-internal static unsafe class Utils
+public static unsafe class Utils
 {
     public static int FrameDelay => 10 + C.ExtraFrameDelay;
-    internal static bool IsCN => Svc.ClientState.ClientLanguage == (ClientLanguage)4;
-    internal static int FCPoints => *(int*)((nint)AgentModule.Instance()->GetAgentByInternalId(AgentId.FreeCompanyCreditShop) + 256);
-    internal static float AnimationLock => Player.AnimationLock;
+    public static bool IsCN => Svc.ClientState.ClientLanguage == (ClientLanguage)4;
+    public static int FCPoints => *(int*)((nint)AgentModule.Instance()->GetAgentByInternalId(AgentId.FreeCompanyCreditShop) + 256);
+    public static float AnimationLock => Player.AnimationLock;
+
+    public static List<GCExchangeListing> SharedGCExchangeListings
+    {
+        get
+        {
+            if(field == null)
+            {
+                field = [];
+                Dictionary<uint, List<GCExchangeListing>> listings = [];
+                foreach(var x in Svc.Data.GetExcelSheet<GCScripShopCategory>())
+                {
+                    var items = Svc.Data.GetSubrowExcelSheet<GCScripShopItem>();
+                    if(x.RowId < items.Count && x.GrandCompany.RowId > 0)
+                    {
+                        var list = listings.GetOrCreate(x.GrandCompany.RowId, []);
+                        var sub = items[x.RowId];
+                        foreach(var entry in sub)
+                        {
+                            if(entry.Item.RowId != 0 && entry.Item.ValueNullable != null && !entry.Item.Value.IsUnique)
+                            {
+                                list.Add(new()
+                                {
+                                    Category = (GCExchangeCategoryTab)(x.SubCategory - 1),
+                                    ItemID = entry.Item.RowId,
+                                    MinPurchaseRank = entry.RequiredGrandCompanyRank.RowId,
+                                    Seals = entry.CostGCSeals,
+                                });
+                            }
+                        }
+                    }
+                }
+                foreach(var x in listings.Values.First())
+                {
+                    if(listings[1].Contains(x) && listings[2].Contains(x) && listings[3].Contains(x))
+                    {
+                        field.Add(x);
+                    }
+                }
+            }
+            return field;
+        }
+    }
 
     public static bool IsLockedOut(this OfflineCharacterData characterData)
     {

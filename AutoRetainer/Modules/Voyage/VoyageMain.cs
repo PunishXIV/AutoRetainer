@@ -4,12 +4,7 @@ using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game.Text.SeStringHandling;
-using ECommons.MathHelpers;
 using ECommons.Throttlers;
-using FFXIVClientStructs.FFXIV.Client.Game;
-using ImGuizmoNET;
-using System.Numerics;
-using System.Xml.Linq;
 
 namespace AutoRetainer.Modules.Voyage;
 

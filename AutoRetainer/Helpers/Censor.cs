@@ -1,5 +1,4 @@
 ﻿using Lumina.Misc;
-using System.Xml.Linq;
 
 namespace AutoRetainer.Helpers;
 

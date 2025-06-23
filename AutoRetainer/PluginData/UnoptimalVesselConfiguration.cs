@@ -1,4 +1,4 @@
-﻿namespace AutoRetainer.Configuration;
+﻿namespace AutoRetainer.PluginData;
 
 [Serializable]
 public class UnoptimalVesselConfiguration
