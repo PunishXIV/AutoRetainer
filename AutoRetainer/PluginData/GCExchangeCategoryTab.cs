@@ -1,5 +1,5 @@
 ﻿namespace AutoRetainer.PluginData;
 public enum GCExchangeCategoryTab
 {
-    Weapons, Armor, Materiel, Materials
+    Weapons = 1, Armor = 2, Materiel = 0, Materials = 3
 }

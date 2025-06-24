@@ -33,6 +33,9 @@ internal unsafe class Memory : IDisposable
     internal delegate void RetainerItemCommandDelegate(nint AgentRetainerItemCommandModule, uint slot, InventoryType inventoryType, uint a4, RetainerItemCommand command);
     internal EzHook<RetainerItemCommandDelegate> RetainerItemCommandHook;
 
+    public nint* MyAccountData = (nint*)Svc.SigScanner.GetStaticAddressFromSig("48 8B 3D ?? ?? ?? ?? 48 85 FF 74 69");
+    public ulong* MyAccountId => (ulong*)(*MyAccountData + 8);
+
     internal bool IsGatheringItemGathered(uint item)
     {
         return GetIsGatheringItemGathered((ushort)item) != 0;

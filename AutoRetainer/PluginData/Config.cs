@@ -19,6 +19,8 @@ internal unsafe class Config : IEzConfig
     public bool StatsUnifyHQ = false;
     public bool RecordStats = true;
     public bool AutoGCContinuation = false;
+    public HashSet<ulong> WhitelistedAccounts = [];
+
     public bool ShouldSerializeEnableAutoGCHandin()
     {
         return false;
@@ -242,4 +244,6 @@ internal unsafe class Config : IEzConfig
     public int FCChestGilCheckCd = 24;
     public Dictionary<ulong, long> FCChestGilCheckTimes = [];
     public Dictionary<ExcelWorldHelper.Region, long> LockoutTime = [];
+    public GCExchangePlan DefaultGCExchangePlan = new();
+    public Dictionary<ulong, GCExchangePlan> GCExchangePlanOverrides = [];
 }

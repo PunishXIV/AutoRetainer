@@ -23,6 +23,7 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.Sheets;
 using Lumina.Text.ReadOnly;
+using OtterGui.Text.EndObjects;
 using System.Text.RegularExpressions;
 using CharaData = (string Name, ushort World);
 
@@ -35,14 +36,32 @@ public static unsafe class Utils
     public static int FCPoints => *(int*)((nint)AgentModule.Instance()->GetAgentByInternalId(AgentId.FreeCompanyCreditShop) + 256);
     public static float AnimationLock => Player.AnimationLock;
 
-    public static List<GCExchangeListing> SharedGCExchangeListings
+    public static void Validate(this GCExchangePlan plan)
+    {
+        foreach(var x in Utils.SharedGCExchangeListings.Values)
+        {
+            if(!plan.Items.Any(l => l.ItemID == x.ItemID))
+            {
+                plan.Items.Add(new(x.ItemID, 0));
+            }
+        }
+        foreach(var x in plan.Items)
+        {
+            if(!SharedGCExchangeListings.ContainsKey(x.ItemID))
+            {
+                new TickScheduler(() => plan.Items.Remove(x));
+            }
+        }
+    }
+
+    public static Dictionary<uint, GCExchangeListingMetadata> SharedGCExchangeListings
     {
         get
         {
             if(field == null)
             {
                 field = [];
-                Dictionary<uint, List<GCExchangeListing>> listings = [];
+                Dictionary<uint, List<GCExchangeListingMetadata>> listings = [];
                 foreach(var x in Svc.Data.GetExcelSheet<GCScripShopCategory>())
                 {
                     var items = Svc.Data.GetSubrowExcelSheet<GCScripShopItem>();
@@ -69,13 +88,36 @@ public static unsafe class Utils
                 {
                     if(listings[1].Contains(x) && listings[2].Contains(x) && listings[3].Contains(x))
                     {
-                        field.Add(x);
+                        field[x.ItemID] = x;
                     }
                 }
             }
             return field;
         }
     }
+
+    public static readonly string[] GCRanks = [
+        "",
+        "Private Third Class",
+        "Private Second Class",
+        "Private First Class",
+        "Corporal",
+        "Sergeant Third Class",
+        "Sergeant Second Class",
+        "Sergeant First Class",
+        "Chief Sergeant",
+        "Second Lieutenant",
+        "First Lieutenant",
+        "Captain",
+        "Second Commander",
+        "First Commander",
+        "High Commander",
+        "Rear Marshal",
+        "Vice Marshal",
+        "Marshal",
+        "Grand Marshal",
+        "Champion",
+    ];
 
     public static bool IsLockedOut(this OfflineCharacterData characterData)
     {

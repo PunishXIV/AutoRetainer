@@ -1,7 +1,12 @@
 ﻿using Lumina.Excel.Sheets;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace AutoRetainer.PluginData;
-public unsafe sealed class GCExchangeListing : IEquatable<GCExchangeListing>
+public unsafe sealed class GCExchangeListingMetadata : IEquatable<GCExchangeListingMetadata>
 {
     public GCExchangeCategoryTab Category;
     public GCExchangeRankTab Rank
@@ -25,14 +30,15 @@ public unsafe sealed class GCExchangeListing : IEquatable<GCExchangeListing>
     public uint ItemID;
     public uint Seals;
     public uint MinPurchaseRank;
+
     public Item Data => Svc.Data.GetExcelSheet<Item>().GetRow(ItemID);
 
     public override bool Equals(object obj)
     {
-        return Equals(obj as GCExchangeListing);
+        return Equals(obj as GCExchangeListingMetadata);
     }
 
-    public bool Equals(GCExchangeListing other)
+    public bool Equals(GCExchangeListingMetadata other)
     {
         return other is not null &&
                Category == other.Category &&
@@ -46,12 +52,12 @@ public unsafe sealed class GCExchangeListing : IEquatable<GCExchangeListing>
         return HashCode.Combine(Category, ItemID, Seals, MinPurchaseRank);
     }
 
-    public static bool operator ==(GCExchangeListing left, GCExchangeListing right)
+    public static bool operator ==(GCExchangeListingMetadata left, GCExchangeListingMetadata right)
     {
-        return EqualityComparer<GCExchangeListing>.Default.Equals(left, right);
+        return EqualityComparer<GCExchangeListingMetadata>.Default.Equals(left, right);
     }
 
-    public static bool operator !=(GCExchangeListing left, GCExchangeListing right)
+    public static bool operator !=(GCExchangeListingMetadata left, GCExchangeListingMetadata right)
     {
         return !(left == right);
     }

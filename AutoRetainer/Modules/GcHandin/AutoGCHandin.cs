@@ -303,6 +303,7 @@ internal static unsafe class AutoGCHandin
     {
         var sealsRemaining = GetMaxSeals() - GetSeals();
         var items = GetHandinItems();
+        if(C.AutoGCContinuation && GCContinuation.GetNextPurchaseListing() == null) checkSealCap = false;
         for(var i = 0; i < items.Count; i++)
         {
             var item = items[i];

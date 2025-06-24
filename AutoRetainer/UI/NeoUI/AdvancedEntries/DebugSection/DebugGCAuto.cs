@@ -16,7 +16,6 @@ internal unsafe class DebugGCAuto : DebugSectionBase
         }
         if(ImGui.Button("EnqueueInitiation")) GCContinuation.EnqueueInitiation();
         if(ImGui.Button("EnqueueExchangeClose")) GCContinuation.EnqueueDeliveryClose();
-        if(ImGui.Button("EnqueueExchangeVentures")) GCContinuation.EnqueueExchangeVentures();
         if(ImGui.Button("Step on")) P.TaskManager.StepMode = true;
         ImGui.SameLine();
         if(ImGui.Button("Step off")) P.TaskManager.StepMode = false;
@@ -52,7 +51,6 @@ internal unsafe class DebugGCAuto : DebugSectionBase
                     entries.Add(new("IconID", () => ImGuiEx.TextCopy($"{x.IconID}")));
                     entries.Add(new("RankReq", () => ImGuiEx.TextCopy($"{x.RankReq}")));
                     entries.Add(new("Seals", () => ImGuiEx.TextCopy($"{x.Seals}")));
-                    entries.Add(new("Unk250", () => ImGuiEx.TextCopy($"{x.Unk250}")));
                     entries.Add(new("Unk350", () => ImGuiEx.TextCopy($"{x.Unk350}")));
                     entries.Add(new("Unk450", () => ImGuiEx.TextCopy($"{x.OpenCurrencyExchange}")));
                 }
@@ -60,7 +58,6 @@ internal unsafe class DebugGCAuto : DebugSectionBase
             }
         }
         ImGuiEx.Text($"GetGCSealMultiplier: {Utils.GetGCSealMultiplier()}");
-        if(ImGui.Button(nameof(GCContinuation.SetMaxVenturesExchange))) DuoLog.Information($"{GCContinuation.SetMaxVenturesExchange()}");
         if(ImGui.Button(nameof(GCContinuation.SelectExchange))) DuoLog.Information($"{GCContinuation.SelectExchange()}");
         if(ImGui.Button(nameof(GCContinuation.ConfirmExchange))) DuoLog.Information($"{GCContinuation.ConfirmExchange()}");
         if(ImGui.Button(nameof(GCContinuation.SelectGCExchangeVerticalTab))) DuoLog.Information($"{GCContinuation.SelectGCExchangeVerticalTab(0)}");

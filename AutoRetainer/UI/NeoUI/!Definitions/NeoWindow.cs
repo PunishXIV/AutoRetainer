@@ -3,6 +3,7 @@ using AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;
 using AutoRetainer.UI.NeoUI.Experiments;
 using AutoRetainer.UI.NeoUI.InventoryManagementEntries;
 using AutoRetainer.UI.NeoUI.MultiModeEntries;
+using ECommons.Configuration;
 using NightmareUI.OtterGuiWrapper.FileSystems.Configuration;
 
 namespace AutoRetainer.UI.NeoUI;
@@ -53,5 +54,10 @@ public sealed class NeoWindow : Window
     public override void Draw()
     {
         FileSystem.Draw(null);
+    }
+
+    public override void OnClose()
+    {
+        EzConfig.Save();
     }
 }
