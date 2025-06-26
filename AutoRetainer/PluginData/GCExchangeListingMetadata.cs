@@ -1,13 +1,17 @@
-﻿using Lumina.Excel.Sheets;
+﻿using ECommons.ExcelServices;
+using Lumina.Excel.Sheets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GrandCompany = ECommons.ExcelServices.GrandCompany;
 
 namespace AutoRetainer.PluginData;
 public unsafe sealed class GCExchangeListingMetadata : IEquatable<GCExchangeListingMetadata>
 {
+    public HashSet<GrandCompany> Companies = [];
+
     public GCExchangeCategoryTab Category;
     public GCExchangeRankTab Rank
     {

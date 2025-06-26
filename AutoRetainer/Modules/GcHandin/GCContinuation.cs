@@ -2,7 +2,9 @@
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using ECommons;
 using ECommons.Automation.NeoTaskManager;
+using ECommons.Automation.NeoTaskManager.Tasks;
 using ECommons.Automation.UIInput;
+using ECommons.ExcelServices;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;
 using ECommons.MathHelpers;
@@ -13,6 +15,8 @@ using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using Lumina.Excel.Sheets;
+using System.Reflection.Metadata.Ecma335;
 
 namespace AutoRetainer.Modules.GcHandin;
 
@@ -80,11 +84,21 @@ internal static unsafe class GCContinuation
 
     internal static bool? ConfirmExchange()
     {
-        var x = Utils.GetSpecificYesno(x => x.Contains("Exchange"));
-        if(x != null && EzThrottler.Throttle("GC ConfirmExchange"))
         {
-            new AddonMaster.SelectYesno((nint)x).Yes();
-            return true;
+            var x = Utils.GetSpecificYesno(x => x.Contains("You cannot currently equip this item"));
+            if(x != null && FrameThrottler.Throttle("ConfirmCannotEquip", 4))
+            {
+                new AddonMaster.SelectYesno((nint)x).Yes();
+                return false;
+            }
+        }
+        {
+            var x = Utils.GetSpecificYesno(x => x.Contains("Exchange"));
+            if(x != null && EzThrottler.Throttle("GC ConfirmExchange"))
+            {
+                new AddonMaster.SelectYesno((nint)x).Yes();
+                return true;
+            }
         }
         return false;
     }
@@ -296,7 +310,8 @@ internal static unsafe class GCContinuation
 
     public static uint GetAmountThatCanBePurchased(this ItemWithQuantity item)
     {
-        var meta = Utils.SharedGCExchangeListings[item.ItemID];
+        var meta = Utils.GetCurrentlyAvailableSharedExchangeListings().SafeSelect(item.ItemID);
+        if(meta == null) return 0;
         if(AutoGCHandin.GetRank() < meta.MinPurchaseRank) return 0;
         if(AutoGCHandin.GetSeals() < meta.Seals) return 0;
         var cnt = InventoryManager.Instance()->GetInventoryItemCount(meta.ItemID);
@@ -313,12 +328,17 @@ internal static unsafe class GCContinuation
         canFit = Math.Min(canFit, 99);
         canFit = Math.Min(canFit, meta.Data.StackSize);
         canFit = Math.Min(canFit, AutoGCHandin.GetSeals() / meta.Seals);
+        if(meta.Data.IsUnique)
+        {
+            canFit = Math.Min(canFit, 1);
+            if(cnt > 0) return 0;
+        }
         return canFit;
     }
 
     public static bool PurchaseItem(this ItemWithQuantity item)
     {
-        var meta = Utils.SharedGCExchangeListings[item.ItemID];
+        var meta = Utils.GetCurrentlyAvailableSharedExchangeListings()[item.ItemID];
         var amount = item.GetAmountThatCanBePurchased();
         if(TryGetAddonByName<AtkUnitBase>("GrandCompanyExchange", out var addon) && IsAddonReady(addon) && AutoGCHandin.IsValidGCTerritory())
         {
@@ -400,6 +420,7 @@ internal static unsafe class GCContinuation
         }
         tasks.Add(new(ConfirmExchange, conf));
         tasks.Add(new(() => AutoGCHandin.GetSeals() < sealsCount, conf));
+        tasks.Add(new FrameDelayTask(4));
         tasks.Add(new(BeginNewPurchase));
         P.TaskManager.InsertMulti([.. tasks]);
     }
@@ -419,7 +440,11 @@ internal static unsafe class GCContinuation
 
     public static ItemWithQuantity GetNextPurchaseListing()
     {
-        ItemWithQuantity[] items = [.. C.DefaultGCExchangePlan.Items, new(VentureItem, 65000)];
+        List<ItemWithQuantity> items = [.. C.DefaultGCExchangePlan.Items];
+        if((double)AutoGCHandin.GetSeals() / (double)AutoGCHandin.GetMaxSeals() > 0.5f)
+        {
+            items.Add(new(VentureItem, 65000));
+        }
         foreach(var l in items)
         {
             var amt = l.GetAmountThatCanBePurchased();

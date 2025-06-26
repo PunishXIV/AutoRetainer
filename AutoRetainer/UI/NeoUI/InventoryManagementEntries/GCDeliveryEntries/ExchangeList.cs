@@ -1,5 +1,7 @@
 ﻿using AutoRetainerAPI.Configuration;
+using ECommons.ExcelServices;
 using Lumina.Excel.Sheets;
+using GrandCompany = ECommons.ExcelServices.GrandCompany;
 using GrandCompanyRank = Lumina.Excel.Sheets.GrandCompanyRank;
 
 namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries.GCDeliveryEntries;
@@ -23,12 +25,49 @@ public unsafe sealed class ExchangeList : InventoryManagemenrBase
         plan.Validate();
         ref var filter = ref Ref<string>.Get($"{plan.ID}filter");
         ref var onlySelected = ref Ref<bool>.Get($"{plan.ID}onlySel");
+        if(ImGuiEx.IconButton(FontAwesomeIcon.AngleDoubleDown))
+        {
+            ImGui.OpenPopup("Ex");
+        }
+        if(ImGui.BeginPopup("Ex"))
+        {
+            if(ImGui.Selectable("Fill weapons and armor purchases optimally for extra FC points"))
+            {
+                List<ItemWithQuantity> items = [];
+                for(int i = plan.Items.Count-1; i >= 0; i--)
+                {
+                    var item = plan.Items[i];
+                    var meta = Utils.SharedGCExchangeListings[item.ItemID];
+                    if((meta.Category == GCExchangeCategoryTab.Weapons || meta.Category == GCExchangeCategoryTab.Armor) && meta.Data.GetRarity() == ItemRarity.Green)
+                    {
+                        items.Add(item);
+                        plan.Items.RemoveAt(i);
+                    } 
+                }
+                items = items.OrderByDescending(x => (double)Svc.Data.GetExcelSheet<GCSupplyDutyReward>().GetRow(x.Data.Value.LevelItem.RowId).SealsExpertDelivery / (double)Utils.SharedGCExchangeListings[x.ItemID].Seals).ToList();
+                foreach(var x in items)
+                {
+                    plan.Items.Add(x);
+                    x.Quantity = Utils.SharedGCExchangeListings[x.ItemID].Data.IsUnique ? 1 : 999;
+                }
+            }
+            if(ImGui.Selectable("Reset quantities"))
+            {
+                plan.Items.Each(x => x.Quantity = 0);
+            }
+            if(ImGui.Selectable("Full reset"))
+            {
+                plan.Items.Clear();
+            }
+            ImGui.EndPopup();
+        }
+        ImGui.SameLine();
         ImGui.Checkbox("Only Selected", ref onlySelected);
         ImGui.SameLine();
         ImGuiEx.SetNextItemFullWidth();
         ImGui.InputTextWithHint("##filter", "Search...", ref filter, 100);
         DragDrop.Begin();
-        if(ImGuiEx.BeginDefaultTable("GCDeliveryList", ["##dragDrop", "~Item", "Price", "Category", "Amount"]))
+        if(ImGuiEx.BeginDefaultTable("GCDeliveryList", ["##dragDrop", "~Item", "GC", "Lv", "Price", "Category", "Amount"]))
         {
             for(var i = 0; i < plan.Items.Count; i++)
             {
@@ -54,6 +93,21 @@ public unsafe sealed class ExchangeList : InventoryManagemenrBase
                 }
                 ImGuiEx.TextV($"{meta.Data.Name.GetText()}");
                 ImGui.TableNextColumn();
+                foreach(var c in Enum.GetValues<GrandCompany>().Where(x => x != GrandCompany.Unemployed))
+                {
+                    if(ThreadLoadImageHandler.TryGetIconTextureWrap(60870 + (int)c, false, out var ctex))
+                    {
+                        var trans = !meta.Companies.Contains(c);
+                        if(trans) ImGui.PushStyleVar(ImGuiStyleVar.Alpha, 0.2f);
+                        ImGui.Image(ctex.ImGuiHandle, new(ImGui.GetFrameHeight()));
+                        if(trans) ImGui.PopStyleVar();
+                        ImGuiEx.Tooltip($"{c}" + (trans?" (unavailable)":""));
+                        ImGui.SameLine(0, 1);
+                    }
+                }
+                ImGui.TableNextColumn();
+                ImGuiEx.TextV($"{meta.Data.LevelItem.RowId}");
+                ImGui.TableNextColumn();
                 if(Svc.Data.GetExcelSheet<GrandCompanyRank>().TryGetRow(meta.MinPurchaseRank, out var rank) && ThreadLoadImageHandler.TryGetIconTextureWrap(rank.IconFlames, false, out var tex))
                 {
                     ImGui.Image(tex.ImGuiHandle, new(ImGui.GetFrameHeight()));
@@ -67,8 +121,15 @@ public unsafe sealed class ExchangeList : InventoryManagemenrBase
                 ImGuiEx.TextV($"{meta.Category}");
                 if(ImGuiEx.HoveredAndClicked()) filter = meta.Category.ToString();
                 ImGui.TableNextColumn();
-                ImGui.SetNextItemWidth(150f.Scale());
-                ImGui.InputInt("##qty", ref x.Quantity.ValidateRange(0, int.MaxValue), 1, 10);
+                if(x.Data.Value.IsUnique)
+                {
+                    ImGuiEx.Checkbox("Unique", ref x.Quantity);
+                }
+                else
+                {
+                    ImGui.SetNextItemWidth(150f.Scale());
+                    ImGui.InputInt("##qty", ref x.Quantity.ValidateRange(0, int.MaxValue), 1, 10);
+                }
                 ImGui.PopID();
             }
             ImGui.EndTable();

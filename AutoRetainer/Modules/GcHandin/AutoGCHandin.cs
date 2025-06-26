@@ -203,7 +203,7 @@ internal static unsafe class AutoGCHandin
                         {
                             Operation = false;
                             DuoLog.Information($"{e.Message}");
-                            if(C.GCHandinNotify)
+                            if(C.GCHandinNotify && !C.AutoGCContinuation)
                             {
                                 Utils.TryNotify(e.Message);
                             }

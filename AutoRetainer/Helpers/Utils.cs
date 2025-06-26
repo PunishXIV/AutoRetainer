@@ -26,6 +26,7 @@ using Lumina.Text.ReadOnly;
 using OtterGui.Text.EndObjects;
 using System.Text.RegularExpressions;
 using CharaData = (string Name, ushort World);
+using GrandCompany = ECommons.ExcelServices.GrandCompany;
 
 namespace AutoRetainer.Helpers;
 
@@ -35,6 +36,11 @@ public static unsafe class Utils
     public static bool IsCN => Svc.ClientState.ClientLanguage == (ClientLanguage)4;
     public static int FCPoints => *(int*)((nint)AgentModule.Instance()->GetAgentByInternalId(AgentId.FreeCompanyCreditShop) + 256);
     public static float AnimationLock => Player.AnimationLock;
+
+    public static bool IsProtected(this Item item)
+    {
+        return C.IMProtectList.Contains(item.RowId);
+    }
 
     public static void Validate(this GCExchangePlan plan)
     {
@@ -51,7 +57,20 @@ public static unsafe class Utils
             {
                 new TickScheduler(() => plan.Items.Remove(x));
             }
+            if(x.Data.ValueNullable != null && x.Data.Value.IsUnique) x.Quantity.ValidateRange(0, 1);
         }
+    }
+
+    public static Dictionary<uint, GCExchangeListingMetadata> GetCurrentlyAvailableSharedExchangeListings()
+    {
+        var gc = Svc.ClientState.TerritoryType switch
+        {
+            MainCities.New_Gridania => GrandCompany.TwinAdder,
+            MainCities.Uldah_Steps_of_Nald => GrandCompany.ImmortalFlames,
+            MainCities.Limsa_Lominsa_Upper_Decks => GrandCompany.Maelstrom,
+            _ => throw new InvalidOperationException("Could not determite accessed grand company")
+        };
+        return SharedGCExchangeListings.Where(x => x.Value.Companies.Contains(gc)).ToDictionary();
     }
 
     public static Dictionary<uint, GCExchangeListingMetadata> SharedGCExchangeListings
@@ -71,7 +90,7 @@ public static unsafe class Utils
                         var sub = items[x.RowId];
                         foreach(var entry in sub)
                         {
-                            if(entry.Item.RowId != 0 && entry.Item.ValueNullable != null && !entry.Item.Value.IsUnique)
+                            if(entry.Item.RowId != 0 && entry.Item.ValueNullable != null)
                             {
                                 list.Add(new()
                                 {
@@ -84,11 +103,18 @@ public static unsafe class Utils
                         }
                     }
                 }
-                foreach(var x in listings.Values.First())
+                foreach(var listing in listings)
                 {
-                    if(listings[1].Contains(x) && listings[2].Contains(x) && listings[3].Contains(x))
+                    foreach(var x in listing.Value)
                     {
-                        field[x.ItemID] = x;
+                        field.TryAdd(x.ItemID, x);
+                        for(uint i = 1; i <= 3; i++)
+                        {
+                            if(listings[i].Contains(x))
+                            {
+                                field[x.ItemID].Companies.Add((GrandCompany)i);
+                            }
+                        }
                     }
                 }
             }
