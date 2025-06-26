@@ -2,7 +2,8 @@
 Collect and assign ventures to your retainers from the comfort of your bed.
 ## Become a Supporter!
 If you like AutoRetainer or any of the other plugins I maintain, please consider becoming a supporter on Patreon or via other means! This will help me to continue updating AutoRetainer and work on new plugins and features.
-- [Subscribe on Patreon](https://subscribe.nightmarexiv.com/)
+- [Subscribe on Patreon (Starts from $1)](https://subscribe.nightmarexiv.com/)
+- [One-time donation on Ko-Fi](https://ko-fi.com/nightmarexiv)
 - [Donate Litecoin, Bitcoin, Tether or other crypto](https://crypto.nightmarexiv.com/)
 ## Key features
 - Assign and reassign your retainer ventures in one click according to your configuration: AutoRetainer will deal with annoying confirmations.
