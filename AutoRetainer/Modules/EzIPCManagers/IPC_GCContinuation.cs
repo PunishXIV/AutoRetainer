@@ -11,7 +11,7 @@ public class IPC_GCContinuation
     [EzIPC]
     public void EnqueueInitiation()
     {
-        GCContinuation.EnqueueInitiation();
+        GCContinuation.EnqueueInitiation(true);
     }
 
     [EzIPC]

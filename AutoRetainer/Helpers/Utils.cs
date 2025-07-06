@@ -17,6 +17,7 @@ using ECommons.MathHelpers;
 using ECommons.Reflection;
 using ECommons.Throttlers;
 using ECommons.UIHelpers.AddonMasterImplementations;
+using FFXIVClientStructs;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
@@ -37,28 +38,112 @@ public static unsafe class Utils
     public static int FCPoints => *(int*)((nint)AgentModule.Instance()->GetAgentByInternalId(AgentId.FreeCompanyCreditShop) + 256);
     public static float AnimationLock => Player.AnimationLock;
 
+    extension(OfflineCharacterData data)
+    {
+        public string NameWithWorld => $"{data.Name}@{data.World}";
+        public string NameWithWorldCensored => Censor.Character(data.NameWithWorld);
+
+        public bool IsLockedOut()
+        {
+            var world = ExcelWorldHelper.Get(data.WorldOverride ?? data.World);
+            if(world != null)
+            {
+                return DateTimeOffset.Now.ToUnixTimeSeconds() < C.LockoutTime.SafeSelect(world.Value.GetRegion(), 0);
+            }
+            return false;
+        }
+
+        public bool ShouldWaitForAllWhenLoggedIn()
+        {
+            return C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn && (C.MultiModeWorkshopConfiguration.MultiWaitForAll || data.MultiWaitForAllDeployables);
+        }
+
+        public bool GetAllowFcTeleportForRetainers()
+        {
+            return data.IsTeleportEnabled() && data.GetIsTeleportEnabledForRetainers() && (data.TeleportOptionsOverride.RetainersFC ?? C.GlobalTeleportOptions.RetainersFC);
+        }
+
+        public bool GetAllowPrivateTeleportForRetainers()
+        {
+            return data.IsTeleportEnabled() && data.GetIsTeleportEnabledForRetainers() && (data.TeleportOptionsOverride.RetainersPrivate ?? C.GlobalTeleportOptions.RetainersPrivate);
+        }
+
+        public bool GetAllowApartmentTeleportForRetainers()
+        {
+            return data.IsTeleportEnabled() && data.GetIsTeleportEnabledForRetainers() && (data.TeleportOptionsOverride.RetainersApartment ?? C.GlobalTeleportOptions.RetainersApartment);
+        }
+
+        public bool GetAllowFcTeleportForSubs()
+        {
+            return data.IsTeleportEnabled() && (data.TeleportOptionsOverride.Deployables ?? C.GlobalTeleportOptions.Deployables);
+        }
+
+        public bool IsTeleportEnabled()
+        {
+            return data.TeleportOptionsOverride.Enabled ?? C.GlobalTeleportOptions.Enabled;
+        }
+
+        public bool GetIsTeleportEnabledForRetainers()
+        {
+            return data.TeleportOptionsOverride.Retainers ?? C.GlobalTeleportOptions.Retainers;
+        }
+
+        public bool GetAreTeleportSettingsOverriden()
+        {
+            return data.TeleportOptionsOverride.Deployables != null
+                || data.TeleportOptionsOverride.Enabled != null
+                || data.TeleportOptionsOverride.Retainers != null
+                || data.TeleportOptionsOverride.RetainersApartment != null
+                || data.TeleportOptionsOverride.RetainersFC != null
+                || data.TeleportOptionsOverride.RetainersPrivate != null;
+        }
+    }
+
+    extension(GCExchangePlan plan)
+    {
+        public string DisplayName
+        {
+            get
+            {
+                if(plan.Name != "") return plan.Name;
+                var index = C.AdditionalGCExchangePlans.IndexOf(plan);
+                if(index != -1) return $"Plan {index + 1}";
+                return $"Plan {plan.GUID.ToString().Split("-")[0]}";
+            }
+        }
+
+        public void Validate()
+        {
+            foreach(var x in Utils.SharedGCExchangeListings.Values)
+            {
+                if(!plan.Items.Any(l => l.ItemID == x.ItemID))
+                {
+                    plan.Items.Add(new(x.ItemID, 0));
+                }
+            }
+            foreach(var x in plan.Items)
+            {
+                if(!SharedGCExchangeListings.ContainsKey(x.ItemID))
+                {
+                    new TickScheduler(() => plan.Items.Remove(x));
+                }
+                if(x.Data.ValueNullable != null && x.Data.Value.IsUnique) x.Quantity.ValidateRange(0, 1);
+            }
+        }
+    }
+
+    public static GCExchangePlan GetGCExchangePlanWithOverrides()
+    {
+        if(C.AdditionalGCExchangePlans.TryGetFirst(x => x.GUID == Data.ExchangePlan, out var plan))
+        {
+            return plan;
+        }
+        return C.DefaultGCExchangePlan;
+    }
+
     public static bool IsProtected(this Item item)
     {
         return C.IMProtectList.Contains(item.RowId);
-    }
-
-    public static void Validate(this GCExchangePlan plan)
-    {
-        foreach(var x in Utils.SharedGCExchangeListings.Values)
-        {
-            if(!plan.Items.Any(l => l.ItemID == x.ItemID))
-            {
-                plan.Items.Add(new(x.ItemID, 0));
-            }
-        }
-        foreach(var x in plan.Items)
-        {
-            if(!SharedGCExchangeListings.ContainsKey(x.ItemID))
-            {
-                new TickScheduler(() => plan.Items.Remove(x));
-            }
-            if(x.Data.ValueNullable != null && x.Data.Value.IsUnique) x.Quantity.ValidateRange(0, 1);
-        }
     }
 
     public static Dictionary<uint, GCExchangeListingMetadata> GetCurrentlyAvailableSharedExchangeListings()
@@ -145,16 +230,6 @@ public static unsafe class Utils
         "Champion",
     ];
 
-    public static bool IsLockedOut(this OfflineCharacterData characterData)
-    {
-        var world = ExcelWorldHelper.Get(characterData.WorldOverride ?? characterData.World);
-        if(world != null)
-        {
-            return DateTimeOffset.Now.ToUnixTimeSeconds() < C.LockoutTime.SafeSelect(world.Value.GetRegion(), 0);
-        }
-        return false;
-    }
-
     public static bool ShouldSkipNPCVendor()
     {
         if(!C.IMSkipVendorIfRetainer) return false;
@@ -204,10 +279,7 @@ public static unsafe class Utils
         }*/
     }
 
-    public static bool ShouldWaitForAllWhenLoggedIn(this OfflineCharacterData data)
-    {
-        return C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn && (C.MultiModeWorkshopConfiguration.MultiWaitForAll || data.MultiWaitForAllDeployables);
-    }
+    
 
     public static void EnqueueVendorItemsByRetainer()
     {
@@ -228,46 +300,6 @@ public static unsafe class Utils
                 break;
             }
         }
-    }
-
-    public static bool GetAllowFcTeleportForRetainers(this OfflineCharacterData data)
-    {
-        return data.IsTeleportEnabled() && data.GetIsTeleportEnabledForRetainers() && (data.TeleportOptionsOverride.RetainersFC ?? C.GlobalTeleportOptions.RetainersFC);
-    }
-
-    public static bool GetAllowPrivateTeleportForRetainers(this OfflineCharacterData data)
-    {
-        return data.IsTeleportEnabled() && data.GetIsTeleportEnabledForRetainers() && (data.TeleportOptionsOverride.RetainersPrivate ?? C.GlobalTeleportOptions.RetainersPrivate);
-    }
-
-    public static bool GetAllowApartmentTeleportForRetainers(this OfflineCharacterData data)
-    {
-        return data.IsTeleportEnabled() && data.GetIsTeleportEnabledForRetainers() && (data.TeleportOptionsOverride.RetainersApartment ?? C.GlobalTeleportOptions.RetainersApartment);
-    }
-
-    public static bool GetAllowFcTeleportForSubs(this OfflineCharacterData data)
-    {
-        return data.IsTeleportEnabled() && (data.TeleportOptionsOverride.Deployables ?? C.GlobalTeleportOptions.Deployables);
-    }
-
-    public static bool IsTeleportEnabled(this OfflineCharacterData data)
-    {
-        return data.TeleportOptionsOverride.Enabled ?? C.GlobalTeleportOptions.Enabled;
-    }
-
-    public static bool GetIsTeleportEnabledForRetainers(this OfflineCharacterData data)
-    {
-        return data.TeleportOptionsOverride.Retainers ?? C.GlobalTeleportOptions.Retainers;
-    }
-
-    public static bool GetAreTeleportSettingsOverriden(this OfflineCharacterData data)
-    {
-        return data.TeleportOptionsOverride.Deployables != null
-            || data.TeleportOptionsOverride.Enabled != null
-            || data.TeleportOptionsOverride.Retainers != null
-            || data.TeleportOptionsOverride.RetainersApartment != null
-            || data.TeleportOptionsOverride.RetainersFC != null
-            || data.TeleportOptionsOverride.RetainersPrivate != null;
     }
 
     public static long GetRemainingSessionMiliSeconds()

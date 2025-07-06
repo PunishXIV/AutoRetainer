@@ -12,7 +12,7 @@ internal static unsafe class HouseEnterTask
     {
         DebugLog($"Enabling automove");
         Utils.RegenerateRandom();
-        Chat.Instance.ExecuteCommand("/automove on");
+        Chat.ExecuteCommand("/automove on");
         return true;
     }
 
@@ -57,7 +57,7 @@ internal static unsafe class HouseEnterTask
             {
                 if(EzThrottler.Throttle("HET.LockonBell"))
                 {
-                    Chat.Instance.ExecuteCommand("/lockon");
+                    Chat.ExecuteCommand("/lockon");
                     return true;
                 }
             }
@@ -81,7 +81,7 @@ internal static unsafe class HouseEnterTask
         if(bell != null && Vector3.Distance(Player.Object.Position, bell.Position) < 4f + Utils.Random * 0.25f)
         {
             DebugLog($"Disabling automove");
-            Chat.Instance.ExecuteCommand("/automove off");
+            Chat.ExecuteCommand("/automove off");
             return true;
         }
         return false;

@@ -55,7 +55,7 @@ public sealed unsafe class FCPointsUpdater
                         TaskManager.InsertDelay(10, true);
                     }
                 });
-                TaskManager.Enqueue(() => Chat.Instance.ExecuteCommand("/freecompanycmd"));
+                TaskManager.Enqueue(() => Chat.ExecuteCommand("/freecompanycmd"));
                 /*TaskManager.Enqueue(() =>
 								{
 										if(TryGetAddonByName<AtkUnitBase>("FreeCompany", out var addon))

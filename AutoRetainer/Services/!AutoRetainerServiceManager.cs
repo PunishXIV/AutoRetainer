@@ -7,14 +7,15 @@ using AutoRetainer.UI.Statistics;
 namespace AutoRetainer.Services;
 public static class AutoRetainerServiceManager
 {
-    public static NeoWindow NeoWindow { get; private set; }
-    public static EzIPCManager EzIPCManager { get; private set; }
-    public static FCPointsUpdater FCPointsUpdater { get; private set; }
-    public static FcDataManager FCData { get; private set; }
-    public static GilDisplayManager GilDisplay { get; private set; }
-    public static VentureStatsManager VentureStats { get; private set; }
-    public static LifestreamIPC LifestreamIPC { get; private set; }
-    //public static EventLogger EventLogger { get; private set; }
-    public static AutoBuyFuelOverlay AutoBuyFuelOverlay { get; private set; }
-    public static TitleScreenButton TitleScreenButton { get; private set; }
+    public static NeoWindow NeoWindow;
+    public static EzIPCManager EzIPCManager;
+    public static FCPointsUpdater FCPointsUpdater;
+    public static FcDataManager FCData;
+    public static GilDisplayManager GilDisplay;
+    public static VentureStatsManager VentureStats;
+    public static LifestreamIPC LifestreamIPC;
+    //public static EventLogger EventLogger;
+    public static AutoBuyFuelOverlay AutoBuyFuelOverlay;
+    public static TitleScreenButton TitleScreenButton;
+    public static AddonWatcher AddonWatcher;
 }

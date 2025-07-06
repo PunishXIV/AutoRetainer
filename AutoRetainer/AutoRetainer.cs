@@ -282,6 +282,41 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 }
             }
         }
+        else if(arguments.EqualsIgnoreCaseAny("n", "night"))
+        {
+            C.NightMode = !C.NightMode;
+            DuoLog.Information($"Night mode {(C.NightMode ? "enabled" : "disabled")}");
+            if(C.NightMode)
+            {
+                if(!MultiMode.Enabled)
+                {
+                    MultiMode.Enabled = true;
+                    MultiMode.OnMultiModeEnabled();
+                }
+            }
+        }
+        else if(arguments.StartsWithAny(StringComparison.OrdinalIgnoreCase, "n ", "night "))
+        {
+            var arg2 = arguments.Split(" ")[1];
+            if(arg2.EqualsIgnoreCaseAny("d", "disable"))
+            {
+                C.NightMode = false;
+            }
+            else if(arg2.EqualsIgnoreCaseAny("e", "enable"))
+            {
+                C.NightMode = true;
+                if(!MultiMode.Enabled)
+                {
+                    MultiMode.Enabled = true;
+                    MultiMode.OnMultiModeEnabled();
+                }
+            }
+            else if(arg2.EqualsIgnoreCaseAny("s", "set"))
+            {
+                C.NightMode = true;
+            }
+            DuoLog.Information($"Night mode {(C.NightMode ? "enabled" : "disabled")}");
+        }
         else if(arguments.EqualsIgnoreCaseAny("s", "settings"))
         {
             S.NeoWindow.IsOpen = true;

@@ -100,7 +100,8 @@ internal unsafe class AutoRetainerWindow : Window
                 .TextWrapped("3. Ensure that your total playing+AutoRetainer usage time does not exceeds 16 hours per day; ensure that periods of inactivity exist between your retainer/submersible checking routine;")
                 .TextWrapped("4. Never reply back to players that are trying to do so-called bot checks by trading or chatting with you; instead, blacklist these players immediately;")
                 .TextWrapped("5. If questioned by game master, always claim that you are doing all actions manually and never admit plugin usage.")
-                .TextWrapped("Failure to follow these rules may result in actions taken against your account.")
+                .TextWrapped("Failure to follow these guidelines may put your account at risk.")
+                .TextWrapped(GradientColor.Get(ImGuiColors.DalamudYellow, ImGuiColors.DalamudRed), "You may not use AutoRetainer for Real Money Trading or other commercial purposes. No support will be provided if you are using it for these purposes.")
                 .Widget(() =>
                 {
                     if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Check, "Accept and continue"))

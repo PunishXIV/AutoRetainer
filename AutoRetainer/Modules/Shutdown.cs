@@ -39,7 +39,7 @@ internal static unsafe class Shutdown
                         {
                             if(EzThrottler.Throttle("SendChat"))
                             {
-                                Chat.Instance.ExecuteCommand("/shutdown");
+                                Chat.ExecuteCommand("/shutdown");
                                 return true;
                             }
                             return false;

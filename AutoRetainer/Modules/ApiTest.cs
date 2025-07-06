@@ -1,4 +1,5 @@
 ﻿using ECommons.Automation.LegacyTaskManager;
+using ECommons.WindowsFormsReflector;
 
 namespace AutoRetainer.Modules;
 
@@ -26,7 +27,7 @@ internal static class ApiTest
         PluginLog.Information($"Now postprocessing {retainerName}");
         TaskManager.Enqueue(() =>
         {
-            if(GenericHelpers.IsKeyPressed(System.Windows.Forms.Keys.Back))
+            if(GenericHelpers.IsKeyPressed(Keys.Back))
             {
                 return true;
             }

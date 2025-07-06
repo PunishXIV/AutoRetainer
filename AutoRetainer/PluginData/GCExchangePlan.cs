@@ -13,4 +13,9 @@ public unsafe sealed class GCExchangePlan
     public Guid GUID = Guid.NewGuid();
     public string Name = "";
     public List<ItemWithQuantity> Items = [];
+    public int RemainingSeals = 0;
+    public bool FinalizeByPurchasing = false;
+
+    public bool ShouldSerializeGUID() => GUID != Guid.Empty;
+    public bool ShouldSerializeID() => false;
 }

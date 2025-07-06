@@ -31,16 +31,19 @@ internal static unsafe class GCContinuation
     public static bool DebugMode = false;
     public static bool DebugConf = false;
 
-    public static void EnqueueInitiation()
+    public static void EnqueueInitiation(bool redeliver)
     {
         P.TaskManager.Enqueue(GCContinuation.WaitUntilNotOccupied);
         P.TaskManager.Enqueue(GCContinuation.InteractWithShop);
         P.TaskManager.Enqueue(BeginNewPurchase);
         P.TaskManager.Enqueue(GCContinuation.WaitUntilNotOccupied);
-        P.TaskManager.Enqueue(GCContinuation.InteractWithExchange);
-        P.TaskManager.Enqueue(GCContinuation.SelectProvisioningMission);
-        P.TaskManager.Enqueue(() => GCContinuation.SelectSupplyListTab(2), "SelectSupplyListTab(2)");
-        P.TaskManager.Enqueue(GCContinuation.EnableDeliveringIfPossible);
+        if(redeliver)
+        {
+            P.TaskManager.Enqueue(GCContinuation.InteractWithExchange);
+            P.TaskManager.Enqueue(GCContinuation.SelectProvisioningMission);
+            P.TaskManager.Enqueue(() => GCContinuation.SelectSupplyListTab(2), "SelectSupplyListTab(2)");
+            P.TaskManager.Enqueue(GCContinuation.EnableDeliveringIfPossible);
+        }
     }
 
     public static void EnqueueDeliveryClose()
@@ -255,8 +258,15 @@ internal static unsafe class GCContinuation
         return false;
     }
 
+    public static uint GetAdjustedSeals()
+    {
+        var plan = Utils.GetGCExchangePlanWithOverrides();
+        return (uint)Math.Max(0, AutoGCHandin.GetSeals() - plan.RemainingSeals.ValidateRange(0, 15000));
+    }
+
     internal static bool? OpenSeals()
     {
+        
         if(TryGetAddonByName<AtkUnitBase>("GrandCompanyExchange", out var addon) && IsAddonReady(addon) && AutoGCHandin.IsValidGCTerritory())
         {
             var reader = new ReaderGrandCompanyExchange(addon);
@@ -266,7 +276,7 @@ internal static unsafe class GCContinuation
                 if(itemInfo.ItemID == 21072)
                 {
                     var currentRank = AutoGCHandin.GetRank();
-                    if(currentRank >= itemInfo.RankReq && AutoGCHandin.GetSeals() >= itemInfo.Seals)
+                    if(currentRank >= itemInfo.RankReq && GetAdjustedSeals() >= itemInfo.Seals)
                     {
                         if(FrameThrottler.Throttle("GCCont.OpenItem", 20))
                         {
@@ -280,40 +290,12 @@ internal static unsafe class GCContinuation
         return false;
     }
 
-    internal static bool? SelectGCPurchaseItem(int which)
-    {
-        if(TryGetAddonByName<AtkUnitBase>("GrandCompanyExchange", out var addon) && IsAddonReady(addon) && AutoGCHandin.IsValidGCTerritory())
-        {
-            var reader = new ReaderGrandCompanyExchange(addon);
-            if(which < reader.ItemCount)
-            {
-                for(var i = 0; i < reader.Items.Count; i++)
-                {
-                    var itemInfo = reader.Items[i];
-                    if(itemInfo.ItemID == 21072)
-                    {
-                        var currentRank = AutoGCHandin.GetRank();
-                        if(currentRank >= itemInfo.RankReq && AutoGCHandin.GetSeals() >= itemInfo.Seals)
-                        {
-                            if(FrameThrottler.Throttle("GCCont.SelectGCPurchaseItem", 20))
-                            {
-
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
     public static uint GetAmountThatCanBePurchased(this ItemWithQuantity item)
     {
         var meta = Utils.GetCurrentlyAvailableSharedExchangeListings().SafeSelect(item.ItemID);
         if(meta == null) return 0;
         if(AutoGCHandin.GetRank() < meta.MinPurchaseRank) return 0;
-        if(AutoGCHandin.GetSeals() < meta.Seals) return 0;
+        if(GetAdjustedSeals() < meta.Seals) return 0;
         var cnt = InventoryManager.Instance()->GetInventoryItemCount(meta.ItemID);
         var targetQuantity = item.Quantity - cnt;
         if(targetQuantity <= 0) return 0;
@@ -327,7 +309,7 @@ internal static unsafe class GCContinuation
         canFit = Math.Min(canFit, (uint)targetQuantity);
         canFit = Math.Min(canFit, 99);
         canFit = Math.Min(canFit, meta.Data.StackSize);
-        canFit = Math.Min(canFit, AutoGCHandin.GetSeals() / meta.Seals);
+        canFit = Math.Min(canFit, GetAdjustedSeals() / meta.Seals);
         if(meta.Data.IsUnique)
         {
             canFit = Math.Min(canFit, 1);
@@ -440,8 +422,8 @@ internal static unsafe class GCContinuation
 
     public static ItemWithQuantity GetNextPurchaseListing()
     {
-        List<ItemWithQuantity> items = [.. C.DefaultGCExchangePlan.Items];
-        if((double)AutoGCHandin.GetSeals() / (double)AutoGCHandin.GetMaxSeals() > 0.5f)
+        List<ItemWithQuantity> items = [.. Utils.GetGCExchangePlanWithOverrides().Items];
+        if((double)GetAdjustedSeals() / (double)AutoGCHandin.GetMaxSeals() > 0.5f)
         {
             items.Add(new(VentureItem, 65000));
         }

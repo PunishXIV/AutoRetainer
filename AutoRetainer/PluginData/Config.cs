@@ -245,5 +245,5 @@ internal unsafe class Config : IEzConfig
     public Dictionary<ulong, long> FCChestGilCheckTimes = [];
     public Dictionary<ExcelWorldHelper.Region, long> LockoutTime = [];
     public GCExchangePlan DefaultGCExchangePlan = new();
-    public Dictionary<ulong, GCExchangePlan> GCExchangePlanOverrides = [];
+    public List<GCExchangePlan> AdditionalGCExchangePlans = [];
 }

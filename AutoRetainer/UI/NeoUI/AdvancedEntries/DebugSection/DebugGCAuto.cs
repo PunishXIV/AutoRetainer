@@ -14,7 +14,7 @@ internal unsafe class DebugGCAuto : DebugSectionBase
                 ImGuiEx.Text(x.ToString() + "/" + ExcelItemHelper.GetName(x.ItemID));
             }
         }
-        if(ImGui.Button("EnqueueInitiation")) GCContinuation.EnqueueInitiation();
+        if(ImGui.Button("EnqueueInitiation")) GCContinuation.EnqueueInitiation(true);
         if(ImGui.Button("EnqueueExchangeClose")) GCContinuation.EnqueueDeliveryClose();
         if(ImGui.Button("Step on")) P.TaskManager.StepMode = true;
         ImGui.SameLine();

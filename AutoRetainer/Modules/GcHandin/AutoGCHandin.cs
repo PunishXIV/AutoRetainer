@@ -151,6 +151,10 @@ internal static unsafe class AutoGCHandin
                     }
                     Operation = false;
                     GCContinuation.EnqueueDeliveryClose();
+                    if(Utils.GetGCExchangePlanWithOverrides().FinalizeByPurchasing)
+                    {
+                        GCContinuation.EnqueueInitiation(false);
+                    }
                 }
                 else
                 {
@@ -188,7 +192,7 @@ internal static unsafe class AutoGCHandin
                                         GCContinuation.EnqueueDeliveryClose();
                                         if(C.AutoGCContinuation)
                                         {
-                                            GCContinuation.EnqueueInitiation();
+                                            GCContinuation.EnqueueInitiation(true);
                                         }
                                         throw new GCHandinInterruptedException("Too many seals, please spend them");
                                     }
@@ -304,13 +308,15 @@ internal static unsafe class AutoGCHandin
         var sealsRemaining = GetMaxSeals() - GetSeals();
         var items = GetHandinItems();
         if(C.AutoGCContinuation && GCContinuation.GetNextPurchaseListing() == null) checkSealCap = false;
+        List<(uint ItemID, uint Seals, int Index)> candidates = [];
         for(var i = 0; i < items.Count; i++)
         {
             var item = items[i];
             if(C.IMProtectList.Contains(item.ItemID)) continue;
             var seals = (uint)(item.Seals * Utils.GetGCSealMultiplier());
-            if(!checkSealCap || sealsRemaining > seals) return (item.ItemID, seals, i);
+            if(!checkSealCap || sealsRemaining > seals) candidates.Add((item.ItemID, seals, i));
         }
+        if(candidates.Count > 0) return candidates.MinBy(x => x.Seals);
         return null;
     }
 

@@ -122,7 +122,7 @@ internal static unsafe class VoyageScheduler
                 if(Utils.GenericThrottle)
                 {
                     Log("Locking on workshop CP");
-                    Chat.Instance.ExecuteCommand("/lockon");
+                    Chat.ExecuteCommand("/lockon");
                     return true;
                 }
             }
@@ -136,7 +136,7 @@ internal static unsafe class VoyageScheduler
         {
             if(Utils.GenericThrottle)
             {
-                Chat.Instance.ExecuteCommand("/automove on");
+                Chat.ExecuteCommand("/automove on");
                 Utils.RegenerateRandom();
                 return true;
             }
@@ -152,7 +152,7 @@ internal static unsafe class VoyageScheduler
             {
                 if(Utils.GenericThrottle)
                 {
-                    Chat.Instance.ExecuteCommand("/automove off");
+                    Chat.ExecuteCommand("/automove off");
                     return true;
                 }
             }
