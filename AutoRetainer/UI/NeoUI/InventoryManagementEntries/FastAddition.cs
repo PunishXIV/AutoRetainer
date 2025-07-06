@@ -13,6 +13,7 @@ public class FastAddition : InventoryManagemenrBase
 
     public override void Draw()
     {
+        var selectedSettings = Utils.GetSelectedIMSettings();
         ImGuiEx.TextWrapped(GradientColor.Get(EColor.RedBright, EColor.YellowBright), $"While this text is visible, hover over items while holding:");
         ImGuiEx.Text(!ImGui.GetIO().KeyShift ? ImGuiColors.DalamudGrey : ImGuiColors.DalamudRed, $"Shift - add to Quick Venture Sell List");
         ImGuiEx.Text($"* Items that already in Unconditional Sell List WILL NOT BE ADDED to Quick Venture Sell List");
@@ -25,26 +26,26 @@ public class FastAddition : InventoryManagemenrBase
             var id = (uint)(Svc.GameGui.HoveredItem % 1000000);
             if(ImGui.GetIO().KeyShift)
             {
-                if(!C.IMProtectList.Contains(id) && !C.IMAutoVendorSoft.Contains(id) && !C.IMAutoVendorHard.Contains(id))
+                if(!selectedSettings.IMProtectList.Contains(id) && !selectedSettings.IMAutoVendorSoft.Contains(id) && !selectedSettings.IMAutoVendorHard.Contains(id))
                 {
-                    C.IMAutoVendorSoft.Add(id);
+                    selectedSettings.IMAutoVendorSoft.Add(id);
                     Notify.Success($"Added {ExcelItemHelper.GetName(id)} to Quick Venture Sell List");
-                    C.IMAutoVendorHard.Remove(id);
+                    selectedSettings.IMAutoVendorHard.Remove(id);
                 }
             }
             if(ImGui.GetIO().KeyCtrl)
             {
-                if(!C.IMProtectList.Contains(id) && !C.IMAutoVendorHard.Contains(id) && !C.IMAutoVendorSoft.Contains(id))
+                if(!selectedSettings.IMProtectList.Contains(id) && !selectedSettings.IMAutoVendorHard.Contains(id) && !selectedSettings.IMAutoVendorSoft.Contains(id))
                 {
-                    C.IMAutoVendorHard.Add(id);
+                    selectedSettings.IMAutoVendorHard.Add(id);
                     Notify.Success($"Added {ExcelItemHelper.GetName(id)} to Unconditional Sell List");
-                    C.IMAutoVendorSoft.Remove(id);
+                    selectedSettings.IMAutoVendorSoft.Remove(id);
                 }
             }
             if(ImGui.GetIO().KeyAlt)
             {
-                if(C.IMAutoVendorSoft.Remove(id)) Notify.Info($"Removed {ExcelItemHelper.GetName(id)} from Quick Venture Sell List");
-                if(C.IMAutoVendorHard.Remove(id)) Notify.Info($"Removed {ExcelItemHelper.GetName(id)} from Unconditional Sell List");
+                if(selectedSettings.IMAutoVendorSoft.Remove(id)) Notify.Info($"Removed {ExcelItemHelper.GetName(id)} from Quick Venture Sell List");
+                if(selectedSettings.IMAutoVendorHard.Remove(id)) Notify.Info($"Removed {ExcelItemHelper.GetName(id)} from Unconditional Sell List");
             }
         }
     }

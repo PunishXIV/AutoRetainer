@@ -27,6 +27,7 @@ internal static unsafe class TaskEntrustDuplicates
     {
         try
         {
+            var s = Data.GetIMSettings();
             var allowedPlayerInventories = plan.GetAllowedInventories();
             if(TryGetAddonByName<AtkUnitBase>("InputNumeric", out var numeric))
             {
@@ -52,13 +53,13 @@ internal static unsafe class TaskEntrustDuplicates
                 foreach(var x in plan.EntrustItems)
                 {
                     var add = (x, plan.EntrustItemsAmountToKeep.SafeSelect(x));
-                    if(plan.ExcludeProtected && C.IMProtectList.Contains(add.Item1)) continue;
+                    if(plan.ExcludeProtected && s.IMProtectList.Contains(add.Item1)) continue;
                     itemList.Add(add);
                     InternalLog.Debug($"[TED] From EntrustItems added item: {ExcelItemHelper.GetName(add.Item1, true)} toKeep={add.Item2}");
                 }
                 foreach(var x in Utils.GetItemsInInventory(allowedPlayerInventories))
                 {
-                    if(plan.ExcludeProtected && C.IMProtectList.Contains(x)) continue;
+                    if(plan.ExcludeProtected && s.IMProtectList.Contains(x)) continue;
                     var item = ExcelItemHelper.Get(x);
                     if(item == null) continue;
                     if(itemList.Any(s => s.ItemID == item?.RowId)) continue;
@@ -80,7 +81,7 @@ internal static unsafe class TaskEntrustDuplicates
                             var item = InventoryManager.Instance()->GetInventorySlot(type, i);
                             if(item->ItemId != 0 && item->Quantity > 0)
                             {
-                                if(plan.ExcludeProtected && C.IMProtectList.Contains(item->ItemId)) continue;
+                                if(plan.ExcludeProtected && s.IMProtectList.Contains(item->ItemId)) continue;
                                 if(itemList.Any(s => s.ItemID == item->ItemId)) continue;
                                 var data = ExcelItemHelper.Get(item->ItemId);
                                 itemList.Add((item->ItemId, 0));
@@ -98,7 +99,7 @@ internal static unsafe class TaskEntrustDuplicates
                         var item = InventoryManager.Instance()->GetInventorySlot(type, i);
                         if(item->ItemId != 0 && item->Quantity > 0)
                         {
-                            if(plan.ExcludeProtected && C.IMProtectList.Contains(item->ItemId)) continue;
+                            if(plan.ExcludeProtected && s.IMProtectList.Contains(item->ItemId)) continue;
                             var itemCount = Utils.GetItemCount(allowedPlayerInventories, item->ItemId);
                             InternalLog.Debug($"[TED] Item count for {ExcelItemHelper.GetName(item->ItemId, true)} = {itemCount}");
                             var data = ExcelItemHelper.Get(item->ItemId);
@@ -133,7 +134,7 @@ internal static unsafe class TaskEntrustDuplicates
                         for(var i = 0; i < inv->Size; i++)
                         {
                             var item = inv->GetInventorySlot(i);
-                            if(plan.ExcludeProtected && C.IMProtectList.Contains(item->ItemId)) continue;
+                            if(plan.ExcludeProtected && s.IMProtectList.Contains(item->ItemId)) continue;
                             if(item->ItemId != 0 && !itemList.Any(s => s.ItemID == item->ItemId))
                             {
                                 var data = ExcelItemHelper.Get(item->ItemId);

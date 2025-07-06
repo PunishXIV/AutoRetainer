@@ -18,4 +18,5 @@ public static class AutoRetainerServiceManager
     public static AutoBuyFuelOverlay AutoBuyFuelOverlay;
     public static TitleScreenButton TitleScreenButton;
     public static AddonWatcher AddonWatcher;
+    public static DataMigrator DataMigrator;
 }

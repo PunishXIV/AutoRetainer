@@ -9,6 +9,8 @@ public unsafe sealed class CharacterConfiguration : InventoryManagemenrBase
 {
     public override string Name { get; } = "Grand Company Delivery/Character Configuration";
 
+    public override int DisplayPriority => -10;
+
     public override void Draw()
     {
         ImGuiEx.TextWrapped($"Here you can assign preconfigured exchange lists to your registered characters, as well as select delivery mode.");

@@ -216,7 +216,7 @@ public static unsafe class InventoryManagementCommon
                         if(ImGuiEx.IconButton(FontAwesomeIcon.Trash))
                         {
                             new TickScheduler(() => list.Remove(item.RowId));
-                            C.IMAutoVendorHardIgnoreStack.Remove(item.RowId);
+                            Utils.GetSelectedIMSettings().IMAutoVendorHardIgnoreStack.Remove(item.RowId);
                         }
                         additionalButtons?.Invoke(item.RowId);
                         ImGui.PopID();
@@ -252,7 +252,7 @@ public static unsafe class InventoryManagementCommon
             {
                 foreach(var x in EzConfig.LoadConfiguration<ARDiscardMiniConfig>(System.IO.Path.Combine(Svc.PluginInterface.ConfigDirectory.Parent.FullName, "ARDiscard.json")).DiscardingItems)
                 {
-                    if(!target.Contains(x) && !C.IMProtectList.Contains(x))
+                    if(!target.Contains(x) && !Utils.GetSelectedIMSettings().IMProtectList.Contains(x))
                     {
                         target.Add(x);
                     }
@@ -268,15 +268,16 @@ public static unsafe class InventoryManagementCommon
 
     public static void ImportBlacklistFromArDiscard()
     {
+        var s = Utils.GetSelectedIMSettings();
         if(ImGuiEx.Button("Import blacklisted entries from Discard Helper", ImGuiEx.Ctrl))
         {
             try
             {
                 foreach(var x in EzConfig.LoadConfiguration<ARDiscardMiniConfig>(System.IO.Path.Combine(Svc.PluginInterface.ConfigDirectory.Parent.FullName, "ARDiscard.json")).DiscardingItems)
                 {
-                    if(!C.IMProtectList.Contains(x))
+                    if(!s.IMProtectList.Contains(x))
                     {
-                        C.IMProtectList.Add(x);
+                        s.IMProtectList.Add(x);
                     }
                 }
             }

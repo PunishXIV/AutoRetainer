@@ -130,7 +130,7 @@ public static unsafe class TroubleshootingUI
             Warning("Your target frame rate when operating is set too low (<20). This may cause issues.");
         }
 
-        if(C.AllowSellFromArmory)
+        if(Data?.GetIMSettings().AllowSellFromArmory == true)
         {
             Info("Allow selling items from Armory Chest is enabled. Make sure to add your savage gear and ultimate weapons to protection list.");
         }

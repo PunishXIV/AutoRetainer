@@ -15,12 +15,20 @@ public unsafe sealed class ExchangeLists : InventoryManagemenrBase
     GCExchangeRankTab? SelectedRank = null;
     Guid SelectedPlanGuid = Guid.Empty;
 
+
     public override void Draw()
     {
         C.AdditionalGCExchangePlans.Where(x => x.GUID == Guid.Empty).Each(x => x.GUID = Guid.NewGuid());
         ImGuiEx.TextWrapped($"""
-            Select which items you'd like to buy during automatic Grand Company expert delivery missions.
-            First available item for purchase will be bought until it's amount in your inventory reaches the target. If there is nothing else to be purchased or items don't fit into your inventory, ventures will be purchased until you reach 65000 of them, at which point expert delivery will discard excess seals.
+            Select the items to be purchased automatically during Grand Company Expert Delivery operations.
+            Purchase Logic:
+            - The system will attempt to purchase the first available item from the list.
+            - Purchases will continue until the quantity of that item in your inventory reaches the specified target amount.
+            If no listed items are available for purchase, or they cannot fit into your inventory:
+            - The system will purchase Ventures instead.
+            - Venture purchases will continue until your Venture count reaches 65,000.
+            Once the Venture cap is reached and no other purchases are possible:
+            - Any excess Grand Company Seals will be discarded.
             """);
 
         var selectedPlan = C.AdditionalGCExchangePlans.FirstOrDefault(x => x.GUID ==  SelectedPlanGuid);

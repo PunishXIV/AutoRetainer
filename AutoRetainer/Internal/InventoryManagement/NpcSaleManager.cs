@@ -21,7 +21,7 @@ public static unsafe class NpcSaleManager
     {
         if(Utils.ShouldSkipNPCVendor() && !ignoreRestriction) return;
         if(GetValidNPC() == null) return;
-        if(!C.IMEnableNpcSell) return;
+        if(!Data.GetIMSettings().IMEnableNpcSell) return;
         foreach(var type in InventorySpaceManager.GetAllowedToSellInventoryTypes())
         {
             var inv = InventoryManager.Instance()->GetInventoryContainer(type);

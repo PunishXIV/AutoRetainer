@@ -97,6 +97,16 @@ public static unsafe class Utils
                 || data.TeleportOptionsOverride.RetainersFC != null
                 || data.TeleportOptionsOverride.RetainersPrivate != null;
         }
+
+        public InventoryManagementSettings GetIMSettings()
+        {
+            return C.DefaultIMSettings;
+        }
+    }
+
+    public static InventoryManagementSettings GetSelectedIMSettings()
+    {
+        return C.DefaultIMSettings;
     }
 
     extension(GCExchangePlan plan)
@@ -143,7 +153,7 @@ public static unsafe class Utils
 
     public static bool IsProtected(this Item item)
     {
-        return C.IMProtectList.Contains(item.RowId);
+        return Data.GetIMSettings().IMProtectList.Contains(item.RowId);
     }
 
     public static Dictionary<uint, GCExchangeListingMetadata> GetCurrentlyAvailableSharedExchangeListings()
@@ -232,8 +242,8 @@ public static unsafe class Utils
 
     public static bool ShouldSkipNPCVendor()
     {
-        if(!C.IMSkipVendorIfRetainer) return false;
-        if(!C.IMEnableAutoVendor) return false;
+        if(!Data.GetIMSettings().IMSkipVendorIfRetainer) return false;
+        if(!Data.GetIMSettings().IMEnableAutoVendor) return false;
         if(C.MultiModeType == MultiModeType.Submersibles) return false;
         if(Data == null) return false;
         if(!Data.Enabled) return false;
@@ -439,11 +449,11 @@ public static unsafe class Utils
 
     public static bool IsItemSellableByHardList(Number item, Number quantity)
     {
-        if(C.IMProtectList.Contains(item)) return false;
-        if(C.IMAutoVendorHard.Contains(item))
+        if(Data.GetIMSettings().IMProtectList.Contains(item)) return false;
+        if(Data.GetIMSettings().IMAutoVendorHard.Contains(item))
         {
-            if(C.IMAutoVendorHardIgnoreStack.Contains(item)) return true;
-            return quantity < C.IMAutoVendorHardStackLimit;
+            if(Data.GetIMSettings().IMAutoVendorHardIgnoreStack.Contains(item)) return true;
+            return quantity < Data.GetIMSettings().IMAutoVendorHardStackLimit;
         }
         else
         {

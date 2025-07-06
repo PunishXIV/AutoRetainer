@@ -135,7 +135,6 @@ internal unsafe class Config : IEzConfig
     public bool AllowSimpleTeleport = false;
 
     public List<EntrustPlan> EntrustPlans = [];
-    public bool AllowSellFromArmory = false;
     public bool DontLogout = false;
 
     public TeleportOptions GlobalTeleportOptions = new();
@@ -209,18 +208,22 @@ internal unsafe class Config : IEzConfig
     public bool StatusBarMSI = false;
     public int StatusBarIconWidth = 96;
 
-    public bool IMEnableCofferAutoOpen = false;
-    public bool IMEnableAutoVendor = false;
-    public bool IMEnableContextMenu = false;
-    public bool IMSkipVendorIfRetainer = false;
-    public List<uint> IMAutoVendorHard = [];
-    public List<uint> IMAutoVendorHardIgnoreStack = [];
-    public List<uint> IMAutoVendorSoft = [];
-    public List<uint> IMProtectList = [];
-    public int IMAutoVendorHardStackLimit = 20;
-    public bool IMDry = false;
-    public bool IMEnableItemDesynthesis = false;
-    public bool IMEnableNpcSell = false;
+    [Obsolete] public bool IMEnableCofferAutoOpen = false;
+    [Obsolete] public bool IMEnableAutoVendor = false;
+    [Obsolete] public bool IMEnableContextMenu = false;
+    [Obsolete] public bool IMSkipVendorIfRetainer = false;
+    [Obsolete] public List<uint> IMAutoVendorHard = [];
+    [Obsolete] public List<uint> IMAutoVendorHardIgnoreStack = [];
+    [Obsolete] public List<uint> IMAutoVendorSoft = [];
+    [Obsolete] public List<uint> IMProtectList = [];
+    [Obsolete] public int IMAutoVendorHardStackLimit = 20;
+    [Obsolete] public bool IMDry = false;
+    [Obsolete] public bool IMEnableItemDesynthesis = false;
+    [Obsolete] public bool IMEnableNpcSell = false;
+    [Obsolete] public bool AllowSellFromArmory = false;
+
+    public InventoryManagementSettings DefaultIMSettings = new();
+    public bool IMMigrated = false;
 
     public Vector2 WindowSize;
     public Vector2 WindowPos;

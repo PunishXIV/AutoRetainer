@@ -78,7 +78,7 @@ internal static unsafe class SchedulerMain
 
                                     var adata = Utils.GetAdditionalData(Svc.ClientState.LocalContentId, ret.Name.ToString());
 
-                                    if(C.IMEnableAutoVendor)
+                                    if(Data.GetIMSettings().IMEnableAutoVendor)
                                     {
                                         TaskVendorItems.Enqueue();
                                     }
@@ -183,7 +183,7 @@ internal static unsafe class SchedulerMain
                                         }
                                     }
 
-                                    if(C.IMEnableAutoVendor)
+                                    if(Data.GetIMSettings().IMEnableAutoVendor)
                                     {
                                         TaskVendorItems.Enqueue();
                                     }
@@ -212,8 +212,8 @@ internal static unsafe class SchedulerMain
                                         DebugLog($"Scheduling closing and disabling plugin as MultiMode is running");
                                         P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
                                         P.TaskManager.Enqueue(DisablePlugin);
-                                        if(C.IMEnableCofferAutoOpen) TaskOpenAllCoffers.Enqueue();
-                                        if(C.IMEnableItemDesynthesis) TaskDesynthItems.Enqueue();
+                                        if(Data.GetIMSettings().IMEnableCofferAutoOpen) TaskOpenAllCoffers.Enqueue();
+                                        if(Data.GetIMSettings().IMEnableItemDesynthesis) TaskDesynthItems.Enqueue();
                                     }
                                     else if(Reason == PluginEnableReason.Artisan)
                                     {

@@ -364,11 +364,11 @@ public unsafe class AutoRetainer : IDalamudPlugin
         {
             if(!IsOccupied() && !P.TaskManager.IsBusy)
             {
-                if(NpcSaleManager.GetValidNPC() != null && C.IMEnableNpcSell)
+                if(NpcSaleManager.GetValidNPC() != null && Data.GetIMSettings().IMEnableNpcSell)
                 {
                     NpcSaleManager.EnqueueIfItemsPresent(true);
                 }
-                else if(C.IMEnableAutoVendor && Utils.GetReachableRetainerBell(true) != null && Player.IsInHomeWorld)
+                else if(Data.GetIMSettings().IMEnableAutoVendor && Utils.GetReachableRetainerBell(true) != null && Player.IsInHomeWorld)
                 {
                     P.SkipNextEnable = true;
                     TaskInteractWithNearestBell.Enqueue(true);
@@ -424,23 +424,24 @@ public unsafe class AutoRetainer : IDalamudPlugin
         }
         else if(arguments.StartsWith("modifySoftVendorList"))
         {
-            if(int.TryParse(arguments.Split(" ")[1], out var num))
+            var s = Data?.GetIMSettings();
+            if(s != null && int.TryParse(arguments.Split(" ")[1], out var num))
             {
                 if(num > 0)
                 {
                     var id = (uint)num;
-                    if(!C.IMAutoVendorSoft.Contains(id))
+                    if(!s.IMAutoVendorSoft.Contains(id))
                     {
-                        C.IMAutoVendorSoft.Add(id);
+                        s.IMAutoVendorSoft.Add(id);
                         PluginLog.Warning($"External addition to soft vendor list: {ExcelItemHelper.GetName(id)}");
                     }
                 }
                 else if(num < 0)
                 {
                     var id = (uint)-num;
-                    if(C.IMAutoVendorSoft.Contains(id))
+                    if(s.IMAutoVendorSoft.Contains(id))
                     {
-                        C.IMAutoVendorSoft.Remove(id);
+                        s.IMAutoVendorSoft.Remove(id);
                         PluginLog.Warning($"External removal from soft vendor list: {ExcelItemHelper.GetName(id)}");
                     }
                 }

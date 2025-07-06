@@ -66,7 +66,7 @@ internal static unsafe class StatisticsManager
                                 VentureID = P.LastVentureID
                             });
                         }
-                        if(C.IMEnableAutoVendor && P.LastVentureID == 395)
+                        if(Data.GetIMSettings().IMEnableAutoVendor && P.LastVentureID == 395)
                         {
                             InventorySpaceManager.EnqueueSoftItemIfAllowed(p.ItemId, amount);
                         }
