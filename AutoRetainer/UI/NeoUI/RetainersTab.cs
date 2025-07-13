@@ -114,7 +114,7 @@ public class RetainersTab : NeoUIEntry
                 {
                     var adata = Utils.GetAdditionalData(x.CID, x.RetainerName);
                     adata.VenturePlan = SelectedVenturePlan;
-                    adata.VenturePlanIndex = (uint)(C.SavedPlans.IndexOf(SelectedVenturePlan) + 1);
+                    //adata.VenturePlanIndex = (uint)(C.SavedPlans.IndexOf(SelectedVenturePlan) + 1);
                     adata.EnablePlanner = true;
                     num++;
                 }

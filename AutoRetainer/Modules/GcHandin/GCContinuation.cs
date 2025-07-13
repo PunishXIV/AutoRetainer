@@ -5,6 +5,7 @@ using ECommons.Automation.NeoTaskManager;
 using ECommons.Automation.NeoTaskManager.Tasks;
 using ECommons.Automation.UIInput;
 using ECommons.ExcelServices;
+using ECommons.ExcelServices.Sheets;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;
 using ECommons.MathHelpers;
@@ -88,7 +89,7 @@ internal static unsafe class GCContinuation
     internal static bool? ConfirmExchange()
     {
         {
-            var x = Utils.GetSpecificYesno(x => x.Contains("You cannot currently equip this item"));
+            var x = Utils.GetSpecificYesno(x => x.RemoveWhitespaces().EqualsIgnoreCaseAny(Svc.Data.GetExcelSheet<Addon>().GetRow(2436).Text.GetText().RemoveWhitespaces(), Svc.Data.GetExcelSheet<Addon>().GetRow(11502).Text.GetText().RemoveWhitespaces()));
             if(x != null && FrameThrottler.Throttle("ConfirmCannotEquip", 4))
             {
                 new AddonMaster.SelectYesno((nint)x).Yes();
@@ -96,7 +97,7 @@ internal static unsafe class GCContinuation
             }
         }
         {
-            var x = Utils.GetSpecificYesno(x => x.Contains("Exchange"));
+            var x = Utils.GetSpecificYesno(x => x.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.GCSealExchangeConfirm));
             if(x != null && EzThrottler.Throttle("GC ConfirmExchange"))
             {
                 new AddonMaster.SelectYesno((nint)x).Yes();
@@ -183,7 +184,7 @@ internal static unsafe class GCContinuation
     {
         if(TryGetAddonByName<AddonSelectString>("SelectString", out var addon) && IsAddonReady(&addon->AtkUnitBase))
         {
-            if(EzThrottler.Throttle("SelectProvisioningMission") && Utils.TrySelectSpecificEntry("Undertake supply and provisioning missions."))
+            if(EzThrottler.Throttle("SelectProvisioningMission") && Utils.TrySelectSpecificEntry(Svc.Data.GetExcelSheet<QuestDialogueText>(name: "custom/000/ComDefGrandCompanyOfficer_00073").GetRow(69).Value.GetText()))
             {
                 return true;
             }

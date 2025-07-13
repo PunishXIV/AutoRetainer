@@ -15,6 +15,7 @@ public unsafe sealed class ExchangeLists : InventoryManagemenrBase
     GCExchangeRankTab? SelectedRank = null;
     Guid SelectedPlanGuid = Guid.Empty;
 
+    public override int DisplayPriority => -5;
 
     public override void Draw()
     {
