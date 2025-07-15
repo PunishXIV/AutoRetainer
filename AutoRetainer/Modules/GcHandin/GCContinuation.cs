@@ -262,7 +262,12 @@ internal static unsafe class GCContinuation
     public static uint GetAdjustedSeals()
     {
         var plan = Utils.GetGCExchangePlanWithOverrides();
-        return (uint)Math.Max(0, AutoGCHandin.GetSeals() - plan.RemainingSeals.ValidateRange(0, 15000));
+        return (uint)Math.Max(0, AutoGCHandin.GetSeals() - Math.Min(plan.RemainingSeals, AutoGCHandin.GetMaxSeals() - 20000));
+    }
+
+    public static uint GetAdjustedMaxSeals()
+    {
+        return (uint)(AutoGCHandin.GetMaxSeals() - Utils.GetGCExchangePlanWithOverrides().RemainingSeals);
     }
 
     internal static bool? OpenSeals()
@@ -291,20 +296,23 @@ internal static unsafe class GCContinuation
         return false;
     }
 
-    public static uint GetAmountThatCanBePurchased(this ItemWithQuantity item)
+    public static uint GetAmountThatCanBePurchased(this GCExchangeItem item)
     {
         var meta = Utils.GetCurrentlyAvailableSharedExchangeListings().SafeSelect(item.ItemID);
         if(meta == null) return 0;
         if(AutoGCHandin.GetRank() < meta.MinPurchaseRank) return 0;
         if(GetAdjustedSeals() < meta.Seals) return 0;
+
         var cnt = InventoryManager.Instance()->GetInventoryItemCount(meta.ItemID);
-        var targetQuantity = item.Quantity - cnt;
+
+        var targetQuantity = item.QuantitySingleTime == 0? item.Quantity - cnt : item.QuantitySingleTime;
         if(targetQuantity <= 0) return 0;
         if(meta.ItemID == VentureItem)
         {
             var canBuy = (uint)(65000 - InventoryManager.Instance()->GetInventoryItemCount(VentureItem));
             return (uint)Math.Min(canBuy, targetQuantity);
         }
+
         var canFit = Utils.GetAmountThatCanFit(Utils.PlayerInvetories, meta.ItemID, false, out _);
         if(canFit == 0) return 0;
         canFit = Math.Min(canFit, (uint)targetQuantity);
@@ -319,7 +327,7 @@ internal static unsafe class GCContinuation
         return canFit;
     }
 
-    public static bool PurchaseItem(this ItemWithQuantity item)
+    public static bool PurchaseItem(this GCExchangeItem item)
     {
         var meta = Utils.GetCurrentlyAvailableSharedExchangeListings()[item.ItemID];
         var amount = item.GetAmountThatCanBePurchased();
@@ -358,7 +366,7 @@ internal static unsafe class GCContinuation
                                 {
                                     DuoLog.Information($"Purchasing {i}'th item {itemInfo.Name} (venture)");
                                 }
-                                ContinuePurchase(meta, amount, currentSealsCount);
+                                ContinuePurchase(meta, amount, currentSealsCount, item);
                                 return true;
                             }
                         }
@@ -375,7 +383,7 @@ internal static unsafe class GCContinuation
                                 {
                                     DuoLog.Information($"Purchasing {i}'th item {itemInfo.Name}");
                                 }
-                                ContinuePurchase(meta, amount, currentSealsCount);
+                                ContinuePurchase(meta, amount, currentSealsCount, item);
                                 return true;
                             }
                         }
@@ -392,7 +400,7 @@ internal static unsafe class GCContinuation
         return false;
     }
 
-    public static void ContinuePurchase(this GCExchangeListingMetadata listing, uint itemCount, uint sealsCount)
+    public static void ContinuePurchase(this GCExchangeListingMetadata listing, uint itemCount, uint sealsCount, GCExchangeItem exchangeItem)
     {
         TaskManagerConfiguration conf = new(abortOnTimeout: false, timeLimitMS: 5000);
         List<TaskManagerTask> tasks = [];
@@ -403,6 +411,7 @@ internal static unsafe class GCContinuation
         }
         tasks.Add(new(ConfirmExchange, conf));
         tasks.Add(new(() => AutoGCHandin.GetSeals() < sealsCount, conf));
+        tasks.Add(new(() => exchangeItem.QuantitySingleTime = (int)Math.Max(0, exchangeItem.QuantitySingleTime - itemCount)));
         tasks.Add(new FrameDelayTask(4));
         tasks.Add(new(BeginNewPurchase));
         P.TaskManager.InsertMulti([.. tasks]);
@@ -421,10 +430,10 @@ internal static unsafe class GCContinuation
         }
     }
 
-    public static ItemWithQuantity GetNextPurchaseListing()
+    public static GCExchangeItem GetNextPurchaseListing()
     {
-        List<ItemWithQuantity> items = [.. Utils.GetGCExchangePlanWithOverrides().Items];
-        if((double)GetAdjustedSeals() / (double)AutoGCHandin.GetMaxSeals() > 0.5f)
+        List<GCExchangeItem> items = [.. Utils.GetGCExchangePlanWithOverrides().Items];
+        if((double)GetAdjustedSeals() / (double)GetAdjustedMaxSeals() > 0.5f || items.Count == 0)
         {
             items.Add(new(VentureItem, 65000));
         }

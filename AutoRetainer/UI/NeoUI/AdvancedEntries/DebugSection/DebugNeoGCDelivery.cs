@@ -13,7 +13,7 @@ public unsafe sealed class DebugNeoGCDelivery : DebugSectionBase
         if(ImGui.Button("BeginNewPurchase")) GCContinuation.BeginNewPurchase();
         foreach(var x in Utils.SharedGCExchangeListings.Values)
         {
-            ImGuiEx.Text($"{x.Data.Name} / {x.ItemID} / {x.Category} / Min rank {x.MinPurchaseRank} {x.Rank} / {x.Seals} seals | can purchase: x{new ItemWithQuantity(x.ItemID, int.MaxValue).GetAmountThatCanBePurchased()}");
+            ImGuiEx.Text($"{x.Data.Name} / {x.ItemID} / {x.Category} / Min rank {x.MinPurchaseRank} {x.Rank} / {x.Seals} seals | can purchase: x{new GCExchangeItem(x.ItemID, int.MaxValue).GetAmountThatCanBePurchased()}");
         }
     }
 }

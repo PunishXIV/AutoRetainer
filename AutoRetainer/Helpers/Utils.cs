@@ -124,13 +124,6 @@ public static unsafe class Utils
 
         public void Validate()
         {
-            foreach(var x in Utils.SharedGCExchangeListings.Values)
-            {
-                if(!plan.Items.Any(l => l.ItemID == x.ItemID))
-                {
-                    plan.Items.Add(new(x.ItemID, 0));
-                }
-            }
             foreach(var x in plan.Items)
             {
                 if(!SharedGCExchangeListings.ContainsKey(x.ItemID))
@@ -185,7 +178,7 @@ public static unsafe class Utils
                         var sub = items[x.RowId];
                         foreach(var entry in sub)
                         {
-                            if(entry.Item.RowId != 0 && entry.Item.ValueNullable != null)
+                            if(!entry.Item.RowId.EqualsAny(0u, 6017u, 6018u, 6019u) && entry.Item.ValueNullable != null)
                             {
                                 list.Add(new()
                                 {
@@ -403,6 +396,10 @@ public static unsafe class Utils
         var data = ExcelItemHelper.Get(itemId);
         debugData = [];
         if(data == null) return 0;
+        if(data.Value.IsUnique)
+        {
+            if(InventoryManager.Instance()->GetInventoryItemCount(itemId, isHq) > 0) return 0;
+        }
         if(data.Value.ItemUICategory.RowId == 59)//crystal special handling
         {
             foreach(var type in inventoryTypes)

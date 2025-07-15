@@ -49,4 +49,5 @@ public class LifestreamIPC
     [EzIPC] public Func<bool?> HasFreeCompanyHouse;
     [EzIPC] public Func<bool> CanMoveToWorkshop;
     [EzIPC] public Action MoveToWorkshop;
+    [EzIPC] public Action<string> ExecuteCommand;
 }

@@ -167,6 +167,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             /autoretainer itemsell - begin selling items to NPC or retainer if possible
             /autoretainer het - enter nearby own house or apartment if possible
             /autoretainer reset - reset all pending tasks
+            /autoretainer deliver - deliver expert delivery items
             """);
         EzCmd.Add("/ays", CommandHandler);
         Svc.Toasts.ErrorToast += Toasts_ErrorToast;
@@ -356,10 +357,6 @@ public unsafe class AutoRetainer : IDalamudPlugin
                 TaskNeoHET.Enqueue(() => DuoLog.Error("Failed to find suitable house"), true);
             }
         }
-        else if(arguments.EqualsIgnoreCaseAny("deliver"))
-        {
-            GCContinuation.EnableDeliveringIfPossible();
-        }
         else if(arguments.EqualsIgnoreCaseAny("itemsell"))
         {
             if(!IsOccupied() && !P.TaskManager.IsBusy)
@@ -452,6 +449,10 @@ public unsafe class AutoRetainer : IDalamudPlugin
             P.TaskManager.Abort();
             SchedulerMain.CharacterPostProcessLocked = false;
             Notify.Success("Reset completed");
+        }
+        else if(arguments.EqualsIgnoreCase("deliver"))
+        {
+            TaskDeliverItems.Enqueue();
         }
         else if(arguments.StartsWith("set"))
         {
