@@ -1,10 +1,10 @@
 ﻿using AutoRetainer.Internal.InventoryManagement;
 using ECommons.GameHelpers;
 
-namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries;
+namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries.InventoryCleanupEntries;
 public class GeneralSettings : InventoryManagemenrBase
 {
-    public override string Name { get; } = "Automatic Selling/General Settings";
+    public override string Name { get; } = "Inventory Cleanup/General Settings";
 
     private GeneralSettings()
     {

@@ -126,14 +126,29 @@ public unsafe sealed class ExchangeLists : InventoryManagemenrBase
         ImGui.PushID(plan.ID);  
         plan.Validate();
 
-        ImGuiEx.TextV($"Plan settings:");
-        ImGui.SameLine();
-        ImGui.SetNextItemWidth(150f);
-        ImGui.SliderInt("Seals to keep", ref plan.RemainingSeals.ValidateRange(0, 70000), 0, 70000);
-        ImGuiEx.HelpMarker($"This amount of seals will be kept after purchase list is executed. However, this value will be capped to be no more than 20000 seals less than maximum possible, according to character's rank. ");
-        ImGui.SameLine();
-        ImGui.Checkbox("Finish by purchasing items", ref plan.FinalizeByPurchasing);
-        ImGuiEx.HelpMarker("If selected, after final exchange items will be purchased, otherwise - purchase will not be made until seals are capped again.");
+        ImGuiEx.InputWithRightButtonsArea("GCPlanSettings", () =>
+        {
+            if(ReferenceEquals(plan, C.DefaultGCExchangePlan))
+            {
+                ImGui.BeginDisabled();
+                var s = "Default exchange plan can not be renamed";
+                ImGui.InputText("##name", ref s, 1);
+                ImGui.EndDisabled();
+            }
+            else
+            {
+                ImGui.InputTextWithHint($"##name", "Name", ref plan.Name, 100);
+                ImGuiEx.Tooltip("Exchange plan name");
+            }
+        }, () =>
+        {
+            ImGui.SetNextItemWidth(100f);
+            ImGui.InputInt("Seals to keep", ref plan.RemainingSeals.ValidateRange(0, 70000), 0, 0);
+            ImGuiEx.HelpMarker($"This amount of seals will be kept after purchase list is executed. However, this value will be capped to be no more than 20000 seals less than maximum possible, according to character's rank. ");
+            ImGui.SameLine();
+            ImGui.Checkbox("Finish by purchasing items", ref plan.FinalizeByPurchasing);
+            ImGuiEx.HelpMarker("If selected, after final exchange items will be purchased, otherwise - purchase will not be made until seals are capped again.");
+        });        
 
         ImGuiEx.SetNextItemFullWidth();
         if(ImGui.BeginCombo("##Add Items", "Add Items", ImGuiComboFlags.HeightLarge))

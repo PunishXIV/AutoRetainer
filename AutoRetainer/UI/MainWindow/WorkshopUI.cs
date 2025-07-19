@@ -23,7 +23,7 @@ internal static unsafe class WorkshopUI
         var sortedData = new List<OfflineCharacterData>();
         if(C.NoCurrentCharaOnTop)
         {
-            sortedData = C.OfflineData;
+            sortedData = C.OfflineData.ApplyOrder(C.DeployablesVisualOrders);
         }
         else
         {
@@ -31,7 +31,7 @@ internal static unsafe class WorkshopUI
             {
                 sortedData.Add(cdata);
             }
-            foreach(var x in C.OfflineData)
+            foreach(var x in C.OfflineData.ApplyOrder(C.DeployablesVisualOrders))
             {
                 if(x.CID != Svc.ClientState.LocalContentId)
                 {

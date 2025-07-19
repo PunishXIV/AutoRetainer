@@ -6,7 +6,7 @@ using ECommons.Interop;
 namespace AutoRetainer.PluginData;
 
 [Serializable]
-internal unsafe class Config : IEzConfig
+internal unsafe class Config
 {
     public string CensorSeed = Guid.NewGuid().ToString();
     public Dictionary<ulong, HashSet<string>> SelectedRetainers = [];
@@ -33,7 +33,6 @@ internal unsafe class Config : IEzConfig
     public bool NoTheme = false;
     public Dictionary<string, AdditionalRetainerData> AdditionalData = [];
     public bool AutoDisable = true;
-    public bool Expert = false;
     public List<(ulong CID, string Name)> Blacklist = [];
     public bool HideOverlayIcons = false;
     public bool UnsafeProtection = false;
@@ -249,4 +248,9 @@ internal unsafe class Config : IEzConfig
     public Dictionary<ExcelWorldHelper.Region, long> LockoutTime = [];
     public GCExchangePlan DefaultGCExchangePlan = new();
     public List<GCExchangePlan> AdditionalGCExchangePlans = [];
+
+    public bool EnableRetainerSort = false;
+    public List<RetainersVisualOrder> RetainersVisualOrders = [];
+    public bool EnableDeployablesSort = false;
+    public List<DeployablesVisualOrder> DeployablesVisualOrders = [];
 }

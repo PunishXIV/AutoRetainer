@@ -97,11 +97,5 @@ public class ExpertTab : NeoUIEntry
                     e.LogDuo();
                 }
             }
-        })
-        ;
-
-    public override bool ShouldDisplay()
-    {
-        return C.Expert;
-    }
+        });
 }

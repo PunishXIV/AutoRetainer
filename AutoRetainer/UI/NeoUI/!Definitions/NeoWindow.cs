@@ -12,6 +12,7 @@ public sealed class NeoWindow : Window
     private readonly NeoUIEntry[] Tabs =
     [
         new MainSettings(),
+        new UserInterface(),
         new DeployablesTab(),
         new RetainersTab(),
         new Keybinds(),

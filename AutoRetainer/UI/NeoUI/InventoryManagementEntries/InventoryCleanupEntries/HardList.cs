@@ -1,7 +1,7 @@
-﻿namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries;
+﻿namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries.InventoryCleanupEntries;
 public class HardList : InventoryManagemenrBase
 {
-    public override string Name => "Automatic Selling/Unconditional Sell List";
+    public override string Name => "Inventory Cleanup/Unconditional Sell List";
 
     private HardList()
     {

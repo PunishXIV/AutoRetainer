@@ -296,12 +296,24 @@ internal static unsafe class GCContinuation
         return false;
     }
 
-    public static uint GetAmountThatCanBePurchased(this GCExchangeItem item)
+    public static uint GetAmountThatCanBePurchased(this GCExchangeItem item, bool potential = false)
     {
         var meta = Utils.GetCurrentlyAvailableSharedExchangeListings().SafeSelect(item.ItemID);
         if(meta == null) return 0;
         if(AutoGCHandin.GetRank() < meta.MinPurchaseRank) return 0;
-        if(GetAdjustedSeals() < meta.Seals) return 0;
+        var potentialSeals = GetAdjustedMaxSeals() - 5000;
+        if(GetAdjustedSeals() < meta.Seals)
+        {
+            if(potential)
+            {
+                var maxSeals = potentialSeals; //buffer
+                if(maxSeals < meta.Seals) return 0;
+            }
+            else
+            {
+                return 0;
+            }
+        }
 
         var cnt = InventoryManager.Instance()->GetInventoryItemCount(meta.ItemID);
 
@@ -310,21 +322,54 @@ internal static unsafe class GCContinuation
         if(meta.ItemID == VentureItem)
         {
             var canBuy = (uint)(65000 - InventoryManager.Instance()->GetInventoryItemCount(VentureItem));
+            canBuy = Math.Min(canBuy, (potential ? potentialSeals : GetAdjustedSeals()) / meta.Seals);
             return (uint)Math.Min(canBuy, targetQuantity);
         }
 
         var canFit = Utils.GetAmountThatCanFit(Utils.PlayerInvetories, meta.ItemID, false, out _);
-        if(canFit == 0) return 0;
+        if(canFit == 0)
+        {
+            if(!potential)
+            {
+                return 0;
+            }
+            else
+            {
+                if(!DoesInventoryHaveDeliverableItem())
+                {
+                    return 0;
+                }
+            }
+        }
         canFit = Math.Min(canFit, (uint)targetQuantity);
         canFit = Math.Min(canFit, 99);
         canFit = Math.Min(canFit, meta.Data.StackSize);
-        canFit = Math.Min(canFit, GetAdjustedSeals() / meta.Seals);
+        canFit = Math.Min(canFit, (potential? potentialSeals:GetAdjustedSeals()) / meta.Seals);
         if(meta.Data.IsUnique)
         {
             canFit = Math.Min(canFit, 1);
             if(cnt > 0) return 0;
         }
         return canFit;
+    }
+
+    public static bool DoesInventoryHaveDeliverableItem()
+    {
+        foreach(var x in Utils.PlayerInvetories)
+        {
+            var inv = InventoryManager.Instance()->GetInventoryContainer(x);
+            for(int i = 0; i < inv->GetSize(); i++)
+            {
+                var item = inv->GetInventorySlot(i);
+                var data = ExcelItemHelper.Get(item->ItemId);
+                if(item->ItemId == 0 || C.DefaultIMSettings.IMProtectList.Contains(item->ItemId)) continue;
+                if(!data.Value.ItemUICategory.RowId.EqualsAny([.. Utils.ArmorsUICategories, .. Utils.WeaponsUICategories])) continue;
+                if(!data.Value.GetRarity().EqualsAny(ItemRarity.Green, ItemRarity.Pink, ItemRarity.Blue)) continue;
+                if(data.Value.Desynth == 0) continue;
+                return true;
+            }
+        }
+        return false;
     }
 
     public static bool PurchaseItem(this GCExchangeItem item)
@@ -432,17 +477,17 @@ internal static unsafe class GCContinuation
 
     public static GCExchangeItem GetNextPurchaseListing()
     {
-        List<GCExchangeItem> items = [.. Utils.GetGCExchangePlanWithOverrides().Items];
-        if((double)GetAdjustedSeals() / (double)GetAdjustedMaxSeals() > 0.5f || items.Count == 0)
-        {
-            items.Add(new(VentureItem, 65000));
-        }
+        List<GCExchangeItem> items = [.. Utils.GetGCExchangePlanWithOverrides().Items, new(VentureItem, 65000)];
         foreach(var l in items)
         {
             var amt = l.GetAmountThatCanBePurchased();
-            if(amt != 0)
+            if(amt > 0)
             {
                 return l;
+            }
+            else if(l.GetAmountThatCanBePurchased(true) > 0)
+            {
+                return null;
             }
         }
         return null;

@@ -244,12 +244,6 @@ public unsafe class AutoRetainer : IDalamudPlugin
             DuoLog.Information($"Debug mode {(config.Verbose ? "enabled" : "disabled")}");
             S.NeoWindow.Reload();
         }
-        else if(arguments.EqualsIgnoreCase("expert"))
-        {
-            config.Expert = !config.Expert;
-            DuoLog.Information($"Expert mode {(config.Expert ? "enabled" : "disabled")}");
-            S.NeoWindow.Reload();
-        }
         else if(arguments.EqualsIgnoreCaseAny("e", "enable"))
         {
             SchedulerMain.EnablePlugin(PluginEnableReason.Auto);

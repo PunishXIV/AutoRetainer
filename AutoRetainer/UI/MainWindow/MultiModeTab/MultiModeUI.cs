@@ -18,7 +18,7 @@ internal static unsafe class MultiModeUI
         JustRelogged = false;
         if(C.NoCurrentCharaOnTop)
         {
-            sortedData = C.OfflineData;
+            sortedData = C.OfflineData.ApplyOrder(C.RetainersVisualOrders);
         }
         else
         {
@@ -27,7 +27,7 @@ internal static unsafe class MultiModeUI
                 sortedData.Add(cdata);
                 shouldExpand = true;
             }
-            foreach(var x in C.OfflineData)
+            foreach(var x in C.OfflineData.ApplyOrder(C.RetainersVisualOrders))
             {
                 if(x.CID != Svc.ClientState.LocalContentId)
                 {

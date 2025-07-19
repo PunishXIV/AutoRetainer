@@ -38,10 +38,72 @@ public static unsafe class Utils
     public static int FCPoints => *(int*)((nint)AgentModule.Instance()->GetAgentByInternalId(AgentId.FreeCompanyCreditShop) + 256);
     public static float AnimationLock => Player.AnimationLock;
 
+    public static uint[] WeaponsUICategories
+    {
+        get
+        {
+            field ??= [..new List<uint>
+                {
+                    Range(1u, 33),
+                    Range(105u, 111),
+                    (uint[])[84, 87, 88, 89, 96, 97, 98, 99]
+                }];
+            return field;
+        }
+    } = null;
+
+    public static uint[] ArmorsUICategories
+    {
+        get
+        {
+            field ??= [..new List<uint>
+                {
+                    Range(34u, 38),
+                    Range(40u, 43)
+                }];
+            return field;
+        }
+    } = null;
+
     extension(OfflineCharacterData data)
     {
         public string NameWithWorld => $"{data.Name}@{data.World}";
         public string NameWithWorldCensored => Censor.Character(data.NameWithWorld);
+
+        public object? GetOrderValue(RetainersVisualOrder order)
+        {
+            return order switch
+            {
+                RetainersVisualOrder.Region_JP => ExcelWorldHelper.Get(data.World)?.GetRegion() != ExcelWorldHelper.Region.JP,
+                RetainersVisualOrder.Region_NA => ExcelWorldHelper.Get(data.World)?.GetRegion() != ExcelWorldHelper.Region.NA,
+                RetainersVisualOrder.Region_EU => ExcelWorldHelper.Get(data.World)?.GetRegion() != ExcelWorldHelper.Region.EU,
+                RetainersVisualOrder.Region_OC => ExcelWorldHelper.Get(data.World)?.GetRegion() != ExcelWorldHelper.Region.OC,
+                RetainersVisualOrder.DataCenter => ExcelWorldHelper.Get(data.World)?.DataCenter.RowId ?? 0,
+                RetainersVisualOrder.Inventory_Slots => (int)data.InventorySpace,
+                RetainersVisualOrder.Ventures => (int)data.Ventures,
+                RetainersVisualOrder.World => data.World,
+                RetainersVisualOrder.Name => data.Name,
+                _ => null
+            };
+        }
+
+        public object? GetOrderValue(DeployablesVisualOrder order)
+        {
+            return order switch
+            {
+                DeployablesVisualOrder.Region_JP => ExcelWorldHelper.Get(data.World)?.GetRegion() != ExcelWorldHelper.Region.JP,
+                DeployablesVisualOrder.Region_NA => ExcelWorldHelper.Get(data.World)?.GetRegion() != ExcelWorldHelper.Region.NA,
+                DeployablesVisualOrder.Region_EU => ExcelWorldHelper.Get(data.World)?.GetRegion() != ExcelWorldHelper.Region.EU,
+                DeployablesVisualOrder.Region_OC => ExcelWorldHelper.Get(data.World)?.GetRegion() != ExcelWorldHelper.Region.OC,
+                DeployablesVisualOrder.DataCenter => ExcelWorldHelper.Get(data.World)?.DataCenter.RowId ?? 0,
+                DeployablesVisualOrder.Inventory_Slots => (int)data.InventorySpace,
+                DeployablesVisualOrder.Ceruleum => (int)data.Ceruleum,
+                DeployablesVisualOrder.Repair_Kits => (int)data.RepairKits,
+                DeployablesVisualOrder.World => data.World,
+                DeployablesVisualOrder.Name => data.Name,
+                _ => null
+            };
+        }
 
         public bool IsLockedOut()
         {
@@ -102,6 +164,52 @@ public static unsafe class Utils
         {
             return C.DefaultIMSettings;
         }
+    }
+
+    public static List<OfflineCharacterData> ApplyOrder<TOrder>(this List<OfflineCharacterData> source, List<TOrder> orders)
+    {
+        if(typeof(TOrder) == typeof(RetainersVisualOrder) && (!C.EnableRetainerSort || C.RetainersVisualOrders.Count == 0)) return source;
+        if(typeof(TOrder) == typeof(DeployablesVisualOrder) && (!C.EnableDeployablesSort || C.DeployablesVisualOrders.Count == 0)) return source;
+        var ascending = true;
+        IOrderedEnumerable<OfflineCharacterData> ordered = null;
+
+        foreach(var order in orders)
+        {
+            object selector(OfflineCharacterData data)
+            {
+                return order switch
+                {
+                    RetainersVisualOrder retainers => data.GetOrderValue(retainers),
+                    DeployablesVisualOrder deployables => data.GetOrderValue(deployables),
+                    _ => null
+                };
+            }
+
+            if(ordered == null)
+            {
+                if(ascending)
+                {
+                    ordered = source.OrderBy(selector);
+                }
+                else
+                {
+                    ordered = source.OrderByDescending(selector);
+                }
+            }
+            else
+            {
+                if(ascending)
+                {
+                    ordered = ordered.ThenBy(selector);
+                }
+                else
+                {
+                    ordered = ordered.ThenByDescending(selector);
+                }
+            }
+        }
+
+        return ordered?.ToList() ?? [.. source];
     }
 
     public static InventoryManagementSettings GetSelectedIMSettings()
@@ -310,11 +418,19 @@ public static unsafe class Utils
         return P.TimeLaunched[0] + 3 * 24 * 60 * 60 * 1000 - DateTimeOffset.Now.ToUnixTimeMilliseconds();
     }
 
-    public static readonly InventoryType[] RetainerInventories = [InventoryType.RetainerPage1, InventoryType.RetainerPage2, InventoryType.RetainerPage3, InventoryType.RetainerPage4, InventoryType.RetainerPage5, InventoryType.RetainerPage6, InventoryType.RetainerPage7];
-    public static readonly InventoryType[] RetainerInventoriesWithCrystals = [InventoryType.RetainerPage1, InventoryType.RetainerPage2, InventoryType.RetainerPage3, InventoryType.RetainerPage4, InventoryType.RetainerPage5, InventoryType.RetainerPage6, InventoryType.RetainerPage7, InventoryType.RetainerCrystals];
-    public static readonly InventoryType[] PlayerInvetories = [InventoryType.Inventory1, InventoryType.Inventory2, InventoryType.Inventory3, InventoryType.Inventory4];
-    public static readonly InventoryType[] PlayerInvetoriesWithCrystals = [InventoryType.Inventory1, InventoryType.Inventory2, InventoryType.Inventory3, InventoryType.Inventory4, InventoryType.Crystals];
-    public static readonly InventoryType[] PlayerArmory = [InventoryType.ArmoryOffHand, InventoryType.ArmoryHead, InventoryType.ArmoryBody, InventoryType.ArmoryHands, InventoryType.ArmoryWaist, InventoryType.ArmoryLegs, InventoryType.ArmoryFeets, InventoryType.ArmoryEar, InventoryType.ArmoryNeck, InventoryType.ArmoryWrist, InventoryType.ArmoryRings, InventoryType.ArmorySoulCrystal, InventoryType.ArmoryMainHand];
+    public static InventoryType[] RetainerInventories => [InventoryType.RetainerPage1, InventoryType.RetainerPage2, InventoryType.RetainerPage3, InventoryType.RetainerPage4, InventoryType.RetainerPage5, InventoryType.RetainerPage6, InventoryType.RetainerPage7];
+
+    public static InventoryType[] RetainerInventoriesWithCrystals => [..RetainerInventories, InventoryType.RetainerCrystals];
+
+    public static InventoryType[] PlayerInvetories => [InventoryType.Inventory1, InventoryType.Inventory2, InventoryType.Inventory3, InventoryType.Inventory4];
+
+    public static InventoryType[] PlayerInvetoriesWithCrystals => [.. PlayerInvetories, InventoryType.Crystals];
+
+    public static InventoryType[] PlayerArmory => [InventoryType.ArmoryOffHand, InventoryType.ArmoryHead, InventoryType.ArmoryBody, InventoryType.ArmoryHands, InventoryType.ArmoryWaist, InventoryType.ArmoryLegs, InventoryType.ArmoryFeets, InventoryType.ArmoryEar, InventoryType.ArmoryNeck, InventoryType.ArmoryWrist, InventoryType.ArmoryRings, InventoryType.ArmorySoulCrystal, InventoryType.ArmoryMainHand];
+
+    public static InventoryType[] PlayerEntireInventory => [.. PlayerInvetories, .. PlayerArmory, InventoryType.EquippedItems];
+
+    public static InventoryType[] RetainerEntireInventory => [.. RetainerInventoriesWithCrystals, InventoryType.RetainerMarket, InventoryType.RetainerEquippedItems];
 
     public static InventoryType[] GetAllowedInventories(this EntrustPlan plan)
     {
@@ -383,6 +499,21 @@ public static unsafe class Utils
         return ret;
     }
 
+    public static bool ContainsItem(this InventoryType type, uint item, bool? isHq = null)
+    {
+        var im = InventoryManager.Instance();
+        var inv = im->GetInventoryContainer(type);
+        for(int i = 0; i < inv->Size; i++)
+        {
+            var slot = inv->Items[i];
+            if(slot.ItemId == item && (isHq == null || isHq == slot.Flags.HasFlag(InventoryItem.ItemFlags.HighQuality)))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /// <summary>
     /// Gets amount of items that can fit into inventories
     /// </summary>
@@ -398,7 +529,14 @@ public static unsafe class Utils
         if(data == null) return 0;
         if(data.Value.IsUnique)
         {
-            if(InventoryManager.Instance()->GetInventoryItemCount(itemId, isHq) > 0) return 0;
+            if(inventoryTypes.ContainsAny(Utils.PlayerEntireInventory))
+            {
+                if(Utils.PlayerEntireInventory.Any(i => i.ContainsItem(itemId, null))) return 0;
+            }
+            if(inventoryTypes.ContainsAny(Utils.RetainerEntireInventory))
+            {
+                if(Utils.RetainerEntireInventory.Any(i => i.ContainsItem(itemId, null))) return 0;
+            }
         }
         if(data.Value.ItemUICategory.RowId == 59)//crystal special handling
         {

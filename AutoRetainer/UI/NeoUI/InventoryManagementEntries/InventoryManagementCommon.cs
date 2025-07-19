@@ -65,16 +65,13 @@ public static unsafe class InventoryManagementCommon
                 ImGui.SameLine();
                 if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Hammer, "+Main/offhand"))
                 {
-                    SelectedCategories.Add(Range(1u, 33));
-                    SelectedCategories.Add(Range(105u, 111));
-                    SelectedCategories.Add((uint[])[84, 87, 88, 89, 96, 97, 98, 99]);
+                    SelectedCategories.Add(Utils.WeaponsUICategories);
                     Modified = true;
                 }
                 ImGui.SameLine();
                 if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.User, "+Armor"))
                 {
-                    SelectedCategories.Add(Range(34u, 38));
-                    SelectedCategories.Add(Range(40u, 43));
+                    SelectedCategories.Add(Utils.ArmorsUICategories);
                     Modified = true;
                 }
                 ImGui.Separator();
@@ -161,6 +158,7 @@ public static unsafe class InventoryManagementCommon
                         if(!list.Contains(x.RowId)) list.Add(x.RowId);
                     }
                 }
+                ImGuiEx.Tooltip("Hold CTRL and click");
                 if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.MinusSquare, "Remove these items to list", ImGuiEx.Ctrl))
                 {
                     foreach(var x in SelectedItems)
@@ -168,6 +166,7 @@ public static unsafe class InventoryManagementCommon
                         list.Remove(x.RowId);
                     }
                 }
+                ImGuiEx.Tooltip("Hold CTRL and click");
             }
         });
 

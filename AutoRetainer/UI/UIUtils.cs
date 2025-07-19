@@ -8,6 +8,48 @@ namespace AutoRetainer.UI;
 
 internal static class UIUtils
 {
+    public static void DrawSortableEnumList<T>(string id, List<T> list) where T:struct, Enum
+    {
+        ref var dragDrop = ref Ref<ImGuiEx.RealtimeDragDrop<T>>.Get($"dsel{id}", () => new($"dsel{id}", x => x.ToString()));
+        ImGui.PushID(id);
+        if(ImGui.BeginCombo("##addNew", "Add Entries...", ImGuiComboFlags.HeightLarge))
+        {
+            foreach(var x in Enum.GetValues<T>())
+            {
+                if(!list.Contains(x))
+                {
+                    if(ImGui.Selectable(x.ToStringEx(), false, ImGuiSelectableFlags.DontClosePopups))
+                    {
+                        list.Add(x);
+                    }
+                }
+            }
+            ImGui.EndCombo();
+        }
+        dragDrop.Begin();
+        for(var i = 0; i < list.Count; i++)
+        {
+            var x = list[i];
+            ImGui.PushID(x.ToString());
+            dragDrop.DrawButtonDummy(x, list,i);
+            ImGui.SameLine();
+            if(ImGuiEx.IconButton(FontAwesomeIcon.Trash))
+            {
+                new TickScheduler(() => list.Remove(x));
+            }
+            ImGui.SameLine();
+            ImGuiEx.Text(x.ToStringEx());
+            ImGui.PopID();
+        }
+        dragDrop.End();
+        ImGui.PopID();
+    }
+
+    public static string ToStringEx<T>(this T obj) where T : Enum
+    {
+        return obj.ToString().Replace('_', ' ');
+    }
+
     public static bool PushColIfPreferredCurrent(this OfflineCharacterData data)
     {
         var normalColor = Player.CID == data.CID ? EColor.CyanBright : ImGui.GetStyle().Colors[(int)ImGuiCol.Text];

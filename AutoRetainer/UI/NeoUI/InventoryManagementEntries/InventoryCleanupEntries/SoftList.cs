@@ -1,7 +1,7 @@
-﻿namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries;
+﻿namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries.InventoryCleanupEntries;
 public class SoftList : InventoryManagemenrBase
 {
-    public override string Name => "Automatic Selling/Quick Venture Sell List";
+    public override string Name => "Inventory Cleanup/Quick Venture Sell List";
     private SoftList()
     {
         var s = Utils.GetSelectedIMSettings();
