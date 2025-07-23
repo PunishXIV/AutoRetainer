@@ -316,7 +316,14 @@ internal static unsafe class AutoGCHandin
             var seals = (uint)(item.Seals * Utils.GetGCSealMultiplier());
             if(!checkSealCap || sealsRemaining > seals) candidates.Add((item.ItemID, seals, i));
         }
-        if(candidates.Count > 0) return candidates.MinBy(x => x.Seals);
+        if(candidates.Count > 0)
+        {
+            return candidates
+                .OrderByDescending(x => Utils.GetGCExchangePlanWithOverrides().Items.Where(i => i.Quantity > 0 || i.QuantitySingleTime > 0).Any(i => i.ItemID == x.ItemID))
+                .ThenByDescending(x => Utils.CountItemsInInventory(x.ItemID, null, Utils.PlayerInvetories))
+                .ThenBy(x => x.Seals)
+                .First();
+        }
         return null;
     }
 

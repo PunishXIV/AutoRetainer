@@ -166,6 +166,26 @@ public static unsafe class Utils
         }
     }
 
+    public static int CountItemsInInventory(uint id, bool? hq, IEnumerable<InventoryType> inventories)
+    {
+        var ret = 0;
+        foreach(var inventory in inventories)
+        {
+            var inv = InventoryManager.Instance()->GetInventoryContainer(inventory);
+            for(var i = 0; i < inv->Size; i++)
+            {
+                var slot = inv->Items[i];
+                var itemId = slot.ItemId;
+                var itemHq = slot.Flags.HasFlag(InventoryItem.ItemFlags.HighQuality);
+                if((hq == null || itemHq == hq) && itemId == id)
+                {
+                    ret += (int)slot.Quantity;
+                }
+            }
+        }
+        return ret;
+    }
+
     public static List<OfflineCharacterData> ApplyOrder<TOrder>(this List<OfflineCharacterData> source, List<TOrder> orders)
     {
         if(typeof(TOrder) == typeof(RetainersVisualOrder) && (!C.EnableRetainerSort || C.RetainersVisualOrders.Count == 0)) return source;
