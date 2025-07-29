@@ -6,10 +6,10 @@ public class ProtectionList : InventoryManagemenrBase
     private ProtectionList()
     {
         DisplayPriority = -1;
-        Builder = new NuiBuilder()
+        Builder = InventoryCleanupCommon.CreateCleanupHeaderBuilder()
             .Section(Name)
             .TextWrapped("AutoRetainer won't sell, desynthese, discard or hand in to Grand Company these items, even if they are included in any other processing lists.")
-            .Widget(() => InventoryManagementCommon.DrawListNew(Utils.GetSelectedIMSettings().IMProtectList))
+            .Widget(() => InventoryManagementCommon.DrawListNew(InventoryCleanupCommon.SelectedPlan.IMProtectList))
             .Separator()
             .Widget(() =>
             {

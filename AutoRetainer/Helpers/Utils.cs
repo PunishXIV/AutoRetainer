@@ -162,7 +162,56 @@ public static unsafe class Utils
 
         public InventoryManagementSettings GetIMSettings()
         {
-            return C.DefaultIMSettings;
+            if(C.AdditionalIMSettings.TryGetFirst(x => x.GUID == data.ExchangePlan, out var plan))
+            {
+                if(plan.AdditionModeProtectList || plan.AdditionModeSoftSellList || plan.AdditionModeHardSellList)
+                {
+                    var newPlan = plan.DSFClone();
+                    if(plan.AdditionModeProtectList)
+                    {
+                        foreach(var x in C.DefaultIMSettings.IMProtectList)
+                        {
+                            if(!newPlan.IMProtectList.Contains(x))
+                            {
+                                newPlan.IMProtectList.Add(x);
+                            }
+                        }
+                    }
+                    if(plan.AdditionModeSoftSellList)
+                    {
+                        foreach(var x in C.DefaultIMSettings.IMAutoVendorSoft)
+                        {
+                            if(!newPlan.IMAutoVendorSoft.Contains(x))
+                            {
+                                newPlan.IMAutoVendorSoft.Add(x);
+                            }
+                        }
+                    }
+                    if(plan.AdditionModeHardSellList)
+                    {
+                        foreach(var x in C.DefaultIMSettings.IMAutoVendorHard)
+                        {
+                            if(!newPlan.IMAutoVendorHard.Contains(x))
+                            {
+                                newPlan.IMAutoVendorHard.Add(x);
+                                if(C.DefaultIMSettings.IMAutoVendorHardIgnoreStack.Contains(x))
+                                {
+                                    newPlan.IMAutoVendorHardIgnoreStack.Add(x);
+                                }
+                            }
+                        }
+                    }
+                    return newPlan;
+                }
+                else
+                {
+                    return plan;
+                }
+            }
+            else
+            {
+                return C.DefaultIMSettings;
+            }
         }
     }
 
@@ -232,11 +281,6 @@ public static unsafe class Utils
         return ordered?.ToList() ?? [.. source];
     }
 
-    public static InventoryManagementSettings GetSelectedIMSettings()
-    {
-        return C.DefaultIMSettings;
-    }
-
     extension(GCExchangePlan plan)
     {
         public string DisplayName
@@ -259,6 +303,20 @@ public static unsafe class Utils
                     new TickScheduler(() => plan.Items.Remove(x));
                 }
                 if(x.Data.ValueNullable != null && x.Data.Value.IsUnique) x.Quantity.ValidateRange(0, 1);
+            }
+        }
+    }
+
+    extension(InventoryManagementSettings plan)
+    {
+        public string DisplayName
+        {
+            get
+            {
+                if(plan.Name != "") return plan.Name;
+                var index = C.AdditionalIMSettings.IndexOf(plan);
+                if(index != -1) return $"Plan {index + 1}";
+                return $"Plan {plan.GUID.ToString().Split("-")[0]}";
             }
         }
     }

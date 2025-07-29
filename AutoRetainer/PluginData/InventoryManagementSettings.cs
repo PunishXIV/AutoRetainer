@@ -7,6 +7,11 @@ using System.Threading.Tasks;
 namespace AutoRetainer.PluginData;
 public unsafe sealed class InventoryManagementSettings
 {
+    public Guid GUID = Guid.NewGuid();
+    internal string ID => this.GUID.ToString();
+
+    public string Name = "";
+
     public bool IMEnableCofferAutoOpen = false;
     public bool IMEnableAutoVendor = false;
     public bool IMEnableContextMenu = false;
@@ -20,4 +25,8 @@ public unsafe sealed class InventoryManagementSettings
     public bool IMEnableItemDesynthesis = false;
     public bool IMEnableNpcSell = false;
     public bool AllowSellFromArmory = false;
+
+    public bool AdditionModeProtectList = true;
+    public bool AdditionModeSoftSellList = false;
+    public bool AdditionModeHardSellList = false;
 }

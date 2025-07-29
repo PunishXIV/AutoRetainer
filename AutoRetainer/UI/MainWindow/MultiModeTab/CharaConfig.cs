@@ -37,8 +37,8 @@ public class CharaConfig
         {
             b = b.Section("Deployables").Widget(() =>
             {
-                ImGui.Checkbox($"Wait For All Pending Deployables", ref data.MultiWaitForAllDeployables);
-                ImGuiComponents.HelpMarker("Prevent processing this character until all enabled deployables have returned from their voyages.");
+                ImGui.Checkbox($"Wait For Voyage Completion", ref data.MultiWaitForAllDeployables);
+                ImGuiComponents.HelpMarker("""This setting works like the global option but applies to individual characters. When enabled, AutoRetainer will wait for all deployables to return before logging into the character. If you're already logged in for another reason, it will still resend completed submarines—unless the global setting "Wait even when already logged in" is also turned on.""");
             });
         }
         b = b.Section("Teleport overrides", data.GetAreTeleportSettingsOverriden() ? ImGui.GetStyle().Colors[(int)ImGuiCol.FrameBg] with { X = 1f } : null, true)

@@ -105,6 +105,32 @@ public unsafe sealed class ExchangeLists : InventoryManagemenrBase
         }
         else
         {
+            if(Data != null)
+            {
+                if(Data.ExchangePlan == SelectedPlanGuid)
+                {
+                    ImGuiEx.Text(ImGuiColors.ParsedGreen, UiBuilder.IconFont, FontAwesomeIcon.Check.ToIconString());
+                    ImGui.SameLine();
+                    ImGuiEx.Text(ImGuiColors.ParsedGreen, $"Used by current character");
+                    ImGui.SameLine();
+                    if(ImGui.SmallButton("Unassign"))
+                    {
+                        Data.ExchangePlan = Guid.Empty;
+                    }
+                }
+                else
+                {
+                    ImGuiEx.Text(ImGuiColors.DalamudOrange, UiBuilder.IconFont, FontAwesomeIcon.ExclamationTriangle.ToIconString());
+                    ImGui.SameLine();
+                    ImGuiEx.Text(ImGuiColors.DalamudOrange, $"Not used by current character");
+                    ImGui.SameLine();
+                    if(ImGui.SmallButton("Assign"))
+                    {
+                        Data.ExchangePlan = selectedPlan.GUID;
+                    }
+                }
+            }
+
             var planIndex = C.AdditionalGCExchangePlans.IndexOf(x => x.GUID == SelectedPlanGuid);
             if(planIndex == -1)
             {

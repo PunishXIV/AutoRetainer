@@ -362,7 +362,7 @@ internal static unsafe class GCContinuation
             {
                 var item = inv->GetInventorySlot(i);
                 var data = ExcelItemHelper.Get(item->ItemId);
-                if(item->ItemId == 0 || C.DefaultIMSettings.IMProtectList.Contains(item->ItemId)) continue;
+                if(item->ItemId == 0 || Data.GetIMSettings().IMProtectList.Contains(item->ItemId)) continue;
                 if(!data.Value.ItemUICategory.RowId.EqualsAny([.. Utils.ArmorsUICategories, .. Utils.WeaponsUICategories])) continue;
                 if(!data.Value.GetRarity().EqualsAny(ItemRarity.Green, ItemRarity.Pink, ItemRarity.Blue)) continue;
                 if(data.Value.Desynth == 0) continue;

@@ -1,4 +1,5 @@
-﻿using ECommons.Configuration;
+﻿using AutoRetainer.UI.NeoUI.InventoryManagementEntries.InventoryCleanupEntries;
+using ECommons.Configuration;
 using ECommons.ExcelServices;
 using ECommons.MathHelpers;
 using Lumina.Excel.Sheets;
@@ -215,7 +216,7 @@ public static unsafe class InventoryManagementCommon
                         if(ImGuiEx.IconButton(FontAwesomeIcon.Trash))
                         {
                             new TickScheduler(() => list.Remove(item.RowId));
-                            Utils.GetSelectedIMSettings().IMAutoVendorHardIgnoreStack.Remove(item.RowId);
+                            InventoryCleanupCommon.SelectedPlan.IMAutoVendorHardIgnoreStack.Remove(item.RowId);
                         }
                         additionalButtons?.Invoke(item.RowId);
                         ImGui.PopID();
@@ -251,7 +252,7 @@ public static unsafe class InventoryManagementCommon
             {
                 foreach(var x in EzConfig.LoadConfiguration<ARDiscardMiniConfig>(System.IO.Path.Combine(Svc.PluginInterface.ConfigDirectory.Parent.FullName, "ARDiscard.json")).DiscardingItems)
                 {
-                    if(!target.Contains(x) && !Utils.GetSelectedIMSettings().IMProtectList.Contains(x))
+                    if(!target.Contains(x) && !InventoryCleanupCommon.SelectedPlan.IMProtectList.Contains(x))
                     {
                         target.Add(x);
                     }
@@ -267,7 +268,7 @@ public static unsafe class InventoryManagementCommon
 
     public static void ImportBlacklistFromArDiscard()
     {
-        var s = Utils.GetSelectedIMSettings();
+        var s = InventoryCleanupCommon.SelectedPlan;
         if(ImGuiEx.Button("Import blacklisted entries from Discard Helper", ImGuiEx.Ctrl))
         {
             try

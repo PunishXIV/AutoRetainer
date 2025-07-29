@@ -8,25 +8,25 @@ public class GeneralSettings : InventoryManagemenrBase
 
     private GeneralSettings()
     {
-        Builder = new NuiBuilder()
+        Builder = InventoryCleanupCommon.CreateCleanupHeaderBuilder()
             .Section(Name)
-            .Checkbox($"Auto-open venture coffers", () => ref Utils.GetSelectedIMSettings().IMEnableCofferAutoOpen, "Multi Mode only. Before logging out, all coffers will be open unless your inventory space is too low.")
-            .Checkbox($"Enable selling items to retainer", () => ref Utils.GetSelectedIMSettings().IMEnableAutoVendor)
-            .Checkbox($"Enable selling items to housing NPC", () => ref Utils.GetSelectedIMSettings().IMEnableNpcSell, "Place any shop NPC in a way that you can interact with it after entering the house")
+            .Checkbox($"Auto-open venture coffers", () => ref InventoryCleanupCommon.SelectedPlan.IMEnableCofferAutoOpen, "Multi Mode only. Before logging out, all coffers will be opened unless your inventory space is too low.")
+            .Checkbox($"Enable selling items to retainer", () => ref InventoryCleanupCommon.SelectedPlan.IMEnableAutoVendor, "When AutoRetainer checks resents retainers to ventures, items will be sold according to Inventory Cleanup plan.")
+            .Checkbox($"Enable selling items to housing NPC", () => ref InventoryCleanupCommon.SelectedPlan.IMEnableNpcSell, "When AutoRetainer enters a house, items will be sold according to the Inventory Cleanup plan. A housing vendor that supports item selling must be placed near the house entrance (not the workshop entrance)—you should be able to interact with the NPC immediately after entering.")
             .Indent()
-            .Checkbox($"Ignore NPC if retainer is available", () => ref Utils.GetSelectedIMSettings().IMSkipVendorIfRetainer)
+            .Checkbox($"Ignore NPC if retainer is available", () => ref InventoryCleanupCommon.SelectedPlan.IMSkipVendorIfRetainer)
             .Widget("Sell now", (x) =>
             {
-                if(ImGuiEx.Button(x, Player.Interactable && Utils.GetSelectedIMSettings().IMEnableNpcSell && NpcSaleManager.GetValidNPC() != null && !IsOccupied() && !P.TaskManager.IsBusy))
+                if(ImGuiEx.Button(x, Player.Interactable && InventoryCleanupCommon.SelectedPlan.IMEnableNpcSell && NpcSaleManager.GetValidNPC() != null && !IsOccupied() && !P.TaskManager.IsBusy))
                 {
                     NpcSaleManager.EnqueueIfItemsPresent(true);
                 }
             })
             .Unindent()
-            .Checkbox($"Auto-desynth items", () => ref Utils.GetSelectedIMSettings().IMEnableItemDesynthesis)
-            .Checkbox($"Enable context menu integration", () => ref Utils.GetSelectedIMSettings().IMEnableContextMenu)
-            .Checkbox($"Allow selling items from Armory Chest", () => ref Utils.GetSelectedIMSettings().AllowSellFromArmory)
-            .Checkbox($"Demo mode", () => ref Utils.GetSelectedIMSettings().IMDry, "Do not sell items, instead print in chat what would be sold")
+            .Checkbox($"Auto-desynth items", () => ref InventoryCleanupCommon.SelectedPlan.IMEnableItemDesynthesis)
+            .Checkbox($"Enable context menu integration", () => ref InventoryCleanupCommon.SelectedPlan.IMEnableContextMenu)
+            .Checkbox($"Allow selling items from Armory Chest", () => ref InventoryCleanupCommon.SelectedPlan.AllowSellFromArmory)
+            .Checkbox($"Demo mode", () => ref InventoryCleanupCommon.SelectedPlan.IMDry, "Do not sell items, instead print in chat what would be sold")
             ;
     }
 }

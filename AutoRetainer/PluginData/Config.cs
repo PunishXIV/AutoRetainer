@@ -222,6 +222,7 @@ internal unsafe class Config
     [Obsolete] public bool AllowSellFromArmory = false;
 
     public InventoryManagementSettings DefaultIMSettings = new();
+    public List<InventoryManagementSettings> AdditionalIMSettings = [];
     public bool IMMigrated = false;
 
     public Vector2 WindowSize;
