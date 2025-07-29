@@ -28,6 +28,7 @@ public class ExpertTab : NeoUIEntry
         .SliderIntAsFloat(100f, "Retainer menu delay, seconds", () => ref C.RetainerMenuDelay.ValidateRange(0, 2000), 0, 2000)
         .Checkbox($"Allow venture timer to display negative values", () => ref C.TimerAllowNegative)
         .Checkbox($"Do not error check venture planner", () => ref C.NoErrorCheckPlanner2)
+        .Checkbox("Enable Manual relogs character postprocess", () => ref C.AllowManualPostprocess, "Allow manual command invocation while AutoRetainer locked in postprocess. ")
         .Widget("Market Cooldown Overlay", (x) =>
         {
             if(ImGui.Checkbox(x, ref C.MarketCooldownOverlay))

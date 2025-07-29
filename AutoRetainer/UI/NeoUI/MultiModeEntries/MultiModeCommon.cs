@@ -5,12 +5,9 @@ public class MultiModeCommon : NeoUIEntry
 
     public override NuiBuilder Builder { get; init; } = new NuiBuilder()
         .Section("Common Settings")
-        .Checkbox($"Enforce Full Character Rotation", () => ref C.CharEqualize, "Recommended for users with > 15 characters, forces multi mode to make sure ventures are processed on all characters in order before returning to the beginning of the cycle.")
         .Checkbox($"Wait on login screen", () => ref C.MultiWaitOnLoginScreen, "If no character is available for ventures, you will be logged off until any character is available again. Title screen movie will be disabled while this option and MultiMode are enabled.")
-        .Checkbox("Synchronise Retainers (one time)", () => ref MultiMode.Synchronize, "AutoRetainer will wait until all enabled retainers have completed their ventures. After that this setting will be disabled automatically and all characters will be processed.")
-        .Checkbox($"Disable Multi Mode on Manual Login", () => ref C.MultiDisableOnRelog)
-        .Checkbox($"Do not reset Preferred Character on Manual Login", () => ref C.MultiNoPreferredReset)
-        .Checkbox("Enable Manual relogs character postprocess", () => ref C.AllowManualPostprocess)
+        .Checkbox($"Disable Multi Mode on Manual Login", () => ref C.MultiDisableOnRelog, "Upon relogging via AutoRetainer's UI or command, disable Multi Mode.")
+        .Checkbox($"Do not reset Preferred Character on Manual Login", () => ref C.MultiNoPreferredReset, "Upon relogging via AutoRetainer's UI or command, do not reset preferred character.")
         .Checkbox("Allow entering shared houses", () => ref C.SharedHET)
         .Checkbox("Attempt to enter house on login even when Multi Mode is disabled", () => ref C.HETWhenDisabled)
         .Checkbox("Do not teleport or enter house for retainers when already next to bell", () => ref C.NoTeleportHetWhenNextToBell)
@@ -59,9 +56,13 @@ public class MultiModeCommon : NeoUIEntry
         .Checkbox("Teleport to free company house for deployables", () => ref C.GlobalTeleportOptions.Deployables)
         .Checkbox("Enable Simple Teleport", () => ref C.AllowSimpleTeleport)
         .Unindent()
-        .Widget(() => ImGuiEx.HelpMarker("Allows teleporting to houses without registering them in Lifestream. You still need Lifestream plugin for teleportation to work.\n\nWarning! This option is less reliable than registering your houses in Lifestream. Avoid it if you can.", EColor.RedBright, FontAwesomeIcon.ExclamationTriangle.ToIconString()))
+        .Widget(() => ImGuiEx.HelpMarker("""
+            Allows teleporting to houses without registering them in Lifestream. Note: the Lifestream plugin is still required for teleportation to work.
+
+            Warning: This option is less reliable than registering your houses in Lifestream. Use it only if necessary.
+            """, EColor.RedBright, FontAwesomeIcon.ExclamationTriangle.ToIconString()))
 
         .Section("Bailout Module")
-        .Checkbox("Auto-close and retry logging in on connection errors", () => ref C.ResolveConnectionErrors)
+        .Checkbox("Auto-close and retry logging in on connection errors", () => ref C.ResolveConnectionErrors, "Upon disconnecting, AutoRetainer will attempt to log back in. If the session has expired, no login attempt will be made.")
         .Widget(() => ImGuiEx.PluginAvailabilityIndicator([new("NoKillPlugin")]));
 }
