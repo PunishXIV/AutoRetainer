@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace AutoRetainer.UI.NeoUI;
-public unsafe sealed class UserInterface : NeoUIEntry
+public sealed unsafe class UserInterface : NeoUIEntry
 {
     public override string Path => "User Interface";
 

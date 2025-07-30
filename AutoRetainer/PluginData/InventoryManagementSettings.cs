@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace AutoRetainer.PluginData;
-public unsafe sealed class InventoryManagementSettings
+public sealed unsafe class InventoryManagementSettings
 {
     public Guid GUID = Guid.NewGuid();
-    internal string ID => this.GUID.ToString();
+    internal string ID => GUID.ToString();
 
     public string Name = "";
 

@@ -40,7 +40,7 @@ internal unsafe class AutoRetainerWindow : Window
         TitleBarButtons.Add(LockButton);
     }
 
-    Action<string> SomeAction;
+    private Action<string> SomeAction;
 
     private void OnLockButtonClick(ImGuiMouseButton m)
     {

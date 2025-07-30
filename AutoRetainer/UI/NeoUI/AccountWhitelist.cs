@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace AutoRetainer.UI.NeoUI;
-public unsafe sealed class AccountWhitelist : NeoUIEntry
+public sealed unsafe class AccountWhitelist : NeoUIEntry
 {
     public override void Draw()
     {
@@ -19,7 +19,7 @@ public unsafe sealed class AccountWhitelist : NeoUIEntry
         {
             ImGuiEx.TextWrapped(EColor.YellowBright, "Current whitelist status: Enabled. To disable, remove all accounts from it.");
         }
-        
+
         if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.UserPlus, "Add current account", enabled: Player.Available))
         {
             C.WhitelistedAccounts.Add(*P.Memory.MyAccountId);

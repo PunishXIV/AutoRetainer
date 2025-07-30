@@ -28,7 +28,7 @@ public static unsafe class TaskAssignHuntingVenture
         if(TryGetAddonByName<AtkUnitBase>("RetainerTaskAsk", out _)) return true;
         if(TryGetAddonByName<AtkUnitBase>("RetainerTaskSupply", out var addon) && addon->IsReady())
         {
-            for(int i = 0; i < addon->AtkValues[107].UInt; i++)
+            for(var i = 0; i < addon->AtkValues[107].UInt; i++)
             {
                 var ptr = (nint)addon->AtkValues[42 + i].Pointer;
                 var id = *(uint*)ptr;
@@ -42,7 +42,7 @@ public static unsafe class TaskAssignHuntingVenture
             if(Svc.Data.GetExcelSheet<RetainerTask>().TryGetRow(ventureId, out var task))
             {
                 var level = task.RetainerLevel;
-                var levelIndex = (level-1) / 5;
+                var levelIndex = (level - 1) / 5;
                 var listIndex = addon->AtkValues[40].Int - levelIndex - 1;
                 if(listIndex >= 0 && Utils.GenericThrottle)
                 {

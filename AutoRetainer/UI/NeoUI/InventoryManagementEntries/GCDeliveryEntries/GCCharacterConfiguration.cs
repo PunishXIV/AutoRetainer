@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries.GCDeliveryEntries;
-public unsafe sealed class GCCharacterConfiguration : InventoryManagemenrBase
+public sealed unsafe class GCCharacterConfiguration : InventoryManagemenrBase
 {
     public override string Name { get; } = "Grand Company Delivery/Character Configuration";
 
@@ -20,13 +20,13 @@ public unsafe sealed class GCCharacterConfiguration : InventoryManagemenrBase
         {
             foreach(var characterData in C.OfflineData)
             {
-                if(filter!= "" && !characterData.NameWithWorld.Contains(filter, StringComparison.OrdinalIgnoreCase)) continue;
+                if(filter != "" && !characterData.NameWithWorld.Contains(filter, StringComparison.OrdinalIgnoreCase)) continue;
                 ImGui.PushID(characterData.Identity);
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
                 ImGuiEx.TextV(characterData.NameWithWorldCensored);
                 ImGui.TableNextColumn();
-                var plan = characterData.ExchangePlan == Guid.Empty?null:C.AdditionalGCExchangePlans.FirstOrDefault(p => p.GUID == characterData.ExchangePlan);
+                var plan = characterData.ExchangePlan == Guid.Empty ? null : C.AdditionalGCExchangePlans.FirstOrDefault(p => p.GUID == characterData.ExchangePlan);
                 ImGui.SetNextItemWidth(200f);
                 if(ImGui.BeginCombo("##chPlan", plan?.DisplayName ?? "Default Plan", ImGuiComboFlags.HeightLarge))
                 {

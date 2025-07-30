@@ -110,7 +110,7 @@ public class RetainersTab : NeoUIEntry
             foreach(var x in SelectedRetainers)
             {
                 var odata = C.OfflineData.FirstOrDefault(z => z.CID == x.CID);
-                if (odata != null && SelectedVenturePlan != null)
+                if(odata != null && SelectedVenturePlan != null)
                 {
                     var adata = Utils.GetAdditionalData(x.CID, x.RetainerName);
                     adata.VenturePlan = SelectedVenturePlan;

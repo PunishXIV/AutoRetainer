@@ -272,7 +272,7 @@ internal static unsafe class GCContinuation
 
     internal static bool? OpenSeals()
     {
-        
+
         if(TryGetAddonByName<AtkUnitBase>("GrandCompanyExchange", out var addon) && IsAddonReady(addon) && AutoGCHandin.IsValidGCTerritory())
         {
             var reader = new ReaderGrandCompanyExchange(addon);
@@ -317,7 +317,7 @@ internal static unsafe class GCContinuation
 
         var cnt = InventoryManager.Instance()->GetInventoryItemCount(meta.ItemID);
 
-        var targetQuantity = item.QuantitySingleTime == 0? item.Quantity - cnt : item.QuantitySingleTime;
+        var targetQuantity = item.QuantitySingleTime == 0 ? item.Quantity - cnt : item.QuantitySingleTime;
         if(targetQuantity <= 0) return 0;
         if(meta.ItemID == VentureItem)
         {
@@ -344,7 +344,7 @@ internal static unsafe class GCContinuation
         canFit = Math.Min(canFit, (uint)targetQuantity);
         canFit = Math.Min(canFit, 99);
         canFit = Math.Min(canFit, meta.Data.StackSize);
-        canFit = Math.Min(canFit, (potential? potentialSeals:GetAdjustedSeals()) / meta.Seals);
+        canFit = Math.Min(canFit, (potential ? potentialSeals : GetAdjustedSeals()) / meta.Seals);
         if(meta.Data.IsUnique)
         {
             canFit = Math.Min(canFit, 1);
@@ -358,7 +358,7 @@ internal static unsafe class GCContinuation
         foreach(var x in Utils.PlayerInvetories)
         {
             var inv = InventoryManager.Instance()->GetInventoryContainer(x);
-            for(int i = 0; i < inv->GetSize(); i++)
+            for(var i = 0; i < inv->GetSize(); i++)
             {
                 var item = inv->GetInventorySlot(i);
                 var data = ExcelItemHelper.Get(item->ItemId);

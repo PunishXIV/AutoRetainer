@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries.InventoryCleanupEntries;
-public unsafe static class InventoryCleanupCommon
+public static unsafe class InventoryCleanupCommon
 {
     public static Guid SelectedPlanGuid = Guid.Empty;
 

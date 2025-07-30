@@ -415,7 +415,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         }
         else if(arguments.StartsWith("modifySoftVendorList"))
         {
-            var s = Data?.GetIMSettings();
+            var s = C.DefaultIMSettings;
             if(s != null && int.TryParse(arguments.Split(" ")[1], out var num))
             {
                 if(num > 0)

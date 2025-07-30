@@ -286,9 +286,9 @@ internal static class Lang
 
     internal static readonly string[] WorkshopRegisterConfirm =
     [
-            "to outfit and register your submersible",  
-            "枚消費して潜水艦を登録します", 
-            "Das Tauchboot mit den gewählten Bauteilen registrieren", 
+            "to outfit and register your submersible",
+            "枚消費して潜水艦を登録します",
+            "Das Tauchboot mit den gewählten Bauteilen registrieren",
             "pour équiper et enregistrer le sous-marin",
             "잠수함을 등록하시겠습니까",
             //"",

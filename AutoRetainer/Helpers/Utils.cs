@@ -160,11 +160,11 @@ public static unsafe class Utils
                 || data.TeleportOptionsOverride.RetainersPrivate != null;
         }
 
-        public InventoryManagementSettings GetIMSettings()
+        public InventoryManagementSettings GetIMSettings(bool raw = false)
         {
-            if(C.AdditionalIMSettings.TryGetFirst(x => x.GUID == data.ExchangePlan, out var plan))
+            if(C.AdditionalIMSettings.TryGetFirst(x => x.GUID == data.InventoryCleanupPlan, out var plan))
             {
-                if(plan.AdditionModeProtectList || plan.AdditionModeSoftSellList || plan.AdditionModeHardSellList)
+                if(!raw && (plan.AdditionModeProtectList || plan.AdditionModeSoftSellList || plan.AdditionModeHardSellList))
                 {
                     var newPlan = plan.DSFClone();
                     if(plan.AdditionModeProtectList)
@@ -468,7 +468,7 @@ public static unsafe class Utils
         }*/
     }
 
-    
+
 
     public static void EnqueueVendorItemsByRetainer()
     {
@@ -498,7 +498,7 @@ public static unsafe class Utils
 
     public static InventoryType[] RetainerInventories => [InventoryType.RetainerPage1, InventoryType.RetainerPage2, InventoryType.RetainerPage3, InventoryType.RetainerPage4, InventoryType.RetainerPage5, InventoryType.RetainerPage6, InventoryType.RetainerPage7];
 
-    public static InventoryType[] RetainerInventoriesWithCrystals => [..RetainerInventories, InventoryType.RetainerCrystals];
+    public static InventoryType[] RetainerInventoriesWithCrystals => [.. RetainerInventories, InventoryType.RetainerCrystals];
 
     public static InventoryType[] PlayerInvetories => [InventoryType.Inventory1, InventoryType.Inventory2, InventoryType.Inventory3, InventoryType.Inventory4];
 
@@ -581,7 +581,7 @@ public static unsafe class Utils
     {
         var im = InventoryManager.Instance();
         var inv = im->GetInventoryContainer(type);
-        for(int i = 0; i < inv->Size; i++)
+        for(var i = 0; i < inv->Size; i++)
         {
             var slot = inv->Items[i];
             if(slot.ItemId == item && (isHq == null || isHq == slot.Flags.HasFlag(InventoryItem.ItemFlags.HighQuality)))

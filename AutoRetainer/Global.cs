@@ -1,8 +1,8 @@
-﻿global using AutoRetainer.PluginData;
-global using AutoRetainer.Helpers;
+﻿global using AutoRetainer.Helpers;
 global using AutoRetainer.Modules;
 global using AutoRetainer.Modules.GcHandin;
 global using AutoRetainer.Modules.Multi;
+global using AutoRetainer.PluginData;
 global using AutoRetainer.Scheduler;
 global using Dalamud.Interface;
 global using Dalamud.Interface.Colors;

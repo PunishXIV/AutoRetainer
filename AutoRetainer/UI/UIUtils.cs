@@ -8,7 +8,7 @@ namespace AutoRetainer.UI;
 
 internal static class UIUtils
 {
-    public static void DrawSortableEnumList<T>(string id, List<T> list) where T:struct, Enum
+    public static void DrawSortableEnumList<T>(string id, List<T> list) where T : struct, Enum
     {
         ref var dragDrop = ref Ref<ImGuiEx.RealtimeDragDrop<T>>.Get($"dsel{id}", () => new($"dsel{id}", x => x.ToString()));
         ImGui.PushID(id);
@@ -31,7 +31,7 @@ internal static class UIUtils
         {
             var x = list[i];
             ImGui.PushID(x.ToString());
-            dragDrop.DrawButtonDummy(x, list,i);
+            dragDrop.DrawButtonDummy(x, list, i);
             ImGui.SameLine();
             if(ImGuiEx.IconButton(FontAwesomeIcon.Trash))
             {

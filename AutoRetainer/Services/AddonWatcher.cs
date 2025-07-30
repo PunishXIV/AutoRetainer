@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace AutoRetainer.Services;
-public unsafe sealed class AddonWatcher : IDisposable
+public sealed unsafe class AddonWatcher : IDisposable
 {
     private AddonWatcher()
     {
@@ -24,7 +24,7 @@ public unsafe sealed class AddonWatcher : IDisposable
     {
         if(Data != null && Data.GCDeliveryType != GCDeliveryType.Disabled)
         {
-            int* ptr = (int*)(args.Addon + 776);
+            var ptr = (int*)(args.Addon + 776);
             var newValue = Data.GCDeliveryType switch
             {
                 GCDeliveryType.Show_All_Items => 0,

@@ -7,14 +7,14 @@ using GrandCompany = ECommons.ExcelServices.GrandCompany;
 using GrandCompanyRank = Lumina.Excel.Sheets.GrandCompanyRank;
 
 namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries.GCDeliveryEntries;
-public unsafe sealed class ExchangeLists : InventoryManagemenrBase
+public sealed unsafe class ExchangeLists : InventoryManagemenrBase
 {
-    ImGuiEx.RealtimeDragDrop<GCExchangeItem> DragDrop = new("GCELDD", x => x.ID);
+    private ImGuiEx.RealtimeDragDrop<GCExchangeItem> DragDrop = new("GCELDD", x => x.ID);
     public override string Name { get; } = "Grand Company Delivery/Exchange Lists";
-    GCExchangeCategoryTab? SelectedCategory = null;
-    GCExchangeCategoryTab? SelectedCategory2 = null;
-    GCExchangeRankTab? SelectedRank = null;
-    Guid SelectedPlanGuid = Guid.Empty;
+    private GCExchangeCategoryTab? SelectedCategory = null;
+    private GCExchangeCategoryTab? SelectedCategory2 = null;
+    private GCExchangeRankTab? SelectedRank = null;
+    private Guid SelectedPlanGuid = Guid.Empty;
 
     public override int DisplayPriority => -5;
 
@@ -33,7 +33,7 @@ public unsafe sealed class ExchangeLists : InventoryManagemenrBase
             - Any excess Grand Company Seals will be discarded.
             """);
 
-        var selectedPlan = C.AdditionalGCExchangePlans.FirstOrDefault(x => x.GUID ==  SelectedPlanGuid);
+        var selectedPlan = C.AdditionalGCExchangePlans.FirstOrDefault(x => x.GUID == SelectedPlanGuid);
         ImGuiEx.InputWithRightButtonsArea(() =>
         {
             if(ImGui.BeginCombo("##selplan", selectedPlan?.DisplayName ?? "Default Plan"))
@@ -57,7 +57,7 @@ public unsafe sealed class ExchangeLists : InventoryManagemenrBase
                 SelectedPlanGuid = newPlan.GUID;
             }
             ImGuiEx.Tooltip("Add new plan");
-            ImGui.SameLine(0,1);
+            ImGui.SameLine(0, 1);
             if(ImGuiEx.IconButton(FontAwesomeIcon.Copy))
             {
                 var clone = (selectedPlan ?? C.DefaultGCExchangePlan).DSFClone();
@@ -65,7 +65,7 @@ public unsafe sealed class ExchangeLists : InventoryManagemenrBase
                 Copy(EzConfig.DefaultSerializationFactory.Serialize(clone));
             }
             ImGuiEx.Tooltip("Copy");
-            ImGui.SameLine(0,1);
+            ImGui.SameLine(0, 1);
             if(ImGuiEx.IconButton(FontAwesomeIcon.Paste))
             {
                 try
@@ -149,7 +149,7 @@ public unsafe sealed class ExchangeLists : InventoryManagemenrBase
         ref bool onlySelected() => ref Ref<bool>.Get($"{plan.ID}onlySel");
         ref string getFilter2() => ref Ref<string>.Get($"{plan.ID}filter2");
 
-        ImGui.PushID(plan.ID);  
+        ImGui.PushID(plan.ID);
         plan.Validate();
 
         ImGuiEx.InputWithRightButtonsArea("GCPlanSettings", () =>
@@ -174,7 +174,7 @@ public unsafe sealed class ExchangeLists : InventoryManagemenrBase
             ImGui.SameLine();
             ImGui.Checkbox("Finish by purchasing items", ref plan.FinalizeByPurchasing);
             ImGuiEx.HelpMarker("If selected, after final exchange items will be purchased, otherwise - purchase will not be made until seals are capped again.");
-        });        
+        });
 
         ImGuiEx.SetNextItemFullWidth();
         if(ImGui.BeginCombo("##Add Items", "Add Items", ImGuiComboFlags.HeightLarge))
@@ -247,7 +247,7 @@ public unsafe sealed class ExchangeLists : InventoryManagemenrBase
             {
                 plan.Items.RemoveAll(x => x.Quantity == 0 && x.QuantitySingleTime == 0);
             }
-            if(ImGuiEx.Selectable("Clear the list (Hold CTRL and click)", enabled:ImGuiEx.Ctrl))
+            if(ImGuiEx.Selectable("Clear the list (Hold CTRL and click)", enabled: ImGuiEx.Ctrl))
             {
                 plan.Items.Clear();
             }
@@ -266,12 +266,12 @@ public unsafe sealed class ExchangeLists : InventoryManagemenrBase
             ImGui.Checkbox("Only Selected", ref onlySelected());
             ImGui.SameLine();
             ImGui.SetNextItemWidth(100f);
-            ImGuiEx.EnumCombo("##cat", ref SelectedCategory, nullName:"All Categories");
+            ImGuiEx.EnumCombo("##cat", ref SelectedCategory, nullName: "All Categories");
             ImGuiEx.Tooltip("Category");
         });
 
-        
-        
+
+
         DragDrop.Begin();
         if(ImGuiEx.BeginDefaultTable("GCDeliveryList", ["##dragDrop", "~Item", "GC", "Lv", "Price", "Category", "Keep", "One-Time", "##controls"]))
         {
@@ -280,7 +280,7 @@ public unsafe sealed class ExchangeLists : InventoryManagemenrBase
                 var currentItem = plan.Items[i];
                 var meta = Utils.SharedGCExchangeListings[currentItem.ItemID];
                 if(onlySelected() && currentItem.Quantity == 0) continue;
-                if(getFilter().Length > 0 
+                if(getFilter().Length > 0
                     && !meta.Data.Name.GetText().Contains(getFilter(), StringComparison.OrdinalIgnoreCase)
                     && !meta.Category.ToString().Equals(getFilter(), StringComparison.OrdinalIgnoreCase)
                     && !Utils.GCRanks[meta.MinPurchaseRank].Equals(getFilter(), StringComparison.OrdinalIgnoreCase)
@@ -318,7 +318,7 @@ public unsafe sealed class ExchangeLists : InventoryManagemenrBase
                         if(trans) ImGui.PushStyleVar(ImGuiStyleVar.Alpha, 0.2f);
                         ImGui.Image(ctex.ImGuiHandle, new(ImGui.GetFrameHeight()));
                         if(trans) ImGui.PopStyleVar();
-                        ImGuiEx.Tooltip($"{c}" + (trans?" (unavailable)":""));
+                        ImGuiEx.Tooltip($"{c}" + (trans ? " (unavailable)" : ""));
                         ImGui.SameLine(0, 1);
                     }
                 }
@@ -350,12 +350,12 @@ public unsafe sealed class ExchangeLists : InventoryManagemenrBase
                 ImGuiEx.Tooltip("Select amount of items to keep in your inventory");
                 ImGui.TableNextColumn();
                 ImGui.SetNextItemWidth(100f.Scale());
-                ImGui.InputInt("##qtyonetime", ref currentItem.QuantitySingleTime.ValidateRange(0, currentItem.Data.Value.IsUnique ? 1 : int.MaxValue), 0,0);
+                ImGui.InputInt("##qtyonetime", ref currentItem.QuantitySingleTime.ValidateRange(0, currentItem.Data.Value.IsUnique ? 1 : int.MaxValue), 0, 0);
                 ImGuiEx.Tooltip("Select amount of items to purchase once. Whenever purchase is made on any character using this plan, an amount will be subtracted from this value. Once it reaches 0, it will back to \"Keep\" amount.");
                 ImGui.TableNextColumn();
                 if(ImGuiEx.IconButton(FontAwesomeIcon.Clone))
                 {
-                    plan.Items.Insert(i+1, currentItem.JSONClone());
+                    plan.Items.Insert(i + 1, currentItem.JSONClone());
                 }
                 ImGuiEx.Tooltip("Duplicate this listing.");
                 ImGui.SameLine(0, 1);

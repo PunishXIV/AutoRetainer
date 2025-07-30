@@ -10,7 +10,7 @@ internal static class TaskIntelligentComponentsChange
         VoyageUtils.Log($"Task enqueued: {nameof(TaskIntelligentComponentsChange)}, name={name}, type={type}");
         P.TaskManager.Enqueue(() =>
         {
-            if (PartSwapperUtils.GetPlanInLevelRange(Data.GetAdditionalVesselData(name, type).Level) == null) return;
+            if(PartSwapperUtils.GetPlanInLevelRange(Data.GetAdditionalVesselData(name, type).Level) == null) return;
             var rep = PartSwapperUtils.GetIsVesselNeedsPartsSwap(name, type, out var log);
             if(rep is { Count: > 0 })
             {

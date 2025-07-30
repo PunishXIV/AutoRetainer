@@ -10,7 +10,7 @@ public unsafe class DebugRetainerTaskSupply : DebugSectionBase
     {
         if(TryGetAddonByName<AtkUnitBase>("RetainerTaskSupply", out var addon) && addon->IsReady())
         {
-            for(int i = 0; i < addon->AtkValues[107].UInt; i++)
+            for(var i = 0; i < addon->AtkValues[107].UInt; i++)
             {
                 var ptr = (nint)addon->AtkValues[42 + i].Pointer;
                 var id = *(uint*)ptr;

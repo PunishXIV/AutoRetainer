@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AutoRetainer.PluginData;
 [Serializable]
-public unsafe sealed class GCExchangePlan
+public sealed unsafe class GCExchangePlan
 {
     public string ID => GUID.ToString();
     public Guid GUID = Guid.NewGuid();

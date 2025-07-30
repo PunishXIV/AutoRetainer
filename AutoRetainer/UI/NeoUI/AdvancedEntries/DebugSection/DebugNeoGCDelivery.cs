@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;
-public unsafe sealed class DebugNeoGCDelivery : DebugSectionBase
+public sealed unsafe class DebugNeoGCDelivery : DebugSectionBase
 {
     public override void Draw()
     {

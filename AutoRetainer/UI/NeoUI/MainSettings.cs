@@ -37,5 +37,5 @@ public class MainSettings : NeoUIEntry
         .Widget("RetainerSense", (x) => ImGui.Checkbox(x, ref C.RetainerSense), "AutoRetainer will automatically enable itself when the player is within interaction range of a Summoning Bell. You must remain stationary or the activation will be cancelled.")
         .Widget(200f, "Activation Time", (x) => ImGuiEx.SliderIntAsFloat(x, ref C.RetainerSenseThreshold, 1000, 100000));
 
-        
+
 }

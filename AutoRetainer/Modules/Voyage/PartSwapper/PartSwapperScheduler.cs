@@ -17,23 +17,23 @@ public static unsafe class PartSwapperScheduler
             P.TaskManager.Enqueue(() =>
                                   {
                                       var plan = PartSwapperUtils.GetPlanInLevelRange(Data.GetAdditionalVesselData(next, type).Level);
-                                      if (plan == null) return;
+                                      if(plan == null) return;
                                       var partSwapperList = PartSwapperUtils.GetIsVesselNeedsPartsSwap(next, VoyageType.Submersible, out _);
-                                      if (partSwapperList is { Count: 0 })
+                                      if(partSwapperList is { Count: 0 })
                                       {
-                                          if (plan.FirstSubDifferent && VoyageUtils.GetVesselIndexByName(next, VoyageType.Submersible) == 0)
+                                          if(plan.FirstSubDifferent && VoyageUtils.GetVesselIndexByName(next, VoyageType.Submersible) == 0)
                                           {
-                                              Data.AdditionalSubmarineData[next].UnlockMode         = plan.FirstSubUnlockMode;
+                                              Data.AdditionalSubmarineData[next].UnlockMode = plan.FirstSubUnlockMode;
                                               Data.AdditionalSubmarineData[next].SelectedUnlockPlan = plan.FirstSubSelectedUnlockPlan;
-                                              Data.AdditionalSubmarineData[next].VesselBehavior     = plan.FirstSubVesselBehavior;
-                                              Data.AdditionalSubmarineData[next].SelectedPointPlan  = plan.FirstSubSelectedPointPlan;
+                                              Data.AdditionalSubmarineData[next].VesselBehavior = plan.FirstSubVesselBehavior;
+                                              Data.AdditionalSubmarineData[next].SelectedPointPlan = plan.FirstSubSelectedPointPlan;
                                           }
                                           else
                                           {
-                                              Data.AdditionalSubmarineData[next].UnlockMode         = plan.UnlockMode;
+                                              Data.AdditionalSubmarineData[next].UnlockMode = plan.UnlockMode;
                                               Data.AdditionalSubmarineData[next].SelectedUnlockPlan = plan.SelectedUnlockPlan;
-                                              Data.AdditionalSubmarineData[next].VesselBehavior     = plan.VesselBehavior;
-                                              Data.AdditionalSubmarineData[next].SelectedPointPlan  = plan.SelectedPointPlan;
+                                              Data.AdditionalSubmarineData[next].VesselBehavior = plan.VesselBehavior;
+                                              Data.AdditionalSubmarineData[next].SelectedPointPlan = plan.SelectedPointPlan;
                                           }
                                       }
                                   }, "Changing submersible plan");
@@ -43,9 +43,9 @@ public static unsafe class PartSwapperScheduler
     public static bool EnqueueSubmersibleRegistrationIfPossible()
     {
         var neededParts = new[] { (uint)Hull.Shark, (uint)Stern.Shark, (uint)Bow.Shark, (uint)Bridge.Shark };
-        if(C.EnableAutomaticSubRegistration 
-            && Data.AdditionalSubmarineData.Count < Data.NumSubSlots 
-            && neededParts.All(part => InventoryManager.Instance()->GetInventoryItemCount((uint)part) > 0) 
+        if(C.EnableAutomaticSubRegistration
+            && Data.AdditionalSubmarineData.Count < Data.NumSubSlots
+            && neededParts.All(part => InventoryManager.Instance()->GetInventoryItemCount((uint)part) > 0)
             && InventoryManager.Instance()->GetInventoryItemCount((uint)Items.DiveCredits) >= (2 * Data.NumSubSlots) - 1)
         {
             P.TaskManager.Enqueue(PartSwapperTasks.SelectRegisterSub);

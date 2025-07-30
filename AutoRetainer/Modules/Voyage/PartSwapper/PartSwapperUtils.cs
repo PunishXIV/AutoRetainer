@@ -3,7 +3,7 @@ using AutoRetainerAPI.Configuration;
 using FFXIVClientStructs.FFXIV.Client.Game;
 
 namespace AutoRetainer.Modules.Voyage.PartSwapper;
-public unsafe static class PartSwapperUtils
+public static unsafe class PartSwapperUtils
 {
     internal static List<(int, uint)>? GetIsVesselNeedsPartsSwap(string name, VoyageType type, out List<string> log)
     {

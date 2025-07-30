@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using GrandCompany = ECommons.ExcelServices.GrandCompany;
 
 namespace AutoRetainer.PluginData;
-public unsafe sealed class GCExchangeListingMetadata : IEquatable<GCExchangeListingMetadata>
+public sealed unsafe class GCExchangeListingMetadata : IEquatable<GCExchangeListingMetadata>
 {
     public HashSet<GrandCompany> Companies = [];
 
