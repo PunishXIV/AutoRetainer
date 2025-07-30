@@ -60,7 +60,15 @@ public static unsafe class InventoryCleanupCommon
         {
             if(ImGuiEx.IconButton(FontAwesomeIcon.Plus))
             {
-                var newPlan = new InventoryManagementSettings();
+                var newPlan = new InventoryManagementSettings()
+                {
+                    AllowSellFromArmory = C.DefaultIMSettings.AllowSellFromArmory,
+                    IMEnableContextMenu = C.DefaultIMSettings.IMEnableContextMenu,
+                    IMEnableCofferAutoOpen = C.DefaultIMSettings.IMEnableCofferAutoOpen,
+                    IMSkipVendorIfRetainer = C.DefaultIMSettings.IMSkipVendorIfRetainer,
+                    IMEnableAutoVendor = C.DefaultIMSettings.IMEnableAutoVendor,
+                    IMEnableNpcSell = C.DefaultIMSettings.IMEnableNpcSell,
+                };
                 C.AdditionalIMSettings.Add(newPlan);
                 SelectedPlanGuid = newPlan.GUID;
             }

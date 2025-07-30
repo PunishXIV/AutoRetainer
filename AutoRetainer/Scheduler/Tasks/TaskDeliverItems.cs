@@ -36,8 +36,8 @@ public static unsafe class TaskDeliverItems
                 ECommons.ExcelServices.GrandCompany.TwinAdder => "ta",
                 _ => throw new ArgumentOutOfRangeException()
             }));
-            P.TaskManager.Enqueue(() => !S.LifestreamIPC.IsBusy(), new(timeLimitMS: 5 * 60 * 1000));
-            P.TaskManager.Enqueue(() => GCContinuation.EnqueueInitiation(true));
         }
+        P.TaskManager.Enqueue(() => !S.LifestreamIPC.IsBusy(), new(timeLimitMS: 5 * 60 * 1000));
+        P.TaskManager.Enqueue(() => GCContinuation.EnqueueInitiation(true));
     }
 }
