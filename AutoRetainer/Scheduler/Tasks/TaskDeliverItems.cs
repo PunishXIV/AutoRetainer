@@ -1,4 +1,5 @@
 ﻿using ECommons.GameHelpers;
+using ECommons.Singletons;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using System;
 using System.Collections.Generic;
