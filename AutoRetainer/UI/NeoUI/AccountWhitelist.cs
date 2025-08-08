@@ -27,7 +27,7 @@ public sealed unsafe class AccountWhitelist : NeoUIEntry
 
         foreach(var x in C.WhitelistedAccounts)
         {
-            ImGui.PushID(x.ToString());
+            ImGuiEx.PushID(x.ToString());
             if(ImGuiEx.IconButton(FontAwesomeIcon.Trash))
             {
                 new TickScheduler(() => C.WhitelistedAccounts.Remove(x));

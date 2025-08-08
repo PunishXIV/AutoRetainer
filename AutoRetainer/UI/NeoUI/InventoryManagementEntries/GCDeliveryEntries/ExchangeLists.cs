@@ -42,7 +42,7 @@ public sealed unsafe class ExchangeLists : InventoryManagemenrBase
                 ImGui.Separator();
                 foreach(var x in C.AdditionalGCExchangePlans)
                 {
-                    ImGui.PushID(x.ID);
+                    ImGuiEx.PushID(x.ID);
                     if(ImGui.Selectable(x.DisplayName)) SelectedPlanGuid = x.GUID;
                     ImGui.PopID();
                 }
@@ -149,7 +149,7 @@ public sealed unsafe class ExchangeLists : InventoryManagemenrBase
         ref bool onlySelected() => ref Ref<bool>.Get($"{plan.ID}onlySel");
         ref string getFilter2() => ref Ref<string>.Get($"{plan.ID}filter2");
 
-        ImGui.PushID(plan.ID);
+        ImGuiEx.PushID(plan.ID);
         plan.Validate();
 
         ImGuiEx.InputWithRightButtonsArea("GCPlanSettings", () =>
@@ -199,7 +199,7 @@ public sealed unsafe class ExchangeLists : InventoryManagemenrBase
                 var cont = plan.Items.Select(s => s.ItemID).ToArray();
                 if(ThreadLoadImageHandler.TryGetIconTextureWrap(x.Value.Data.Icon, false, out var t))
                 {
-                    ImGui.Image(t.ImGuiHandle, new(ImGui.GetTextLineHeight()));
+                    ImGui.Image(t.Handle, new(ImGui.GetTextLineHeight()));
                     ImGui.SameLine();
                 }
                 if(ImGui.Selectable(x.Value.Data.GetName() + $"##{x.Key}", cont.Contains(x.Key), ImGuiSelectableFlags.DontClosePopups))
@@ -286,7 +286,7 @@ public sealed unsafe class ExchangeLists : InventoryManagemenrBase
                     && !Utils.GCRanks[meta.MinPurchaseRank].Equals(getFilter(), StringComparison.OrdinalIgnoreCase)
                     ) continue;
                 if(SelectedCategory != null && meta.Category != SelectedCategory.Value) continue;
-                ImGui.PushID(currentItem.ID);
+                ImGuiEx.PushID(currentItem.ID);
                 ImGui.TableNextRow();
                 DragDrop.SetRowColor(currentItem);
                 ImGui.TableNextColumn();
@@ -305,7 +305,7 @@ public sealed unsafe class ExchangeLists : InventoryManagemenrBase
                 ImGui.TableNextColumn();
                 if(ThreadLoadImageHandler.TryGetIconTextureWrap(meta.Data.Icon, false, out var t))
                 {
-                    ImGui.Image(t.ImGuiHandle, new(ImGui.GetFrameHeight()));
+                    ImGui.Image(t.Handle, new(ImGui.GetFrameHeight()));
                     ImGui.SameLine();
                 }
                 ImGuiEx.TextV($"{meta.Data.Name.GetText()}");
@@ -316,7 +316,7 @@ public sealed unsafe class ExchangeLists : InventoryManagemenrBase
                     {
                         var trans = !meta.Companies.Contains(c);
                         if(trans) ImGui.PushStyleVar(ImGuiStyleVar.Alpha, 0.2f);
-                        ImGui.Image(ctex.ImGuiHandle, new(ImGui.GetFrameHeight()));
+                        ImGui.Image(ctex.Handle, new(ImGui.GetFrameHeight()));
                         if(trans) ImGui.PopStyleVar();
                         ImGuiEx.Tooltip($"{c}" + (trans ? " (unavailable)" : ""));
                         ImGui.SameLine(0, 1);
@@ -327,7 +327,7 @@ public sealed unsafe class ExchangeLists : InventoryManagemenrBase
                 ImGui.TableNextColumn();
                 if(Svc.Data.GetExcelSheet<GrandCompanyRank>().TryGetRow(meta.MinPurchaseRank, out var rank) && ThreadLoadImageHandler.TryGetIconTextureWrap(rank.IconFlames, false, out var tex))
                 {
-                    ImGui.Image(tex.ImGuiHandle, new(ImGui.GetFrameHeight()));
+                    ImGui.Image(tex.Handle, new(ImGui.GetFrameHeight()));
                     var rankName = Utils.GCRanks[meta.MinPurchaseRank];
                     ImGuiEx.Tooltip(rankName);
                     if(ImGuiEx.HoveredAndClicked()) getFilter() = rankName;

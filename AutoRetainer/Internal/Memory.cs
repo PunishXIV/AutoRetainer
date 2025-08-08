@@ -23,7 +23,7 @@ internal unsafe class Memory : IDisposable
     private GetIsGatheringItemGatheredDelegate GetIsGatheringItemGathered;
 
     internal delegate nint OnReceiveMarketPricePacketDelegate(nint a1, nint data);
-    [Signature("48 89 5C 24 ?? 57 48 83 EC 20 48 8B 0D ?? ?? ?? ?? 48 8B FA E8 ?? ?? ?? ?? 48 8B D8 48 85 C0 74 4A", DetourName = nameof(AddonItemSearchResult_OnRequestedUpdateDelegateDetour), Fallibility = Fallibility.Fallible)]
+    [Signature("48 89 5C 24 ?? 57 48 83 EC 20 48 8B 0D ?? ?? ?? ?? 48 8B DA E8", DetourName = nameof(AddonItemSearchResult_OnRequestedUpdateDelegateDetour), Fallibility = Fallibility.Fallible)]
     internal Hook<OnReceiveMarketPricePacketDelegate> OnReceiveMarketPricePacketHook;
 
     internal delegate byte OutdoorTerritory_IsEstateResidentDelegate(nint a1, byte a2);
@@ -50,7 +50,7 @@ internal unsafe class Memory : IDisposable
         EzSignatureHelper.Initialize(this);
         if(C.MarketCooldownOverlay) OnReceiveMarketPricePacketHook?.Enable();
         ReceiveRetainerVentureListUpdateHook?.Enable();
-        RetainerItemCommandHook = new("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 48 83 EC 30 48 8B 6C 24", RetainerItemCommandDetour, false);
+        RetainerItemCommandHook = new("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 48 83 EC 30 48 8B 5C 24 ?? 41 8B F0", RetainerItemCommandDetour, false);
     }
 
     internal void RetainerItemCommandDetour(nint AgentRetainerItemCommandModule, uint slot, InventoryType inventoryType, uint a4, RetainerItemCommand command)

@@ -20,7 +20,7 @@ public static unsafe class RetainerConfig
             for(var i = 0; i < C.EntrustPlans.Count; i++)
             {
                 var plan = C.EntrustPlans[i];
-                ImGui.PushID(plan.Guid.ToString());
+                ImGuiEx.PushID(plan.Guid.ToString());
                 if(ImGui.Selectable(plan.Name, plan == selectedPlan))
                 {
                     adata.EntrustPlan = plan.Guid;

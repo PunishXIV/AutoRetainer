@@ -25,7 +25,7 @@ public class EntrustManager : InventoryManagemenrBase
                 for(var i = 0; i < C.EntrustPlans.Count; i++)
                 {
                     var plan = C.EntrustPlans[i];
-                    ImGui.PushID(plan.Guid.ToString());
+                    ImGuiEx.PushID(plan.Guid.ToString());
                     if(ImGui.Selectable(plan.Name, plan == selectedPlan))
                     {
                         SelectedGuid = plan.Guid;
@@ -105,7 +105,7 @@ public class EntrustManager : InventoryManagemenrBase
                         ImGui.TableNextColumn();
                         if(ThreadLoadImageHandler.TryGetIconTextureWrap(x.Icon, true, out var icon))
                         {
-                            ImGui.Image(icon.ImGuiHandle, new(ImGui.GetFrameHeight()));
+                            ImGui.Image(icon.Handle, new(ImGui.GetFrameHeight()));
                         }
                         ImGui.TableNextColumn();
                         if(ImGui.Checkbox(x.Name.ToString(), ref contains))

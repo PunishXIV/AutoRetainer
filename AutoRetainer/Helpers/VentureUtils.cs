@@ -488,7 +488,7 @@ internal static unsafe class VentureUtils
                 var item = data->StringArray[i];
                 if(item != null)
                 {
-                    var str = MemoryHelper.ReadSeStringNullTerminated((nint)item);
+                    var str = MemoryHelper.ReadSeStringNullTerminated((nint)item.Value);
                     ret.Add(str.GetText());
                 }
             }

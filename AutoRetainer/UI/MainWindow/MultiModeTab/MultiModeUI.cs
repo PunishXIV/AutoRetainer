@@ -36,13 +36,14 @@ internal static unsafe class MultiModeUI
             }
         }
         UIUtils.DrawSearch();
+
         for(var index = 0; index < sortedData.Count; index++)
         {
             var data = sortedData[index];
             if(data.World.IsNullOrEmpty() || data.ExcludeRetainer) continue;
             var search = Ref<string>.Get("SearchChara");
             if(search != "" && !$"{data.Name}@{data.World}".Contains(search, StringComparison.OrdinalIgnoreCase)) continue;
-            ImGui.PushID(data.CID.ToString());
+            ImGuiEx.PushID(data.CID.ToString());
             var rCurPos = ImGui.GetCursorPos();
             var colen = false;
             if(data.Enabled)
@@ -116,7 +117,7 @@ internal static unsafe class MultiModeUI
                     colpref = false;
                 }
                 var enabledRetainers = data.GetEnabledRetainers();
-                ImGui.PushID(data.CID.ToString());
+                ImGuiEx.PushID(data.CID.ToString());
 
                 var storePos = ImGui.GetCursorPos();
                 var retainerData = data.RetainerData;
@@ -157,6 +158,7 @@ internal static unsafe class MultiModeUI
             ImGui.NewLine();
             ImGui.PopID();
         }
+        
         StatusTextWidth = 0f;
         UIUtils.DrawOverlayTexts(overlayTexts, ref StatusTextWidth);
 

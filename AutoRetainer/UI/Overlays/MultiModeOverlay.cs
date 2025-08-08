@@ -33,7 +33,7 @@ internal class MultiModeOverlay : Window
             displayed = true;
             if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "bailoutTitleRestart.png"), out var t))
             {
-                ImGui.Image(t.ImGuiHandle, StatusPanelSize);
+                ImGui.Image(t.Handle, StatusPanelSize);
                 if(ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
@@ -59,7 +59,7 @@ internal class MultiModeOverlay : Window
             displayed = true;
             if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "timer.png"), out var t))
             {
-                ImGui.Image(t.ImGuiHandle, StatusPanelSize);
+                ImGui.Image(t.Handle, StatusPanelSize);
                 if(ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
@@ -86,7 +86,7 @@ internal class MultiModeOverlay : Window
             displayed = true;
             if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "processing.png"), out var t))
             {
-                ImGui.Image(t.ImGuiHandle, StatusPanelSize);
+                ImGui.Image(t.Handle, StatusPanelSize);
                 if(ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
@@ -112,7 +112,7 @@ internal class MultiModeOverlay : Window
             displayed = true;
             if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "processing.png"), out var t))
             {
-                ImGui.Image(t.ImGuiHandle, StatusPanelSize);
+                ImGui.Image(t.Handle, StatusPanelSize);
                 if(ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
@@ -138,7 +138,7 @@ internal class MultiModeOverlay : Window
             displayed = true;
             if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "bellalert.png"), out var t))
             {
-                ImGui.Image(t.ImGuiHandle, StatusPanelSize);
+                ImGui.Image(t.Handle, StatusPanelSize);
                 if(ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
@@ -162,7 +162,7 @@ internal class MultiModeOverlay : Window
             displayed = true;
             if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "multi.png"), out var t))
             {
-                ImGui.Image(t.ImGuiHandle, StatusPanelSize);
+                ImGui.Image(t.Handle, StatusPanelSize);
                 if(ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
@@ -188,7 +188,7 @@ internal class MultiModeOverlay : Window
             displayed = true;
             if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "Night.png"), out var t))
             {
-                ImGui.Image(t.ImGuiHandle, StatusPanelSize);
+                ImGui.Image(t.Handle, StatusPanelSize);
                 if(ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
@@ -215,7 +215,7 @@ internal class MultiModeOverlay : Window
             displayed = true;
             if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "submarine.png"), out var t))
             {
-                ImGui.Image(t.ImGuiHandle, StatusPanelSize);
+                ImGui.Image(t.Handle, StatusPanelSize);
                 if(ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
@@ -241,7 +241,7 @@ internal class MultiModeOverlay : Window
             displayed = true;
             if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", Utils.GetReachableRetainerBell(false) == null ? "bellcrossed.png" : "bell.png"), out var t))
             {
-                ImGui.Image(t.ImGuiHandle, StatusPanelSize);
+                ImGui.Image(t.Handle, StatusPanelSize);
                 if(ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
@@ -267,7 +267,7 @@ internal class MultiModeOverlay : Window
             displayed = true;
             if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "notify.png"), out var t))
             {
-                ImGui.Image(t.ImGuiHandle, StatusPanelSize);
+                ImGui.Image(t.Handle, StatusPanelSize);
                 if(ImGui.IsItemHovered())
                 {
                     ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
@@ -298,7 +298,7 @@ internal class MultiModeOverlay : Window
                 {
                     if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "wait.png"), out var t))
                     {
-                        ImGui.Image(t.ImGuiHandle, StatusPanelSize / 2);
+                        ImGui.Image(t.Handle, StatusPanelSize / 2);
                         ImGuiEx.Tooltip("Wait for all deployables is globally enabled.");
                     }
                     else
@@ -311,7 +311,7 @@ internal class MultiModeOverlay : Window
                 {
                     if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "wait.png"), out var t))
                     {
-                        ImGui.Image(t.ImGuiHandle, StatusPanelSize / 2);
+                        ImGui.Image(t.Handle, StatusPanelSize / 2);
                         ImGuiEx.Tooltip("Wait for all deployables is enabled for this character.");
                     }
                     else

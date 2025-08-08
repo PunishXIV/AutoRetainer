@@ -50,7 +50,7 @@ internal static unsafe class BailoutManager
                             if(Utils.GenericThrottle)
                             {
                                 DuoLog.Warning($"[Bailout] Backing out of CharaSelect");
-                                addon->GetButtonNodeById(4)->ClickAddonButton(addon);
+                                addon->GetComponentButtonById(4)->ClickAddonButton(addon);
                                 CharaSelectStuck = Environment.TickCount64;
                                 EzThrottler.Throttle("MultiModeAfkOnTitleLogin", 60000, true);
                                 IsLogOnTitleEnabled = true;
@@ -75,7 +75,7 @@ internal static unsafe class BailoutManager
                 {
                     if(EzThrottler.Throttle("ClickDialogueOk", 10000))
                     {
-                        addon->GetButtonNodeById(4)->ClickAddonButton(addon);
+                        addon->GetComponentButtonById(4)->ClickAddonButton(addon);
                         EzThrottler.Throttle("MultiModeAfkOnTitleLogin", 60000, true);
                         IsLogOnTitleEnabled = true;
                     }

@@ -11,7 +11,7 @@ internal static class UIUtils
     public static void DrawSortableEnumList<T>(string id, List<T> list) where T : struct, Enum
     {
         ref var dragDrop = ref Ref<ImGuiEx.RealtimeDragDrop<T>>.Get($"dsel{id}", () => new($"dsel{id}", x => x.ToString()));
-        ImGui.PushID(id);
+        ImGuiEx.PushID(id);
         if(ImGui.BeginCombo("##addNew", "Add Entries...", ImGuiComboFlags.HeightLarge))
         {
             foreach(var x in Enum.GetValues<T>())
@@ -30,7 +30,7 @@ internal static class UIUtils
         for(var i = 0; i < list.Count; i++)
         {
             var x = list[i];
-            ImGui.PushID(x.ToString());
+            ImGuiEx.PushID(x.ToString());
             dragDrop.DrawButtonDummy(x, list, i);
             ImGui.SameLine();
             if(ImGuiEx.IconButton(FontAwesomeIcon.Trash))
@@ -199,7 +199,7 @@ internal static class UIUtils
     internal static bool DrawKeybind(string text, ref LimitedKeys key)
     {
         var ret = false;
-        ImGui.PushID(text);
+        ImGuiEx.PushID(text);
         ImGuiEx.Text($"{text}:");
         ImGui.Dummy(new(20, 1));
         ImGui.SameLine();

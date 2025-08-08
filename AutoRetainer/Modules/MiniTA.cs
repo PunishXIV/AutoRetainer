@@ -73,7 +73,7 @@ internal static unsafe class MiniTA
     {
         var addon = Svc.GameGui.GetAddonByName("SelectString", 1);
         if(addon == IntPtr.Zero) return;
-        var selectStrAddon = (AddonSelectString*)addon;
+        var selectStrAddon = (AddonSelectString*)addon.Address;
         if(!IsAddonReady(&selectStrAddon->AtkUnitBase))
         {
             return;

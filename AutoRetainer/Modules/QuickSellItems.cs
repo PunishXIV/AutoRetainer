@@ -14,9 +14,9 @@ namespace AutoRetainer.Modules;
 #pragma warning disable CS0649
 public unsafe class QuickSellItems : IDisposable
 {
-    internal delegate void* OpenInventoryContext(AgentInventoryContext* agent, InventoryType inventory, ushort slot, int a4, ushort a5, byte a6);
-    [Signature("83 B9 ?? ?? ?? ?? ?? 7E 11", DetourName = nameof(OpenInventoryContextDetour), Fallibility = Fallibility.Fallible)]
-    internal Hook<OpenInventoryContext> openInventoryContextHook;
+    //TODO: just remake this
+    [Signature("83 B9 ?? ?? ?? ?? ?? 7E 11 39 91", DetourName = nameof(OpenInventoryContextDetour), Fallibility = Fallibility.Fallible)]
+    internal Hook<AgentInventoryContext.Delegates.OpenForItemSlot> openInventoryContextHook;
 
     public InventoryType[] CanSellFrom = [
         InventoryType.Inventory1,
@@ -109,9 +109,9 @@ public unsafe class QuickSellItems : IDisposable
         return text.Count > 0;
     }
 
-    private void* OpenInventoryContextDetour(AgentInventoryContext* agent, InventoryType inventoryType, ushort slot, int a4, ushort a5, byte a6)
+    private void OpenInventoryContextDetour(AgentInventoryContext* agent, InventoryType inventoryType, ushort slot, int a4, ushort a5)
     {
-        var retVal = openInventoryContextHook.Original(agent, inventoryType, slot, a4, a5, a6);
+        openInventoryContextHook.Original(agent, inventoryType, slot, a4, a5);
         InternalLog.Verbose($"Inventory hook: {inventoryType}, {slot}");
         try
         {
@@ -128,9 +128,9 @@ public unsafe class QuickSellItems : IDisposable
                         if(item != null)
                         {
                             var addonId = agent->AgentInterface.GetAddonId();
-                            if(addonId == 0) return retVal;
+                            if(addonId == 0) return;
                             var addon = AtkStage.Instance()->RaptureAtkUnitManager->GetAddonById((ushort)addonId);
-                            if(addon == null) return retVal;
+                            if(addon == null) return;
 
                             for(var i = 0; i < agent->ContextItemCount; i++)
                             {
@@ -149,7 +149,7 @@ public unsafe class QuickSellItems : IDisposable
                                     agent->AgentInterface.Hide();
                                     addon->Close(true);
                                     DebugLog($"QRA Selected {i}:{contextItemName}");
-                                    return retVal;
+                                    return;
                                 }
                             }
                         }
@@ -161,8 +161,6 @@ public unsafe class QuickSellItems : IDisposable
         {
             ex.Log();
         }
-
-        return retVal;
     }
 
     public void Disable()

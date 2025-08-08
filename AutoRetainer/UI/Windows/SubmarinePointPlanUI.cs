@@ -176,13 +176,13 @@ internal unsafe class SubmarinePointPlanUI : Window
                         var toRem = -1;
                         for (var i = 0; i < SelectedPlan.Points.Count; i++)
                         {
-                            ImGui.PushID(i);
-                            if(ImGui.ArrowButton($"##up", ImGuiDir.Up) && i > 0)
+                            ImGuiEx.PushID(i);
+                            if(ImGuiEx.IconButton(FontAwesomeIcon.ArrowUp) && i > 0)
                             {
                                 (SelectedPlan.Points[i-1], SelectedPlan.Points[i]) = (SelectedPlan.Points[i], SelectedPlan.Points[i-1]);
                             }
                             ImGui.SameLine();
-                            if(ImGui.ArrowButton($"##down", ImGuiDir.Down) && i < SelectedPlan.Points.Count - 1)
+                            if(ImGuiEx.IconButton(FontAwesomeIcon.ArrowDown) && i < SelectedPlan.Points.Count - 1)
                             {
                                 (SelectedPlan.Points[i+1], SelectedPlan.Points[i]) = (SelectedPlan.Points[i], SelectedPlan.Points[i+1]);
                             }

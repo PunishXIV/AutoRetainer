@@ -91,11 +91,11 @@ public sealed class VenturePlanner : Window
                     for(var i = 0; i < adata.VenturePlan.List.Count; i++)
                     {
                         var v = adata.VenturePlan.List[i];
-                        ImGui.PushID(v.GUID);
+                        ImGuiEx.PushID(v.GUID);
                         {
                             var d = i == 0;
                             if(d) ImGui.BeginDisabled();
-                            if(ImGui.ArrowButton("##up", ImGuiDir.Up))
+                            if(ImGuiEx.IconButton(FontAwesomeIcon.ArrowUp))
                             {
                                 Safe(() => (adata.VenturePlan.List[i], adata.VenturePlan.List[i - 1]) = (adata.VenturePlan.List[i - 1], adata.VenturePlan.List[i]));
                             }
@@ -105,7 +105,7 @@ public sealed class VenturePlanner : Window
                         {
                             var d = i == adata.VenturePlan.List.Count - 1;
                             if(d) ImGui.BeginDisabled();
-                            if(ImGui.ArrowButton("##down", ImGuiDir.Down))
+                            if(ImGuiEx.IconButton(FontAwesomeIcon.ArrowDown))
                             {
                                 Safe(() => (adata.VenturePlan.List[i], adata.VenturePlan.List[i + 1]) = (adata.VenturePlan.List[i + 1], adata.VenturePlan.List[i]));
                             }
@@ -153,7 +153,7 @@ public sealed class VenturePlanner : Window
                         for(var i = 0; i < C.SavedPlans.Count; i++)
                         {
                             var p = C.SavedPlans[i];
-                            ImGui.PushID(p.GUID);
+                            ImGuiEx.PushID(p.GUID);
                             if(ImGui.Selectable(p.Name))
                             {
                                 adata.VenturePlan = p.JSONClone();

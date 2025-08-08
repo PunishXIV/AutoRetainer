@@ -24,7 +24,7 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.Sheets;
 using Lumina.Text.ReadOnly;
-using OtterGui.Text.EndObjects;
+//using OtterGui.Text.EndObjects;
 using System.Text.RegularExpressions;
 using CharaData = (string Name, ushort World);
 using GrandCompany = ECommons.ExcelServices.GrandCompany;
@@ -1158,7 +1158,7 @@ public static unsafe class Utils
         {
             try
             {
-                var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("SelectYesno", i);
+                var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("SelectYesno", i).Address;
                 if(addon == null) return null;
                 if(IsAddonReady(addon))
                 {
@@ -1186,7 +1186,7 @@ public static unsafe class Utils
         {
             try
             {
-                var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("SelectYesno", i);
+                var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("SelectYesno", i).Address;
                 if(addon == null) return null;
                 if(IsAddonReady(addon))
                 {

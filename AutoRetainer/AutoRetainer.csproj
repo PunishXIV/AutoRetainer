@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<Authors>Puni.sh</Authors>
-		<Version>4.5.1.12</Version>
+		<Version>4.5.1.15</Version>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -36,9 +36,7 @@
 		<ProjectReference Include="..\AutoRetainerAPI\AutoRetainerAPI\AutoRetainerAPI.csproj" />
 		<ProjectReference Include="..\ECommons.FileWriter\ECommons.FileWriter\ECommons.FileWriter.csproj" ReferenceOutputAssembly="false" OutputItemType="Content" CopyToOutputDirectory="Always" />
 		<ProjectReference Include="..\ECommons\ECommons\ECommons.csproj" />
-		<ProjectReference Include="..\NightmareUI.OtterGuiWrapper\NightmareUI.OtterGuiWrapper\NightmareUI.OtterGuiWrapper.csproj" />
 		<ProjectReference Include="..\NightmareUI\NightmareUI\NightmareUI.csproj" />
-		<ProjectReference Include="..\OtterGui\OtterGui.csproj" />
 		<ProjectReference Include="..\PunishLib\PunishLib\PunishLib.csproj" />
 	</ItemGroup>
 
@@ -79,10 +77,22 @@
 			<HintPath>$(DalamudLibPath)Dalamud.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
-		<Reference Include="ImGui.NET">
-			<HintPath>$(DalamudLibPath)ImGui.NET.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
+      <Reference Include="Dalamud.Bindings.ImGui">
+          <HintPath>$(DalamudLibPath)Dalamud.Bindings.ImGui.dll</HintPath>
+          <Private>False</Private>
+      </Reference>
+      <Reference Include="Dalamud.Bindings.ImPlot">
+          <HintPath>$(DalamudLibPath)Dalamud.Bindings.ImPlot.dll</HintPath>
+          <Private>False</Private>
+      </Reference>
+      <Reference Include="Dalamud.Bindings.ImGuizmo">
+          <HintPath>$(DalamudLibPath)Dalamud.Bindings.ImGuizmo.dll</HintPath>
+          <Private>False</Private>
+      </Reference>
+      <Reference Include="TerraFX.Interop.Windows">
+          <HintPath>$(DalamudLibPath)TerraFX.Interop.Windows.dll</HintPath>
+          <Private>False</Private>
+      </Reference>
 		<Reference Include="Lumina">
 			<HintPath>$(DalamudLibPath)Lumina.dll</HintPath>
 			<Private>False</Private>

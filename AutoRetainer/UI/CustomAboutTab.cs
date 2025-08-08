@@ -32,7 +32,7 @@ namespace AutoRetainer.UI
             {
                 if(ThreadLoadImageHandler.TryGetTextureWrap(GetImageURL(), out var texture))
                 {
-                    ImGui.Image(texture.ImGuiHandle, new(200f, 200f));
+                    ImGui.Image(texture.Handle, new(200f, 200f));
                 }
             });
             ImGuiHelpers.ScaledDummy(10f);

@@ -123,7 +123,7 @@ public static unsafe class InventoryManagementCommon
                         {
                             if(ThreadLoadImageHandler.TryGetIconTextureWrap(x.Icon, false, out var tex))
                             {
-                                ImGui.Image(tex.ImGuiHandle, new(ImGuiHelpers.GetButtonSize("X").Y));
+                                ImGui.Image(tex.Handle, new(ImGuiHelpers.GetButtonSize("X").Y));
                                 Tooltip();
                                 ImGui.SameLine();
                             }
@@ -203,12 +203,12 @@ public static unsafe class InventoryManagementCommon
                 {
                     actions.Add(() =>
                     {
-                        ImGui.PushID(item.RowId.ToString());
+                        ImGuiEx.PushID(item.RowId.ToString());
                         ImGui.TableNextRow();
                         ImGui.TableNextColumn();
                         if(ThreadLoadImageHandler.TryGetIconTextureWrap(item.Icon, false, out var tex))
                         {
-                            ImGui.Image(tex.ImGuiHandle, new(ImGuiHelpers.GetButtonSize("X").Y));
+                            ImGui.Image(tex.Handle, new(ImGuiHelpers.GetButtonSize("X").Y));
                         }
                         ImGui.TableNextColumn();
                         ImGuiEx.TextV($"{item.Name}");
@@ -312,7 +312,7 @@ public static unsafe class InventoryManagementCommon
             {
                 if(ThreadLoadImageHandler.TryGetIconTextureWrap(data.Icon, false, out var tex))
                 {
-                    ImGui.Image(tex.ImGuiHandle, new(ImGuiHelpers.GetButtonSize("X").Y));
+                    ImGui.Image(tex.Handle, new(ImGuiHelpers.GetButtonSize("X").Y));
                     ImGui.SameLine();
                 }
                 ImGuiEx.Text($"{data.GetName()}");

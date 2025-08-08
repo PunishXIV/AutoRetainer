@@ -60,7 +60,7 @@ internal unsafe class DebugVenture : DebugSectionBase
                     var item = data->StringArray[i];
                     if(item != null)
                     {
-                        var str = MemoryHelper.ReadSeStringNullTerminated((nint)item);
+                        var str = MemoryHelper.ReadSeStringNullTerminated((nint)item.Value);
                         ImGuiEx.Text($"{i}: {str.GetText()}");
                     }
                     else

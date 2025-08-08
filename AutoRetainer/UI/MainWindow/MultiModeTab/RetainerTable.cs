@@ -90,7 +90,7 @@ public static unsafe class RetainerTable
 
                 if(ThreadLoadImageHandler.TryGetIconTextureWrap(ret.Job == 0 ? 62143 : 062100 + ret.Job, true, out var t))
                 {
-                    ImGui.Image(t.ImGuiHandle, new(24, 24));
+                    ImGui.Image(t.Handle, new(24, 24));
                 }
                 else
                 {

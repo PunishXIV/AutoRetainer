@@ -147,7 +147,7 @@ internal static unsafe class OfflineDataManager
             var numArray = UIModule.Instance()->GetRaptureAtkModule()->AtkModule.GetNumberArrayData(58);
             if(numArray != null)
             {
-                var gil = numArray->IntArray[354];
+                var gil = Utils.CountItemsInInventory(1, null, [InventoryType.FreeCompanyGil]);
                 if(gil != 0 || S.FCPointsUpdater?.IsFCChestReady() == true)
                 {
                     C.FCData[fc->Id].Gil = gil;
