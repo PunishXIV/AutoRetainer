@@ -176,7 +176,7 @@ internal unsafe class SubmarinePointPlanUI : Window
                         var toRem = -1;
                         for (var i = 0; i < SelectedPlan.Points.Count; i++)
                         {
-                            ImGuiEx.PushID(i);
+                            ImGui.PushID(i);
                             if(ImGuiEx.IconButton(FontAwesomeIcon.ArrowUp) && i > 0)
                             {
                                 (SelectedPlan.Points[i-1], SelectedPlan.Points[i]) = (SelectedPlan.Points[i], SelectedPlan.Points[i-1]);

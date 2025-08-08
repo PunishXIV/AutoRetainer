@@ -3,6 +3,7 @@ using ECommons.Events;
 using ECommons.ExcelServices;
 using ECommons.Interop;
 using ECommons.MathHelpers;
+using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -14,6 +15,16 @@ internal unsafe class DebugMisc : DebugSectionBase
 {
     public override void Draw()
     {
+        if(ImGui.CollapsingHeader("CMenu"))
+        {
+            if(TryGetAddonMaster<AddonMaster.ContextMenu>(out var m) && m.IsAddonReady)
+            {
+                foreach(var x in m.Entries)
+                {
+                    ImGuiEx.Text($"{x.Text}/{x.Enabled}");
+                }
+            }
+        }
         if(ImGui.CollapsingHeader("Retainer item stats"))
         {
             var im = InventoryManager.Instance();

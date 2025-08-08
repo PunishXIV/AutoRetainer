@@ -4,7 +4,7 @@ using AutoRetainer.UI.NeoUI.Experiments;
 using AutoRetainer.UI.NeoUI.InventoryManagementEntries;
 using AutoRetainer.UI.NeoUI.MultiModeEntries;
 using ECommons.Configuration;
-//using NightmareUI.OtterGuiWrapper.FileSystems.Configuration;
+using NightmareUI.OtterGuiWrapper.FileSystems.Configuration;
 //ott
 namespace AutoRetainer.UI.NeoUI;
 public sealed class NeoWindow : Window
@@ -38,7 +38,7 @@ public sealed class NeoWindow : Window
         ..ConfigFileSystemHelpers.CreateInstancesOf<DebugSectionBase>(),
     ];
 
-    //internal ConfigFileSystem FileSystem;
+    internal ConfigFileSystem FileSystem;
 
     public NeoUIEntry Selected;
 
@@ -46,19 +46,19 @@ public sealed class NeoWindow : Window
     {
         P.WindowSystem.AddWindow(this);
         this.SetMinSize();
-        //FileSystem = new(() => Tabs);
+        FileSystem = new(() => Tabs);
     }
 
     public void Reload()
     {
-        //FileSystem.Reload();
+        FileSystem.Reload();
     }
 
     public override void Draw()
     {
-        //FileSystem.Draw(null);
+        FileSystem.Draw(null);
 
-        ImGuiEx.SetNextItemFullWidth();
+        /*ImGuiEx.SetNextItemFullWidth();
         if(ImGui.BeginCombo("##selConf", Selected?.Path ?? "Select section", ImGuiComboFlags.HeightLarge))
         {
             foreach(var x in Tabs)
@@ -71,17 +71,17 @@ public sealed class NeoWindow : Window
             }
             ImGui.EndCombo();
         }
-        Selected?.Draw();
+        Selected?.Draw();*/
     }
 
     public override void OnClose()
     {
         EzConfig.Save();
     }
-
+    /*
     public static class ConfigFileSystemHelpers
     {
-        public static IEnumerable<T?> CreateInstancesOf<T>()// where T : ConfigFileSystemEntry
+        public static IEnumerable<T?> CreateInstancesOf<T>()
         {
             var instances = typeof(T).Assembly.GetTypes().Where(x => !x.IsAbstract && typeof(T).IsAssignableFrom(x)).Select(x => (T?)Activator.CreateInstance(x, true));
             foreach(var i in instances)
@@ -90,5 +90,5 @@ public sealed class NeoWindow : Window
             }
         }
     }
-
+    */
 }
