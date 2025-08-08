@@ -87,6 +87,7 @@ public static unsafe class InventoryCleanupCommon
                 try
                 {
                     var newPlan = EzConfig.DefaultSerializationFactory.Deserialize<InventoryManagementSettings>(Paste()) ?? throw new NullReferenceException();
+                    newPlan.GUID.Regenerate();
                     C.AdditionalIMSettings.Add(newPlan);
                     SelectedPlanGuid = newPlan.GUID;
                 }
@@ -102,7 +103,9 @@ public static unsafe class InventoryCleanupCommon
                 ImGui.SameLine(0, 1);
                 if(ImGuiEx.IconButton(FontAwesomeIcon.ArrowsUpToLine, enabled: ImGuiEx.Ctrl && selectedPlan != null))
                 {
-                    C.DefaultIMSettings = selectedPlan;
+                    C.DefaultIMSettings = selectedPlan.DSFClone();
+                    C.DefaultIMSettings.GUID.Regenerate();
+                    C.DefaultIMSettings.Name = "";
                     new TickScheduler(() => C.AdditionalIMSettings.Remove(selectedPlan));
                 }
                 ImGuiEx.Tooltip("Make this plan default. Current default plan will be overwritten. Hold CTRL and click.");
@@ -143,7 +146,20 @@ public static unsafe class InventoryCleanupCommon
                         Data.InventoryCleanupPlan = selectedPlan.GUID;
                     }
                 }
+                ImGui.SameLine();
             }
+
+            var charas = C.OfflineData.Where(x => x.ExchangePlan == selectedPlan.GUID).ToArray();
+            if(charas.Length > 0)
+            {
+                ImGuiEx.Text($"Used by {charas.Length} characters in total");
+                ImGuiEx.Tooltip($"{charas.Select(x => x.NameWithWorldCensored)}");
+            }
+            else
+            {
+                ImGuiEx.Text($"Not used by any characters");
+            }
+
             ImGuiEx.Text("Combine this plan's lists with default plan:");
             ImGui.Indent();
             ImGui.Checkbox("Combine Quick Venture sell list", ref selectedPlan.AdditionModeSoftSellList);

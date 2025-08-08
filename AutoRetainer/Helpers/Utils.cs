@@ -288,9 +288,7 @@ public static unsafe class Utils
             get
             {
                 if(plan.Name != "") return plan.Name;
-                var index = C.AdditionalGCExchangePlans.IndexOf(plan);
-                if(index != -1) return $"Plan {index + 1}";
-                return $"Plan {plan.GUID.ToString().Split("-")[0]}";
+                return $"Unnamed Plan {plan.GUID.GetDisplayTag()}";
             }
         }
 
@@ -314,9 +312,7 @@ public static unsafe class Utils
             get
             {
                 if(plan.Name != "") return plan.Name;
-                var index = C.AdditionalIMSettings.IndexOf(plan);
-                if(index != -1) return $"Plan {index + 1}";
-                return $"Plan {plan.GUID.ToString().Split("-")[0]}";
+                return $"Unnamed Plan {plan.GUID.GetDisplayTag()}";
             }
         }
     }

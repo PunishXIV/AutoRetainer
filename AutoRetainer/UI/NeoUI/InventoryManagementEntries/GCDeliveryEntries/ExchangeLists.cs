@@ -1,6 +1,7 @@
 ﻿using AutoRetainerAPI.Configuration;
 using ECommons.Configuration;
 using ECommons.ExcelServices;
+using ECommons.GameHelpers;
 using Lumina.Excel.Sheets;
 using System.Numerics;
 using GrandCompany = ECommons.ExcelServices.GrandCompany;
@@ -71,6 +72,7 @@ public sealed unsafe class ExchangeLists : InventoryManagemenrBase
                 try
                 {
                     var newPlan = EzConfig.DefaultSerializationFactory.Deserialize<GCExchangePlan>(Paste()) ?? throw new NullReferenceException();
+                    newPlan.GUID.Regenerate();  
                     C.AdditionalGCExchangePlans.Add(newPlan);
                     SelectedPlanGuid = newPlan.GUID;
                 }
@@ -86,7 +88,9 @@ public sealed unsafe class ExchangeLists : InventoryManagemenrBase
                 ImGui.SameLine(0, 1);
                 if(ImGuiEx.IconButton(FontAwesomeIcon.ArrowsUpToLine, enabled: ImGuiEx.Ctrl && selectedPlan != null))
                 {
-                    C.DefaultGCExchangePlan = selectedPlan;
+                    C.DefaultGCExchangePlan = selectedPlan.DSFClone();
+                    C.DefaultGCExchangePlan.Name = "";
+                    C.DefaultGCExchangePlan.GUID.Regenerate();
                     new TickScheduler(() => C.AdditionalGCExchangePlans.Remove(selectedPlan));
                 }
                 ImGuiEx.Tooltip("Make this plan default. Current default plan will be overwritten. Hold CTRL and click.");
@@ -129,9 +133,21 @@ public sealed unsafe class ExchangeLists : InventoryManagemenrBase
                         Data.ExchangePlan = selectedPlan.GUID;
                     }
                 }
+                ImGui.SameLine();
             }
 
-            var planIndex = C.AdditionalGCExchangePlans.IndexOf(x => x.GUID == SelectedPlanGuid);
+            var charas = C.OfflineData.Where(x => x.ExchangePlan == selectedPlan.GUID).ToArray();
+            if(charas.Length > 0)
+            {
+                ImGuiEx.Text($"Used by {charas.Length} characters in total");
+                ImGuiEx.Tooltip($"{charas.Select(x => x.NameWithWorldCensored)}");
+            }
+            else
+            {
+                ImGuiEx.Text($"Not used by any characters");
+            }
+
+                var planIndex = C.AdditionalGCExchangePlans.IndexOf(x => x.GUID == SelectedPlanGuid);
             if(planIndex == -1)
             {
                 SelectedPlanGuid = Guid.Empty;
