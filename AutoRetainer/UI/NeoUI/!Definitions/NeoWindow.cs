@@ -25,7 +25,7 @@ public sealed class NeoWindow : Window
         new MultiModeFPSLimiter(),
         new MultiModeLockout(),
 
-        ..ConfigFileSystemHelpers.CreateInstancesOf<InventoryManagemenrBase>(),
+        ..ConfigFileSystemHelpers.CreateInstancesOf<InventoryManagementBase>(),
 
         new LoginOverlay(),
         new MiscTab(),

@@ -57,8 +57,7 @@ public class CharaConfig
             ImGui.Text("If all above are disabled or fail, will be teleported to inn.");
             ImGui.Unindent();
             ImGuiEx.Checkbox("Teleport to free company house for deployables", ref data.TeleportOptionsOverride.Deployables);
-            ImGui.Unindent();
-            ImGuiGroup.EndGroupBox();
+            ImGui.Unindent(); 
         }).Draw();
         SharedUI.DrawExcludeReset(data);
         ImGui.PopID();

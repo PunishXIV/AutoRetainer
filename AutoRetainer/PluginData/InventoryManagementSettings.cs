@@ -19,6 +19,9 @@ public sealed unsafe class InventoryManagementSettings
     public List<uint> IMAutoVendorHard = [];
     public List<uint> IMAutoVendorHardIgnoreStack = [];
     public List<uint> IMAutoVendorSoft = [];
+    public List<uint> IMDiscard = [];
+    public List<uint> IMDiscardIgnoreStack = [];
+    public List<uint> IMDesynth = [];
     public List<uint> IMProtectList = [];
     public int IMAutoVendorHardStackLimit = 20;
     public bool IMDry = false;

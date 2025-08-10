@@ -1,7 +1,7 @@
 ﻿using ECommons.ExcelServices;
 
 namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries.InventoryCleanupEntries;
-public class FastAddition : InventoryManagemenrBase
+public class FastAddition : InventoryManagementBase
 {
     public override string Name { get; } = "Inventory Cleanup/Fast Addition and Removal";
 

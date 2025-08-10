@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries.GCDeliveryEntries;
-public sealed unsafe class GCCharacterConfiguration : InventoryManagemenrBase
+public sealed unsafe class GCCharacterConfiguration : InventoryManagementBase
 {
     public override string Name { get; } = "Grand Company Delivery/Character Configuration";
 

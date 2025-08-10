@@ -2,7 +2,7 @@
 using ECommons.GameHelpers;
 
 namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries.InventoryCleanupEntries;
-public class GeneralSettings : InventoryManagemenrBase
+public class GeneralSettings : InventoryManagementBase
 {
     public override string Name { get; } = "Inventory Cleanup/General Settings";
 

@@ -8,7 +8,7 @@ using GrandCompany = ECommons.ExcelServices.GrandCompany;
 using GrandCompanyRank = Lumina.Excel.Sheets.GrandCompanyRank;
 
 namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries.GCDeliveryEntries;
-public sealed unsafe class ExchangeLists : InventoryManagemenrBase
+public sealed unsafe class ExchangeLists : InventoryManagementBase
 {
     private ImGuiEx.RealtimeDragDrop<GCExchangeItem> DragDrop = new("GCELDD", x => x.ID);
     public override string Name { get; } = "Grand Company Delivery/Exchange Lists";

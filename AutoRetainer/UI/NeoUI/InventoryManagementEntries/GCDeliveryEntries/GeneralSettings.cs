@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries.GCDeliveryEntries;
-public sealed unsafe class GeneralSettings : InventoryManagemenrBase
+public sealed unsafe class GeneralSettings : InventoryManagementBase
 {
     public override string Name { get; } = "Grand Company Delivery/General Settings";
 

@@ -65,6 +65,146 @@ public static unsafe class Utils
         }
     } = null;
 
+    extension(InventoryManagementSettings thisRef)
+    {
+        public bool AddItemToList(IMListKind kind, uint item, out string error)
+        {
+            error = null;
+            var data = ExcelItemHelper.Get(item);
+            if(data == null)
+            {
+                error = $"Item with identifier {item} is invalid";
+                return false;
+            }
+            else if(kind == IMListKind.Protect)
+            {
+                thisRef.IMAutoVendorHard.Remove(item);
+                thisRef.IMAutoVendorSoft.Remove(item);
+                thisRef.IMAutoVendorHardIgnoreStack.Remove(item);
+                thisRef.IMDiscard.Remove(item);
+                thisRef.IMDiscardIgnoreStack.Remove(item);
+                thisRef.IMDesynth.Remove(item);
+                if(!thisRef.IMProtectList.Contains(item))
+                {
+                    thisRef.IMProtectList.Add(item);
+                    return true;
+                }
+                else
+                {
+                    error = $"Item {data.GetName()} is already present in protection list";
+                    return false;
+                }
+            }
+            else if(kind == IMListKind.SoftSell)
+            {
+                if(thisRef.IMProtectList.Contains(item))
+                {
+                    error = $"Item {data.GetName()} is protected";
+                    return false;
+                }
+                else
+                {
+                    thisRef.IMAutoVendorHard.Remove(item);
+                    thisRef.IMAutoVendorHardIgnoreStack.Remove(item);
+                    thisRef.IMDiscard.Remove(item);
+                    thisRef.IMDiscardIgnoreStack.Remove(item);
+                    thisRef.IMDesynth.Remove(item);
+                    if(!thisRef.IMAutoVendorSoft.Contains(item))
+                    {
+                        thisRef.IMAutoVendorSoft.Add(item);
+                        return true;
+                    }
+                    else
+                    {
+                        error = $"Item {data.GetName()} is already present in quick venture sell list";
+                        return false;
+                    }
+                }
+            }
+            else if(kind == IMListKind.HardSell)
+            {
+                if(thisRef.IMProtectList.Contains(item))
+                {
+                    error = $"Item {data.GetName()} is protected";
+                    return false;
+                }
+                else
+                {
+                    thisRef.IMAutoVendorSoft.Remove(item);
+                    thisRef.IMDiscard.Remove(item);
+                    thisRef.IMDiscardIgnoreStack.Remove(item);
+                    thisRef.IMDesynth.Remove(item);
+                    if(!thisRef.IMAutoVendorHard.Contains(item))
+                    {
+                        thisRef.IMAutoVendorHard.Add(item);
+                        return true;
+                    }
+                    else
+                    {
+                        error = $"Item {data.GetName()} is already present in unconditional sell list";
+                        return false;
+                    }
+                }
+            }
+            else if(kind == IMListKind.Discard)
+            {
+                if(thisRef.IMProtectList.Contains(item))
+                {
+                    error = $"Item {data.GetName()} is protected";
+                    return false;
+                }
+                else
+                {
+                    thisRef.IMAutoVendorSoft.Remove(item);
+                    thisRef.IMAutoVendorHard.Remove(item);
+                    thisRef.IMAutoVendorHardIgnoreStack.Remove(item);
+                    thisRef.IMDesynth.Remove(item);
+                    if(!thisRef.IMDiscard.Contains(item))
+                    {
+                        thisRef.IMDiscard.Add(item);
+                        return true;
+                    }
+                    else
+                    {
+                        error = $"Item {data.GetName()} is already present in discard list";
+                        return false;
+                    }
+                }
+            }
+            else if(kind == IMListKind.Desynth)
+            {
+                if(thisRef.IMProtectList.Contains(item))
+                {
+                    error = $"Item {data.GetName()} is protected";
+                    return false;
+                }
+                else
+                {
+                    thisRef.IMAutoVendorSoft.Remove(item);
+                    thisRef.IMAutoVendorHard.Remove(item);
+                    thisRef.IMAutoVendorHardIgnoreStack.Remove(item);
+                    thisRef.IMDiscard.Remove(item);
+                    thisRef.IMDiscardIgnoreStack.Remove(item);
+                    if(!thisRef.IMDiscard.Contains(item))
+                    {
+                        thisRef.IMDiscard.Add(item);
+                        return true;
+                    }
+                    else
+                    {
+                        error = $"Item {data.GetName()} is already present in desynthesis list";
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                error = $"Invalid command {kind}";
+                return false;
+            }
+        }
+    } 
+
     extension(OfflineCharacterData data)
     {
         public string NameWithWorld => $"{data.Name}@{data.World}";

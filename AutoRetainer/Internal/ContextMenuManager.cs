@@ -72,6 +72,8 @@ internal unsafe class ContextMenuManager
                             OnClicked = (a) =>
                             {
                                 Data.GetIMSettings(true).IMAutoVendorHard.Remove(id);
+                                Data.GetIMSettings(true).IMDiscard.Remove(id);
+                                Data.GetIMSettings(true).IMDesynth.Remove(id);
                                 Data.GetIMSettings(true).IMAutoVendorSoft.Add(id);
                                 Notify.Success($"Item {ExcelItemHelper.GetName(id)} added to Quick Venture sell list");
                             }

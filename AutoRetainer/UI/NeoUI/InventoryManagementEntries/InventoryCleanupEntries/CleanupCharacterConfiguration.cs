@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries.InventoryCleanupEntries;
-public sealed unsafe class CleanupCharacterConfiguration : InventoryManagemenrBase
+public sealed unsafe class CleanupCharacterConfiguration : InventoryManagementBase
 {
     public override string Name { get; } = "Inventory Cleanup/Character Configuration";
 

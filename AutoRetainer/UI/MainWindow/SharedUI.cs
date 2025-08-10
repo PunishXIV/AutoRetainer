@@ -74,7 +74,6 @@ internal static class SharedUI
                 new TickScheduler(() => C.OfflineData.RemoveAll(x => x.CID == data.CID));
             }
             ImGuiComponents.HelpMarker("Character's saved data will be removed without excluding it. Character data will be regenerated once you log back into this character.");
-            ImGuiGroup.EndGroupBox();
         }).Draw();
     }
 }

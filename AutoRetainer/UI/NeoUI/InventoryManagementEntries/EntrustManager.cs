@@ -5,11 +5,12 @@ using ECommons.Throttlers;
 using Lumina.Excel.Sheets;
 
 namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries;
-public class EntrustManager : InventoryManagemenrBase
+public class EntrustManager : InventoryManagementBase
 {
     public override string Name { get; } = "Entrust Manager";
     private Guid SelectedGuid = Guid.Empty;
     private string Filter = "";
+    private InventoryManagementCommon InventoryManagementCommon = new();
 
     public override void Draw()
     {
@@ -131,7 +132,10 @@ public class EntrustManager : InventoryManagemenrBase
             });
             ImGuiEx.TreeNodeCollapsingHeader($"Entrust individual items ({selectedPlan.EntrustItems.Count} selected)###eitems", () =>
             {
-                InventoryManagementCommon.DrawListNew(selectedPlan.EntrustItems, (x) =>
+                InventoryManagementCommon.DrawListNew(
+                    itemId => selectedPlan.EntrustItems.Add(itemId), 
+                    itemId => selectedPlan.EntrustItems.Remove(itemId), 
+                    selectedPlan.EntrustItems, (x) =>
                 {
                     var amount = selectedPlan.EntrustItemsAmountToKeep.SafeSelect(x);
                     ImGui.SameLine();
