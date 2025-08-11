@@ -3,6 +3,7 @@ using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Scheduler.Handlers;
 using AutoRetainer.Scheduler.Tasks;
 using AutoRetainerAPI.Configuration;
+using Dalamud.Bindings.ImPlot;
 using Dalamud.Game;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Enums;
@@ -81,7 +82,7 @@ public static unsafe class Utils
                 thisRef.IMAutoVendorHard.Remove(item);
                 thisRef.IMAutoVendorSoft.Remove(item);
                 thisRef.IMAutoVendorHardIgnoreStack.Remove(item);
-                thisRef.IMDiscard.Remove(item);
+                thisRef.IMDiscardList.Remove(item);
                 thisRef.IMDiscardIgnoreStack.Remove(item);
                 thisRef.IMDesynth.Remove(item);
                 if(!thisRef.IMProtectList.Contains(item))
@@ -106,7 +107,7 @@ public static unsafe class Utils
                 {
                     thisRef.IMAutoVendorHard.Remove(item);
                     thisRef.IMAutoVendorHardIgnoreStack.Remove(item);
-                    thisRef.IMDiscard.Remove(item);
+                    thisRef.IMDiscardList.Remove(item);
                     thisRef.IMDiscardIgnoreStack.Remove(item);
                     thisRef.IMDesynth.Remove(item);
                     if(!thisRef.IMAutoVendorSoft.Contains(item))
@@ -131,7 +132,7 @@ public static unsafe class Utils
                 else
                 {
                     thisRef.IMAutoVendorSoft.Remove(item);
-                    thisRef.IMDiscard.Remove(item);
+                    thisRef.IMDiscardList.Remove(item);
                     thisRef.IMDiscardIgnoreStack.Remove(item);
                     thisRef.IMDesynth.Remove(item);
                     if(!thisRef.IMAutoVendorHard.Contains(item))
@@ -159,9 +160,9 @@ public static unsafe class Utils
                     thisRef.IMAutoVendorHard.Remove(item);
                     thisRef.IMAutoVendorHardIgnoreStack.Remove(item);
                     thisRef.IMDesynth.Remove(item);
-                    if(!thisRef.IMDiscard.Contains(item))
+                    if(!thisRef.IMDiscardList.Contains(item))
                     {
-                        thisRef.IMDiscard.Add(item);
+                        thisRef.IMDiscardList.Add(item);
                         return true;
                     }
                     else
@@ -183,11 +184,11 @@ public static unsafe class Utils
                     thisRef.IMAutoVendorSoft.Remove(item);
                     thisRef.IMAutoVendorHard.Remove(item);
                     thisRef.IMAutoVendorHardIgnoreStack.Remove(item);
-                    thisRef.IMDiscard.Remove(item);
+                    thisRef.IMDiscardList.Remove(item);
                     thisRef.IMDiscardIgnoreStack.Remove(item);
-                    if(!thisRef.IMDiscard.Contains(item))
+                    if(!thisRef.IMDiscardList.Contains(item))
                     {
-                        thisRef.IMDiscard.Add(item);
+                        thisRef.IMDiscardList.Add(item);
                         return true;
                     }
                     else
@@ -205,24 +206,24 @@ public static unsafe class Utils
         }
     } 
 
-    extension(OfflineCharacterData data)
+    extension(OfflineCharacterData thisRef)
     {
-        public string NameWithWorld => $"{data.Name}@{data.World}";
-        public string NameWithWorldCensored => Censor.Character(data.NameWithWorld);
+        public string NameWithWorld => $"{thisRef.Name}@{thisRef.World}";
+        public string NameWithWorldCensored => Censor.Character(thisRef.NameWithWorld);
 
         public object? GetOrderValue(RetainersVisualOrder order)
         {
             return order switch
             {
-                RetainersVisualOrder.Region_JP => ExcelWorldHelper.Get(data.World)?.GetRegion() != ExcelWorldHelper.Region.JP,
-                RetainersVisualOrder.Region_NA => ExcelWorldHelper.Get(data.World)?.GetRegion() != ExcelWorldHelper.Region.NA,
-                RetainersVisualOrder.Region_EU => ExcelWorldHelper.Get(data.World)?.GetRegion() != ExcelWorldHelper.Region.EU,
-                RetainersVisualOrder.Region_OC => ExcelWorldHelper.Get(data.World)?.GetRegion() != ExcelWorldHelper.Region.OC,
-                RetainersVisualOrder.DataCenter => ExcelWorldHelper.Get(data.World)?.DataCenter.RowId ?? 0,
-                RetainersVisualOrder.Inventory_Slots => (int)data.InventorySpace,
-                RetainersVisualOrder.Ventures => (int)data.Ventures,
-                RetainersVisualOrder.World => data.World,
-                RetainersVisualOrder.Name => data.Name,
+                RetainersVisualOrder.Region_JP => ExcelWorldHelper.Get(thisRef.World)?.GetRegion() != ExcelWorldHelper.Region.JP,
+                RetainersVisualOrder.Region_NA => ExcelWorldHelper.Get(thisRef.World)?.GetRegion() != ExcelWorldHelper.Region.NA,
+                RetainersVisualOrder.Region_EU => ExcelWorldHelper.Get(thisRef.World)?.GetRegion() != ExcelWorldHelper.Region.EU,
+                RetainersVisualOrder.Region_OC => ExcelWorldHelper.Get(thisRef.World)?.GetRegion() != ExcelWorldHelper.Region.OC,
+                RetainersVisualOrder.DataCenter => ExcelWorldHelper.Get(thisRef.World)?.DataCenter.RowId ?? 0,
+                RetainersVisualOrder.Inventory_Slots => (int)thisRef.InventorySpace,
+                RetainersVisualOrder.Ventures => (int)thisRef.Ventures,
+                RetainersVisualOrder.World => thisRef.World,
+                RetainersVisualOrder.Name => thisRef.Name,
                 _ => null
             };
         }
@@ -231,23 +232,23 @@ public static unsafe class Utils
         {
             return order switch
             {
-                DeployablesVisualOrder.Region_JP => ExcelWorldHelper.Get(data.World)?.GetRegion() != ExcelWorldHelper.Region.JP,
-                DeployablesVisualOrder.Region_NA => ExcelWorldHelper.Get(data.World)?.GetRegion() != ExcelWorldHelper.Region.NA,
-                DeployablesVisualOrder.Region_EU => ExcelWorldHelper.Get(data.World)?.GetRegion() != ExcelWorldHelper.Region.EU,
-                DeployablesVisualOrder.Region_OC => ExcelWorldHelper.Get(data.World)?.GetRegion() != ExcelWorldHelper.Region.OC,
-                DeployablesVisualOrder.DataCenter => ExcelWorldHelper.Get(data.World)?.DataCenter.RowId ?? 0,
-                DeployablesVisualOrder.Inventory_Slots => (int)data.InventorySpace,
-                DeployablesVisualOrder.Ceruleum => (int)data.Ceruleum,
-                DeployablesVisualOrder.Repair_Kits => (int)data.RepairKits,
-                DeployablesVisualOrder.World => data.World,
-                DeployablesVisualOrder.Name => data.Name,
+                DeployablesVisualOrder.Region_JP => ExcelWorldHelper.Get(thisRef.World)?.GetRegion() != ExcelWorldHelper.Region.JP,
+                DeployablesVisualOrder.Region_NA => ExcelWorldHelper.Get(thisRef.World)?.GetRegion() != ExcelWorldHelper.Region.NA,
+                DeployablesVisualOrder.Region_EU => ExcelWorldHelper.Get(thisRef.World)?.GetRegion() != ExcelWorldHelper.Region.EU,
+                DeployablesVisualOrder.Region_OC => ExcelWorldHelper.Get(thisRef.World)?.GetRegion() != ExcelWorldHelper.Region.OC,
+                DeployablesVisualOrder.DataCenter => ExcelWorldHelper.Get(thisRef.World)?.DataCenter.RowId ?? 0,
+                DeployablesVisualOrder.Inventory_Slots => (int)thisRef.InventorySpace,
+                DeployablesVisualOrder.Ceruleum => (int)thisRef.Ceruleum,
+                DeployablesVisualOrder.Repair_Kits => (int)thisRef.RepairKits,
+                DeployablesVisualOrder.World => thisRef.World,
+                DeployablesVisualOrder.Name => thisRef.Name,
                 _ => null
             };
         }
 
         public bool IsLockedOut()
         {
-            var world = ExcelWorldHelper.Get(data.WorldOverride ?? data.World);
+            var world = ExcelWorldHelper.Get(thisRef.WorldOverride ?? thisRef.World);
             if(world != null)
             {
                 return DateTimeOffset.Now.ToUnixTimeSeconds() < C.LockoutTime.SafeSelect(world.Value.GetRegion(), 0);
@@ -257,52 +258,52 @@ public static unsafe class Utils
 
         public bool ShouldWaitForAllWhenLoggedIn()
         {
-            return C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn && (C.MultiModeWorkshopConfiguration.MultiWaitForAll || data.MultiWaitForAllDeployables);
+            return C.MultiModeWorkshopConfiguration.WaitForAllLoggedIn && (C.MultiModeWorkshopConfiguration.MultiWaitForAll || thisRef.MultiWaitForAllDeployables);
         }
 
         public bool GetAllowFcTeleportForRetainers()
         {
-            return data.IsTeleportEnabled() && data.GetIsTeleportEnabledForRetainers() && (data.TeleportOptionsOverride.RetainersFC ?? C.GlobalTeleportOptions.RetainersFC);
+            return thisRef.IsTeleportEnabled() && thisRef.GetIsTeleportEnabledForRetainers() && (thisRef.TeleportOptionsOverride.RetainersFC ?? C.GlobalTeleportOptions.RetainersFC);
         }
 
         public bool GetAllowPrivateTeleportForRetainers()
         {
-            return data.IsTeleportEnabled() && data.GetIsTeleportEnabledForRetainers() && (data.TeleportOptionsOverride.RetainersPrivate ?? C.GlobalTeleportOptions.RetainersPrivate);
+            return thisRef.IsTeleportEnabled() && thisRef.GetIsTeleportEnabledForRetainers() && (thisRef.TeleportOptionsOverride.RetainersPrivate ?? C.GlobalTeleportOptions.RetainersPrivate);
         }
 
         public bool GetAllowApartmentTeleportForRetainers()
         {
-            return data.IsTeleportEnabled() && data.GetIsTeleportEnabledForRetainers() && (data.TeleportOptionsOverride.RetainersApartment ?? C.GlobalTeleportOptions.RetainersApartment);
+            return thisRef.IsTeleportEnabled() && thisRef.GetIsTeleportEnabledForRetainers() && (thisRef.TeleportOptionsOverride.RetainersApartment ?? C.GlobalTeleportOptions.RetainersApartment);
         }
 
         public bool GetAllowFcTeleportForSubs()
         {
-            return data.IsTeleportEnabled() && (data.TeleportOptionsOverride.Deployables ?? C.GlobalTeleportOptions.Deployables);
+            return thisRef.IsTeleportEnabled() && (thisRef.TeleportOptionsOverride.Deployables ?? C.GlobalTeleportOptions.Deployables);
         }
 
         public bool IsTeleportEnabled()
         {
-            return data.TeleportOptionsOverride.Enabled ?? C.GlobalTeleportOptions.Enabled;
+            return thisRef.TeleportOptionsOverride.Enabled ?? C.GlobalTeleportOptions.Enabled;
         }
 
         public bool GetIsTeleportEnabledForRetainers()
         {
-            return data.TeleportOptionsOverride.Retainers ?? C.GlobalTeleportOptions.Retainers;
+            return thisRef.TeleportOptionsOverride.Retainers ?? C.GlobalTeleportOptions.Retainers;
         }
 
         public bool GetAreTeleportSettingsOverriden()
         {
-            return data.TeleportOptionsOverride.Deployables != null
-                || data.TeleportOptionsOverride.Enabled != null
-                || data.TeleportOptionsOverride.Retainers != null
-                || data.TeleportOptionsOverride.RetainersApartment != null
-                || data.TeleportOptionsOverride.RetainersFC != null
-                || data.TeleportOptionsOverride.RetainersPrivate != null;
+            return thisRef.TeleportOptionsOverride.Deployables != null
+                || thisRef.TeleportOptionsOverride.Enabled != null
+                || thisRef.TeleportOptionsOverride.Retainers != null
+                || thisRef.TeleportOptionsOverride.RetainersApartment != null
+                || thisRef.TeleportOptionsOverride.RetainersFC != null
+                || thisRef.TeleportOptionsOverride.RetainersPrivate != null;
         }
 
         public InventoryManagementSettings GetIMSettings(bool raw = false)
         {
-            if(C.AdditionalIMSettings.TryGetFirst(x => x.GUID == data.InventoryCleanupPlan, out var plan))
+            if(C.AdditionalIMSettings.TryGetFirst(x => x.GUID == thisRef.InventoryCleanupPlan, out var plan))
             {
                 if(!raw && (plan.AdditionModeProtectList || plan.AdditionModeSoftSellList || plan.AdditionModeHardSellList))
                 {
@@ -327,6 +328,16 @@ public static unsafe class Utils
                             }
                         }
                     }
+                    if(plan.AdditionModeDesynthList)
+                    {
+                        foreach(var x in C.DefaultIMSettings.IMDesynth)
+                        {
+                            if(!newPlan.IMDesynth.Contains(x))
+                            {
+                                newPlan.IMDesynth.Add(x);
+                            }
+                        }
+                    }
                     if(plan.AdditionModeHardSellList)
                     {
                         foreach(var x in C.DefaultIMSettings.IMAutoVendorHard)
@@ -337,6 +348,20 @@ public static unsafe class Utils
                                 if(C.DefaultIMSettings.IMAutoVendorHardIgnoreStack.Contains(x))
                                 {
                                     newPlan.IMAutoVendorHardIgnoreStack.Add(x);
+                                }
+                            }
+                        }
+                    }
+                    if(plan.AdditionModeDiscardList)
+                    {
+                        foreach(var x in C.DefaultIMSettings.IMDiscardList)
+                        {
+                            if(!newPlan.IMDiscardList.Contains(x))
+                            {
+                                newPlan.IMDiscardList.Add(x);
+                                if(C.DefaultIMSettings.IMDiscardIgnoreStack.Contains(x))
+                                {
+                                    newPlan.IMDiscardIgnoreStack.Add(x);
                                 }
                             }
                         }
@@ -353,9 +378,67 @@ public static unsafe class Utils
                 return C.DefaultIMSettings;
             }
         }
+
+        public IEnumerable<InventoryType> GetDiscardableInventories()
+        {
+            return [.. PlayerInvetories, .. (Data.GetIMSettings().AllowSellFromArmory ? PlayerArmory : [])];
+        }
     }
 
-    public static int CountItemsInInventory(uint id, bool? hq, IEnumerable<InventoryType> inventories)
+    public static bool InventoryContainsDiscardableItems()
+    {
+        var imPlan = Data.GetIMSettings();
+        if(imPlan == null)
+        {
+            return false;
+        }
+        foreach(var item in imPlan.IMDiscardList)
+        {
+            var cnt = CountItemsInInventory(item, null, Data.GetDiscardableInventories(), slot => imPlan.IMDiscardIgnoreStack.Contains(slot.ItemId) || slot.Quantity < imPlan.IMDiscardStackLimit);
+            if(cnt > 0) return true;
+        }
+        return false;
+    }
+
+    public static void ExecuteDiscardSafely(InventoryType type, int slotIndex, uint expectedItem, bool simulate = false)
+    {
+        var imPlan = Data.GetIMSettings() ?? throw new NullReferenceException();
+        var inventory = InventoryManager.Instance();
+        var cont = inventory->GetInventoryContainer(type);
+        if(cont->IsLoaded)
+        {
+            var slot = &cont->Items[slotIndex];
+            if(slot->ItemId == expectedItem)
+            {
+                if(imPlan.IMProtectList.Contains(slot->ItemId))
+                {
+                    DuoLog.Warning($"Requested discard of slot {type}[{slotIndex}], item {ExcelItemHelper.GetName(expectedItem)}, is protected, can not discard");
+                }
+                else
+                {
+                    if(imPlan.IMDry)
+                    {
+                        DuoLog.Warning($"Would discard {(nint)slot:X} {ExcelItemHelper.GetName(slot->ItemId, true)} x{slot->Quantity}, {type}[{slotIndex}]");
+                    }
+                    else
+                    {
+                        ExecuteDiscardUnsafe(slot, type, slotIndex);
+                    }
+                }
+            }
+            else
+            {
+                DuoLog.Warning($"Requested discard of slot {type}[{slotIndex}], expected item {ExcelItemHelper.GetName(expectedItem)}, contained {slotIndex}, can not discard");
+            }
+        }
+    }
+
+    private static void ExecuteDiscardUnsafe(InventoryItem* ptr, InventoryType type, int slotIndex)
+    {
+        AgentInventoryContext.Instance()->DiscardItem(ptr, type, slotIndex, 0);
+    }
+
+    public static int CountItemsInInventory(uint id, bool? hq, IEnumerable<InventoryType> inventories, Predicate<InventoryItem> itemPredicate = null)
     {
         var ret = 0;
         foreach(var inventory in inventories)
@@ -364,11 +447,14 @@ public static unsafe class Utils
             for(var i = 0; i < inv->Size; i++)
             {
                 var slot = inv->Items[i];
-                var itemId = slot.ItemId;
-                var itemHq = slot.Flags.HasFlag(InventoryItem.ItemFlags.HighQuality);
-                if((hq == null || itemHq == hq) && itemId == id)
+                if(itemPredicate == null || itemPredicate(slot))
                 {
-                    ret += (int)slot.Quantity;
+                    var itemId = slot.ItemId;
+                    var itemHq = slot.Flags.HasFlag(InventoryItem.ItemFlags.HighQuality);
+                    if((hq == null || itemHq == hq) && itemId == id)
+                    {
+                        ret += (int)slot.Quantity;
+                    }
                 }
             }
         }

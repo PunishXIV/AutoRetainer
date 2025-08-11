@@ -166,6 +166,8 @@ public static unsafe class InventoryCleanupCommon
             ImGuiEx.HelpMarker("Items retrieved from quick ventures included into both this plan and default plan will be sold.");
             ImGui.Checkbox("Combine Unconditional sell list", ref selectedPlan.AdditionModeHardSellList);
             ImGuiEx.HelpMarker("Items included into both this plan and default plan will be sold. If included into both default and current plan, stack size bypass option from current plan will be honored. \"Maximum stack size to be sold\" option from current plan will override default plan's option. ");
+            ImGui.Checkbox("Combine Discard list", ref selectedPlan.AdditionModeDiscardList);
+            ImGuiEx.HelpMarker("Items included into both this plan and default plan will be discarded. If included into both default and current plan, stack size bypass option from current plan will be honored. \"Maximum stack size to be discarded\" option from current plan will override default plan's option. ");
             ImGui.Checkbox("Combine Protection list", ref selectedPlan.AdditionModeProtectList);
             ImGuiEx.HelpMarker("Items included into both this plan and default plan will not be sold automatically or exchanged to Grand Company, even if included into any lists.");
             ImGui.Unindent();

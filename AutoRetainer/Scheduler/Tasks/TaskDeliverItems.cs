@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace AutoRetainer.Scheduler.Tasks;
 public static unsafe class TaskDeliverItems
 {
-    public static void Enqueue()
+    public static void Enqueue(bool force = false)
     {
         var gcInfo = GCContinuation.GetGCInfo();
         if(gcInfo == null)
@@ -23,7 +23,7 @@ public static unsafe class TaskDeliverItems
             Notify.Error("Lifestream is busy");
             return;
         }
-        if(Utils.IsBusy)
+        if(!force && Utils.IsBusy)
         {
             Notify.Error("AutoRetainer is busy");
             return;

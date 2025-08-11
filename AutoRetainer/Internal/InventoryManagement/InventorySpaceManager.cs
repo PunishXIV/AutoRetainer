@@ -25,7 +25,7 @@ public static unsafe class InventorySpaceManager
 
     public static bool? SafeSellSlot(SellSlotTask Task)
     {
-        if(Utils.GenericThrottle && EzThrottler.Throttle("SellSlot", 333))
+        if(EzThrottler.Check("SellSlot") && Utils.GenericThrottle && EzThrottler.Throttle("SellSlot", Random.Shared.Next(300, 400)))
         {
             var inv = InventoryManager.Instance()->GetInventoryContainer(Task.InventoryType);
             if(inv == null)

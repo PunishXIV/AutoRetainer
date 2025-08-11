@@ -317,4 +317,6 @@ internal static class Lang
     //3290	Acheter <Value>IntegerParameter(2)</Value> <SheetFr(Item,12,IntegerParameter(1),IntegerParameter(2),1)/> pour <Format(IntegerParameter(3),FF05021D0103)/> sceau<If(LessThanOrEqualTo(IntegerParameter(3),1))><Else/>x</If><Indent/>?
 
     internal static readonly string[] GCSealExchangeConfirm = ["Exchange", "よろしいですか？", "Staatstaler gegen", "Acheter", "要交换吗", "교환하시겠습니까"];
+
+    internal static readonly string[] DiscardItem = ["Discard", "を捨てます。", "wegwerfen", "Jeter"];
 }

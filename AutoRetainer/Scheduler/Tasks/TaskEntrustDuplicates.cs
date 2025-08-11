@@ -47,7 +47,7 @@ internal static unsafe class TaskEntrustDuplicates
             {
                 return false;
             }
-            if(EzThrottler.Throttle("EntrustItem", 333))
+            if(EzThrottler.Check("EntrustItem") && Utils.GenericThrottle && EzThrottler.Throttle("EntrustItem", Random.Shared.Next(300, 400)))
             {
                 List<(uint ItemID, int ToKeep)> itemList = [];
                 foreach(var x in plan.EntrustItems)

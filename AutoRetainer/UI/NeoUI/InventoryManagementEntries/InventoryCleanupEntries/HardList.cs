@@ -2,7 +2,7 @@
 public class HardList : InventoryManagementBase
 {
     public override string Name => "Inventory Cleanup/Unconditional Sell List";
-    public InventoryManagementCommon InventoryManagementCommon = new();
+    private InventoryManagementCommon InventoryManagementCommon = new();
 
     private HardList()
     {

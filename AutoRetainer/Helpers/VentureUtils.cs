@@ -4,6 +4,7 @@ using AutoRetainerAPI.Configuration;
 using Dalamud.Memory;
 using Dalamud.Utility;
 using ECommons.ExcelServices;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.Sheets;
 
 namespace AutoRetainer.Helpers;
@@ -478,7 +479,7 @@ internal static unsafe class VentureUtils
     internal static List<string> GetAvailableVentureNames()
     {
         List<string> ret = [];
-        var data = CSFramework.Instance()->UIModule->GetRaptureAtkModule()->AtkModule.GetStringArrayData(97);
+        var data = CSFramework.Instance()->UIModule->GetRaptureAtkModule()->AtkModule.GetStringArrayData((int)StringArrayType.RetainerTask);
         if(data != null)
         {
             for(var i = 0; i < data->AtkArrayData.Size; i++)

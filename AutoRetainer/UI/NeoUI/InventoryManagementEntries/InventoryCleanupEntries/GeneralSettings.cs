@@ -25,8 +25,8 @@ public class GeneralSettings : InventoryManagementBase
             .Unindent()
             .Checkbox($"Auto-desynth items", () => ref InventoryCleanupCommon.SelectedPlan.IMEnableItemDesynthesis)
             .Checkbox($"Enable context menu integration", () => ref InventoryCleanupCommon.SelectedPlan.IMEnableContextMenu)
-            .Checkbox($"Allow selling items from Armory Chest", () => ref InventoryCleanupCommon.SelectedPlan.AllowSellFromArmory)
-            .Checkbox($"Demo mode", () => ref InventoryCleanupCommon.SelectedPlan.IMDry, "Do not sell items, instead print in chat what would be sold")
+            .Checkbox($"Allow selling/discarding items from Armory Chest", () => ref InventoryCleanupCommon.SelectedPlan.AllowSellFromArmory)
+            .Checkbox($"Demo mode", () => ref InventoryCleanupCommon.SelectedPlan.IMDry, "Do not sell/discard items, instead print in chat what would be sold")
             ;
     }
 }

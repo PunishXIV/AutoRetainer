@@ -8,8 +8,10 @@ public static unsafe class TaskOpenAllCoffers
 {
     public static void Enqueue()
     {
+        TaskRecursiveItemDiscard.EnqueueIfNeeded();
         P.TaskManager.Enqueue(RecursivelyOpenCoffers, new(timeLimitMS: 10 * 60 * 1000, abortOnTimeout: false));
         P.TaskManager.Enqueue(() => Utils.AnimationLock == 0);
+        TaskRecursiveItemDiscard.EnqueueIfNeeded();
     }
 
     public static bool? RecursivelyOpenCoffers()

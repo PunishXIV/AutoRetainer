@@ -446,7 +446,17 @@ public unsafe class AutoRetainer : IDalamudPlugin
         }
         else if(arguments.EqualsIgnoreCase("deliver"))
         {
-            TaskDeliverItems.Enqueue();
+            if(!P.TaskManager.IsBusy)
+            {
+                TaskDeliverItems.Enqueue();
+            }
+        }
+        else if(arguments.EqualsIgnoreCase("discard"))
+        {
+            if(!P.TaskManager.IsBusy)
+            {
+                TaskRecursiveItemDiscard.EnqueueIfNeeded();
+            }
         }
         else if(arguments.StartsWith("set"))
         {
