@@ -17,7 +17,7 @@ internal static class FPSManager
                 Svc.GameConfig.System.Set("FPSInActive", FPSInactiveValue);
                 if(C.UnlockFPSUnlimited) Svc.GameConfig.System.Set("Fps", FPSValue);
                 UnlockChillFrames();
-                PluginLog.Debug($"FPS restrictions restored");
+                DebugLog($"FPS restrictions restored");
             }
         }
         else if(C.UnlockFPS)
@@ -30,7 +30,7 @@ internal static class FPSManager
                 Svc.GameConfig.System.Set("FPSInActive", 0);
                 if(C.UnlockFPSUnlimited) Svc.GameConfig.System.Set("Fps", 0);
                 if(C.UnlockFPSChillFrames) LockChillFrames();
-                PluginLog.Debug($"FPS restrictions removed");
+                DebugLog($"FPS restrictions removed");
             }
         }
     }
@@ -42,7 +42,7 @@ internal static class FPSManager
             WasChanged = false;
             Svc.GameConfig.System.Set("FPSInActive", FPSInactiveValue);
             Svc.GameConfig.System.Set("Fps", FPSValue);
-            PluginLog.Debug($"FPS restrictions restored");
+            DebugLog($"FPS restrictions restored");
         }
     }
 

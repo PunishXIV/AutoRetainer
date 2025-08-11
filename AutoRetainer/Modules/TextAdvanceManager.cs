@@ -16,7 +16,7 @@ internal static class TextAdvanceManager
             {
                 WasChanged = false;
                 UnlockTA();
-                PluginLog.Debug($"TextAdvance unlocked");
+                DebugLog($"TextAdvance unlocked");
             }
         }
         else
@@ -25,7 +25,7 @@ internal static class TextAdvanceManager
             {
                 WasChanged = true;
                 LockTA();
-                PluginLog.Debug($"TextAdvance locked");
+                DebugLog($"TextAdvance locked");
             }
         }
     }

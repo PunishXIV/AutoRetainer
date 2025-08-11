@@ -25,7 +25,7 @@ public static unsafe class InventorySpaceManager
 
     public static bool? SafeSellSlot(SellSlotTask Task)
     {
-        if(EzThrottler.Check("SellSlot") && Utils.GenericThrottle && EzThrottler.Throttle("SellSlot", Random.Shared.Next(300, 400)))
+        if(EzThrottler.Check("SellSlot") && EzThrottler.Throttle("SellSlot", Utils.GenerateRandomDelay()))
         {
             var inv = InventoryManager.Instance()->GetInventoryContainer(Task.InventoryType);
             if(inv == null)
@@ -57,7 +57,7 @@ public static unsafe class InventorySpaceManager
             if(!Data.GetIMSettings().IMDry)
             {
                 P.Memory.RetainerItemCommandDetour(AgentRetainerItemCommandModule, Task.Slot, Task.InventoryType, 0, RetainerItemCommand.HaveRetainerSellItem);
-                PluginLog.Debug($"Sold slot {Task}");
+                DebugLog($"Sold slot {Task}");
             }
             else
             {

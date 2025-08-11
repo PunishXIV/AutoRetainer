@@ -14,7 +14,7 @@ internal static class TaskIntelligentRepair
             {
                 TaskRepairAll.EnqueueImmediate(rep, name, type);
             }
-            PluginLog.Debug($"Repair check log: {log.Join(", ")}");
+            DebugLog($"Repair check log: {log.Join(", ")}");
         }, "IntelligentRepairTask");
     }
 }

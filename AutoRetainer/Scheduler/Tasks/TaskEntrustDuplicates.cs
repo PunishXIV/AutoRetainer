@@ -17,9 +17,9 @@ internal static unsafe class TaskEntrustDuplicates
 
     public static void EnqueueNew(EntrustPlan plan)
     {
-        P.TaskManager.Enqueue((Action)(() => WasOpen = false));
-        P.TaskManager.Enqueue(() => TryGetAddonByName<AtkUnitBase>("SelectString", out var addon) && IsAddonReady(addon));
-        P.TaskManager.Enqueue(() => RecursivelyEntrustItems(plan), new(timeLimitMS: 60 * 60 * 1000));
+        P.TaskManager.Enqueue((Action)(() => WasOpen = false), "Set WasOpen = false");
+        P.TaskManager.Enqueue(() => TryGetAddonByName<AtkUnitBase>("SelectString", out var addon) && IsAddonReady(addon), "Wait until addon SelectString ready");
+        P.TaskManager.Enqueue(() => RecursivelyEntrustItems(plan), $"Recursivelty entrust items ({plan.Guid} | {plan.Name})", new(timeLimitMS: 60 * 60 * 1000));
         P.TaskManager.Enqueue(() => !WasOpen || TaskVendorItems.CloseInventory() == true);
     }
 
@@ -47,7 +47,7 @@ internal static unsafe class TaskEntrustDuplicates
             {
                 return false;
             }
-            if(EzThrottler.Check("EntrustItem") && Utils.GenericThrottle && EzThrottler.Throttle("EntrustItem", Random.Shared.Next(300, 400)))
+            if(EzThrottler.Check("EntrustItem") && EzThrottler.Throttle("EntrustItem", Utils.GenerateRandomDelay()))
             {
                 List<(uint ItemID, int ToKeep)> itemList = [];
                 foreach(var x in plan.EntrustItems)
@@ -184,6 +184,7 @@ internal static unsafe class TaskEntrustDuplicates
         {
             if(EzThrottler.Throttle("REI SelectEntrust", 2000))
             {
+                DebugLog($"SelectEntrust triggered");
                 WasOpen = true;
                 RetainerHandlers.SelectEntrustItems();
             }

@@ -112,7 +112,7 @@ internal unsafe class RetainerListOverlay : Window
                         }
                         else
                         {
-                            //Notify.Error($"No entrust plan found for retainer {ret.Name}");
+                            Notify.Error($"No entrust plan found for retainer {ret.Name}");
                         }
 
                     }

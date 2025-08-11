@@ -1,4 +1,5 @@
-﻿using ECommons.Throttlers;
+﻿using Dalamud.Game.ClientState.Conditions;
+using ECommons.Throttlers;
 using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using System;
@@ -20,7 +21,9 @@ public unsafe static class TaskRecursiveItemDiscard
             ProcessedSlots.Clear();
             if(Utils.InventoryContainsDiscardableItems())
             {
-                P.TaskManager.Insert(RecursivelyDiscardItems);
+                P.TaskManager.InsertMulti(
+                    new(() => !Svc.Condition[ConditionFlag.OccupiedInQuestEvent], "Wait until not occupied"),
+                    new(RecursivelyDiscardItems));
             }
         }, $"{nameof(TaskRecursiveItemDiscard)} master task");
     }
@@ -41,7 +44,7 @@ public unsafe static class TaskRecursiveItemDiscard
                 else if(Data.GetIMSettings().IMDiscardList.Contains(slot.ItemId)
                     && (slot.Quantity < Data.GetIMSettings().IMDiscardStackLimit || Data.GetIMSettings().IMDiscardIgnoreStack.Contains(slot.ItemId)))
                 {
-                    if(EzThrottler.Check("DiscardItem") && Utils.GenericThrottle && EzThrottler.Throttle("DiscardItem", Random.Shared.Next(300, 400)))
+                    if(EzThrottler.Check("DiscardItem") && Utils.GenericThrottle && EzThrottler.Throttle("DiscardItem", Utils.GenerateRandomDelay()))
                     {
                         ProcessedSlots.Add(new(invType, i));
                         Utils.ExecuteDiscardSafely(invType, i, slot.ItemId);
@@ -84,9 +87,10 @@ public unsafe static class TaskRecursiveItemDiscard
             if(addon != null && addon->IsReady())
             {
                 var m = new AddonMaster.SelectYesno(addon);
-                if(EzThrottler.Throttle("ConfirmDiscard"))
+                if(EzThrottler.Throttle("ConfirmDiscard", 200))
                 {
                     m.Yes();
+                    Utils.RethrottleGeneric();
                     return false;
                 }
             }

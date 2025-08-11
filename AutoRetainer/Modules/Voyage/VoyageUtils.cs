@@ -323,7 +323,7 @@ internal static unsafe class VoyageUtils
 
     internal static void WriteOfflineData()
     {
-        //PluginLog.Debug($"WriteOfflineDataSub");
+        //DebugLog($"WriteOfflineDataSub");
         if(HousingManager.Instance()->WorkshopTerritory != null && C.OfflineData.TryGetFirst(x => x.CID == Player.CID, out var ocd))
         {
             ocd.WriteOfflineInventoryData();
@@ -362,7 +362,7 @@ internal static unsafe class VoyageUtils
                         adata.Level = vessel->RankId;
                         adata.NextLevelExp = vessel->NextLevelExp;
                         adata.CurrentExp = vessel->CurrentExp;
-                        //PluginLog.Debug("Write offline sub data");
+                        //DebugLog("Write offline sub data");
                         adata.Part1 = (int)GetVesselComponent(i, VoyageType.Submersible, 0)->ItemId;
                         adata.Part2 = (int)GetVesselComponent(i, VoyageType.Submersible, 1)->ItemId;
                         adata.Part3 = (int)GetVesselComponent(i, VoyageType.Submersible, 2)->ItemId;

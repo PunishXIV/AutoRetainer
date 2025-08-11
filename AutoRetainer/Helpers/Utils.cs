@@ -25,6 +25,8 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.Sheets;
 using Lumina.Text.ReadOnly;
+using System;
+
 //using OtterGui.Text.EndObjects;
 using System.Text.RegularExpressions;
 using CharaData = (string Name, ushort World);
@@ -903,7 +905,7 @@ public static unsafe class Utils
 
     internal static void ExtraLog(string s)
     {
-        if(C.ExtraDebug) PluginLog.Debug(s);
+        if(C.ExtraDebug) DebugLog(s);
     }
 
     internal static bool ContainsAllItems<T>(this IEnumerable<T> a, IEnumerable<T> b)
@@ -1272,12 +1274,14 @@ public static unsafe class Utils
     {
         if(TryGetAddonByName<AddonSelectString>("SelectString", out var addon) && IsAddonReady(&addon->AtkUnitBase))
         {
+            InternalLog.Debug($"Entries: {new AddonMaster.SelectString(addon).Entries.Select(x => x.Text).Print("\n")}");
             if(new AddonMaster.SelectString(addon).Entries.TryGetFirst(x => inputTextTest(x.Text), out var entry))
             {
+                InternalLog.Debug($"Entry found: {entry}");
                 if((Throttler?.Invoke() ?? GenericThrottle))
                 {
                     entry.Select();
-                    DebugLog($"TrySelectSpecificEntry: selecting {entry}");
+                    InternalLog.Debug($"TrySelectSpecificEntry: selecting {entry}");
                     return true;
                 }
             }
@@ -1307,6 +1311,24 @@ public static unsafe class Utils
             {
                 instance.GetType().Assembly.GetType("NotificationMaster.TrayIconManager", true).GetMethod("ShowToast").Invoke(null, new object[] { s, P.Name });
             }, true);
+        }
+    }
+
+    public static int GenerateRandomDelay()
+    {
+        var roll = System.Random.Shared.NextSingle();
+
+        if(roll < 0.6f)
+        {
+            return System.Random.Shared.Next(300, 350);
+        }
+        else if(roll < 0.9f)
+        {
+            return System.Random.Shared.Next(350, 400);
+        }
+        else
+        {
+            return System.Random.Shared.Next(400, 500);
         }
     }
 

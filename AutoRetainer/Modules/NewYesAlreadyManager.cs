@@ -16,7 +16,7 @@ internal static class NewYesAlreadyManager
             {
                 WasChanged = false;
                 Unlock();
-                PluginLog.Debug($"YesAlready unlocked");
+                DebugLog($"YesAlready unlocked");
             }
         }
         else
@@ -25,7 +25,7 @@ internal static class NewYesAlreadyManager
             {
                 WasChanged = true;
                 Lock();
-                PluginLog.Debug($"YesAlready locked");
+                DebugLog($"YesAlready locked");
             }
         }
     }

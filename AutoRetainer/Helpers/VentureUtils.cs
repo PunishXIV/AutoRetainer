@@ -70,7 +70,7 @@ internal static unsafe class VentureUtils
             var adj = VentureUtils.GetAdjustedRetainerTask(next, (Job)ret.ClassJob);
             if(adj != next)
             {
-                PluginLog.Debug($"Adjusted venture ID {next}->{adj}");
+                DebugLog($"Adjusted venture ID {next}->{adj}");
                 next = adj;
             }
         }

@@ -138,7 +138,7 @@ internal unsafe class Config
 
     public TeleportOptions GlobalTeleportOptions = new();
     public bool SharedHET = false;
-    public bool SkipItemConfirmations = false;
+    internal bool SkipItemConfirmations => true;
     public ulong LastLoggedInChara = 0;
 
     internal bool DontReassign

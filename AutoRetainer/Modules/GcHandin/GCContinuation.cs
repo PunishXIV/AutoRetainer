@@ -64,7 +64,7 @@ internal static unsafe class GCContinuation
                 var numeric = (AtkComponentNumericInput*)addon->UldManager.NodeList[8]->GetComponent();
                 var set = Math.Min(amount, (int)(num.Value / 200));
                 if(set < 1) throw new Exception($"Venture amount is too low, is {set}, expected 1 or more");
-                PluginLog.Debug($"Setting {set} ventures");
+                DebugLog($"Setting {set} ventures");
                 numeric->SetValue((int)set);
                 return true;
             }

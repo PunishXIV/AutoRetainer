@@ -65,12 +65,12 @@ internal static unsafe class AutoGCHandin
             Safety.Check();
             if(Operation && HandleConfirmation())
             {
-                PluginLog.Debug($"Handle 1");
+                DebugLog($"Handle 1");
                 //
             }
             else if(Operation && HandleYesno())
             {
-                PluginLog.Debug($"Handle 2");
+                DebugLog($"Handle 2");
                 //
             }
             else

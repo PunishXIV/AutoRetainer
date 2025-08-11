@@ -57,7 +57,7 @@ internal unsafe class Memory : IDisposable
     {
         try
         {
-            PluginLog.Debug($"RetainerItemCommandDetour: {AgentRetainerItemCommandModule:X16}, slot={slot}, type={inventoryType}, a4={a4}, command={command}");
+            DebugLog($"RetainerItemCommandDetour: {AgentRetainerItemCommandModule:X16}, slot={slot}, type={inventoryType}, a4={a4}, command={command}");
         }
         catch(Exception e)
         {
@@ -73,7 +73,7 @@ internal unsafe class Memory : IDisposable
     private nint ReceiveRetainerVentureListUpdateDetour(nint a1, int a2, nint a3)
     {
         var ret = ReceiveRetainerVentureListUpdateHook.Original(a1, a2, a3);
-        PluginLog.Debug($"{a1:X16}, {a2:X8}, {a3:X16}");
+        DebugLog($"{a1:X16}, {a2:X8}, {a3:X16}");
         P.ListUpdateFrame = CSFramework.Instance()->FrameCounter;
         return ret;
     }
@@ -122,7 +122,7 @@ internal unsafe class Memory : IDisposable
 
     private void SellItemDetour(uint inventorySlot, InventoryType a2, uint a3)
     {
-        PluginLog.Debug($"SellItemDetour: {inventorySlot}, {a2}, {a3}");
+        DebugLog($"SellItemDetour: {inventorySlot}, {a2}, {a3}");
         SellItemHook.Original(inventorySlot, a2, a3);
     }
 

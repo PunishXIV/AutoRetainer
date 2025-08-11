@@ -22,7 +22,7 @@ public sealed unsafe class UserInterface : NeoUIEntry
         .Checkbox("Display only most significant icon in status bar", () => ref C.StatusBarMSI)
         .SliderInt(120f, "Status bar icon size", () => ref C.StatusBarIconWidth, 32, 128)
         .Checkbox("Open AutoRetainer window on game start", () => ref C.DisplayOnStart)
-        .Checkbox("Skip item sell/trade confirmation while plugin is active", () => ref C.SkipItemConfirmations)
+        //.Checkbox("Skip item sell/trade confirmation while plugin is active", () => ref C.SkipItemConfirmations)
         .Checkbox("Enable title screen button (requires plugin restart)", () => ref C.UseTitleScreenButton)
         .Checkbox("Hide character search", () => ref C.NoCharaSearch)
         .Checkbox("Don't flash background of characters that are complete", () => ref C.NoGradient)

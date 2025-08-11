@@ -16,7 +16,7 @@ internal static class TaskIntelligentComponentsChange
             {
                 TaskChangeComponents.EnqueueImmediate(rep, name, type);
             }
-            PluginLog.Debug($"Change check log: {(log.Count > 0 ? log.Join(", ") : "None")}");
+            DebugLog($"Change check log: {(log.Count > 0 ? log.Join(", ") : "None")}");
         }, "IntelligentChangeTask");
     }
 }

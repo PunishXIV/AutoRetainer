@@ -2,6 +2,7 @@
 using AutoRetainer.Modules.Voyage.PartSwapper;
 using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainer.Modules.Voyage.VoyageCalculator;
+using AutoRetainer.Scheduler.Tasks;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game.Text.SeStringHandling;
 using ECommons.Throttlers;
@@ -79,7 +80,7 @@ internal static unsafe class VoyageMain
             {
                 if(!IsInVoyagePanel)
                 {
-                    PluginLog.Debug($"Entered voyage panel");
+                    DebugLog($"Entered voyage panel");
                     IsInVoyagePanel = true;
                     //Notify.Info($"Entered voyage panel");
                     if(IsKeyPressed(C.Suppress))
@@ -93,7 +94,7 @@ internal static unsafe class VoyageMain
                             if(Data.AnyEnabledVesselsAvailable())
                             {
                                 VoyageScheduler.Enabled = true;
-                                PluginLog.Debug($"<!> Enabled voyage scheduler");
+                                DebugLog($"<!> Enabled voyage scheduler");
                             }
                             else
                             {
@@ -111,7 +112,7 @@ internal static unsafe class VoyageMain
                 IsInVoyagePanel = false;
                 //Notify.Info("Closed voyage panel");
                 VoyageScheduler.Enabled = false;
-                PluginLog.Debug($"<!> Exited voyage panel, disabled voyage scheduler");
+                DebugLog($"<!> Exited voyage panel, disabled voyage scheduler");
             }
         }
 
@@ -143,6 +144,7 @@ internal static unsafe class VoyageMain
                     {
                         if(EzThrottler.Throttle("DoWorkshopPanelTick.EnqueuePanelSelector", 1000))
                         {
+                            TaskRecursiveItemDiscard.EnqueueIfNeeded();
                             P.TaskManager.Enqueue(VoyageScheduler.SelectAirshipManagement);
                         }
                     }
@@ -150,6 +152,7 @@ internal static unsafe class VoyageMain
                     {
                         if(EzThrottler.Throttle("DoWorkshopPanelTick.EnqueuePanelSelector", 1000))
                         {
+                            TaskRecursiveItemDiscard.EnqueueIfNeeded();
                             P.TaskManager.Enqueue(VoyageScheduler.SelectSubManagement);
                         }
                     }
@@ -158,6 +161,7 @@ internal static unsafe class VoyageMain
                         if(EzThrottler.Throttle("DoWorkshopPanelTick.EnqueuePanelSelector", 1000))
                         {
                             P.TaskManager.Enqueue(VoyageScheduler.SelectExitMainPanel);
+                            TaskRecursiveItemDiscard.EnqueueIfNeeded();
                         }
                     }
                 }

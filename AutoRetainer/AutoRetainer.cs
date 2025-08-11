@@ -557,7 +557,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             if(!retainer.VentureID.EqualsAny(0u, LastVentureID))
             {
                 LastVentureID = retainer.VentureID;
-                PluginLog.Debug($"Retainer {retainer.Name} current venture={LastVentureID}");
+                DebugLog($"Retainer {retainer.Name} current venture={LastVentureID}");
             }
         }
         else
@@ -565,7 +565,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             if(LastVentureID != 0)
             {
                 LastVentureID = 0;
-                PluginLog.Debug($"Last venture ID reset");
+                DebugLog($"Last venture ID reset");
             }
         }
         //if(C.RetryItemSearch) RetryItemSearch.Tick();

@@ -24,7 +24,7 @@ public static unsafe class TaskNeoHET
 
     public static void Enqueue(Action onFailure, bool tryForceWorkshop = false)
     {
-        PluginLog.Debug($"Enqueued HouseEnterTask from {new StackTrace().GetFrames().Select(x => x.GetMethod()?.Name).Prepend("      ").Print("\n")}");
+        DebugLog($"Enqueued HouseEnterTask from {new StackTrace().GetFrames().Select(x => x.GetMethod()?.Name).Prepend("      ").Print("\n")}");
         P.TaskManager.EnqueueTask(NeoTasks.WaitForNotOccupied(new(timeLimitMS: 10 * 60 * 1000)));
         P.TaskManager.Enqueue(() =>
         {

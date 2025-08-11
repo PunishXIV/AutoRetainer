@@ -12,7 +12,7 @@ internal static class PriorityManager
         {
             PriorityChanged = true;
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
-            PluginLog.Debug($"Setting FFXIV process priority to high.");
+            DebugLog($"Setting FFXIV process priority to high.");
         }
     }
 
@@ -22,7 +22,7 @@ internal static class PriorityManager
         {
             PriorityChanged = false;
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Normal;
-            PluginLog.Debug($"Restoring FFXIV process priority.");
+            DebugLog($"Restoring FFXIV process priority.");
         }
     }
 
