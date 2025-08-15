@@ -8,6 +8,10 @@ using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.Sheets;
+using Microsoft.VisualBasic.ApplicationServices;
+using System.Text.RegularExpressions;
+using TerraFX.Interop.Windows;
+using static FFXIVClientStructs.FFXIV.Client.UI.RaptureAtkHistory.Delegates;
 
 namespace AutoRetainer.Scheduler.Handlers;
 
