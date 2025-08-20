@@ -107,11 +107,11 @@ public static unsafe class Utils
                 }
                 else
                 {
-                    thisRef.IMAutoVendorHard.Remove(item);
-                    thisRef.IMAutoVendorHardIgnoreStack.Remove(item);
-                    thisRef.IMDiscardList.Remove(item);
-                    thisRef.IMDiscardIgnoreStack.Remove(item);
-                    thisRef.IMDesynth.Remove(item);
+                    //thisRef.IMAutoVendorHard.Remove(item);
+                    //thisRef.IMAutoVendorHardIgnoreStack.Remove(item);
+                    //thisRef.IMDiscardList.Remove(item);
+                    //thisRef.IMDiscardIgnoreStack.Remove(item);
+                    //thisRef.IMDesynth.Remove(item);
                     if(!thisRef.IMAutoVendorSoft.Contains(item))
                     {
                         thisRef.IMAutoVendorSoft.Add(item);
@@ -383,7 +383,7 @@ public static unsafe class Utils
 
         public IEnumerable<InventoryType> GetDiscardableInventories()
         {
-            return [.. PlayerInvetories, .. (Data.GetIMSettings().AllowSellFromArmory ? PlayerArmory : [])];
+            return [.. PlayerInvetoriesWithCrystals, .. (Data.GetIMSettings().AllowSellFromArmory ? PlayerArmory : [])];
         }
     }
 
@@ -1406,12 +1406,15 @@ public static unsafe class Utils
                 if(addon == null) return null;
                 if(IsAddonReady(addon))
                 {
-                    var textNode = addon->UldManager.NodeList[15]->GetAsAtkTextNode();
-                    var text = GenericHelpers.ReadSeString(&textNode->NodeText).GetText();
-                    if(compare(text))
+                    var textNode = addon->GetTextNodeById(2);
+                    if(textNode != null)
                     {
-                        PluginLog.Verbose($"SelectYesno {text} addon {i} by predicate");
-                        return addon;
+                        var text = GenericHelpers.ReadSeString(&textNode->NodeText).GetText();
+                        if(compare(text))
+                        {
+                            PluginLog.Verbose($"SelectYesno {text} addon {i} by predicate");
+                            return addon;
+                        }
                     }
                 }
             }
@@ -1434,12 +1437,15 @@ public static unsafe class Utils
                 if(addon == null) return null;
                 if(IsAddonReady(addon))
                 {
-                    var textNode = addon->UldManager.NodeList[15]->GetAsAtkTextNode();
-                    var text = textNode->NodeText.GetText().Cleanup();
-                    if(text.ContainsAny(s.Select(x => x.Cleanup())))
+                    var textNode = addon->GetTextNodeById(2);
+                    if(textNode != null)
                     {
-                        PluginLog.Verbose($"SelectYesno {s.Print()} addon {i}");
-                        return addon;
+                        var text = textNode->NodeText.GetText().Cleanup();
+                        if(text.ContainsAny(s.Select(x => x.Cleanup())))
+                        {
+                            PluginLog.Verbose($"SelectYesno {s.Print()} addon {i}");
+                            return addon;
+                        }
                     }
                 }
             }
@@ -1554,9 +1560,14 @@ public static unsafe class Utils
         return false;
     }
 
-    internal static int GetInventoryFreeSlotCount()
+    /// <summary>
+    /// Default check in: Utils.PlayerInvetories
+    /// </summary>
+    /// <param name="types"></param>
+    /// <returns></returns>
+    internal static int GetInventoryFreeSlotCount(InventoryType[] types = null)
     {
-        InventoryType[] types = [InventoryType.Inventory1, InventoryType.Inventory2, InventoryType.Inventory3, InventoryType.Inventory4];
+        types ??= PlayerInvetories;
         var c = InventoryManager.Instance();
         var slots = 0;
         foreach(var x in types)

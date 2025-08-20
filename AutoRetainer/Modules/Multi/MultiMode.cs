@@ -45,6 +45,8 @@ internal static unsafe class MultiMode
             if(Data != null)
             {
                 C.LastLoggedInChara = Data.CID;
+                EzThrottler.Reset($"ExpertDeliver_{Data?.Identity}");
+                EzThrottler.Reset($"GcBusy");
             }
             if(TaskChangeCharacter.Expected != null)
             {
@@ -105,6 +107,8 @@ internal static unsafe class MultiMode
         {
             return;
         }
+        EzThrottler.Reset("GcBusy");
+        EzThrottler.Reset($"ExpertDeliver_{Data?.Identity}");
         LastLogin = 0;
         if(!TaskTeleportToProperty.ShouldVoidHET())
         {
@@ -198,17 +202,21 @@ internal static unsafe class MultiMode
             {
                 if(!Utils.IsInventoryFree())
                 {
-                    if(C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
-                    {
-                        data.Enabled = false;
-                    }
+                    Data.Enabled = false;
                 }
             }
             if(ProperOnLogin.PlayerPresent && !P.TaskManager.IsBusy && IsInteractionAllowed()
-                && (!Synchronize || C.OfflineData.Where(x => !x.IsLockedOut()).All(x => x.GetEnabledRetainers().All(z => z.GetVentureSecondsRemaining() <= C.UnsyncCompensation))))
+                && (!Synchronize || C.OfflineData.Where(x => !x.IsLockedOut()).All(x => x.GetEnabledRetainers().All(z => z.GetVentureSecondsRemaining() <= C.UnsyncCompensation)))
+                && EzThrottler.Check("GcBusy"))
             {
                 Synchronize = false;
-                if(IsCurrentCharacterDone() && !IsOccupied())
+                if(CanExpertDeliver() && !IsOccupied() && EzThrottler.Check($"ExpertDeliver_{Data.Identity}"))
+                {
+                    TaskDeliverItems.Enqueue();
+                    EzThrottler.Throttle("GcBusy", 60000, true);
+                    EzThrottler.Throttle($"ExpertDeliver_{Data.Identity}", 30 * 60 * 1000, true);
+                }
+                else if(IsCurrentCharacterDone() && !IsOccupied())
                 {
                     var next = GetCurrentTargetCharacter();
                     if(next == null && IsAllRetainersHaveMoreThan15Mins())
@@ -257,6 +265,7 @@ internal static unsafe class MultiMode
                         {
                             if(!TaskTeleportToProperty.EnqueueIfNeededAndPossible(true))
                             {
+                                EzThrottler.Reset($"ExpertDeliver_{Data.Identity}");
                                 DebugLog($"Enqueueing interaction with panel");
                                 BlockInteraction(10);
                                 TaskInteractWithNearestPanel.Enqueue();
@@ -276,6 +285,7 @@ internal static unsafe class MultiMode
                                 EnsureCharacterValidity();
                                 if(data.Enabled)
                                 {
+                                    EzThrottler.Reset($"ExpertDeliver_{Data.Identity}");
                                     DebugLog($"Enqueueing interaction with bell");
                                     TaskInteractWithNearestBell.Enqueue();
                                     P.TaskManager.Enqueue(() => { SchedulerMain.EnablePlugin(PluginEnableReason.MultiMode); return true; });
@@ -289,6 +299,16 @@ internal static unsafe class MultiMode
                 }
             }
         }
+    }
+
+    internal static bool CanExpertDeliver()
+    {
+        if(!C.FullAutoGCDelivery) return false;
+        if(C.FullAutoGCDeliveryOnlyWsUnlocked && S.WorkstationMonitor.Locked) return false;
+        if(!GCContinuation.IsGCRankSufficientForExpertExchange()) return false;
+        if(!GCContinuation.DoesInventoryHaveDeliverableItem()) return false;
+        if(Utils.GetInventoryFreeSlotCount() > C.FullAutoGCDeliveryInventory) return false;
+        return true;
     }
 
     internal static void EnterWorkshopForRetainers()

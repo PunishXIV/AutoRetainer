@@ -1,4 +1,5 @@
-﻿using AutoRetainerAPI.Configuration;
+﻿using AutoRetainer.StaticData;
+using AutoRetainerAPI.Configuration;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using ECommons;
 using ECommons.Automation.NeoTaskManager;
@@ -23,8 +24,11 @@ namespace AutoRetainer.Modules.GcHandin;
 
 internal static unsafe class GCContinuation
 {
+    [Obsolete("Don't use it")]
     public static readonly GCInfo Maelstrom = new(1002387, 1002388, new(92.751045f, 40.27537f, 75.468185f));
+    [Obsolete("Don't use it")]
     public static readonly GCInfo ImmortalFlames = new(1002390, 1002391, new(-141.44354f, 4.109951f, -106.125496f));
+    [Obsolete("Don't use it")]
     public static readonly GCInfo TwinAdder = new(1002393, 1002394, new(-67.464386f, -0.5018193f, -8.161054f));
 
     public static readonly uint VentureItem = 21072;
@@ -131,6 +135,7 @@ internal static unsafe class GCContinuation
         return false;
     }
 
+    [Obsolete]
     internal static GCInfo? GetGCInfo()
     {
         if(PlayerState.Instance()->GrandCompany == 1) return Maelstrom;
@@ -139,23 +144,36 @@ internal static unsafe class GCContinuation
         return null;
     }
 
+    public static FullGrandCompanyInfo GetFullGCInfo()
+    {
+        if(PlayerState.Instance()->GrandCompany == 1) return FullGrandCompanyInfo.Maelstrom;
+        if(PlayerState.Instance()->GrandCompany == 2) return FullGrandCompanyInfo.TwinAdder;
+        if(PlayerState.Instance()->GrandCompany == 3) return FullGrandCompanyInfo.ImmortalFlames;
+        return null;
+    }
+
+    public static bool IsGCRankSufficientForExpertExchange()
+    {
+        return AutoGCHandin.GetRank() >= 6;
+    }
+
     internal static bool? InteractWithExchange()
     {
-        return InteractWithDataID(GetGCInfo().Value.ExchangeDataID);
+        return InteractWith(GetFullGCInfo().DeliveryMissions);
     }
 
     internal static bool? InteractWithShop()
     {
-        return InteractWithDataID(GetGCInfo().Value.ShopDataID);
+        return InteractWith(GetFullGCInfo().SealShop);
     }
 
-    private static bool? InteractWithDataID(uint dataID)
+    private static bool? InteractWith(NPCDescriptor descriptor)
     {
         if(Svc.Targets.Target != null)
         {
             if(Player.IsAnimationLocked) return false;
             var t = Svc.Targets.Target;
-            if(t.IsTargetable && t.DataId == dataID && Vector3.Distance(Player.Object.Position, t.Position) < 10f && !IsOccupied() && EzThrottler.Throttle("GCInteract"))
+            if(t.IsTargetable && t.DataId == descriptor.DataID && descriptor.IsWithinInteractRadius() && !IsOccupied() && EzThrottler.Throttle("GCInteract"))
             {
                 TargetSystem.Instance()->InteractWithObject(Svc.Targets.Target.Struct(), false);
                 return true;
@@ -165,7 +183,7 @@ internal static unsafe class GCContinuation
         {
             foreach(var t in Svc.Objects)
             {
-                if(t.IsTargetable && t.DataId == dataID && Vector3.Distance(Player.Object.Position, t.Position) < 10f && !IsOccupied() && EzThrottler.Throttle("GCSetTarget"))
+                if(t.IsTargetable && t.DataId == descriptor.DataID && descriptor.IsWithinInteractRadius() && !IsOccupied() && EzThrottler.Throttle("GCSetTarget"))
                 {
                     Svc.Targets.Target = t;
                     return false;
@@ -353,9 +371,16 @@ internal static unsafe class GCContinuation
         return canFit;
     }
 
-    public static bool DoesInventoryHaveDeliverableItem()
+
+    /// <summary>
+    /// Default search in: Utils.PlayerInventories
+    /// </summary>
+    /// <param name="types"></param>
+    /// <returns></returns>
+    public static bool DoesInventoryHaveDeliverableItem(InventoryType[] types = null)
     {
-        foreach(var x in Utils.PlayerInvetories)
+        types ??= Utils.PlayerInvetories;
+        foreach(var x in types)
         {
             var inv = InventoryManager.Instance()->GetInventoryContainer(x);
             for(var i = 0; i < inv->GetSize(); i++)
@@ -374,6 +399,7 @@ internal static unsafe class GCContinuation
 
     public static bool PurchaseItem(this GCExchangeItem item)
     {
+        EzThrottler.Throttle($"GcBusy", 60000, true);
         var meta = Utils.GetCurrentlyAvailableSharedExchangeListings()[item.ItemID];
         var amount = item.GetAmountThatCanBePurchased();
         if(TryGetAddonByName<AtkUnitBase>("GrandCompanyExchange", out var addon) && IsAddonReady(addon) && AutoGCHandin.IsValidGCTerritory())
@@ -480,6 +506,10 @@ internal static unsafe class GCContinuation
         List<GCExchangeItem> items = [.. Utils.GetGCExchangePlanWithOverrides().Items, new(VentureItem, 65000)];
         foreach(var l in items)
         {
+            if(l.ItemID == VentureItem && Utils.GetInventoryFreeSlotCount() == 0 && DoesInventoryHaveDeliverableItem())
+            {
+                return null;
+            }
             var amt = l.GetAmountThatCanBePurchased();
             if(amt > 0)
             {

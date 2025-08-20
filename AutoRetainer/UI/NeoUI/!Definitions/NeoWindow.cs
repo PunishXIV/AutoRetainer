@@ -34,6 +34,7 @@ public sealed class NeoWindow : Window
 
         new LogTab(),
         new ExpertTab(),
+        new CharacterSync(),
 
         ..ConfigFileSystemHelpers.CreateInstancesOf<DebugSectionBase>(),
     ];

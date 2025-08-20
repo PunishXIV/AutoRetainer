@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<Authors>Puni.sh</Authors>
-		<Version>4.5.1.21</Version>
+		<Version>4.5.2.0</Version>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -105,10 +105,6 @@
 		</Reference>
 		<Reference Include="ImGuiScene">
 			<HintPath>$(DalamudLibPath)ImGuiScene.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
-		<Reference Include="PInvoke.User32">
-			<HintPath>$(DalamudLibPath)PInvoke.User32.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
       <Reference Include="Dalamud.Common">

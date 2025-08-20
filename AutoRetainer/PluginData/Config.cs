@@ -254,4 +254,9 @@ internal unsafe class Config
     public List<RetainersVisualOrder> RetainersVisualOrders = [];
     public bool EnableDeployablesSort = false;
     public List<DeployablesVisualOrder> DeployablesVisualOrders = [];
+
+    public bool FullAutoGCDelivery = false;
+    public HalfHourSchedule GCDeliverySchedule = new();
+    public bool FullAutoGCDeliveryOnlyWsUnlocked = false;
+    public int FullAutoGCDeliveryInventory = 50;
 }

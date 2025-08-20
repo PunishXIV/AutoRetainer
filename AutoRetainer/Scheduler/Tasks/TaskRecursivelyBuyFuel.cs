@@ -39,5 +39,6 @@ public unsafe class TaskRecursivelyBuyFuel
             }
             return false;
         }, new(timeLimitMS: 1000 * 60 * 10));
+        P.TaskManager.Enqueue(() => Utils.TryNotify("Finished purchasing Ceruleum Tanks"));
     }
 }

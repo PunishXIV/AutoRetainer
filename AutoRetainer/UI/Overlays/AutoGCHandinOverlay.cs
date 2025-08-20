@@ -1,4 +1,5 @@
 using AutoRetainerAPI.Configuration;
+using Dalamud.Interface.Style;
 using ECommons.GameHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -9,6 +10,7 @@ internal unsafe class AutoGCHandinOverlay : Window
 {
     internal float height;
     internal bool Allowed = false;
+    internal int Remaining = 0;
     public AutoGCHandinOverlay() : base("AutoRetainer GC Handin overlay", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysUseWindowPadding | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoSavedSettings, true)
     {
         RespectCloseHotkey = false;
@@ -51,6 +53,11 @@ internal unsafe class AutoGCHandinOverlay : Window
         {
             ImGui.SameLine();
             ImGuiEx.Text(GradientColor.Get(ImGuiColors.DalamudRed, ImGuiColors.DalamudYellow), $"Foreign world. No FC points will be granted.");
+        }
+        if(AutoGCHandin.Operation && Remaining != 0)
+        {
+            ImGui.SameLine();
+            ImGuiEx.Text(ImGuiColors.DalamudViolet, $"{Remaining} items left");
         }
         height = ImGui.GetWindowSize().Y;
     }
