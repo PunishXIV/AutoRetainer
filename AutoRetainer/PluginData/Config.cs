@@ -259,4 +259,5 @@ internal unsafe class Config
     public HalfHourSchedule GCDeliverySchedule = new();
     public bool FullAutoGCDeliveryOnlyWsUnlocked = false;
     public int FullAutoGCDeliveryInventory = 50;
+    public bool FullAutoGCDeliveryUseBuffItem = false;
 }

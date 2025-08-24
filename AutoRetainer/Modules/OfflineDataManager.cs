@@ -92,6 +92,8 @@ internal static unsafe class OfflineDataManager
         }
         data.Gil = (uint)InventoryManager.Instance()->GetInventoryItemCount(1);
         data.ClassJobLevelArray = UIState.Instance()->PlayerState.ClassJobLevels.ToArray();
+        data.GCRank = AutoGCHandin.GetRank();
+        data.GCSeals = AutoGCHandin.GetSeals();
         if(writeGatherables)
         {
             try

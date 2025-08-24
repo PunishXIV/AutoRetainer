@@ -31,5 +31,6 @@ public sealed unsafe class GeneralSettings : InventoryManagementBase
         .Checkbox("Enable Multi Mode Expert Delivery", () => ref C.FullAutoGCDelivery)
         .Checkbox("Only when workstation is not locked", () => ref C.FullAutoGCDeliveryOnlyWsUnlocked)
         .InputInt(150f, "Inventory slots remaining to trigger delivery", () => ref C.FullAutoGCDeliveryInventory)
+        .Checkbox("Use Priority seal allowance, if possible", () => ref C.FullAutoGCDeliveryUseBuffItem)
         ;
 }

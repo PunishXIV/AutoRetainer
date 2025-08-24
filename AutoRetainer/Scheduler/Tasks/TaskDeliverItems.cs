@@ -1,7 +1,11 @@
-﻿using ECommons.GameHelpers;
+﻿using ECommons.Automation.NeoTaskManager.Tasks;
+using ECommons.GameFunctions;
+using ECommons.GameHelpers;
 using ECommons.Singletons;
 using ECommons.Throttlers;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +38,33 @@ public static unsafe class TaskDeliverItems
             Notify.Error("AutoRetainer is busy");
             return false;
         }
+        P.TaskManager.Enqueue(() =>
+        {
+            if(C.FullAutoGCDeliveryUseBuffItem)
+            {
+                if(Player.Object.IsCasting(14946, ActionType.Item))
+                {
+                    return true;
+                }
+                else if(!Player.Status.Any(x => x.StatusId == 1078) && InventoryManager.Instance()->GetInventoryItemCount(14946) > 0)
+                {
+                    if(EzThrottler.Throttle("UseFCBuffItem", 1000))
+                    {
+                        AgentInventoryContext.Instance()->UseItem(14946);
+                    }
+                    return false;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return true;
+            }
+        }, new(timeLimitMS: 30000, abortOnTimeout: false));
+        P.TaskManager.Enqueue(() => !Player.Object.IsCasting() && !Player.IsAnimationLocked);
         if(!gcInfo.IsReadyToExchange())
         {
             P.TaskManager.Enqueue(() => S.LifestreamIPC.ExecuteCommand("gc " + Player.GrandCompany switch
