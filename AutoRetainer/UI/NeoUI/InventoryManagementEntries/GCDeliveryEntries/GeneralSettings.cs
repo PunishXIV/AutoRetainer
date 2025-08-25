@@ -22,7 +22,7 @@ public sealed unsafe class GeneralSettings : InventoryManagementBase
             - Expert Delivery will resume automatically.
             - The process will repeat until there are no eligible items left to deliver or no seals remaining.
             """)
-        
+
         .Section("Multi Mode Expert Delivery")
         .TextWrapped($"""
         When enabled:
@@ -30,7 +30,11 @@ public sealed unsafe class GeneralSettings : InventoryManagementBase
         """)
         .Checkbox("Enable Multi Mode Expert Delivery", () => ref C.FullAutoGCDelivery)
         .Checkbox("Only when workstation is not locked", () => ref C.FullAutoGCDeliveryOnlyWsUnlocked)
-        .InputInt(150f, "Inventory slots remaining to trigger delivery", () => ref C.FullAutoGCDeliveryInventory)
+        .InputInt(150f, "Inventory slots remaining to trigger delivery, less or equal", () => ref C.FullAutoGCDeliveryInventory, "Only primary inventory is accounted for, not armory")
+        .Checkbox("Trigger on venture exhaustion", () => ref C.FullAutoGCDeliveryDeliverOnVentureExhaust, "This may cause situation where you will just go to GC exchange every login. Make sure you have a purchase plan to buy enough ventures set. ")
+        .Indent()
+        .InputInt(150f, "Ventures remaining to trigger delivery, less or equal", () => ref C.FullAutoGCDeliveryDeliverOnVentureLessThan)
+        .Unindent()
         .Checkbox("Use Priority seal allowance, if possible", () => ref C.FullAutoGCDeliveryUseBuffItem)
         ;
 }

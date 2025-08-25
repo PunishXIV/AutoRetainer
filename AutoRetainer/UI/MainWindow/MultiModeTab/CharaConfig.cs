@@ -52,6 +52,7 @@ public class CharaConfig
             ImGuiEx.Checkbox("Teleport for retainers...", ref data.TeleportOptionsOverride.Retainers);
             ImGui.Indent();
             ImGuiEx.Checkbox("...to private house", ref data.TeleportOptionsOverride.RetainersPrivate);
+            ImGuiEx.Checkbox("...to shared house", ref data.TeleportOptionsOverride.RetainersShared);
             ImGuiEx.Checkbox("...to free company house", ref data.TeleportOptionsOverride.RetainersFC);
             ImGuiEx.Checkbox("...to apartment", ref data.TeleportOptionsOverride.RetainersApartment);
             ImGui.Text("If all above are disabled or fail, will be teleported to inn.");

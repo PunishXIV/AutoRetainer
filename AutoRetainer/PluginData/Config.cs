@@ -260,4 +260,7 @@ internal unsafe class Config
     public bool FullAutoGCDeliveryOnlyWsUnlocked = false;
     public int FullAutoGCDeliveryInventory = 50;
     public bool FullAutoGCDeliveryUseBuffItem = false;
+    public bool FullAutoGCDeliveryDeliverOnVentureExhaust = false;
+    public int FullAutoGCDeliveryDeliverOnVentureLessThan = 50;
+    public bool FullAutoGCDeliveryTpBackToHome = false;
 }

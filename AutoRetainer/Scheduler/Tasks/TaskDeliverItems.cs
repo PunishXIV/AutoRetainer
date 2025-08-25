@@ -56,15 +56,15 @@ public static unsafe class TaskDeliverItems
                 }
                 else
                 {
-                    return false;
+                    return true;
                 }
             }
             else
             {
                 return true;
             }
-        }, new(timeLimitMS: 30000, abortOnTimeout: false));
-        P.TaskManager.Enqueue(() => !Player.Object.IsCasting() && !Player.IsAnimationLocked);
+        }, "UseGCBuff", new(timeLimitMS: 30000, abortOnTimeout: false));
+        P.TaskManager.Enqueue(() => !Player.Object.IsCasting() && !Player.IsAnimationLocked, "WaitUntilNotOccupied");
         if(!gcInfo.IsReadyToExchange())
         {
             P.TaskManager.Enqueue(() => S.LifestreamIPC.ExecuteCommand("gc " + Player.GrandCompany switch
@@ -73,10 +73,10 @@ public static unsafe class TaskDeliverItems
                 ECommons.ExcelServices.GrandCompany.Maelstrom => "m",
                 ECommons.ExcelServices.GrandCompany.TwinAdder => "ta",
                 _ => throw new ArgumentOutOfRangeException()
-            }));
+            }), "Teleport to GC");
         }
-        P.TaskManager.Enqueue(() => !S.LifestreamIPC.IsBusy(), new(timeLimitMS: 5 * 60 * 1000) { CompanionAction = _ => EzThrottler.Throttle("GcBusy", 60000, true)});
-        P.TaskManager.Enqueue(() => GCContinuation.EnqueueInitiation(true));
+        P.TaskManager.Enqueue(() => !S.LifestreamIPC.IsBusy(), "Wait until teleportation completed", new(timeLimitMS: 5 * 60 * 1000) { CompanionAction = _ => EzThrottler.Throttle("GcBusy", 60000, true)});
+        P.TaskManager.Enqueue(() => GCContinuation.EnqueueInitiation(true), "Initiate GC delivery");
         return true;
     }
 }

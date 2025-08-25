@@ -12,6 +12,7 @@ using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.EzSharedDataManager;
 using ECommons.GameHelpers;
 using ECommons.Throttlers;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using static AutoRetainer.Modules.OfflineDataManager;
@@ -307,8 +308,10 @@ internal static unsafe class MultiMode
         if(C.FullAutoGCDeliveryOnlyWsUnlocked && S.WorkstationMonitor.Locked) return false;
         if(!GCContinuation.IsGCRankSufficientForExpertExchange()) return false;
         if(!GCContinuation.DoesInventoryHaveDeliverableItem()) return false;
-        if(Utils.GetInventoryFreeSlotCount() > C.FullAutoGCDeliveryInventory) return false;
-        return true;
+        var canDeliver = false;
+        if(Utils.GetInventoryFreeSlotCount() <= C.FullAutoGCDeliveryInventory) canDeliver = true;
+        if(C.FullAutoGCDeliveryDeliverOnVentureExhaust && InventoryManager.Instance()->GetInventoryItemCount(GCContinuation.VentureItem) <= C.FullAutoGCDeliveryDeliverOnVentureLessThan) canDeliver = true;
+        return canDeliver;
     }
 
     internal static void EnterWorkshopForRetainers()

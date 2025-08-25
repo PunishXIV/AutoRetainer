@@ -13,17 +13,22 @@ public static class TaskTeleportToProperty
         if(!isSubmersibleOperation && C.NoTeleportHetWhenNextToBell && Utils.GetReachableRetainerBell(false) != null) return false;
         var fcTeleportEnabled = (Data.GetAllowFcTeleportForRetainers() && !isSubmersibleOperation) || (Data.GetAllowFcTeleportForSubs() && isSubmersibleOperation);
         var data = S.LifestreamIPC.GetHousePathData(Player.CID);
+        var sharedData = S.LifestreamIPC.GetSharedHousePathData();
         var info = S.LifestreamIPC.GetCurrentPlotInfo();
         {
             var canPrivate = Data.GetAllowPrivateTeleportForRetainers() && data.Private != null && data.Private.PathToEntrance.Count > 0;
+            var canShared = Data.GetAllowSharedTeleportForRetainers() && sharedData != null && sharedData.PathToEntrance.Count > 0;
+            PluginLog.Information($"CanShared: {canShared}");
             var canFc = (fcTeleportEnabled && data.FC != null && data.FC.PathToEntrance.Count > 0);
-            if((isSubmersibleOperation || !canPrivate) && canFc)
+            if((isSubmersibleOperation || !(canPrivate || canShared)) && canFc)
             {
-                return Process(true);
+                PluginLog.Information($"Teleport: fc=true, canShared={canShared}");
+                return Process(true, canShared);
             }
-            if(!isSubmersibleOperation && canPrivate)
+            if(!isSubmersibleOperation && (canPrivate || canShared))
             {
-                return Process(false);
+                PluginLog.Information($"Teleport: fc=false, canShared={canShared}");
+                return Process(false, canShared);
             }
         }
 
@@ -31,13 +36,16 @@ public static class TaskTeleportToProperty
         {
             var canFc = fcTeleportEnabled && S.LifestreamIPC.HasFreeCompanyHouse() != false;
             var canPrivate = Data.GetAllowPrivateTeleportForRetainers() && S.LifestreamIPC.HasPrivateHouse() != false;
-            if((isSubmersibleOperation || !canPrivate) && canFc)
+            var canShared = Data.GetAllowSharedTeleportForRetainers() && S.LifestreamIPC.HasSharedEstate() != false;
+            if((isSubmersibleOperation || !(canPrivate || canShared)) && canFc)
             {
-                return ProcessSimple(true);
+                PluginLog.Information($"Simple Teleport: fc=true, canShared={canShared}");
+                return ProcessSimple(true, canShared);
             }
-            if(!isSubmersibleOperation && canPrivate)
+            if(!isSubmersibleOperation && (canPrivate || canShared))
             {
-                return ProcessSimple(false);
+                PluginLog.Information($"Simple Teleport: fc=false, canShared={canShared}");
+                return ProcessSimple(false, canShared);
             }
         }
 
@@ -102,9 +110,9 @@ public static class TaskTeleportToProperty
 
         return false;
 
-        bool Process(bool fc)
+        bool Process(bool fc, bool shared)
         {
-            var pathData = fc ? data.FC : data.Private;
+            var pathData = fc ? data.FC : (shared?sharedData:data.Private);
             if(info != null
                 && info.Value.Plot == pathData.Plot
                 && info.Value.Ward == pathData.Ward
@@ -120,7 +128,7 @@ public static class TaskTeleportToProperty
                     return true; //already here
                 }
             }
-            P.TaskManager.Enqueue(() => S.LifestreamIPC.EnqueuePropertyShortcut(fc ? 2 : 1, 1));
+            P.TaskManager.Enqueue(() => S.LifestreamIPC.EnqueuePropertyShortcut(fc ? 2 : (shared?5:1), 1));
             P.TaskManager.Enqueue(() =>
             {
                 if(!Svc.ClientState.IsLoggedIn)
@@ -138,10 +146,10 @@ public static class TaskTeleportToProperty
             return true;
         }
 
-        bool ProcessSimple(bool fc)
+        bool ProcessSimple(bool fc, bool shared)
         {
-            var isHere = TaskNeoHET.IsInMarkerHousingPlot(fc ? TaskNeoHET.FcMarkers : TaskNeoHET.PrivateMarkers);
-            var noProperty = !(fc ? S.LifestreamIPC.HasFreeCompanyHouse() : S.LifestreamIPC.HasPrivateHouse());
+            var isHere = TaskNeoHET.IsInMarkerHousingPlot(fc ? TaskNeoHET.FcMarkers : (shared?TaskNeoHET.SharedMarkers:TaskNeoHET.PrivateMarkers));
+            var noProperty = !(fc ? S.LifestreamIPC.HasFreeCompanyHouse() : (shared?S.LifestreamIPC.HasSharedEstate() != false:S.LifestreamIPC.HasPrivateHouse()));
             if(noProperty == true)
             {
                 return false;
@@ -155,7 +163,7 @@ public static class TaskTeleportToProperty
                 TaskNeoHET.Enqueue(null);
                 return true; //already here
             }
-            P.TaskManager.Enqueue(() => S.LifestreamIPC.EnqueuePropertyShortcut(fc ? 2 : 1, 1));
+            P.TaskManager.Enqueue(() => S.LifestreamIPC.EnqueuePropertyShortcut(fc ? 2 : (shared?5:1), 1));
             P.TaskManager.Enqueue(() =>
             {
                 if(!Svc.ClientState.IsLoggedIn)
@@ -179,10 +187,12 @@ public static class TaskTeleportToProperty
         var subsSoon = Data.WorkshopEnabled && Data.AnyEnabledVesselsAvailable() && MultiMode.EnabledSubmarines && (!Data.ShouldWaitForAllWhenLoggedIn() || Data.AreAnyEnabledVesselsReturnInNext(1, true));
         var retainersSoon = MultiMode.AnyRetainersAvailable(0) && MultiMode.EnabledRetainers;
         var blockHet = subsSoon || retainersSoon;
-        if(C.AllowSimpleTeleport && (Data.GetAllowFcTeleportForRetainers() || Data.GetAllowPrivateTeleportForRetainers())) return blockHet;
+        if(C.AllowSimpleTeleport && (Data.GetAllowFcTeleportForRetainers() || Data.GetAllowPrivateTeleportForRetainers() || Data.GetAllowSharedTeleportForRetainers())) return blockHet;
         var data = S.LifestreamIPC.GetHousePathData(Player.CID);
+        var sharedData = S.LifestreamIPC.GetSharedHousePathData();
         if(Data.GetAllowFcTeleportForRetainers() && data.FC != null && data.FC.PathToEntrance.Count > 0) return blockHet;
         if(Data.GetAllowPrivateTeleportForRetainers() && data.Private != null && data.Private.PathToEntrance.Count > 0) return blockHet;
+        if(Data.GetAllowSharedTeleportForRetainers() && sharedData != null && sharedData.PathToEntrance.Count > 0) return blockHet;
         return false;
     }
 }

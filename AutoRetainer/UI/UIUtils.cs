@@ -128,6 +128,33 @@ internal static class UIUtils
             ImGuiEx.Tooltip(error ?? $"Private house is registered in Lifestream and path is set. You will be teleported to Private house for resending Retainers.\nAddress: {Svc.Data.GetExcelSheet<Aetheryte>().GetRowOrDefault((uint)data.Private.ResidentialDistrict)?.Territory.Value.PlaceNameRegion.Value.Name}, ward {data.Private.Ward + 1}, plot {data.Private.Plot + 1}");
             ImGui.SameLine(0, 3);
         }
+        if(offlineData.GetAllowSharedTeleportForRetainers())
+        {
+            string error = null;
+            var black = false;
+            var sharedData = S.LifestreamIPC.GetSharedHousePathData();
+            if(Player.CID == offlineData.CID && Player.IsInHomeWorld)
+            {
+                if(sharedData == null)
+                {
+                    error = "Shared estate is not registered in Lifestream.";
+                }
+                else if(sharedData.PathToEntrance.Count == 0)
+                {
+                    error = "Shared estate is registered in Lifestream but path to entrance is not set.";
+                }
+            }
+            else
+            {
+                error = "Can only display shared estate information while player is logged in";
+                black = true;
+            }
+            ImGui.PushFont(UiBuilder.IconFont);
+            ImGuiEx.Text(error == null ? null : black?ImGuiColors.DalamudGrey2:ImGuiColors.DalamudGrey3, black ? "\ue4fe" : "\uf004");
+            ImGui.PopFont();
+            ImGuiEx.Tooltip(error ?? $"Shared estate is registered in Lifestream and path is set. You will be teleported to Shared estate for resending Retainers.\nAddress: {Svc.Data.GetExcelSheet<Aetheryte>().GetRowOrDefault((uint)sharedData.ResidentialDistrict)?.Territory.Value.PlaceNameRegion.Value.Name}, ward {sharedData.Ward + 1}, plot {sharedData.Plot + 1}");
+            ImGui.SameLine(0, 3);
+        }
     }
 
     public static void DrawOverlayTexts(List<OverlayTextData> overlayTexts, ref float statusTextWidth)

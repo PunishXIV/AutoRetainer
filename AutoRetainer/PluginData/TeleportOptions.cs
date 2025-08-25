@@ -7,4 +7,5 @@ public class TeleportOptions
     public bool RetainersFC = false;
     public bool RetainersApartment = false;
     public bool Deployables = false;
+    public bool RetainersShared = false;
 }

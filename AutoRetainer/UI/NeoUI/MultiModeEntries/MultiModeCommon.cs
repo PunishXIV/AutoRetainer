@@ -49,6 +49,7 @@ public class MultiModeCommon : NeoUIEntry
         .Checkbox("Teleport for retainers...", () => ref C.GlobalTeleportOptions.Retainers)
         .Indent()
         .Checkbox("...to private house", () => ref C.GlobalTeleportOptions.RetainersPrivate)
+        .Checkbox("...to shared estate", () => ref C.GlobalTeleportOptions.RetainersShared)
         .Checkbox("...to free company house", () => ref C.GlobalTeleportOptions.RetainersFC)
         .Checkbox("...to apartment", () => ref C.GlobalTeleportOptions.RetainersApartment)
         .TextWrapped("If all above are disabled or fail, will be teleported to inn.")

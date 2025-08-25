@@ -49,6 +49,10 @@ internal static unsafe class GCContinuation
             P.TaskManager.Enqueue(() => GCContinuation.SelectSupplyListTab(2), "SelectSupplyListTab(2)");
             P.TaskManager.Enqueue(GCContinuation.EnableDeliveringIfPossible);
         }
+        else
+        {
+            P.TaskManager.Enqueue(() => EzThrottler.Reset($"GcBusy"));
+        }
     }
 
     public static void EnqueueDeliveryClose()
@@ -353,7 +357,7 @@ internal static unsafe class GCContinuation
             }
             else
             {
-                if(!DoesInventoryHaveDeliverableItem())
+                if(!DoesInventoryHaveDeliverableItem(Utils.PlayerInvetories))
                 {
                     return 0;
                 }
@@ -379,7 +383,14 @@ internal static unsafe class GCContinuation
     /// <returns></returns>
     public static bool DoesInventoryHaveDeliverableItem(InventoryType[] types = null)
     {
-        types ??= Utils.PlayerInvetories;
+        types ??= Data.GCDeliveryType switch
+        {
+            GCDeliveryType.Hide_Armoury_Chest_Items => Utils.PlayerInvetories,
+            GCDeliveryType.Hide_Gear_Set_Items => [.. Utils.PlayerInvetories, .. Utils.PlayerArmory],
+            GCDeliveryType.Show_All_Items => [.. Utils.PlayerInvetories, .. Utils.PlayerArmory],
+            _ => null
+        };
+        if(types == null) return false;
         foreach(var x in types)
         {
             var inv = InventoryManager.Instance()->GetInventoryContainer(x);
@@ -506,7 +517,7 @@ internal static unsafe class GCContinuation
         List<GCExchangeItem> items = [.. Utils.GetGCExchangePlanWithOverrides().Items, new(VentureItem, 65000)];
         foreach(var l in items)
         {
-            if(l.ItemID == VentureItem && Utils.GetInventoryFreeSlotCount() == 0 && DoesInventoryHaveDeliverableItem())
+            if(l.ItemID == VentureItem && Utils.GetInventoryFreeSlotCount() == 0 && DoesInventoryHaveDeliverableItem(Utils.PlayerInvetories))
             {
                 return null;
             }

@@ -170,7 +170,7 @@ public static unsafe class TaskNeoHET
 
     public static IGameObject GetFcOrPrivateEntranceFromMarkers()
     {
-        return GetHouseEntranceFromMarkers([.. PrivateMarkers, .. FcMarkers, .. (C.SharedHET ? TaskNeoHET.SharedMarkers : [])]);
+        return GetHouseEntranceFromMarkers([.. PrivateMarkers, .. FcMarkers, .. ((C.SharedHET || Data.GetAllowSharedTeleportForRetainers()) ? TaskNeoHET.SharedMarkers : [])]);
     }
 
     public static IGameObject GetHouseEntranceFromMarkers(IEnumerable<uint> markers)

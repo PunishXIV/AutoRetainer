@@ -273,6 +273,11 @@ public static unsafe class Utils
             return thisRef.IsTeleportEnabled() && thisRef.GetIsTeleportEnabledForRetainers() && (thisRef.TeleportOptionsOverride.RetainersPrivate ?? C.GlobalTeleportOptions.RetainersPrivate);
         }
 
+        public bool GetAllowSharedTeleportForRetainers()
+        {
+            return thisRef.IsTeleportEnabled() && thisRef.GetIsTeleportEnabledForRetainers() && (thisRef.TeleportOptionsOverride.RetainersShared ?? C.GlobalTeleportOptions.RetainersShared);
+        }
+
         public bool GetAllowApartmentTeleportForRetainers()
         {
             return thisRef.IsTeleportEnabled() && thisRef.GetIsTeleportEnabledForRetainers() && (thisRef.TeleportOptionsOverride.RetainersApartment ?? C.GlobalTeleportOptions.RetainersApartment);
