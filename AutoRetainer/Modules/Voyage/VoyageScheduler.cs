@@ -122,7 +122,7 @@ internal static unsafe class VoyageScheduler
                 if(Utils.GenericThrottle)
                 {
                     Log("Locking on workshop CP");
-                    Chat.ExecuteCommand("/lockon");
+                    Chat.ExecuteCommand("/lockon on");
                     return true;
                 }
             }

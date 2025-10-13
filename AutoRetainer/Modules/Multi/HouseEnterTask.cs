@@ -57,7 +57,7 @@ internal static unsafe class HouseEnterTask
             {
                 if(EzThrottler.Throttle("HET.LockonBell"))
                 {
-                    Chat.ExecuteCommand("/lockon");
+                    Chat.ExecuteCommand("/lockon on");
                     return true;
                 }
             }

@@ -162,6 +162,10 @@ internal static unsafe class VoyageMain
                         {
                             P.TaskManager.Enqueue(VoyageScheduler.SelectExitMainPanel);
                             TaskRecursiveItemDiscard.EnqueueIfNeeded();
+                            P.TaskManager.Enqueue(() =>
+                            {
+                                P.TaskManager.InsertStack(TaskVendorItems.EnqueueFromCommand);
+                            });
                         }
                     }
                 }

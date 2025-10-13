@@ -1176,7 +1176,7 @@ public static unsafe class Utils
         {
             if((x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName))
             {
-                var distance = extend && VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType) ? 20f : GetValidInteractionDistance(x);
+                var distance = extend && (VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType) || Player.TerritoryIntendedUse == TerritoryIntendedUseEnum.Inn) ? 20f : GetValidInteractionDistance(x) ;
                 if(Vector3.Distance(x.Position, Svc.ClientState.LocalPlayer.Position) < distance && x.IsTargetable)
                 {
                     return x;

@@ -1,5 +1,7 @@
 ﻿using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Scheduler.Handlers;
+using ECommons.ExcelServices;
+using ECommons.GameHelpers;
 
 namespace AutoRetainer.Scheduler.Tasks;
 
@@ -10,7 +12,7 @@ internal static unsafe class TaskInteractWithNearestBell
         P.TaskManager.Enqueue(NewYesAlreadyManager.WaitForYesAlreadyDisabledTask);
         P.TaskManager.Enqueue(() =>
         {
-            if(VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType) && Utils.GetReachableRetainerBell(false) == null)
+            if((VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType) || Player.TerritoryIntendedUse == TerritoryIntendedUseEnum.Inn) && Utils.GetReachableRetainerBell(false) == null)
             {
                 var bell = Utils.GetNearestRetainerBell(out var distance);
                 if(distance < 20f)

@@ -26,6 +26,7 @@ internal static unsafe class MiniTA
                 {
                     new AddonMaster.Talk((nint)addon).Click();
                 }
+                ProcessUselessConfirmations();
             }
             if(C.SkipItemConfirmations && (P.TaskManager.IsBusy || AutoGCHandin.Operation))
             {
@@ -94,5 +95,21 @@ internal static unsafe class MiniTA
     internal static bool ProcessCutsceneSkip(nint arg)
     {
         return VoyageScheduler.Enabled;
+    }
+
+    internal static void ProcessUselessConfirmations()
+    {
+        if(TryGetAddonMaster<AddonMaster.SelectOk>(out var m) && m.IsAddonReady)
+        {
+            PluginLog.Debug($"Ok: {m.Text} || {m.Text.ContainsPartOf(Svc.Data.GetExcelSheet<Lobby>().GetRow(618).Text)}");
+            if(m.Text.ContainsPartOf(Svc.Data.GetExcelSheet<Lobby>().GetRow(618).Text)
+                || m.Text.ContainsPartOf(Svc.Data.GetExcelSheet<Lobby>().GetRow(1237).Text))
+            {
+                if(EzThrottler.Throttle($"Addon{(nint)m.Addon}"))
+                {
+                    m.Ok();
+                }
+            }
+        }
     }
 }

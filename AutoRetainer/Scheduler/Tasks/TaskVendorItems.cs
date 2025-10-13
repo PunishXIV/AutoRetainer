@@ -1,10 +1,56 @@
 ﻿using AutoRetainer.Internal.InventoryManagement;
 using AutoRetainer.Scheduler.Handlers;
+using ECommons.GameHelpers;
+using ECommons.UIHelpers.AddonMasterImplementations;
+using FFXIVClientStructs.FFXIV.Client.Game;
 
 namespace AutoRetainer.Scheduler.Tasks;
 
 public static class TaskVendorItems
 {
+    public static void EnqueueFromCommand()
+    {
+        if(NpcSaleManager.GetValidNPC() != null && Data.GetIMSettings().IMEnableNpcSell)
+        {
+            NpcSaleManager.EnqueueIfItemsPresent(true);
+        }
+        else if(HasVendorableItems() && Data.GetIMSettings().IMEnableAutoVendor && Utils.GetReachableRetainerBell(true) != null && Player.IsInHomeWorld && Data.RetainerData.Count > 0)
+        {
+            P.SkipNextEnable = true;
+            P.TaskManager.Enqueue(() => !IsOccupied());
+            TaskInteractWithNearestBell.Enqueue(true);
+            P.TaskManager.Enqueue(() => TryGetAddonMaster<AddonMaster.RetainerList>(out var m) && m.IsAddonReady);
+            P.TaskManager.Enqueue(() =>
+            {
+                P.TaskManager.InsertStack(Utils.EnqueueVendorItemsByRetainer);
+            });
+            P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
+        }
+    }
+
+    public unsafe static bool HasVendorableItems()
+    {
+        foreach(var type in InventorySpaceManager.GetAllowedToSellInventoryTypes())
+        {
+            var inv = InventoryManager.Instance()->GetInventoryContainer(type);
+            if(inv != null)
+            {
+                for(var i = 0; i < inv->Size; i++)
+                {
+                    var slot = inv->GetInventorySlot(i);
+                    if(slot != null && slot->ItemId != 0)
+                    {
+                        if(Utils.IsItemSellableByHardList(slot->ItemId, slot->Quantity))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     public static void Enqueue(bool softAsHard = false)
     {
         P.TaskManager.Enqueue(() => AddHardItems(softAsHard));

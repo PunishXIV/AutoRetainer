@@ -355,23 +355,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         {
             if(!IsOccupied() && !P.TaskManager.IsBusy)
             {
-                if(NpcSaleManager.GetValidNPC() != null && Data.GetIMSettings().IMEnableNpcSell)
-                {
-                    NpcSaleManager.EnqueueIfItemsPresent(true);
-                }
-                else if(Data.GetIMSettings().IMEnableAutoVendor && Utils.GetReachableRetainerBell(true) != null && Player.IsInHomeWorld)
-                {
-                    P.SkipNextEnable = true;
-                    TaskInteractWithNearestBell.Enqueue(true);
-                    P.TaskManager.Enqueue(() => TryGetAddonMaster<AddonMaster.RetainerList>(out var m) && m.IsAddonReady);
-                    P.TaskManager.Enqueue(() =>
-                    {
-                        P.TaskManager.BeginStack();
-                        Safe(Utils.EnqueueVendorItemsByRetainer);
-                        P.TaskManager.InsertStack();
-                    });
-                    P.TaskManager.Enqueue(RetainerListHandlers.CloseRetainerList);
-                }
+                TaskVendorItems.EnqueueFromCommand();
             }
             else
             {

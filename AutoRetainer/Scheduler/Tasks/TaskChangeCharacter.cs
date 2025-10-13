@@ -4,6 +4,7 @@ using ECommons.ExcelServices;
 using ECommons.GameHelpers;
 using ECommons.Throttlers;
 using ECommons.UIHelpers.AddonMasterImplementations;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.Sheets;
 
@@ -228,8 +229,9 @@ public static unsafe class TaskChangeCharacter
 
     public static bool? ConfirmLogin()
     {
-        if(TryGetAddonByName<AtkUnitBase>("SelectOk", out _))
+        if(TryGetAddonMaster<AddonMaster.SelectOk>("SelectOk", out var ok) && ok.IsAddonReady)
         {
+            if(ok.Text.ContainsPartOf(Svc.Data.GetExcelSheet<Error>().GetRow(13206).Unknown0))
             return true;
         }
         if(TryGetAddonMaster<AddonMaster.SelectYesno>(out var m) && m.IsAddonReady)

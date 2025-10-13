@@ -1,4 +1,5 @@
-﻿using ECommons.Configuration;
+﻿using Dalamud.Utility;
+using ECommons.Configuration;
 using ECommons.Events;
 using ECommons.ExcelServices;
 using ECommons.Interop;
@@ -7,6 +8,7 @@ using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using Lumina.Excel.Sheets;
 using ItemLevel = AutoRetainer.Helpers.ItemLevel;
 
 namespace AutoRetainer.UI.NeoUI.AdvancedEntries.DebugSection;
@@ -15,6 +17,14 @@ internal unsafe class DebugMisc : DebugSectionBase
 {
     public override void Draw()
     {
+        if(ImGui.CollapsingHeader("618"))
+        {
+            var a = Svc.Data.GetExcelSheet<Lobby>().GetRow(618).Text.ToDalamudString();
+            foreach(var pl in a.Payloads)
+            {
+                ImGuiEx.Text($"{pl.Type}: {pl.ToString()}");
+            }
+        }
         if(ImGui.CollapsingHeader("CMenu"))
         {
             if(TryGetAddonMaster<AddonMaster.ContextMenu>(out var m) && m.IsAddonReady)
