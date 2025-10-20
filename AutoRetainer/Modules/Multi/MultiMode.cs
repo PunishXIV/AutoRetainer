@@ -45,6 +45,7 @@ internal static unsafe class MultiMode
     {
         ProperOnLogin.RegisterInteractable(delegate
         {
+            TaskActivateSealSweetener.LastAttemptAt = 0;
             if(Data != null)
             {
                 C.LastLoggedInChara = Data.CID;

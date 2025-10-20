@@ -15,8 +15,10 @@ using System.Threading.Tasks;
 namespace AutoRetainer.Scheduler.Tasks;
 public static unsafe class TaskDeliverItems
 {
+    static bool UsingItemBuff = false;
     public static bool Enqueue(bool force = false)
     {
+        UsingItemBuff = false;
         var gcInfo = GCContinuation.GetFullGCInfo();
         if(gcInfo == null)
         {
@@ -44,6 +46,7 @@ public static unsafe class TaskDeliverItems
             {
                 if(Player.Object.IsCasting(14946, ActionType.Item))
                 {
+                    UsingItemBuff = true;
                     return true;
                 }
                 else if(!Player.Status.Any(x => x.StatusId == 1078) && InventoryManager.Instance()->GetInventoryItemCount(14946) > 0)
@@ -65,6 +68,19 @@ public static unsafe class TaskDeliverItems
             }
         }, "UseGCBuff", new(timeLimitMS: 30000, abortOnTimeout: false));
         P.TaskManager.Enqueue(() => !Player.Object.IsCasting() && !Player.IsAnimationLocked, "WaitUntilNotOccupied");
+        P.TaskManager.Enqueue(() =>
+        {
+            if(UsingItemBuff) return;
+            if(!C.FullAutoGCDeliveryUseBuffFCAction) return;
+            if(Player.Character->FreeCompanyTagString != "" && Player.IsInHomeWorld)
+            {
+                P.TaskManager.InsertStack(() =>
+                {
+                    TaskActivateSealSweetener.EnqueueThrottled();
+                });
+            }
+            return;
+        });
         if(!gcInfo.IsReadyToExchange())
         {
             P.TaskManager.Enqueue(() => S.LifestreamIPC.ExecuteCommand("gc " + Player.GrandCompany switch

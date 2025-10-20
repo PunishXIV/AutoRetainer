@@ -1,4 +1,5 @@
-﻿using Dalamud.Utility;
+﻿using AutoRetainer.Scheduler.Tasks;
+using Dalamud.Utility;
 using ECommons.Configuration;
 using ECommons.Events;
 using ECommons.ExcelServices;
@@ -17,6 +18,38 @@ internal unsafe class DebugMisc : DebugSectionBase
 {
     public override void Draw()
     {
+        if(ImGui.CollapsingHeader("FreeCompanyAction"))
+        {
+            ImGuiEx.Text($"Num: {TaskActivateSealSweetener.NumActions}");
+            foreach(var x in TaskActivateSealSweetener.Actions)
+            {
+                ImGuiEx.Text($"{x} / {Svc.Data.GetExcelSheet<CompanyAction>().GetRowOrDefault((uint)x)?.Name}");
+            }
+            ImGuiEx.FilteringInputInt("Callback value 1", out var val1);
+            ImGuiEx.FilteringInputInt("Callback value 2", out var val2);
+            if(ImGui.Button("On FreeCompany"))
+            {
+                if(TryGetAddonByName<AtkUnitBase>("FreeCompany", out var addon) && addon->IsReady())
+                {
+                    Callback.Fire(addon, true, val1, (uint)val2);
+                }
+            }
+            if(ImGui.Button("On FreeCompanyAction"))
+            {
+                if(TryGetAddonByName<AtkUnitBase>("FreeCompanyAction", out var addon) && addon->IsReady())
+                {
+                    Callback.Fire(addon, true, val1, (uint)val2);
+                }
+            }
+            if(ImGui.Button("TaskActivateSealSweetener.Enqueue"))
+            {
+                TaskActivateSealSweetener.Enqueue();
+            }
+            if(ImGui.Button("TaskActivateSealSweetener.EnqueueThrottled"))
+            {
+                TaskActivateSealSweetener.EnqueueThrottled();
+            }
+        }
         if(ImGui.CollapsingHeader("618"))
         {
             var a = Svc.Data.GetExcelSheet<Lobby>().GetRow(618).Text.ToDalamudString();
