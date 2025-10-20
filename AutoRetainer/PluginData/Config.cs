@@ -264,4 +264,5 @@ internal unsafe class Config
     public bool FullAutoGCDeliveryDeliverOnVentureExhaust = false;
     public int FullAutoGCDeliveryDeliverOnVentureLessThan = 50;
     public bool FullAutoGCDeliveryTpBackToHome = false;
+    public bool VendorItemAfterVoyage = false;
 }

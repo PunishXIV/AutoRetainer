@@ -12,6 +12,7 @@ public class MultiModeDeployables : NeoUIEntry
         .Unindent()
         .DragInt(60f, "Advance Relog Threshold, seconds", () => ref C.MultiModeWorkshopConfiguration.AdvanceTimer.ValidateRange(0, 300), 0.1f, 0, 300, "The number of seconds AutoRetainer should log in early before submarines on this character are ready to be resent.")
         .DragInt(120f, "Retainer venture processing cutoff, minutes", () => ref C.DisableRetainerVesselReturn.ValidateRange(0, 60), "If set to a value greater than 0, AutoRetainer will stop processing any retainers this number of minutes before any character is scheduled to redeploy submarines, taking all previous settings into account.")
+        .Checkbox("Sell items from Unconditional sell list right after deployment (requires retainers)", () => ref C.VendorItemAfterVoyage)
         .Checkbox("Periodically check FC chest for gil upon entering workshop", () => ref C.FCChestGilCheck, "Periodically checks the Free Company chest when entering the Workshop to keep the gil counter up to date.")
         .Indent()
         .SliderInt(150f, "Check frequency, hours", () => ref C.FCChestGilCheckCd, 0, 24 * 5)
