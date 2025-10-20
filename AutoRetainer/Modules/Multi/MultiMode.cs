@@ -2,6 +2,7 @@
 using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainer.Scheduler.Tasks;
+using AutoRetainer.Services.Lifestream;
 using AutoRetainer.UI.MainWindow.MultiModeTab;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game.Config;
@@ -24,6 +25,7 @@ internal static unsafe class MultiMode
     internal static bool Active => Enabled && !IPC.Suppressed;
 
     internal static bool Enabled = false;
+    public static (string Name, string World)? ExpectedCharacter = null;
 
     internal static bool WaitOnLoginScreen => C.MultiWaitOnLoginScreen || BailoutManager.IsLogOnTitleEnabled || C.NightMode;
 
@@ -49,16 +51,16 @@ internal static unsafe class MultiMode
                 EzThrottler.Reset($"ExpertDeliver_{Data?.Identity}");
                 EzThrottler.Reset($"GcBusy");
             }
-            if(TaskChangeCharacter.Expected != null)
+            if(MultiMode.ExpectedCharacter != null)
             {
                 if(MultiMode.Enabled)
                 {
-                    if(TaskChangeCharacter.Expected.Value.Name != Player.Name || TaskChangeCharacter.Expected.Value.World != Player.HomeWorld)
+                    if(MultiMode.ExpectedCharacter.Value.Name != Player.Name || MultiMode.ExpectedCharacter.Value.World != Player.HomeWorld)
                     {
-                        DuoLog.Warning($"[ARERRCMM] Character mismatch, expected {TaskChangeCharacter.Expected}, but logged in on {Player.NameWithWorld}. Please report this to developer unless you have manually interfered with login process");
+                        DuoLog.Warning($"[ARERRCMM] Character mismatch, expected {MultiMode.ExpectedCharacter}, but logged in on {Player.NameWithWorld}. Please report this to developer unless you have manually interfered with login process");
                     }
                 }
-                TaskChangeCharacter.Expected = null;
+                MultiMode.ExpectedCharacter = null;
             }
             BailoutManager.IsLogOnTitleEnabled = false;
             WriteOfflineData(true, true);
@@ -157,7 +159,7 @@ internal static unsafe class MultiMode
             {
                 BlockInteraction(1);
             }
-            if(P.TaskManager.IsBusy)
+            if(P.TaskManager.IsBusy || S.LifestreamIPC.IsBusy())
             {
                 return;
             }
@@ -438,13 +440,14 @@ internal static unsafe class MultiMode
                     {
                         CharaCnt.Clear();
                     }
+                    P.TaskManager.Enqueue(() => Player.Interactable && IsScreenReady());
                     if(data != null)
                     {
-                        TaskChangeCharacter.Enqueue(data.CurrentWorld, data.Name, data.World, data.ServiceAccount);
+                        P.TaskManager.Enqueue(() => S.LifestreamIPC.ChangeCharacter(data.Name, data.World));
                     }
                     else
                     {
-                        TaskChangeCharacter.EnqueueLogout();
+                        P.TaskManager.Enqueue(() => S.LifestreamIPC.Logout());
                     }
                     return true;
                 }
@@ -453,7 +456,7 @@ internal static unsafe class MultiMode
             {
                 if(Utils.CanAutoLogin() || (allowFromTaskManager && Utils.CanAutoLoginFromTaskManager()))
                 {
-                    TaskChangeCharacter.EnqueueLogin(data.CurrentWorld, data.Name, data.World, data.ServiceAccount);
+                    P.TaskManager.Enqueue(() => S.LifestreamIPC.ChangeCharacter(data.Name, data.World));
                     return true;
                 }
                 else

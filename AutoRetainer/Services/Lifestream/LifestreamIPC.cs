@@ -32,6 +32,12 @@ public class LifestreamIPC
     [EzIPC] public Action<int, int?> EnqueuePropertyShortcut;
     [EzIPC] public Func<(int Kind, int Ward, int Plot)?> GetCurrentPlotInfo;
 
+    /// <summary>
+    /// name, world
+    /// </summary>
+    [EzIPC] public Func<string, string, ErrorCode> ChangeCharacter;
+    [EzIPC] public Func<ErrorCode> Logout;
+
     [EzIPCEvent]
     public void OnHouseEnterError()
     {
