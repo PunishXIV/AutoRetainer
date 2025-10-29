@@ -142,7 +142,7 @@ public unsafe class InventoryManagementCommon
                                 }
                                 else
                                 {
-                                    if(ImGuiEx.HoveredAndClicked("Right click to add this single item to list immediately", ImGuiMouseButton.Right))
+                                    if(ImGuiEx.HoveredAndClicked("Right click to remove this single item to list immediately", ImGuiMouseButton.Right))
                                     {
                                         removeAction(x.RowId);
                                     }
