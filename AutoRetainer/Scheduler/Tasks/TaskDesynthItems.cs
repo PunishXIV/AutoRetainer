@@ -11,24 +11,8 @@ using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
 namespace AutoRetainer.Scheduler.Tasks;
 public static unsafe class TaskDesynthItems
 {
-    private static readonly InventoryType[] DesynthableInventories =
-    [
-        InventoryType.Inventory1,
-        InventoryType.Inventory2,
-        InventoryType.Inventory3,
-        InventoryType.Inventory4,
-        InventoryType.ArmoryMainHand,
-        InventoryType.ArmoryOffHand,
-        InventoryType.ArmoryHead,
-        InventoryType.ArmoryBody,
-        InventoryType.ArmoryHands,
-        InventoryType.ArmoryLegs,
-        InventoryType.ArmoryFeets,
-        InventoryType.ArmoryEar,
-        InventoryType.ArmoryNeck,
-        InventoryType.ArmoryWrist,
-        InventoryType.ArmoryRings
-    ];
+    private static InventoryType[] DesynthableInventories => [.. Utils.PlayerInvetories, 
+        .. (Data.GetIMSettings().IMEnableItemDesynthesisFromArmory ? Utils.PlayerArmory : [])];
 
     public static void Enqueue()
     {
@@ -40,7 +24,7 @@ public static unsafe class TaskDesynthItems
     {
         if(!QuestManager.IsQuestComplete(65688)) return true;
 
-        var eligibleItems = GetEligibleItems();
+        var eligibleItems = GetDesynthesisEligibleItems();
         if(eligibleItems.Count == 0) return true;
 
         foreach(var item in eligibleItems)
@@ -57,7 +41,7 @@ public static unsafe class TaskDesynthItems
         return false;
     }
 
-    private static List<Pointer<InventoryItem>> GetEligibleItems()
+    private static List<Pointer<InventoryItem>> GetDesynthesisEligibleItems()
     {
         List<Pointer<InventoryItem>> items = [];
         foreach(var inv in DesynthableInventories)

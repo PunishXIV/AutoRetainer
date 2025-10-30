@@ -27,6 +27,7 @@ public sealed unsafe class InventoryManagementSettings
     public int IMDiscardStackLimit = 20;
     public bool IMDry = false;
     public bool IMEnableItemDesynthesis = false;
+    public bool IMEnableItemDesynthesisFromArmory = false;
     public bool IMEnableNpcSell = false;
     public bool AllowSellFromArmory = false;
 
