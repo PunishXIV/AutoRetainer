@@ -158,6 +158,7 @@ internal unsafe class AutoRetainerWindow : Window
         {
             MultiMode.OnMultiModeEnabled();
         }
+        Utils.DrawLifestreamAvailabilityIndicator();
         if(C.ShowNightMode)
         {
             ImGui.SameLine();

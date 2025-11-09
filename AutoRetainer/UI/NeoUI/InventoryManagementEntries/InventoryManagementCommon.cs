@@ -204,7 +204,7 @@ public unsafe class InventoryManagementCommon
                 {
                     actions.Add(() =>
                     {
-                        ImGuiEx.PushID(item.RowId.ToString());
+                        ImGui.PushID(item.RowId.ToString());
                         ImGui.TableNextRow();
                         ImGui.TableNextColumn();
                         if(ThreadLoadImageHandler.TryGetIconTextureWrap(item.Icon, false, out var tex))

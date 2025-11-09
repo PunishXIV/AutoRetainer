@@ -21,6 +21,10 @@ internal unsafe class LoginOverlay : Window
 
     public override void Draw()
     {
+        if(!Utils.IsLifestreamInstalled())
+        {
+            Utils.DrawLifestreamWarning("Multi Mode");
+        }
         var num = 1;
         ref var sacc = ref Ref<int>.Get("ServAcc", -1);
         int[] userServiceAccounts = [-1, .. C.OfflineData.Select(x => x.ServiceAccount).Distinct().Order()];

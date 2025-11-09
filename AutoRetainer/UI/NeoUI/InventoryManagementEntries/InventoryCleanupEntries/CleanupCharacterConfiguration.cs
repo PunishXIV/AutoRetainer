@@ -21,7 +21,7 @@ public sealed unsafe class CleanupCharacterConfiguration : InventoryManagementBa
             foreach(var characterData in C.OfflineData)
             {
                 if(filter != "" && !characterData.NameWithWorld.Contains(filter, StringComparison.OrdinalIgnoreCase)) continue;
-                ImGuiEx.PushID(characterData.Identity);
+                ImGui.PushID(characterData.Identity);
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
                 ImGuiEx.TextV(characterData.NameWithWorldCensored);
@@ -34,7 +34,7 @@ public sealed unsafe class CleanupCharacterConfiguration : InventoryManagementBa
                     ImGui.Separator();
                     foreach(var cleanupPlan in C.AdditionalIMSettings)
                     {
-                        ImGuiEx.PushID(cleanupPlan.ID);
+                        ImGui.PushID(cleanupPlan.ID);
                         if(ImGui.Selectable($"{cleanupPlan.DisplayName}"))
                         {
                             characterData.InventoryCleanupPlan = cleanupPlan.GUID;

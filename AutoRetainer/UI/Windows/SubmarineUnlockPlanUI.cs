@@ -222,7 +222,7 @@ internal unsafe class SubmarineUnlockPlanUI : Window
                     {
                         if(x.Value.Point < 9000)
                         {
-                            ImGuiEx.PushID($"{x.Key}");
+                            ImGui.PushID($"{x.Key}");
                             ImGui.TableNextRow();
                             ImGui.TableNextColumn();
                             var data = Svc.Data.GetExcelSheet<SubmarineExploration>().GetRowOrDefault(x.Key);

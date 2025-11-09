@@ -11,7 +11,7 @@ internal static class UIUtils
     public static void DrawSortableEnumList<T>(string id, List<T> list) where T : struct, Enum
     {
         ref var dragDrop = ref Ref<ImGuiEx.RealtimeDragDrop<T>>.Get($"dsel{id}", () => new($"dsel{id}", x => x.ToString()));
-        ImGuiEx.PushID(id);
+        ImGui.PushID(id);
         if(ImGui.BeginCombo("##addNew", "Add Entries...", ImGuiComboFlags.HeightLarge))
         {
             foreach(var x in Enum.GetValues<T>())
@@ -30,7 +30,7 @@ internal static class UIUtils
         for(var i = 0; i < list.Count; i++)
         {
             var x = list[i];
-            ImGuiEx.PushID(x.ToString());
+            ImGui.PushID(x.ToString());
             dragDrop.DrawButtonDummy(x, list, i);
             ImGui.SameLine();
             if(ImGuiEx.IconButton(FontAwesomeIcon.Trash))
@@ -67,6 +67,13 @@ internal static class UIUtils
 
     public static void DrawSearch()
     {
+        if(C.OfflineData.Any(x => x.WorkshopEnabled || x.Enabled))
+        {
+            if(!Utils.IsLifestreamInstalled())
+            {
+                Utils.DrawLifestreamWarning("Multi Mode");
+            }
+        }
         if(!C.NoCharaSearch)
         {
             ImGuiEx.SetNextItemFullWidth();
@@ -226,7 +233,7 @@ internal static class UIUtils
     internal static bool DrawKeybind(string text, ref LimitedKeys key)
     {
         var ret = false;
-        ImGuiEx.PushID(text);
+        ImGui.PushID(text);
         ImGuiEx.Text($"{text}:");
         ImGui.Dummy(new(20, 1));
         ImGui.SameLine();

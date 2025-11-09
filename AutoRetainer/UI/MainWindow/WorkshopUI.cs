@@ -44,7 +44,7 @@ internal static unsafe class WorkshopUI
         {
             var search = Ref<string>.Get("SearchChara");
             if(search != "" && !$"{data.Name}@{data.World}".Contains(search, StringComparison.OrdinalIgnoreCase)) continue;
-            ImGuiEx.PushID($"Player{data.CID}");
+            ImGui.PushID($"Player{data.CID}");
             var rCurPos = ImGui.GetCursorPos();
             float pad = 0;
             ImGui.PushFont(UiBuilder.IconFont);
@@ -329,7 +329,7 @@ internal static unsafe class WorkshopUI
     private static void DrawRow(OfflineCharacterData data, OfflineVesselData vessel, VoyageType type)
     {
         if(type == VoyageType.Airship && data.GetEnabledVesselsData(type).Count == 0 && C.HideAirships) return;
-        ImGuiEx.PushID($"{data.CID}/{vessel.Name}/{type}");
+        ImGui.PushID($"{data.CID}/{vessel.Name}/{type}");
         var enabled = type == VoyageType.Airship ? data.EnabledAirships : data.EnabledSubs;
         var adata = data.GetAdditionalVesselData(vessel.Name, type);
 

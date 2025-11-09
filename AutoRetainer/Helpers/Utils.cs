@@ -2,12 +2,14 @@
 using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Scheduler.Handlers;
 using AutoRetainer.Scheduler.Tasks;
+using AutoRetainer.UI.NeoUI.Experiments;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Bindings.ImPlot;
 using Dalamud.Game;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Interface.ImGuiNotification;
 using Dalamud.Memory;
 using Dalamud.Utility;
 using ECommons.Events;
@@ -54,6 +56,60 @@ public static unsafe class Utils
             return field;
         }
     } = null;
+
+    public static bool IsLifestreamInstalled()
+    {
+        return Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "Lifestream" && x.IsLoaded && x.Version >= new Version("2.5.3.0"));
+    }
+
+    public static void DrawLifestreamWarning(string function)
+    {
+        if(!Utils.IsLifestreamInstalled())
+        {
+            ImGuiEx.TextWrapped(EColor.RedBright, $"Lifestream plugin is not installed or not enabled. You have to install and enable it in order for {function} to work. Click here if you would like to open an instruction on how to do so.");
+            if(ImGuiEx.HoveredAndClicked())
+            {
+                ShellStart("https://github.com/NightmareXIV/Lifestream/?tab=readme-ov-file#installation");
+            }
+        }
+    }
+
+    public static void NotifyIfLifestreamIsNotInstalled(string function = "this function")
+    {
+        ref var notification = ref Ref<IActiveNotification>.Get("Notification");
+        if(!Utils.IsLifestreamInstalled())
+        {
+            if(notification != null)
+            {
+                try
+                {
+                    notification.DismissNow();
+                }
+                catch(Exception e)
+                {
+                    e.LogVerbose();
+                }
+            }
+            notification = Svc.NotificationManager.AddNotification(new()
+            {
+                Title = "Lifestream is not installed",
+                Content = $"Lifestream plugin is required to use {function}. Click here for a guide on how to install it.",
+                InitialDuration = TimeSpan.FromSeconds(60),
+                Type = NotificationType.Error,
+                Minimized = false,
+            });
+            notification.Click += delegate
+            {
+                ShellStart("https://github.com/NightmareXIV/Lifestream/?tab=readme-ov-file#installation");
+                Ref<IActiveNotification>.Get("Notification")?.DismissNow();
+            };
+        }
+    }
+
+    public static void DrawLifestreamAvailabilityIndicator()
+    {
+        ImGuiEx.PluginAvailabilityIndicator([new("Lifestream", "2.5.3.0")]);
+    }
 
     public static uint[] ArmorsUICategories
     {

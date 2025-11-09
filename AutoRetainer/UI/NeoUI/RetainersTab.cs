@@ -35,7 +35,7 @@ public class RetainersTab : NeoUIEntry
                 {
                     continue;
                 }
-                ImGuiEx.PushID(x.CID.ToString());
+                ImGui.PushID(x.CID.ToString());
                 ImGuiEx.CollectionCheckbox(Censor.Character(x.Name, x.World), x.RetainerData.Select(r => (x.CID, r.Name)), SelectedRetainers);
                 ImGui.Indent();
                 foreach(var r in x.RetainerData)

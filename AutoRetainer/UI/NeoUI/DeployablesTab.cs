@@ -94,7 +94,7 @@ public class DeployablesTab : NeoUIEntry
                 if(search.Length > 0 && !$"{x.Name}@{x.World}".Contains(search, StringComparison.OrdinalIgnoreCase)) continue;
                 if(x.OfflineSubmarineData.Count > 0)
                 {
-                    ImGuiEx.PushID(x.CID.ToString());
+                    ImGui.PushID(x.CID.ToString());
                     ImGuiEx.CollectionCheckbox(Censor.Character(x.Name, x.World), x.OfflineSubmarineData.Select(v => (x.CID, v.Name)), SelectedVessels);
                     ImGui.Indent();
                     foreach(var v in x.OfflineSubmarineData)
@@ -334,14 +334,14 @@ public class DeployablesTab : NeoUIEntry
                 ImGui.Text("Level range:");
                 ImGui.SameLine();
                 ImGuiEx.SetNextItemWidthScaled(60f);
-                ImGuiEx.PushID("##minlvl");
+                ImGui.PushID("##minlvl");
                 ImGui.DragInt($"##minlvl{entry.GUID}", ref entry.MinLevel, 0.1f);
                 ImGui.PopID();
                 ImGui.SameLine();
                 ImGuiEx.Text($"-");
                 ImGuiEx.SetNextItemWidthScaled(60f);
                 ImGui.SameLine();
-                ImGuiEx.PushID("##maxlvl");
+                ImGui.PushID("##maxlvl");
                 ImGui.DragInt($"##maxlvl{entry.GUID}", ref entry.MaxLevel, 0.1f);
                 ImGui.PopID();
 

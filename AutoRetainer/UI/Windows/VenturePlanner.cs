@@ -91,7 +91,7 @@ public sealed class VenturePlanner : Window
                     for(var i = 0; i < adata.VenturePlan.List.Count; i++)
                     {
                         var v = adata.VenturePlan.List[i];
-                        ImGuiEx.PushID(v.GUID);
+                        ImGui.PushID(v.GUID);
                         {
                             var d = i == 0;
                             if(d) ImGui.BeginDisabled();
@@ -153,7 +153,7 @@ public sealed class VenturePlanner : Window
                         for(var i = 0; i < C.SavedPlans.Count; i++)
                         {
                             var p = C.SavedPlans[i];
-                            ImGuiEx.PushID(p.GUID);
+                            ImGui.PushID(p.GUID);
                             if(ImGui.Selectable(p.Name))
                             {
                                 adata.VenturePlan = p.JSONClone();

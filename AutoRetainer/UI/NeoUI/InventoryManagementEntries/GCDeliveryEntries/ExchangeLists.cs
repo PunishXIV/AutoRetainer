@@ -43,7 +43,7 @@ public sealed unsafe class ExchangeLists : InventoryManagementBase
                 ImGui.Separator();
                 foreach(var x in C.AdditionalGCExchangePlans)
                 {
-                    ImGuiEx.PushID(x.ID);
+                    ImGui.PushID(x.ID);
                     if(ImGui.Selectable(x.DisplayName)) SelectedPlanGuid = x.GUID;
                     ImGui.PopID();
                 }
@@ -165,7 +165,7 @@ public sealed unsafe class ExchangeLists : InventoryManagementBase
         ref bool onlySelected() => ref Ref<bool>.Get($"{plan.ID}onlySel");
         ref string getFilter2() => ref Ref<string>.Get($"{plan.ID}filter2");
 
-        ImGuiEx.PushID(plan.ID);
+        ImGui.PushID(plan.ID);
         plan.Validate();
 
         ImGuiEx.InputWithRightButtonsArea("GCPlanSettings", () =>
@@ -302,7 +302,7 @@ public sealed unsafe class ExchangeLists : InventoryManagementBase
                     && !Utils.GCRanks[meta.MinPurchaseRank].Equals(getFilter(), StringComparison.OrdinalIgnoreCase)
                     ) continue;
                 if(SelectedCategory != null && meta.Category != SelectedCategory.Value) continue;
-                ImGuiEx.PushID(currentItem.ID);
+                ImGui.PushID(currentItem.ID);
                 ImGui.TableNextRow();
                 DragDrop.SetRowColor(currentItem);
                 ImGui.TableNextColumn();

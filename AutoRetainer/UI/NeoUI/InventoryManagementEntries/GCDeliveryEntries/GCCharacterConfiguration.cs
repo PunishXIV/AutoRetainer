@@ -21,7 +21,7 @@ public sealed unsafe class GCCharacterConfiguration : InventoryManagementBase
             foreach(var characterData in C.OfflineData)
             {
                 if(filter != "" && !characterData.NameWithWorld.Contains(filter, StringComparison.OrdinalIgnoreCase)) continue;
-                ImGuiEx.PushID(characterData.Identity);
+                ImGui.PushID(characterData.Identity);
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
                 ImGuiEx.TextV(characterData.NameWithWorldCensored);
@@ -34,7 +34,7 @@ public sealed unsafe class GCCharacterConfiguration : InventoryManagementBase
                     ImGui.Separator();
                     foreach(var exchangePlan in C.AdditionalGCExchangePlans)
                     {
-                        ImGuiEx.PushID(exchangePlan.ID);
+                        ImGui.PushID(exchangePlan.ID);
                         if(ImGui.Selectable($"{exchangePlan.DisplayName}"))
                         {
                             characterData.ExchangePlan = exchangePlan.GUID;

@@ -50,7 +50,7 @@ public static unsafe class InventoryCleanupCommon
                 ImGui.Separator();
                 foreach(var x in C.AdditionalIMSettings)
                 {
-                    ImGuiEx.PushID(x.ID);
+                    ImGui.PushID(x.ID);
                     if(ImGui.Selectable(x.DisplayName)) SelectedPlanGuid = x.GUID;
                     ImGui.PopID();
                 }

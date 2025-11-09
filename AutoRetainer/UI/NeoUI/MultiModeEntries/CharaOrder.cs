@@ -31,7 +31,7 @@ public class CharaOrder : NeoUIEntry
                 for(var index = 0; index < C.OfflineData.Count; index++)
                 {
                     var chr = C.OfflineData[index];
-                    ImGuiEx.PushID(chr.Identity);
+                    ImGui.PushID(chr.Identity);
                     ImGui.TableNextRow();
                     DragDrop.SetRowColor(chr.Identity);
                     ImGui.TableNextColumn();

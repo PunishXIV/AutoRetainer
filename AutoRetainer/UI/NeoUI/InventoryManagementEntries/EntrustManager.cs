@@ -26,7 +26,7 @@ public class EntrustManager : InventoryManagementBase
                 for(var i = 0; i < C.EntrustPlans.Count; i++)
                 {
                     var plan = C.EntrustPlans[i];
-                    ImGuiEx.PushID(plan.Guid.ToString());
+                    ImGui.PushID(plan.Guid.ToString());
                     if(ImGui.Selectable(plan.Name, plan == selectedPlan))
                     {
                         SelectedGuid = plan.Guid;

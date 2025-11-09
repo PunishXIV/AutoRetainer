@@ -7,7 +7,7 @@ public class CharaConfig
 {
     public static void Draw(OfflineCharacterData data, bool isRetainer)
     {
-        ImGuiEx.PushID(data.CID.ToString());
+        ImGui.PushID(data.CID.ToString());
         SharedUI.DrawMultiModeHeader(data);
         var b = new NuiBuilder()
 
