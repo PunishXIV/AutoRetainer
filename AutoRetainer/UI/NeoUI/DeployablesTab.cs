@@ -1,5 +1,6 @@
 ﻿using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage;
+using AutoRetainer.UI.Windows;
 using AutoRetainerAPI.Configuration;
 using ECommons.MathHelpers;
 using VesselDescriptor = (ulong CID, string VesselName);
@@ -23,6 +24,16 @@ public class DeployablesTab : NeoUIEntry
         .Checkbox($"Resend vessels when accessing the Voyage Control Panel", () => ref C.SubsAutoResend2)
         .Checkbox($"Finalize all vessels before resending them", () => ref C.FinalizeBeforeResend)
         .Checkbox($"Hide Airships from Deployables UI", () => ref C.HideAirships)
+
+        .Section("Plans")
+        .Widget(SubmarineUnlockPlanUI.DrawButtonText, x =>
+        {
+            SubmarineUnlockPlanUI.DrawButton();
+        })
+        .Widget(SubmarinePointPlanUI.DrawButtonText, x =>
+        {
+            SubmarinePointPlanUI.DrawButton();
+        })
 
         .Section("Alert Settings")
         .Checkbox($"Less than possible vessels enabled", () => ref C.AlertNotAllEnabled)

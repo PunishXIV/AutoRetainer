@@ -111,6 +111,7 @@ internal static unsafe class MultiMode
         {
             return;
         }
+        EzThrottler.Throttle("ForceShutdownForSubs", 10 * 60 * 1000, true);
         EzThrottler.Reset("GcBusy");
         EzThrottler.Reset($"ExpertDeliver_{Data?.Identity}");
         LastLogin = 0;
@@ -164,6 +165,25 @@ internal static unsafe class MultiMode
             if(P.TaskManager.IsBusy || S.LifestreamIPC.IsBusy())
             {
                 return;
+            }
+            if(C.ShutdownOnSubExhaustion)
+            {
+                if(Utils.CanShutdownForSubs())
+                {
+                    if(Utils.CanEnqueueShutdown())
+                    {
+                        Utils.EnqueueShutdown();
+                    }
+                    if(EzThrottler.Check("ForceShutdownForSubs"))
+                    {
+                        PluginLog.Warning($"Could not shutdown the game normally, forcing exit");
+                        Environment.Exit(0);
+                    }
+                }
+                else
+                {
+                    EzThrottler.Throttle("ForceShutdownForSubs", 10 * 60 * 1000, true);
+                }
             }
             if(MultiMode.WaitOnLoginScreen)
             {
@@ -377,11 +397,11 @@ internal static unsafe class MultiMode
         return Environment.TickCount64 > NextInteractionAt;
     }
 
-    internal static OfflineRetainerData[] GetEnabledRetainers(this OfflineCharacterData data)
+    internal static OfflineRetainerData[] GetEnabledRetainers(this OfflineCharacterData data, bool checkHasVenture = true)
     {
         if(C.SelectedRetainers.TryGetValue(data.CID, out var enabledRetainers))
         {
-            return data.RetainerData.Where(z => enabledRetainers.Contains(z.Name) && z.HasVenture).ToArray();
+            return data.RetainerData.Where(z => enabledRetainers.Contains(z.Name) && (!checkHasVenture || z.HasVenture)).ToArray();
         }
         return Array.Empty<OfflineRetainerData>();
     }

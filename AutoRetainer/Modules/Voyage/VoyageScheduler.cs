@@ -290,6 +290,9 @@ internal static unsafe class VoyageScheduler
             if(Utils.GenericThrottle && EzThrottler.Throttle("Voyage.Deploy"))
             {
                 Callback.Fire(addon, true, 0);
+                var day = Utils.GetDaysSinceUtcStart();
+                Data.SentVoyagesByDay[day] = Data.SentVoyagesByDay.SafeSelect(day) + 1;
+                Data.SentVoyagesByDay.RemoveAll(x => x.Key < day - 30);
                 return true;
             }
         }

@@ -72,7 +72,8 @@ internal static unsafe class RetainerHandlers
         EnforceSelectStringThrottle();
         //2385	View venture report. (Complete)
         var text = Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(2385).Text.ToDalamudString().GetText();
-        return Utils.TrySelectSpecificEntry(text);
+        var ret = Utils.TrySelectSpecificEntry(text);
+        return ret;
     }
 
     internal static bool? EnforceSelectString(Func<bool?> Action)
@@ -148,6 +149,9 @@ internal static unsafe class RetainerHandlers
             {
                 new AddonMaster.RetainerTaskAsk((IntPtr)addon).Assign();
                 DebugLog("Clicked assign");
+                var day = Utils.GetDaysSinceUtcStart();
+                Data.SentVenturesByDay[day] = Data.SentVenturesByDay.SafeSelect(day) + 1;
+                Data.SentVenturesByDay.RemoveAll(x => x.Key < day - 30);
                 return true;
             }
         }

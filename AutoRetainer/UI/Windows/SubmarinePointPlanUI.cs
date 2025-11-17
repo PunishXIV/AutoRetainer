@@ -25,6 +25,15 @@ internal unsafe class SubmarinePointPlanUI : Window
         return i;
     }
 
+    public static readonly string DrawButtonText = "Open Submarine Point Plan Editor";
+    public static void DrawButton()
+    {
+        if(ImGuiEx.IconButtonWithText((FontAwesomeIcon)Lang.IconPlanner[0], DrawButtonText))
+        {
+            P.SubmarinePointPlanUI.IsOpen = true;
+        }
+    }
+
     public override void Draw()
     {
         C.SubmarinePointPlans.RemoveAll(x => x.Delete);
@@ -121,7 +130,15 @@ internal unsafe class SubmarinePointPlanUI : Window
                 {
                     try
                     {
-                        SelectedPlan.CopyFrom(JsonConvert.DeserializeObject<SubmarinePointPlan>(Paste()));
+                        var plan = JsonConvert.DeserializeObject<SubmarinePointPlan>(Paste());
+                        if(!plan.IsModified())
+                        {
+                            Notify.Error("Could not import clipboard content. Is it correct plan?");
+                        }
+                        else
+                        {
+                            SelectedPlan.CopyFrom(plan);
+                        }
                     }
                     catch(Exception ex)
                     {

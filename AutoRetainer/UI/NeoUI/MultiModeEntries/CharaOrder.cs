@@ -21,11 +21,12 @@ public class CharaOrder : NeoUIEntry
             ImGui.SetNextItemWidth(150f);
             ImGui.InputText($"Search", ref Search, 50);
             DragDrop.Begin();
-            if(ImGui.BeginTable("CharaOrderTable", 3, ImGuiTableFlags.Borders | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit))
+            if(ImGui.BeginTable("CharaOrderTable", 4, ImGuiTableFlags.Borders | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit))
             {
                 ImGui.TableSetupColumn("##ctrl");
                 ImGui.TableSetupColumn("Character", ImGuiTableColumnFlags.WidthStretch);
                 ImGui.TableSetupColumn("Toggles");
+                ImGui.TableSetupColumn("Deletion");
                 ImGui.TableHeadersRow();
 
                 for(var index = 0; index < C.OfflineData.Count; index++)
@@ -60,6 +61,12 @@ public class CharaOrder : NeoUIEntry
                     ImGui.SameLine();
                     ImGuiEx.ButtonCheckbox(FontAwesomeIcon.Coins, ref chr.NoGilTrack, inverted: true);
                     ImGuiEx.Tooltip("Count gil on this character towards total");
+                    ImGui.TableNextColumn();
+                    if(ImGuiEx.IconButton(FontAwesomeIcon.UserMinus))
+                    {
+                        chr.ClearFCData();
+                    }
+                    ImGuiEx.Tooltip("Reset FC data and deployable data for this character. It will regenerate once you log in and access workshop panel.");
                     ImGui.SameLine();
                     if(ImGuiEx.IconButton(FontAwesomeIcon.Trash, enabled: ImGuiEx.Ctrl))
                     {

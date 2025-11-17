@@ -74,6 +74,12 @@ internal static class SharedUI
                 new TickScheduler(() => C.OfflineData.RemoveAll(x => x.CID == data.CID));
             }
             ImGuiComponents.HelpMarker("Character's saved data will be removed without excluding it. Character data will be regenerated once you log back into this character.");
+
+                if(ImGui.Button("Clear Free company data"))
+            {
+                data.ClearFCData();
+            }
+            ImGuiComponents.HelpMarker("Free company data, airships and submersibles will be removed from this character. Data will be regenerated once available.");
         }).Draw();
     }
 }

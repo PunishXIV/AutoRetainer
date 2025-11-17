@@ -9,6 +9,7 @@ using Dalamud.Game;
 using Dalamud.Interface.Components;
 using ECommons.MathHelpers;
 using Lumina.Excel.Sheets;
+using MessagePack;
 
 
 namespace AutoRetainer.UI.MainWindow;
@@ -51,6 +52,7 @@ internal static unsafe class WorkshopUI
             ImGuiEx.ButtonCheckbox($"\uf21a##{data.CID}", ref data.WorkshopEnabled, 0xFF097000);
             ImGui.PopFont();
             ImGuiEx.Tooltip($"Enable submersibles in multi mode on this character");
+            ImGuiEx.DragDropRepopulate("RepopWsEn", data.WorkshopEnabled, ref data.WorkshopEnabled);
             ImGui.SameLine(0, 3);
             if(ImGuiEx.IconButton(FontAwesomeIcon.DoorOpen))
             {
@@ -346,38 +348,41 @@ internal static unsafe class WorkshopUI
         ImGuiEx.CollectionCheckbox($"{vessel.Name}##sub", vessel.Name, enabled);
         if(disabled) ImGui.EndDisabled();
         ImGui.SameLine();
-        ImGui.PushFont(UiBuilder.IconFont);
         if(adata.VesselBehavior == VesselBehavior.Finalize)
         {
-            ImGuiEx.Text(Lang.IconAnchor);
+            ImGuiEx.IconButton(Lang.IconAnchor);
+            repop();
         }
         else if(adata.VesselBehavior == VesselBehavior.Redeploy)
         {
-            ImGuiEx.Text(Lang.IconResend);
+            ImGuiEx.IconButton(Lang.IconResend);
+            repop();
         }
         else if(adata.VesselBehavior == VesselBehavior.LevelUp)
         {
-            ImGuiEx.Text(Lang.IconLevelup);
+            ImGuiEx.IconButton(Lang.IconLevelup);
+            repop();
         }
         else if(adata.VesselBehavior == VesselBehavior.Unlock)
         {
-            ImGuiEx.Text(Lang.IconUnlock);
+            ImGuiEx.IconButton(Lang.IconUnlock);
+            repop();
             ImGui.SameLine();
             if(adata.UnlockMode == UnlockMode.WhileLevelling)
             {
-                ImGuiEx.Text(Lang.IconLevelup);
+                ImGuiEx.IconButton(Lang.IconLevelup);
             }
             else if(adata.UnlockMode == UnlockMode.SpamOne)
             {
-                ImGuiEx.Text(Lang.IconRepeat);
+                ImGuiEx.IconButton(Lang.IconRepeat);
             }
             else if(adata.UnlockMode == UnlockMode.MultiSelect)
             {
-                ImGuiEx.Text(Lang.IconPath);
+                ImGuiEx.IconButton(Lang.IconPath);
             }
             else
             {
-                ImGuiEx.Text(Lang.IconWarning);
+                ImGuiEx.IconButton(Lang.IconWarning);
             }
         }
         else if(adata.VesselBehavior == VesselBehavior.Use_plan)
@@ -385,16 +390,33 @@ internal static unsafe class WorkshopUI
             var plan = VoyageUtils.GetSubmarinePointPlanByGuid(adata.SelectedPointPlan);
             var valid = plan != null && plan.Points.Count.InRange(1, 5, true);
             var fast = plan != null && plan.Points.SequenceEqual(adata.Points.Where(x => x != 0).Select(x => (uint)x));
-            ImGuiEx.Text(valid ? (fast ? EColor.GreenBright : null) : EColor.RedBright, Lang.IconPlanner);
-            ImGui.PushFont(UiBuilder.DefaultFont);
+            Vector4? col = valid ? (fast ? EColor.GreenBright : null) : EColor.RedBright;
+            if(col != null) ImGui.PushStyleColor(ImGuiCol.Text, col.Value);
+            ImGuiEx.IconButton(Lang.IconPlanner);
+            if(col != null) ImGui.PopStyleColor();
             if(valid) ImGuiEx.Tooltip(plan.Points.Select(x => $"{VoyageUtils.GetSubmarineExploration(x)?.FancyDestination()}").Print("\n"));
-            ImGui.PopFont();
+            repop();
         }
         else
         {
-            ImGuiEx.Text(Lang.IconWarning);
+            ImGuiEx.IconButton(Lang.IconWarning);
         }
-        ImGui.PopFont();
+        void repop()
+        {
+            ImGuiEx.DragDropRepopulateClass("RepSubConf", adata, x =>
+            {
+                adata.VesselBehavior = x.VesselBehavior;
+                if(adata.VesselBehavior == VesselBehavior.Use_plan)
+                {
+                    adata.SelectedPointPlan = x.SelectedPointPlan;
+                }
+                if(adata.VesselBehavior == VesselBehavior.Unlock)
+                {
+                    adata.SelectedUnlockPlan = x.SelectedUnlockPlan;
+                    adata.UnlockMode = x.UnlockMode;
+                }
+            });
+        }
         if(adata.IndexOverride > 0)
         {
             ImGui.SameLine();

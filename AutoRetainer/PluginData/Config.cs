@@ -265,4 +265,7 @@ internal unsafe class Config
     public int FullAutoGCDeliveryDeliverOnVentureLessThan = 50;
     public bool FullAutoGCDeliveryTpBackToHome = false;
     public bool VendorItemAfterVoyage = false;
+
+    public bool ShutdownOnSubExhaustion = false;
+    public float HoursForShutdown = 3;
 }

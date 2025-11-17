@@ -1,4 +1,6 @@
-﻿namespace AutoRetainer.UI.NeoUI.MultiModeEntries;
+﻿using ECommons.Throttlers;
+
+namespace AutoRetainer.UI.NeoUI.MultiModeEntries;
 public class MultiModeDeployables : NeoUIEntry
 {
     public override string Path => "Multi Mode/Deployables";
@@ -20,5 +22,16 @@ public class MultiModeDeployables : NeoUIEntry
         {
             if(ImGuiEx.Button(x, C.FCChestGilCheckTimes.Count > 0)) C.FCChestGilCheckTimes.Clear();
         })
-        .Unindent();
+        .Unindent()
+        .Checkbox("Shutdown the game after all deployables have been processed", () => ref C.ShutdownOnSubExhaustion)
+        .Indent()
+        .SliderFloat(150f, "Don't shutdown if there are deployables that return within this amount of hours", () => ref C.HoursForShutdown, 0f, 10f)
+        .Widget(() =>
+        {
+            ImGuiEx.HelpMarker($"""
+                Currently: {(Utils.CanShutdownForSubs()?"Can shutdown":"Can NOT shutdown")}
+                Remaining for force shutdown: {EzThrottler.GetRemainingTime("ForceShutdownForSubs")}
+                """);
+        })
+        ;
 }
