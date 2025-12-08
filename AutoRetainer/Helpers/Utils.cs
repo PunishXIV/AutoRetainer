@@ -4,6 +4,8 @@ using AutoRetainer.Scheduler.Handlers;
 using AutoRetainer.Scheduler.Tasks;
 using AutoRetainer.UI.NeoUI.Experiments;
 using AutoRetainerAPI.Configuration;
+using CsvHelper;
+using CsvHelper.Configuration;
 using Dalamud.Bindings.ImPlot;
 using Dalamud.Game;
 using Dalamud.Game.ClientState.Conditions;
@@ -29,6 +31,10 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.Sheets;
 using Lumina.Text.ReadOnly;
 using System;
+using System.Globalization;
+
+using System.IO;
+
 
 //using OtterGui.Text.EndObjects;
 using System.Text.RegularExpressions;
@@ -50,6 +56,31 @@ public static unsafe class Utils
         if(TryGetAddonMaster<AddonMaster._TitleMenu>(out var m) && m.IsAddonReady) return true;
         if(Player.Interactable && !GenericHelpers.IsOccupied()) return true;
         return false;
+    }
+
+    public static void WriteCsv(string filePath, string[] columnNames, List<string[]> rows)
+    {
+        var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            HasHeaderRecord = true
+        };
+
+        using var writer = new StreamWriter(filePath);
+        using var csv = new CsvWriter(writer, config);
+        foreach(var col in columnNames)
+        {
+            csv.WriteField(col);
+        }
+        csv.NextRecord();
+
+        foreach(var row in rows)
+        {
+            foreach(var field in row)
+            {
+                csv.WriteField(field);
+            }
+            csv.NextRecord();
+        }
     }
 
     public static void EnqueueShutdown()
@@ -169,7 +200,7 @@ public static unsafe class Utils
 
     public static void DrawLifestreamAvailabilityIndicator()
     {
-        ImGuiEx.PluginAvailabilityIndicator([new("Lifestream", "2.5.3.0")]);
+        ImGuiEx.PluginAvailabilityIndicator([new("Lifestream", new Version("2.5.3.0"))]);
     }
 
     public static long GetDaysSinceUtcStart()

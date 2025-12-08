@@ -36,4 +36,6 @@ public sealed unsafe class InventoryManagementSettings
     public bool AdditionModeHardSellList = false;
     public bool AdditionModeDiscardList = false;
     public bool AdditionModeDesynthList = false;
+
+    public int MaxCoffersAtOnce = 10000;
 }

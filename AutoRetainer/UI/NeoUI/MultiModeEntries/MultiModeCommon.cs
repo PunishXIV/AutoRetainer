@@ -14,6 +14,10 @@ public class MultiModeCommon : NeoUIEntry
 
         .Section("Game startup")
         .Checkbox($"Enable Multi Mode on Game Boot", () => ref C.MultiAutoStart)
+        .Checkbox($"Enable Multi Mode on Plugin Startup", () => ref C.MultiOnPluginLoad)
+        .Indent()
+        .SliderInt(150f, "Delay, seconds", () => ref C.MultiModeOnPluginLoadDelay, 0, 20)
+        .Unindent()
         .Widget("Auto-login on Game Boot", (x) =>
         {
             ImGui.SetNextItemWidth(150f);

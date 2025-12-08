@@ -21,6 +21,11 @@ internal unsafe class LoginOverlay : Window
 
     public override void Draw()
     {
+        this.SizeConstraints = new()
+        {
+            MinimumSize = new(0f, 0f),
+            MaximumSize = new(float.MaxValue, ImGui.GetWindowViewport().Size.Y * C.LoginOverlayPercent / 100f)
+        };
         if(!Utils.IsLifestreamInstalled())
         {
             Utils.DrawLifestreamWarning("Multi Mode");
@@ -44,6 +49,7 @@ internal unsafe class LoginOverlay : Window
         }
         ImGui.SetWindowFontScale(C.LoginOverlayScale);
         //ImGui.PushFont(Svc.PluginInterface.UiBuilder.GetGameFontHandle(new GameFontStyle(GameFontFamilyAndSize.MiedingerMid18)).ImFont);
+        int cnt = 0;
         foreach(var x in C.OfflineData.Where(x => !x.Name.IsNullOrEmpty() && (!x.ExcludeOverlay || (C.LoginOverlayAllSearch && Search != ""))))
         {
             if(sacc > -1 && x.ServiceAccount != sacc) continue;
@@ -59,9 +65,12 @@ internal unsafe class LoginOverlay : Window
                 MultiMode.Relog(x, out _, RelogReason.Overlay);
                 //AutoLogin.Instance.Login(x.CurrentWorld, x.Name, ExcelWorldHelper.GetWorldByName(x.World).RowId, x.ServiceAccount);
             }
+            cnt++;
+            if(cnt % C.NumLoginOverlayCols.ValidateRange(1, 10) != 0) ImGui.SameLine();
         }
-        //ImGui.PopFont();
-        ImGuiEx.LineCentered("LoginCenter", delegate
+        if(cnt % C.NumLoginOverlayCols.ValidateRange(1, 10) != 0) ImGui.NewLine();
+            //ImGui.PopFont();
+            ImGuiEx.LineCentered("LoginCenter", delegate
         {
             if(ImGui.Checkbox("Multi Mode", ref MultiMode.Enabled))
             {

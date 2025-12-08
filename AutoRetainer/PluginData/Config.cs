@@ -20,6 +20,8 @@ internal unsafe class Config
     public bool RecordStats = true;
     public bool AutoGCContinuation = false;
     public HashSet<ulong> WhitelistedAccounts = [];
+    public int NumLoginOverlayCols = 1;
+    public float LoginOverlayPercent = 100f;
 
     public bool ShouldSerializeEnableAutoGCHandin()
     {
@@ -268,4 +270,7 @@ internal unsafe class Config
 
     public bool ShutdownOnSubExhaustion = false;
     public float HoursForShutdown = 3;
+
+    public bool MultiOnPluginLoad = false;
+    public int MultiModeOnPluginLoadDelay = 10;
 }
