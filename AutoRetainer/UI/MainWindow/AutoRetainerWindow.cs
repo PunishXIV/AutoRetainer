@@ -93,128 +93,135 @@ internal unsafe class AutoRetainerWindow : Window
     public override void Draw()
     {
         //ImGuiEx.Text(GradientColor.Get(EColor.RedBright, EColor.YellowBright), "This version MUST NOT BE RUNNING UNATTENDED.");
-        if(!C.AcceptedDisclamer)
+        try
         {
-            new NuiBuilder()
-                .Section("Disclaimer")
-                .TextWrapped(ImGuiColors.DalamudYellow, "Please note that using AutoRetainer for RMT purposes is strictly prohibited. ")
-                .TextWrapped(ImGuiColors.DalamudRed, "To avoid unnecessary consequences please follow these rules when using AutoRetainer:")
-                .TextWrapped("1. Do not acknowledge your use of AutoRetainer in game chat;")
-                .TextWrapped("2. Do not leave AutoRetainer unattended for prolonged period of time;")
-                .TextWrapped("3. Ensure that your total playing+AutoRetainer usage time does not exceeds 16 hours per day; ensure that periods of inactivity exist between your retainer/submersible checking routine;")
-                .TextWrapped("4. Never reply back to players that are trying to do so-called bot checks by trading or chatting with you; instead, blacklist these players immediately;")
-                .TextWrapped("5. If questioned by game master, always claim that you are doing all actions manually and never admit plugin usage.")
-                .TextWrapped("Failure to follow these guidelines may put your account at risk.")
-                .TextWrapped(GradientColor.Get(ImGuiColors.DalamudYellow, ImGuiColors.DalamudRed), "You may not use AutoRetainer for Real Money Trading or other commercial purposes. No support will be provided if you are using it for these purposes.")
-                .Widget(() =>
-                {
-                    if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Check, "Accept and continue"))
+            if(!C.AcceptedDisclamer)
+            {
+                new NuiBuilder()
+                    .Section("Disclaimer")
+                    .TextWrapped(ImGuiColors.DalamudYellow, "Please note that using AutoRetainer for RMT purposes is strictly prohibited. ")
+                    .TextWrapped(ImGuiColors.DalamudRed, "To avoid unnecessary consequences please follow these rules when using AutoRetainer:")
+                    .TextWrapped("1. Do not acknowledge your use of AutoRetainer in game chat;")
+                    .TextWrapped("2. Do not leave AutoRetainer unattended for prolonged period of time;")
+                    .TextWrapped("3. Ensure that your total playing+AutoRetainer usage time does not exceeds 16 hours per day; ensure that periods of inactivity exist between your retainer/submersible checking routine;")
+                    .TextWrapped("4. Never reply back to players that are trying to do so-called bot checks by trading or chatting with you; instead, blacklist these players immediately;")
+                    .TextWrapped("5. If questioned by game master, always claim that you are doing all actions manually and never admit plugin usage.")
+                    .TextWrapped("Failure to follow these guidelines may put your account at risk.")
+                    .TextWrapped(GradientColor.Get(ImGuiColors.DalamudYellow, ImGuiColors.DalamudRed), "You may not use AutoRetainer for Real Money Trading or other commercial purposes. No support will be provided if you are using it for these purposes.")
+                    .Widget(() =>
                     {
-                        C.AcceptedDisclamer = true;
-                        EzConfig.Save();
-                    }
-                })
-                .Draw();
-            return;
-        }
-        var e = SchedulerMain.PluginEnabledInternal;
-        var disabled = MultiMode.Active && !ImGui.GetIO().KeyCtrl;
-
-        if(disabled)
-        {
-            ImGui.BeginDisabled();
-        }
-        if(ImGui.Checkbox($"Enable {P.Name}", ref e))
-        {
-            P.WasEnabled = false;
-            if(e)
-            {
-                SchedulerMain.EnablePlugin(PluginEnableReason.Auto);
+                        if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Check, "Accept and continue"))
+                        {
+                            C.AcceptedDisclamer = true;
+                            EzConfig.Save();
+                        }
+                    })
+                    .Draw();
+                return;
             }
-            else
+            var e = SchedulerMain.PluginEnabledInternal;
+            var disabled = MultiMode.Active && !ImGui.GetIO().KeyCtrl;
+
+            if(disabled)
             {
-                SchedulerMain.DisablePlugin();
+                ImGui.BeginDisabled();
+            }
+            if(ImGui.Checkbox($"Enable {P.Name}", ref e))
+            {
+                P.WasEnabled = false;
+                if(e)
+                {
+                    SchedulerMain.EnablePlugin(PluginEnableReason.Auto);
+                }
+                else
+                {
+                    SchedulerMain.DisablePlugin();
+                }
+            }
+            if(C.ShowDeployables && (VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType) || VoyageScheduler.Enabled))
+            {
+                ImGui.SameLine();
+                ImGui.Checkbox($"Deployables", ref VoyageScheduler.Enabled);
+            }
+            if(disabled)
+            {
+                ImGui.EndDisabled();
+                ImGuiComponents.HelpMarker($"MultiMode controls this option. Hold CTRL to override.");
+            }
+
+            if(P.WasEnabled)
+            {
+                ImGui.SameLine();
+                ImGuiEx.Text(GradientColor.Get(ImGuiColors.DalamudGrey, ImGuiColors.DalamudGrey3, 500), $"Paused");
+            }
+
+            ImGui.SameLine();
+            if(ImGui.Checkbox("Multi", ref MultiMode.Enabled))
+            {
+                MultiMode.OnMultiModeEnabled();
+            }
+            Utils.DrawLifestreamAvailabilityIndicator();
+            if(C.ShowNightMode)
+            {
+                ImGui.SameLine();
+                if(ImGui.Checkbox("Night", ref C.NightMode))
+                {
+                    MultiMode.BailoutNightMode();
+                }
+            }
+            if(C.DisplayMMType)
+            {
+                ImGui.SameLine();
+                ImGuiEx.SetNextItemWidthScaled(100f);
+                ImGuiEx.EnumCombo("##mode", ref C.MultiModeType);
+            }
+            if(C.CharEqualize && MultiMode.Enabled)
+            {
+                ImGui.SameLine();
+                if(ImGui.Button("Reset counters"))
+                {
+                    MultiMode.CharaCnt.Clear();
+                }
+            }
+
+            Svc.PluginInterface.GetIpcProvider<object>(ApiConsts.OnMainControlsDraw).SendMessage();
+
+            if(IPC.Suppressed)
+            {
+                ImGuiEx.Text(ImGuiColors.DalamudRed, $"Plugin operation is suppressed by other plugin.");
+                ImGui.SameLine();
+                if(ImGui.SmallButton("Cancel"))
+                {
+                    IPC.Suppressed = false;
+                }
+            }
+
+            if(P.TaskManager.IsBusy)
+            {
+                ImGui.SameLine();
+                if(ImGui.Button($"Abort {P.TaskManager.NumQueuedTasks} tasks"))
+                {
+                    P.TaskManager.Abort();
+                }
+            }
+
+            PatreonBanner.DrawRight();
+            ImGuiEx.EzTabBar("tabbar", PatreonBanner.Text,
+                            ("Retainers", MultiModeUI.Draw, null, true),
+                            ("Deployables", WorkshopUI.Draw, null, true),
+                            ("Troubleshooting", TroubleshootingUI.Draw, null, true),
+                            ("Statistics", DrawStats, null, true),
+                            ("About", CustomAboutTab.Draw, null, true)
+                            );
+            if(!C.PinWindow)
+            {
+                C.WindowPos = ImGui.GetWindowPos();
+                C.WindowSize = ImGui.GetWindowSize();
             }
         }
-        if(C.ShowDeployables && (VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType) || VoyageScheduler.Enabled))
+        catch(Exception e)
         {
-            ImGui.SameLine();
-            ImGui.Checkbox($"Deployables", ref VoyageScheduler.Enabled);
-        }
-        if(disabled)
-        {
-            ImGui.EndDisabled();
-            ImGuiComponents.HelpMarker($"MultiMode controls this option. Hold CTRL to override.");
-        }
-
-        if(P.WasEnabled)
-        {
-            ImGui.SameLine();
-            ImGuiEx.Text(GradientColor.Get(ImGuiColors.DalamudGrey, ImGuiColors.DalamudGrey3, 500), $"Paused");
-        }
-
-        ImGui.SameLine();
-        if(ImGui.Checkbox("Multi", ref MultiMode.Enabled))
-        {
-            MultiMode.OnMultiModeEnabled();
-        }
-        Utils.DrawLifestreamAvailabilityIndicator();
-        if(C.ShowNightMode)
-        {
-            ImGui.SameLine();
-            if(ImGui.Checkbox("Night", ref C.NightMode))
-            {
-                MultiMode.BailoutNightMode();
-            }
-        }
-        if(C.DisplayMMType)
-        {
-            ImGui.SameLine();
-            ImGuiEx.SetNextItemWidthScaled(100f);
-            ImGuiEx.EnumCombo("##mode", ref C.MultiModeType);
-        }
-        if(C.CharEqualize && MultiMode.Enabled)
-        {
-            ImGui.SameLine();
-            if(ImGui.Button("Reset counters"))
-            {
-                MultiMode.CharaCnt.Clear();
-            }
-        }
-
-        Svc.PluginInterface.GetIpcProvider<object>(ApiConsts.OnMainControlsDraw).SendMessage();
-
-        if(IPC.Suppressed)
-        {
-            ImGuiEx.Text(ImGuiColors.DalamudRed, $"Plugin operation is suppressed by other plugin.");
-            ImGui.SameLine();
-            if(ImGui.SmallButton("Cancel"))
-            {
-                IPC.Suppressed = false;
-            }
-        }
-
-        if(P.TaskManager.IsBusy)
-        {
-            ImGui.SameLine();
-            if(ImGui.Button($"Abort {P.TaskManager.NumQueuedTasks} tasks"))
-            {
-                P.TaskManager.Abort();
-            }
-        }
-
-        PatreonBanner.DrawRight();
-        ImGuiEx.EzTabBar("tabbar", PatreonBanner.Text,
-                        ("Retainers", MultiModeUI.Draw, null, true),
-                        ("Deployables", WorkshopUI.Draw, null, true),
-                        ("Troubleshooting", TroubleshootingUI.Draw, null, true),
-                        ("Statistics", DrawStats, null, true),
-                        ("About", CustomAboutTab.Draw, null, true)
-                        );
-        if(!C.PinWindow)
-        {
-            C.WindowPos = ImGui.GetWindowPos();
-            C.WindowSize = ImGui.GetWindowSize();
+            ImGuiEx.TextWrapped(e.ToStringFull());
         }
     }
 

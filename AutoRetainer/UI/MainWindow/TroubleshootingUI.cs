@@ -11,6 +11,18 @@ public static unsafe class TroubleshootingUI
     {
         ImGuiEx.TextWrapped("This tab checks your configuration for common issues that you can resolve yourself before contacting support.");
 
+        if(!Player.Available)
+        {
+            ImGuiEx.TextWrapped($"Can not troubleshoot when not logged in.");
+            return;
+        }
+
+        if(Data == null)
+        {
+            ImGuiEx.TextWrapped($"No data available for current character. Access retainer bell, deployables panel or logout to create data.");
+            return;
+        }
+
         if(!Svc.ClientState.ClientLanguage.EqualsAny(ClientLanguage.Japanese, ClientLanguage.German, ClientLanguage.French, ClientLanguage.English))
         {
             Error($"Local publisher client detected. AutoRetainer was not tested to work with local publisher's FFXIV clients. Some or all functions may not work. Additionally, keep in mind that ottercorp's Chinese Dalamud fork collects telemetry about your pc, characters, used plugins and Dalamud configuration without your consent and without a possibility to opt-out.");

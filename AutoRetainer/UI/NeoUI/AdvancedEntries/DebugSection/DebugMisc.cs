@@ -19,6 +19,10 @@ internal unsafe class DebugMisc : DebugSectionBase
 {
     public override void Draw()
     {
+        if(ImGuiEx.Button("Telelport"))
+        {
+            MultiMode.RunTeleportLogic();
+        }
         if(ImGui.CollapsingHeader("AskEligibility"))
         {
             ImGuiEx.Text($"""

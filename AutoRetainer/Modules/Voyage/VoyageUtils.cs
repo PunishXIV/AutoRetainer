@@ -184,7 +184,7 @@ internal static unsafe class VoyageUtils
 
         foreach(var x in Unlocks.PointToUnlockPoint.Where(z => z.Value.Point < 9000 && !plan.ExcludedRoutes.Contains(z.Key)))
         {
-            if(ret.Count > 0 && Svc.Data.GetExcelSheet<SubmarineExploration>().GetRow(ret.First().point).Map.RowId != Svc.Data.GetExcelSheet<SubmarineExploration>().GetRow(x.Key).Map.RowId) break;
+            if(ret.Count > 0 && Svc.Data.GetExcelSheet<SubmarineExploration>().GetRowOrDefault(ret.First().point)?.Map.RowId != Svc.Data.GetExcelSheet<SubmarineExploration>().GetRowOrDefault(x.Key)?.Map.RowId) break;
             if(!P.SubmarineUnlockPlanUI.IsMapUnlocked(x.Key, true) && P.SubmarineUnlockPlanUI.IsMapUnlocked(x.Value.Point, true) && !ret.Any(z => z.point == x.Value.Point))
             {
                 ret.Add((x.Value.Point, $"{VoyageUtils.GetSubmarineExplorationName(x.Key)} not unlocked"));

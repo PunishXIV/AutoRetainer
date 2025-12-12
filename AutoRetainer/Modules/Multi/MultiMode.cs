@@ -729,4 +729,19 @@ internal static unsafe class MultiMode
             }
         });
     }
+
+    public static void RunTeleportLogic()
+    {
+        if(Data.WorkshopEnabled && Data.AnyEnabledVesselsAvailable() && MultiMode.EnabledSubmarines)
+        {
+            if(!Data.ShouldWaitForAllWhenLoggedIn() || Data.AreAnyEnabledVesselsReturnInNext(0, true))
+            {
+                TaskTeleportToProperty.EnqueueIfNeededAndPossible(true);
+            }
+        }
+        else
+        {
+            TaskTeleportToProperty.EnqueueIfNeededAndPossible(false);
+        }
+    }
 }

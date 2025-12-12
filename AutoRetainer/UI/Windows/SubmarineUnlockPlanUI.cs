@@ -269,7 +269,7 @@ internal unsafe class SubmarineUnlockPlanUI : Window
                 }
                 if(ImGui.CollapsingHeader("Display current point exploration order"))
                 {
-                    ImGuiEx.Text(SelectedPlan.GetPrioritizedPointList().Select(x => $"{Svc.Data.GetExcelSheet<SubmarineExploration>().GetRow(x.point).Destination} ({x.justification})").Join("\n"));
+                    ImGuiEx.Text(SelectedPlan.GetPrioritizedPointList().Select(x => $"{Svc.Data.GetExcelSheet<SubmarineExploration>().GetRowOrDefault(x.point)?.Destination} ({x.justification})").Join("\n"));
                 }
             }
             ImGui.EndChild();

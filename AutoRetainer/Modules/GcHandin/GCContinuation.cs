@@ -52,6 +52,7 @@ internal static unsafe class GCContinuation
         else
         {
             P.TaskManager.Enqueue(() => EzThrottler.Reset($"GcBusy"));
+            P.TaskManager.Enqueue(MultiMode.RunTeleportLogic);
         }
     }
 
