@@ -2,11 +2,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<Authors>Puni.sh</Authors>
-		<Version>4.5.4.13</Version>
+		<Version>4.5.5.0</Version>
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<TargetFramework>net9.0-windows7.0</TargetFramework>
+		<TargetFramework>net10.0-windows7.0</TargetFramework>
 		<Platforms>x64</Platforms>
 		<LangVersion>preview</LangVersion>
 		<DalamudLibPath>$(appdata)\xivlauncher\addon\Hooks\dev\</DalamudLibPath>

@@ -20,7 +20,7 @@ public unsafe class EventLogger : IDisposable
             Event:
             Param: {evt.EventParam:X16}
             Num_: {Enumerable.Range(0, 40).Select(x => (byte)x).ToHexString()}
-            Data: {MemoryHelper.ReadRaw(evt.Data, 40).ToHexString()}
+            Data: {MemoryHelper.ReadRaw(evt.AtkEventData, 40).ToHexString()}
             AtkType: {evt.AtkEventType}
             Flags: {((AtkEvent*)evt.AtkEvent)->Param}
             
