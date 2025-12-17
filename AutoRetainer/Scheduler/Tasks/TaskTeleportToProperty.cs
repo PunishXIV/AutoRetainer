@@ -78,7 +78,7 @@ public static class TaskTeleportToProperty
             //inn logic
             if(!Inns.List.Contains((ushort)Player.Territory))
             {
-                P.TaskManager.Enqueue(() => S.LifestreamIPC.EnqueueInnShortcut(1));
+                P.TaskManager.Enqueue(() => S.LifestreamIPC.EnqueueInnShortcut(null));
                 P.TaskManager.Enqueue(() =>
                 {
                     if(!Svc.ClientState.IsLoggedIn)

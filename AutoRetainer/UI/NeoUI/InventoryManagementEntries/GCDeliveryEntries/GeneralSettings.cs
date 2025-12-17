@@ -37,5 +37,6 @@ public sealed unsafe class GeneralSettings : InventoryManagementBase
         .Unindent()
         .Checkbox("Use Priority seal allowance, if possible", () => ref C.FullAutoGCDeliveryUseBuffItem)
         .Checkbox("Use Free Company seal buff, if possible", () => ref C.FullAutoGCDeliveryUseBuffFCAction)
+        .Checkbox("Teleport back to house/inn after delivery", () => ref C.TeleportAfterGCExchange)
         ;
 }

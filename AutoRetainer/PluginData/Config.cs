@@ -143,6 +143,8 @@ internal unsafe class Config
     internal bool SkipItemConfirmations => true;
     public ulong LastLoggedInChara = 0;
 
+    public bool TeleportAfterGCExchange = true;
+
     internal bool DontReassign
     {
         get

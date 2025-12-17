@@ -1,5 +1,5 @@
-﻿using AutoRetainer.StaticData;
-using AutoRetainerAPI.Configuration;
+﻿using AutoRetainerAPI.Configuration;
+using AutoRetainerAPI.StaticData;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using ECommons;
 using ECommons.Automation.NeoTaskManager;
@@ -52,7 +52,10 @@ internal static unsafe class GCContinuation
         else
         {
             P.TaskManager.Enqueue(() => EzThrottler.Reset($"GcBusy"));
-            P.TaskManager.Enqueue(MultiMode.RunTeleportLogic);
+            if(C.TeleportAfterGCExchange)
+            {
+                P.TaskManager.Enqueue(MultiMode.RunTeleportLogic);
+            }
         }
     }
 
