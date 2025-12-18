@@ -33,9 +33,6 @@ internal unsafe class Memory : IDisposable
     internal delegate void RetainerItemCommandDelegate(nint AgentRetainerItemCommandModule, uint slot, InventoryType inventoryType, uint a4, RetainerItemCommand command);
     internal EzHook<RetainerItemCommandDelegate> RetainerItemCommandHook;
 
-    public nint* MyAccountData = (nint*)Svc.SigScanner.GetStaticAddressFromSig("48 8B 3D ?? ?? ?? ?? 48 85 FF 74 69");
-    public ulong* MyAccountId => (ulong*)(*MyAccountData + 8);
-
     public delegate nint AddonGrandCompanySupplyList_SetExchangeModeDelegate(nint addon, int mode);
     public AddonGrandCompanySupplyList_SetExchangeModeDelegate AddonGrandCompanySupplyList_SetExchangeMode = EzDelegate.Get<AddonGrandCompanySupplyList_SetExchangeModeDelegate>("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 8B D6 48 8D 4D F7");
 

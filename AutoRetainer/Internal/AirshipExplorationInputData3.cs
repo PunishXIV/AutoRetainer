@@ -4,6 +4,6 @@
 [StructLayout(LayoutKind.Explicit)]
 public struct AirshipExplorationInputData3
 {
-    [FieldOffset(156)] public int Unk0;
+    [FieldOffset(172)] public int Unk0;
 }
 
