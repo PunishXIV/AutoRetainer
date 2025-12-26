@@ -29,9 +29,24 @@ public class MultiModeDeployables : NeoUIEntry
         .Widget(() =>
         {
             ImGuiEx.HelpMarker($"""
-                Currently: {(Utils.CanShutdownForSubs()?"Can shutdown":"Can NOT shutdown")}
+                Currently: {(Utils.CanShutdownForSubs() ? "Can shutdown" : "Can NOT shutdown")}
                 Remaining for force shutdown: {EzThrottler.GetRemainingTime("ForceShutdownForSubs")}
                 """);
         })
+        .Unindent()
+        .TextWrapped("Auto-buy Ceruleum Tanks after entering Workshop:")
+        .Indent()
+        .Widget(() =>
+        {
+            if(Data != null)
+            {
+                ImGui.Checkbox($"Enable on {Data.NameWithWorldCensored}", ref Data.AutoFuelPurchase);
+            }
+            ImGuiEx.TextWrapped($"In order to enable/disable fuel purchase for other characters, navigate to Functions, Exclusions, Order section.");
+        })
+        .InputInt(150f, "Tanks remaining to trigger purchase", () => ref C.AutoFuelPurchaseLow.ValidateRange(100, 99999))
+        .InputInt(150f, "Buy until this amount in inventory", () => ref C.AutoFuelPurchaseMax)
+        .Checkbox("Only buy when workstation is unlocked", () => ref C.AutoFuelPurchaseOnlyWsUnlocked)
+        .Unindent()
         ;
 }

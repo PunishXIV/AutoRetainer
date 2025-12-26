@@ -146,6 +146,10 @@ internal unsafe class Config
     public bool TeleportAfterGCExchange = true;
     public bool TeleportAfterGCExchangeMulti = true;
 
+    public int AutoFuelPurchaseLow = 300;
+    public int AutoFuelPurchaseMax = 900;
+    public bool AutoFuelPurchaseOnlyWsUnlocked = false;
+
     internal bool DontReassign
     {
         get

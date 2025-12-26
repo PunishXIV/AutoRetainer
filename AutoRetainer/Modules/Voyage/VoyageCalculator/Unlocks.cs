@@ -1,4 +1,6 @@
-﻿namespace AutoRetainer.Modules.Voyage.VoyageCalculator;
+﻿using TerraFX.Interop.WinRT;
+
+namespace AutoRetainer.Modules.Voyage.VoyageCalculator;
 
 public static class Unlocks
 {
@@ -125,8 +127,9 @@ public static class Unlocks
     { 111, new UnlockedFrom(106) },                         // Q    Proudkeel                     <-       The Floral Reef
     { 112, new UnlockedFrom(109) },                         // R    East Dodie's Abyss            <-       The Fluttering Bay
     { 113, new UnlockedFrom(108) },                         // S    Lilac Sea 5                   <-       The Floating Standard
-    { 114, new UnlockedFrom(111) },                         // T    West Dodie's Abyss            <-       Proudkeel
+    { 114, new UnlockedFrom(111, Map:true) },                         // T    West Dodie's Abyss            <-       Proudkeel
 
+    { 115, new UnlockedFrom(9999) },                        // Map South Indigo Deep
     { 116, new UnlockedFrom(114) },                         // A    The Indigo Shallows           <-       West Dodie's Abyss
     { 117, new UnlockedFrom(116) },                         // B    Voyagers' Reprieve            <-       The Indigo Shallows
     { 118, new UnlockedFrom(116) },                         // C    North Delphinium Seashelf     <-       The Indigo Shallows
@@ -148,7 +151,16 @@ public static class Unlocks
     { 132, new UnlockedFrom(127) },                         // Q    South Delphinium Seashelf     <-       Saltfarer's Eye
     { 133, new UnlockedFrom(129) },                         // R    Startail Shelf                <-       Moonshadow Isle
     { 134, new UnlockedFrom(132) },                         // S    Cradle of the Winds           <-       South Delphinium Seashelf
-    { 135, new UnlockedFrom(133) },                         // T    Startail Trench               <-       Startail Shelf
+    { 135, new UnlockedFrom(133, Map:true) },                         // T    Startail Trench               <-       Startail Shelf
+
+    { 136, new UnlockedFrom(9999) },                        // Map The Northern Empty
+    { 137, new UnlockedFrom(135) },                         // A    Eastern Blackblood Wells        <-       Startail Trench
+    { 138, new UnlockedFrom(137) },                         // B    Sea Wolf Cove                   <-       Eastern Blackblood Wells
+    { 139, new UnlockedFrom(137) },                         // C    Southernmost Hanthbyrt          <-       Eastern Blackblood Wells
+    { 140, new UnlockedFrom(139) },                         // D    Oeyaseik                        <-       Southernmost Hanthbyrt
+    { 141, new UnlockedFrom(138) },                         // E    Northeast Hanthbyrt             <-      Sea Wolf Cove
+    { 142, new UnlockedFrom(140) },                         // F    Vyrstrant                       <-       Oeyaseik
+    { 143, new UnlockedFrom(9876) },                        // G    The Sunken Jawbone (G)          <-
 };
 
     public static List<(uint, UnlockedFrom)> FindUnlockPath(uint finalPoint)

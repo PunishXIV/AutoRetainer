@@ -153,6 +153,14 @@ public static class Sectors
         { 133, new Breakpoint(249, 264, 304, 349, 254) },
         { 134, new Breakpoint(250, 265, 305, 350, 255) },
         { 135, new Breakpoint(250, 266, 305, 350, 255) },
+
+        { 137, new Breakpoint(251, 266, 306, 351, 256) },
+        { 138, new Breakpoint(252, 267, 307, 352, 257) },
+        { 139, new Breakpoint(253, 268, 308, 353, 258) },
+        { 140, new Breakpoint(254, 269, 309, 354, 259) },
+        { 141, new Breakpoint(254, 269, 309, 354, 259) },
+        { 142, new Breakpoint(255, 270, 310, 355, 260) },
+        { 143, new Breakpoint(255, 270, 310, 355, 260) },
     };
 
     public static Breakpoint CalculateBreakpoint(List<uint> points)

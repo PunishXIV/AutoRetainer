@@ -1,6 +1,7 @@
 ﻿using AutoRetainer.Internal.InventoryManagement;
 using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Modules.Voyage.Tasks;
+using AutoRetainer.Scheduler.Tasks;
 using AutoRetainerAPI.StaticData;
 using Dalamud.Game.ClientState.Objects.Types;
 using ECommons.Automation.NeoTaskManager;
@@ -115,6 +116,18 @@ public static unsafe class TaskNeoHET
                     new(() => C.FCChestGilCheckTimes[Player.CID] = DateTimeOffset.Now.ToUnixTimeMilliseconds()),
                     new(CloseFCChest)
                     ]);
+                }
+                if(Data.AutoFuelPurchase && Utils.CountItemsInInventory(10155, null, Utils.PlayerEntireInventory) < C.AutoFuelPurchaseLow && (!C.AutoFuelPurchaseOnlyWsUnlocked || !S.WorkstationMonitor.Locked))
+                {
+                    tasks.Add(new(() =>
+                    {
+                        P.TaskManager.InsertStack(() =>
+                        {
+                            TaskRecursivelyBuyFuel.EnqueueNpcInteraction();
+                            TaskRecursivelyBuyFuel.Enqueue();
+                            TaskRecursivelyBuyFuel.EnqueueShopClosure();
+                        });
+                    }));
                 }
                 P.TaskManager.InsertMulti([.. tasks]);
             }
