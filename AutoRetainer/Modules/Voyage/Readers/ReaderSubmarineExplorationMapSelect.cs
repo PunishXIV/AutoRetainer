@@ -6,7 +6,7 @@ namespace AutoRetainer.Modules.Voyage.Readers;
 internal unsafe class ReaderSubmarineExplorationMapSelect(AtkUnitBase* UnitBase) : AtkReader(UnitBase)
 {
     internal uint SubmarineRank => ReadUInt(1) ?? 0;
-    internal List<Map> Maps => Loop<Map>(3, 3, 6);
+    internal List<Map> Maps => Loop<Map>(3, 3, 7);
 
     internal unsafe class Map(nint UnitBasePtr, int offset = 0) : AtkReader(UnitBasePtr, offset)
     {
