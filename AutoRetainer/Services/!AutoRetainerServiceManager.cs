@@ -20,4 +20,5 @@ public static class AutoRetainerServiceManager
     public static AddonWatcher AddonWatcher;
     public static DataMigrator DataMigrator;
     public static WorkstationMonitor WorkstationMonitor;
+    public static IpcConfigValuesProvider IpcConfigValuesProvider;
 }

@@ -1,4 +1,6 @@
-﻿namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries.InventoryCleanupEntries;
+﻿using AutoRetainerAPI.Configuration;
+
+namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries.InventoryCleanupEntries;
 public class ProtectionList : InventoryManagementBase
 {
     public override string Name { get; } = "Inventory Cleanup/Protection List";

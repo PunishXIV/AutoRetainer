@@ -3,14 +3,15 @@ using AutoRetainer.Scheduler.Handlers;
 using ECommons.GameHelpers;
 using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace AutoRetainer.Scheduler.Tasks;
 
-public static class TaskVendorItems
+public unsafe static class TaskVendorItems
 {
     public static void EnqueueFromCommand()
     {
-        if(NpcSaleManager.GetValidNPC() != null && Data.GetIMSettings().IMEnableNpcSell)
+        if((NpcSaleManager.GetValidNPC() != null || TryGetAddonByName<AtkUnitBase>("Shop", out _)) && Data.GetIMSettings().IMEnableNpcSell)
         {
             NpcSaleManager.EnqueueIfItemsPresent(true);
         }

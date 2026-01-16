@@ -120,7 +120,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
 
     internal void SetConfig(Config c)
     {
-        config = c;
+        config = EzConfig.Set<Config>(c);
     }
 
     public void Load()
@@ -382,7 +382,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         }
         else if(arguments.EqualsIgnoreCaseAny("itemsell"))
         {
-            if(!IsOccupied() && !P.TaskManager.IsBusy)
+            if((!IsOccupied() || TryGetAddonByName<AtkUnitBase>("Shop", out _)) && !P.TaskManager.IsBusy)
             {
                 TaskVendorItems.EnqueueFromCommand();
             }

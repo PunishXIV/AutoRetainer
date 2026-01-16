@@ -1,4 +1,5 @@
-﻿using Dalamud.Game.Gui.ContextMenu;
+﻿using AutoRetainerAPI.Configuration;
+using Dalamud.Game.Gui.ContextMenu;
 using Dalamud.Game.Text.SeStringHandling;
 using ECommons.ChatMethods;
 using ECommons.ExcelServices;

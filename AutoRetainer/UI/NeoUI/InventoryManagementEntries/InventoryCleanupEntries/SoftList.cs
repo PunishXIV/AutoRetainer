@@ -1,4 +1,6 @@
-﻿namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries.InventoryCleanupEntries;
+﻿using AutoRetainerAPI.Configuration;
+
+namespace AutoRetainer.UI.NeoUI.InventoryManagementEntries.InventoryCleanupEntries;
 public class SoftList : InventoryManagementBase
 {
     public override string Name => "Inventory Cleanup/Quick Venture Sell List";

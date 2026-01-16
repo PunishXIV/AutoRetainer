@@ -20,6 +20,32 @@ public static unsafe class NpcSaleManager
     public static void EnqueueIfItemsPresent(bool ignoreRestriction)
     {
         if(Utils.ShouldSkipNPCVendor() && !ignoreRestriction) return;
+        if(TryGetAddonByName<AtkUnitBase>("Shop", out var shopAddon) && IsAddonReady(shopAddon))
+        {
+            foreach(var type in InventorySpaceManager.GetAllowedToSellInventoryTypes())
+            {
+                var inv = InventoryManager.Instance()->GetInventoryContainer(type);
+                if(inv != null)
+                {
+                    for(var i = 0; i < inv->Size; i++)
+                    {
+                        var slot = inv->GetInventorySlot(i);
+                        if(slot != null && slot->ItemId != 0)
+                        {
+                            if(Utils.IsItemSellableByHardList(slot->ItemId, slot->Quantity))
+                            {
+                                P.TaskManager.BeginStack();
+                                P.TaskManager.EnqueueDelay(500);
+                                P.TaskManager.Enqueue(SellHardListItemsTask, new(timeLimitMS: 1000 * 60 * 5));
+                                P.TaskManager.Enqueue(CloseShop);
+                                P.TaskManager.InsertStack();
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
         if(GetValidNPC() == null) return;
         if(!Data.GetIMSettings().IMEnableNpcSell) return;
         foreach(var type in InventorySpaceManager.GetAllowedToSellInventoryTypes())

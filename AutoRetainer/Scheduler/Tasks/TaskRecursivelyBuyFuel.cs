@@ -53,7 +53,10 @@ public unsafe class TaskRecursivelyBuyFuel
             }
             return false;
         }, new(timeLimitMS: 1000 * 60 * 10));
-        P.TaskManager.Enqueue(() => Utils.TryNotify("Finished purchasing Ceruleum Tanks"));
+        if(ignoreMax)
+        {
+            P.TaskManager.Enqueue(() => Utils.TryNotify("Finished purchasing Ceruleum Tanks"));
+        }
     }
 
     public static void EnqueueNpcInteraction()

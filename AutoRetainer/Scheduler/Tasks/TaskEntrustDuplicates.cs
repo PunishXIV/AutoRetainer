@@ -1,5 +1,6 @@
 ﻿using AutoRetainer.Internal.InventoryManagement;
 using AutoRetainer.Scheduler.Handlers;
+using AutoRetainerAPI.Configuration;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using ECommons.ExcelServices;

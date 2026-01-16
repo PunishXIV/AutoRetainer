@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.UI.NeoUI.InventoryManagementEntries.InventoryCleanupEntries;
+using AutoRetainerAPI.Configuration;
 using ECommons.Configuration;
 using ECommons.ExcelServices;
 using ECommons.MathHelpers;

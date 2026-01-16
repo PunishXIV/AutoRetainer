@@ -129,4 +129,24 @@ public class IPC_PluginState
     {
         return Data.GetIMSettings().IMProtectList.Contains(itemId);
     }
+
+    [EzIPC]
+    public bool? AreAnyEnabledVesselsNotDeployed(ulong contentId)
+    {
+        var data = C.OfflineData.FirstOrDefault(x => x.CID == contentId);
+        if(data == null) return null;
+        return VoyageUtils.AreAnyEnabledVesselsNotDeployed(data);
+    }
+
+    [EzIPC]
+    public bool? AreAnyEnabledVesselsReady(ulong contentId)
+    {
+        var data = C.OfflineData.FirstOrDefault(x => x.CID == contentId);
+        if(data == null) return null;
+        if(data.AreAnyEnabledVesselsReturnInNext(C.MultiModeWorkshopConfiguration.AdvanceTimer, C.MultiModeWorkshopConfiguration.MultiWaitForAll))
+        {
+            return true;
+        }
+        return false;
+    }
 }
