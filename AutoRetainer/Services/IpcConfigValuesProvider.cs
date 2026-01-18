@@ -28,12 +28,15 @@ public class IpcConfigValuesProvider : IDisposable
             var registerFuncMethod = ipcProvider.GetType().GetMethod("RegisterFunc");
 
             var funcType = typeof(Func<>).MakeGenericType(fieldType);
-            var lambda = Expression.Lambda(
-                funcType,
-                Expression.Field(Expression.Constant(C), field)
-            ).Compile();
 
-            registerFuncMethod.Invoke(ipcProvider, [lambda]);
+            // Use a helper method that creates the correctly typed lambda
+            var helperMethod = typeof(Utils)
+                .GetMethod("CreateGetter", BindingFlags.Public | BindingFlags.Static)
+                .MakeGenericMethod(fieldType);
+
+            var lambda = (Delegate)helperMethod.Invoke(this, new object[] { field });
+
+    registerFuncMethod.Invoke(ipcProvider, [lambda]);
 
             var unregisterFuncMethod = ipcProvider.GetType().GetMethod("UnregisterFunc");
 

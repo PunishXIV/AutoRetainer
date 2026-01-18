@@ -34,6 +34,8 @@ using System;
 using System.Globalization;
 
 using System.IO;
+using System.Reflection;
+
 
 
 //using OtterGui.Text.EndObjects;
@@ -46,6 +48,10 @@ namespace AutoRetainer.Helpers;
 
 public static unsafe class Utils
 {
+    public static Func<T> CreateGetter<T>(FieldInfo field)
+    {
+        return () => (T)field.GetValue(C);
+    }
     public static int FrameDelay => 10 + C.ExtraFrameDelay;
     public static bool IsCN => Svc.ClientState.ClientLanguage == (ClientLanguage)4;
     public static int FCPoints => *(int*)((nint)AgentModule.Instance()->GetAgentByInternalId(AgentId.FreeCompanyCreditShop) + 256);

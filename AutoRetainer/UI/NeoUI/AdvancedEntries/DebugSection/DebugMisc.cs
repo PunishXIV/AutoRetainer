@@ -19,6 +19,17 @@ internal unsafe class DebugMisc : DebugSectionBase
 {
     public override void Draw()
     {
+        if(ImGui.CollapsingHeader("ApiTest1"))
+        {
+            try
+            {
+                ImGuiEx.Text($"{P.API.Config.FCData}");
+            }
+            catch(Exception e)
+            {
+                ImGuiEx.Text($"{e}");
+            }
+        }
         if(ImGuiEx.Button("Telelport"))
         {
             MultiMode.RunTeleportLogic();

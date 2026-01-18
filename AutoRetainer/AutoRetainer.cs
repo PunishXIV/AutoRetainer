@@ -26,6 +26,7 @@ using ECommons.Reflection;
 using ECommons.Singletons;
 using ECommons.Throttlers;
 using ECommons.UIHelpers.AddonMasterImplementations;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.Sheets;
 using NotificationMasterAPI;
