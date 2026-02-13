@@ -138,10 +138,11 @@ internal static class UIUtils
         if(offlineData.GetAllowSharedTeleportForRetainers())
         {
             string error = null;
+            string message = "";
             var black = false;
-            var sharedData = S.LifestreamIPC.GetSharedHousePathData();
             if(Player.CID == offlineData.CID && Player.IsInHomeWorld)
             {
+                var sharedData = S.LifestreamIPC.GetSharedHousePathData();
                 if(sharedData == null)
                 {
                     error = "Shared estate is not registered in Lifestream.";
@@ -149,6 +150,10 @@ internal static class UIUtils
                 else if(sharedData.PathToEntrance.Count == 0)
                 {
                     error = "Shared estate is registered in Lifestream but path to entrance is not set.";
+                }
+                else
+                {
+                    message = $"Shared estate is registered in Lifestream and path is set. You will be teleported to Shared estate for resending Retainers.\nAddress: {Svc.Data.GetExcelSheet<Aetheryte>().GetRowOrDefault((uint)sharedData.ResidentialDistrict)?.Territory.Value.PlaceNameRegion.Value.Name}, ward {sharedData.Ward + 1}, plot {sharedData.Plot + 1}";
                 }
             }
             else
@@ -159,7 +164,7 @@ internal static class UIUtils
             ImGui.PushFont(UiBuilder.IconFont);
             ImGuiEx.Text(error == null ? null : black?ImGuiColors.DalamudGrey2:ImGuiColors.DalamudGrey3, black ? "\ue4fe" : "\uf004");
             ImGui.PopFont();
-            ImGuiEx.Tooltip(error ?? $"Shared estate is registered in Lifestream and path is set. You will be teleported to Shared estate for resending Retainers.\nAddress: {Svc.Data.GetExcelSheet<Aetheryte>().GetRowOrDefault((uint)sharedData.ResidentialDistrict)?.Territory.Value.PlaceNameRegion.Value.Name}, ward {sharedData.Ward + 1}, plot {sharedData.Plot + 1}");
+            ImGuiEx.Tooltip(error ?? message);
             ImGui.SameLine(0, 3);
         }
     }
