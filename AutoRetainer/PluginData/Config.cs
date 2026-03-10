@@ -150,6 +150,9 @@ internal unsafe class Config
     public int AutoFuelPurchaseMax = 900;
     public bool AutoFuelPurchaseOnlyWsUnlocked = false;
 
+    public bool ExitOnSubCompletion = false;
+    public int ExitOnSubCompletionTime = 60;
+
     internal bool DontReassign
     {
         get

@@ -9,8 +9,16 @@ public static class TaskTeleportToProperty
     public static uint[] Apartments = [Houses.Ingleside_Apartment, Houses.Kobai_Goten_Apartment, Houses.Lily_Hills_Apartment, Houses.Sultanas_Breath_Apartment, Houses.Topmast_Apartment];
     public static bool EnqueueIfNeededAndPossible(bool isSubmersibleOperation)
     {
-        if(Player.Territory.EqualsAny(VoyageUtils.Workshops)) return false;
-        if(!isSubmersibleOperation && C.NoTeleportHetWhenNextToBell && Utils.GetReachableRetainerBell(false) != null) return false;
+        if(Player.Territory.EqualsAny(VoyageUtils.Workshops))
+        {
+            PluginLog.Debug($"TeleportTask: {isSubmersibleOperation} | Already in workshop");
+            return false;
+        }
+        if(!isSubmersibleOperation && C.NoTeleportHetWhenNextToBell && Utils.GetReachableRetainerBell(false) != null)
+        {
+            PluginLog.Debug($"TeleportTask: {isSubmersibleOperation} | Fail because already next to retainer bell");
+            return false;
+        }
         var fcTeleportEnabled = (Data.GetAllowFcTeleportForRetainers() && !isSubmersibleOperation) || (Data.GetAllowFcTeleportForSubs() && isSubmersibleOperation);
         var data = S.LifestreamIPC.GetHousePathData(Player.CID);
         var sharedData = S.LifestreamIPC.GetSharedHousePathData();
@@ -20,7 +28,20 @@ public static class TaskTeleportToProperty
             var canShared = Data.GetAllowSharedTeleportForRetainers() && sharedData != null && sharedData.PathToEntrance.Count > 0;
             PluginLog.Information($"CanShared: {canShared}");
             var canFc = (fcTeleportEnabled && data.FC != null && data.FC.PathToEntrance.Count > 0);
-            if((isSubmersibleOperation || !(canPrivate || canShared)) && canFc)
+            var shouldTeleportToFc = (isSubmersibleOperation || !(canPrivate || canShared)) && canFc;
+            PluginLog.Debug($"""
+                Teleport to FC:
+                fcTeleportEnabled={fcTeleportEnabled}
+                GetAllowFcTeleportForSubs={Data.GetAllowFcTeleportForSubs()}
+                isSubmersibleOperation={isSubmersibleOperation}
+                FC={data.FC}
+                PathToEntrance={data.FC?.PathToEntrance.Print()}
+                shouldTeleportToFc={shouldTeleportToFc}
+                canPrivate={canPrivate}
+                canShared={canShared}
+                canFc={canFc}
+                """);
+            if(shouldTeleportToFc)
             {
                 PluginLog.Information($"Teleport: fc=true, canShared={canShared}");
                 return Process(true, canShared);
@@ -88,6 +109,7 @@ public static class TaskTeleportToProperty
                     }
                     return IsScreenReady() && Player.Interactable && Inns.List.Contains((ushort)Player.Territory) && !S.LifestreamIPC.IsBusy();
                 }, new(timeLimitMS: 5 * 60 * 1000));
+                PluginLog.Debug($"TeleportTask: {isSubmersibleOperation} | Success, going to inn");
                 return true;
             }
         }
@@ -99,14 +121,18 @@ public static class TaskTeleportToProperty
             if(TaskNeoHET.IsInMarkerHousingPlot([.. TaskNeoHET.PrivateMarkers, .. TaskNeoHET.FcMarkers, .. (C.SharedHET ? TaskNeoHET.SharedMarkers : [])]))
             {
                 TaskNeoHET.Enqueue(null);
+                PluginLog.Debug($"TeleportTask: {isSubmersibleOperation} | Success, fallback enqueue HET into house");
                 return true;
             }
             else if(TaskNeoHET.GetApartmentEntrance() != null && Player.DistanceTo(TaskNeoHET.GetApartmentEntrance()) < 40f)
             {
                 TaskNeoHET.Enqueue(null);
+                PluginLog.Debug($"TeleportTask: {isSubmersibleOperation} | Success, fallback enqueue HET into apartment");
                 return true;
             }
         }
+
+        PluginLog.Debug($"TeleportTask: {isSubmersibleOperation} | Failed, completely fell through logic");
 
         return false;
 
@@ -120,11 +146,13 @@ public static class TaskTeleportToProperty
             {
                 if(Player.Territory.EqualsAny([.. Houses.List]))
                 {
+                    PluginLog.Debug($"TeleportTask: {isSubmersibleOperation} | Failed, already in house");
                     return false;
                 }
                 else
                 {
                     TaskNeoHET.Enqueue(null);
+                    PluginLog.Debug($"TeleportTask: {isSubmersibleOperation} | Success, enter house and skip teleport");
                     return true; //already here
                 }
             }
@@ -143,6 +171,7 @@ public static class TaskTeleportToProperty
                 && !S.LifestreamIPC.IsBusy();
             }, new(timeLimitMS: 5 * 60 * 1000));
             TaskNeoHET.Enqueue(null);
+            PluginLog.Debug($"TeleportTask: {isSubmersibleOperation} | Success, full sequence");
             return true;
         }
 
@@ -152,15 +181,18 @@ public static class TaskTeleportToProperty
             var noProperty = !(fc ? S.LifestreamIPC.HasFreeCompanyHouse() : (shared?S.LifestreamIPC.HasSharedEstate() != false:S.LifestreamIPC.HasPrivateHouse()));
             if(noProperty == true)
             {
+                PluginLog.Debug($"TeleportTask: {isSubmersibleOperation} | Simple failed, no property found");
                 return false;
             }
             if(Player.Territory.EqualsAny([.. Houses.List]) && (!fc || TaskNeoHET.GetWorkshopEntrance() != null))
             {
+                PluginLog.Debug($"TeleportTask: {isSubmersibleOperation} | Simple failed, already in house");
                 return false;
             }
             else if(isHere)
             {
                 TaskNeoHET.Enqueue(null);
+                PluginLog.Debug($"TeleportTask: {isSubmersibleOperation} | Simple success, enqueued HET");
                 return true; //already here
             }
             P.TaskManager.Enqueue(() => S.LifestreamIPC.EnqueuePropertyShortcut(fc ? 2 : (shared?5:1), 1));
@@ -176,6 +208,7 @@ public static class TaskTeleportToProperty
                 && !S.LifestreamIPC.IsBusy();
             }, new(timeLimitMS: 5 * 60 * 1000));
             TaskNeoHET.Enqueue(null);
+            PluginLog.Debug($"TeleportTask: {isSubmersibleOperation} | Simple success, full sequence");
             return true;
         }
     }

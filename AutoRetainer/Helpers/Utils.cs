@@ -56,6 +56,18 @@ public static unsafe class Utils
     public static bool IsCN => Svc.ClientState.ClientLanguage == (ClientLanguage)4;
     public static int FCPoints => *(int*)((nint)AgentModule.Instance()->GetAgentByInternalId(AgentId.FreeCompanyCreditShop) + 256);
     public static float AnimationLock => Player.AnimationLock;
+    public static int FCRank
+    {
+        get
+        {
+            var array = AtkStage.Instance()->AtkArrayDataHolder->GetNumberArrayData(52);
+            if(array != null)
+            {
+                return array->IntArray[4];
+            }
+            return 0;
+        }
+    }
 
     public static bool CanEnqueueShutdown()
     {

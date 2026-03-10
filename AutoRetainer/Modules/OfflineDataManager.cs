@@ -161,6 +161,10 @@ internal static unsafe class OfflineDataManager
                 C.FCData[fc->Id].FCPoints = Utils.FCPoints;
                 C.FCData[fc->Id].FCPointsLastUpdate = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             }
+            if(Utils.FCRank != 0)
+            {
+                C.FCData[fc->Id].Rank = Utils.FCRank;
+            }
         }
         data.WriteOfflineInventoryData();
         C.OfflineData.RemoveAll(x => x.World == "" && x.Name == "Unknown");
