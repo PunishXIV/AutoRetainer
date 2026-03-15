@@ -22,14 +22,7 @@
 		<NoWarn>CS1591;CS0419</NoWarn>
       <Deterministic>true</Deterministic>
       <CustomCS>false</CustomCS>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
-		<OutputPath>bin/Release</OutputPath>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-		<OutputPath>bin/Debug</OutputPath>
+      <OutputPath>bin\ReleaseTC\</OutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>
