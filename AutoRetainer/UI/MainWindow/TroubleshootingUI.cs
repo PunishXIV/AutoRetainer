@@ -17,8 +17,6 @@ public static unsafe class TroubleshootingUI
     {
         ImGuiEx.TextWrapped("This tab checks your configuration for common issues that you can resolve yourself before contacting support.");
 
-        if(IsPluginInstalled("LightlessSync"))
-
         if(!Player.Available)
         {
             ImGuiEx.TextWrapped($"Can not troubleshoot when not logged in.");
