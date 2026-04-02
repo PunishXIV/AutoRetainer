@@ -43,8 +43,15 @@ public static unsafe class PartSwapperScheduler
     public static bool EnqueueSubmersibleRegistrationIfPossible()
     {
         var neededParts = new[] { (uint)Hull.Shark, (uint)Stern.Shark, (uint)Bow.Shark, (uint)Bridge.Shark };
+        PluginLog.Information($"""
+            EnqueueSubmersibleRegistrationIfPossible:
+            Enabled: {C.EnableAutomaticSubRegistration}
+            Count check: {Data.OfflineSubmarineData.Count} < {Data.NumSubSlots}
+            Part check: {neededParts.Select(part => $"{part}: x{InventoryManager.Instance()->GetInventoryItemCount((uint)part)}").Print()}
+            Dive credit check: {InventoryManager.Instance()->GetInventoryItemCount((uint)Items.DiveCredits)} >= {(2 * Data.NumSubSlots) - 1}
+            """);
         if(C.EnableAutomaticSubRegistration
-            && Data.AdditionalSubmarineData.Count < Data.NumSubSlots
+            && Data.OfflineSubmarineData.Count < Data.NumSubSlots
             && neededParts.All(part => InventoryManager.Instance()->GetInventoryItemCount((uint)part) > 0)
             && InventoryManager.Instance()->GetInventoryItemCount((uint)Items.DiveCredits) >= (2 * Data.NumSubSlots) - 1)
         {
@@ -65,6 +72,7 @@ public static unsafe class PartSwapperScheduler
         }
         else
         {
+            PluginLog.Information($"Sub registration is not needed");
             return false;
         }
     }

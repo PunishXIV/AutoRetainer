@@ -19,6 +19,7 @@ internal unsafe class DebugMisc : DebugSectionBase
 {
     public override void Draw()
     {
+        ImGuiEx.Text($"OfflineSubmarineData.Count {Data.OfflineSubmarineData.Count}, NumSubSlots {Data.NumSubSlots}");
         ImGuiEx.Text($"FC Rank: {Utils.FCRank}");
         if(ImGui.CollapsingHeader("ApiTest1"))
         {

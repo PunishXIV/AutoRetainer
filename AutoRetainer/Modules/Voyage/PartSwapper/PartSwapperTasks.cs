@@ -53,13 +53,13 @@ public static unsafe class PartSwapperTasks
             {
                 if(plans.MinLevel == 1)
                 {
-                    if(Data.OfflineSubmarineData.Count != Data.NumSubSlots)
+                    /*if(Data.OfflineSubmarineData.Count != Data.NumSubSlots)
                     {
                         PluginLog.Warning($"OfflineSubmarineData has a size of {Data.OfflineSubmarineData.Count} but expected {Data.NumSubSlots}.");
                         return false;
-                    }
+                    }*/ //???????????????????????????????????????????
 
-                    var newSubName = Data.OfflineSubmarineData[Data.NumSubSlots - 1].Name;
+                    var newSubName = Data.OfflineSubmarineData[^1].Name;
                     Data.AdditionalSubmarineData[newSubName].VesselBehavior = Data.NumSubSlots == 1 && plans.FirstSubDifferent ? plans.FirstSubVesselBehavior : plans.VesselBehavior;
                     Data.AdditionalSubmarineData[newSubName].UnlockMode = Data.NumSubSlots == 1 && plans.FirstSubDifferent ? plans.FirstSubUnlockMode : plans.UnlockMode;
                     Data.AdditionalSubmarineData[newSubName].SelectedUnlockPlan = Data.NumSubSlots == 1 && plans.FirstSubDifferent ? plans.FirstSubSelectedUnlockPlan : plans.SelectedUnlockPlan;
