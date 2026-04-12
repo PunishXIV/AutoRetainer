@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<Authors>Puni.sh</Authors>
-		<Version>4.5.5.16</Version>
+		<Version>4.5.5.18</Version>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -35,8 +35,12 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\AutoRetainerAPI\AutoRetainerAPI\AutoRetainerAPI.csproj" />
-		<ProjectReference Include="..\ECommons.FileWriter\ECommons.FileWriter\ECommons.FileWriter.csproj" ReferenceOutputAssembly="false" OutputItemType="Content" CopyToOutputDirectory="Always" />
-		<ProjectReference Include="..\ECommons\ECommons\ECommons.csproj" />
+    <ProjectReference Include="..\ECommons\ECommons\ECommons.csproj">
+    </ProjectReference>
+    <PackageReference Include="ECommons" Version="*">
+        <ExcludeAssets>runtime;build;native;contentfiles;analyzers</ExcludeAssets>
+        <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
 		<ProjectReference Include="..\NightmareUI.OtterGuiWrapper\NightmareUI.OtterGuiWrapper\NightmareUI.OtterGuiWrapper.csproj" />
 		<ProjectReference Include="..\NightmareUI\NightmareUI\NightmareUI.csproj" />
 		<ProjectReference Include="..\OtterGui\OtterGui.csproj" />

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.3.11520.95 d18.3
+VisualStudioVersion = 18.3.11520.95
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoRetainer", "AutoRetainer\AutoRetainer.csproj", "{C60CB325-B487-4F98-AE4B-E5751906A088}"
 EndProject
@@ -22,8 +22,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NightmareUI.OtterGuiWrapper", "NightmareUI.OtterGuiWrapper\NightmareUI.OtterGuiWrapper\NightmareUI.OtterGuiWrapper.csproj", "{B9098DF3-0755-4AFE-8C00-FE5CDDEDC006}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OtterGui", "OtterGui\OtterGui.csproj", "{A9A854AA-F54E-4739-9752-AC0FE54FCEA1}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECommons.FileWriter", "ECommons.FileWriter\ECommons.FileWriter\ECommons.FileWriter.csproj", "{100B454B-F244-4125-BCD0-FBC78B31DC50}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFXIVClientStructs", "FFXIVClientStructs\FFXIVClientStructs\FFXIVClientStructs.csproj", "{2B58FF81-C498-422F-B71D-AA0B6880C449}"
 EndProject
@@ -97,14 +95,6 @@ Global
 		{A9A854AA-F54E-4739-9752-AC0FE54FCEA1}.Release|Any CPU.Build.0 = Release|x64
 		{A9A854AA-F54E-4739-9752-AC0FE54FCEA1}.Release|x64.ActiveCfg = Release|x64
 		{A9A854AA-F54E-4739-9752-AC0FE54FCEA1}.Release|x64.Build.0 = Release|x64
-		{100B454B-F244-4125-BCD0-FBC78B31DC50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{100B454B-F244-4125-BCD0-FBC78B31DC50}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{100B454B-F244-4125-BCD0-FBC78B31DC50}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{100B454B-F244-4125-BCD0-FBC78B31DC50}.Debug|x64.Build.0 = Debug|Any CPU
-		{100B454B-F244-4125-BCD0-FBC78B31DC50}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{100B454B-F244-4125-BCD0-FBC78B31DC50}.Release|Any CPU.Build.0 = Release|Any CPU
-		{100B454B-F244-4125-BCD0-FBC78B31DC50}.Release|x64.ActiveCfg = Release|Any CPU
-		{100B454B-F244-4125-BCD0-FBC78B31DC50}.Release|x64.Build.0 = Release|Any CPU
 		{2B58FF81-C498-422F-B71D-AA0B6880C449}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2B58FF81-C498-422F-B71D-AA0B6880C449}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B58FF81-C498-422F-B71D-AA0B6880C449}.Debug|x64.ActiveCfg = Debug|Any CPU

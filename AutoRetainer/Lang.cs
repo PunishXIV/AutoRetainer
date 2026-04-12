@@ -1,5 +1,6 @@
 ﻿using AutoRetainerAPI.Configuration;
 using Dalamud.Utility;
+using ECommons.ExcelServices.Sheets;
 using Lumina.Excel.Sheets;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
@@ -301,14 +302,8 @@ internal static class Lang
     //215	TEXT_CMNDEFRETAINERCALL_00010_ASK_RETURN_WITH_BUYBACK	Wenn du deinen Gehilfen wegschickst, kannst du die von ihm verkauften Gegenstände nicht mehr zurückkaufen. Möchtest du trotzdem fortfahren?
     //215	TEXT_CMNDEFRETAINERCALL_00010_ASK_RETURN_WITH_BUYBACK	Renvoyer le servant effacera la liste de rachat. Confirmer<Indent/>?
 
-    internal static readonly string[] WillBeUnableToProcessBuyback = [
-        "Your retainer will be unable to process item buyback requests once recalled. Are you sure you wish to proceed?",
-        "リテイナーを帰すと売却依頼アイテムの買い戻しができなくなりますが、よろしいですか？",
-        "Renvoyer le servant effacera la liste de rachat. Confirmer",
-        "Wenn du deinen Gehilfen wegschickst, kannst du die von ihm verkauften Gegenstände nicht mehr zurückkaufen. Möchtest du trotzdem fortfahren",
-        "让雇员返回后将无法购回委托卖掉的道具",
-        "讓僱員返回後將無法購回委託賣掉的道具",
-        "집사를 돌려보내면 판매 의뢰한 아이템을 재매입할 수 없게 됩니다. 계속하시겠습니까?",
+    internal static string[] WillBeUnableToProcessBuyback => field ??= [
+        Svc.Data.GetExcelSheet<QuestDialogueText>(name:"custom/000/CmnDefRetainerCall_00010").GetRow(215).Value.GetText(),
         ];
 
     internal static readonly string[] LogInPartialText = ["Logging in with", "Log in with", "でログインします。", "einloggen?", "eingeloggt.", "Se connecter avec", "Vous allez vous connecter avec", "Souhaitez-vous vous connecter avec", "登入吗", "登入嗎", "登录吗", "접속하시겠습니까?", "三可以通过次级指令重新编辑角色形象"];
