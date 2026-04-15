@@ -22,7 +22,7 @@
 		<NoWarn>CS1591;CS0419</NoWarn>
       <Deterministic>true</Deterministic>
       <CustomCS>false</CustomCS>
-      <OutputPath>bin\ReleaseTC\</OutputPath>
+      <OutputPath>bin\Release\</OutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>
