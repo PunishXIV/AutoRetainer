@@ -49,6 +49,8 @@ internal unsafe class Config
     public float LoginOverlayBPadding = 1.35f;
     public bool LoginOverlayAllSearch = false;
 
+    public CutsceneSkipMode CutsceneSkipMode = CutsceneSkipMode.Never;
+
     public OpenBellBehavior OpenBellBehaviorNoVentures = OpenBellBehavior.Enable_AutoRetainer;
     public OpenBellBehavior OpenBellBehaviorWithVentures = OpenBellBehavior.Enable_AutoRetainer;
     public TaskCompletedBehavior TaskCompletedBehaviorAuto = TaskCompletedBehavior.Stay_in_retainer_list_and_keep_plugin_enabled;
@@ -242,7 +244,7 @@ internal unsafe class Config
     public bool PinWindow = false;
     public bool DisplayOnStart = false;
 
-    public bool ResolveConnectionErrors = false;
+    public bool ResolveConnectionErrors = true;
     public int ConnectionErrorsRetry = 10;
     public bool ConnectionErrorsBlacklist = true;
     public bool EnableEntrustManager = true;
@@ -282,4 +284,5 @@ internal unsafe class Config
 
     public bool MultiOnPluginLoad = false;
     public int MultiModeOnPluginLoadDelay = 10;
+    public bool IgnoreGCRankCheck = false;
 }

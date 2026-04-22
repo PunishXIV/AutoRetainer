@@ -162,6 +162,7 @@ internal static unsafe class GCContinuation
 
     public static bool IsGCRankSufficientForExpertExchange()
     {
+        if(C.IgnoreGCRankCheck) return GetFullGCInfo() != null;
         return AutoGCHandin.GetRank() >= 6;
     }
 

@@ -23,6 +23,14 @@ public class ExpertTab : NeoUIEntry
         .InputInt(150f, "Timeout before AutoRetainer will attempt to unstuck, seconds", () => ref C.BailoutTimeout)
 
         .Section("Settings")
+        .Widget("Skip Inn Login Cutscene", text =>
+        {
+            ImGui.SetNextItemWidth(200);
+            if(ImGuiEx.EnumCombo(text, ref C.CutsceneSkipMode))
+            {
+                S.InnCutsceneSkip.RefreshAccordingToConfig();
+            }
+        })
         .Checkbox($"Disable sorting and collapsing/expanding", () => ref C.NoCurrentCharaOnTop)
         .Checkbox($"Show MultiMode checkbox on plugin UI bar", () => ref C.MultiModeUIBar)
         .SliderIntAsFloat(100f, "Retainer menu delay, seconds", () => ref C.RetainerMenuDelay.ValidateRange(0, 2000), 0, 2000)

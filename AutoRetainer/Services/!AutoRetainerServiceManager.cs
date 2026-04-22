@@ -21,4 +21,5 @@ public static class AutoRetainerServiceManager
     public static DataMigrator DataMigrator;
     public static WorkstationMonitor WorkstationMonitor;
     public static IpcConfigValuesProvider IpcConfigValuesProvider;
+    public static InnCutsceneSkip InnCutsceneSkip;
 }

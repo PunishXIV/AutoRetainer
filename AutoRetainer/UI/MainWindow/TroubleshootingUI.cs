@@ -25,8 +25,12 @@ public static unsafe class TroubleshootingUI
 
         if(Data == null)
         {
-            ImGuiEx.TextWrapped($"No data available for current character. Access retainer bell, deployables panel or logout to create data.");
-            return;
+            Error($"No data available for current character. Access retainer bell, deployables panel or logout to create data.");
+        }
+
+        if(C.IgnoreGCRankCheck)
+        {
+            Error("Ignore GC rank check is enabled. Disable it for normal plugin operation. (/ays set IgnoreGCRankCheck false)");
         }
 
         if(!Svc.ClientState.ClientLanguage.EqualsAny(ClientLanguage.Japanese, ClientLanguage.German, ClientLanguage.French, ClientLanguage.English))
@@ -93,11 +97,11 @@ public static unsafe class TroubleshootingUI
             {
                 Error("Your current character is excluded from AutoRetainer completely, prevenging it from being processed in any way. Go to settings - exclusions to change it.");
             }
-            if(Data.ExcludeRetainer)
+            if(Data?.ExcludeRetainer == true)
             {
                 Error("Your current character is excluded from retainer list. Go to settings - exclusions to change it.");
             }
-            if(Data.ExcludeWorkshop)
+            if(Data?.ExcludeWorkshop == true)
             {
                 Error("Your current character is excluded from deployable list. Go to settings - exclusions to change it.");
             }
