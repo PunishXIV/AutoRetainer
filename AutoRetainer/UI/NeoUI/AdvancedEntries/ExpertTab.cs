@@ -30,6 +30,7 @@ public class ExpertTab : NeoUIEntry
             {
                 S.InnCutsceneSkip.RefreshAccordingToConfig();
             }
+            ImGuiEx.HelpMarker("Cutscene skip is detectable server-side and increases chance of ban", EColor.RedBright, FontAwesomeIcon.ExclamationTriangle.ToIconString());
         })
         .Checkbox($"Disable sorting and collapsing/expanding", () => ref C.NoCurrentCharaOnTop)
         .Checkbox($"Show MultiMode checkbox on plugin UI bar", () => ref C.MultiModeUIBar)

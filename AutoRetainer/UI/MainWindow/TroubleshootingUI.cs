@@ -23,6 +23,11 @@ public static unsafe class TroubleshootingUI
             return;
         }
 
+        if(C.CutsceneSkipMode != AutoRetainerAPI.Configuration.CutsceneSkipMode.Never)
+        {
+            Info($"Inn cutscene skip module is set to {C.CutsceneSkipMode}. Inn cutscene will be skipped by AutoRetainer.");
+        }
+
         if(Data == null)
         {
             Error($"No data available for current character. Access retainer bell, deployables panel or logout to create data.");
