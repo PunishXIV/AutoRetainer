@@ -484,12 +484,12 @@ internal static unsafe class VentureUtils
         {
             for(var i = 0; i < data->AtkArrayData.Size; i++)
             {
-                if(data->StringArray[i] == null) break;
+                if(data->StringArray[i].Value == null) break;
                 if(i % 4 != 1) continue;
-                var item = data->StringArray[i];
+                var item = data->StringArray[i].Value;
                 if(item != null)
                 {
-                    var str = MemoryHelper.ReadSeStringNullTerminated((nint)item.Value);
+                    var str = MemoryHelper.ReadSeStringNullTerminated((nint)item);
                     ret.Add(str.GetText());
                 }
             }

@@ -40,7 +40,7 @@ internal static unsafe class MultiMode
 
     internal static Dictionary<ulong, int> CharaCnt = [];
     internal static bool CanHET => Active && CanHETRaw;
-    internal static bool CanHETRaw => ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType) && (TaskNeoHET.GetFcOrPrivateEntranceFromMarkers() != null || TaskNeoHET.GetApartmentEntrance() != null) && (!C.NoTeleportHetWhenNextToBell || Utils.GetReachableRetainerBell(false) == null);
+    internal static bool CanHETRaw => ResidentalAreas.List.Contains((ushort)Svc.ClientState.TerritoryType) && (TaskNeoHET.GetFcOrPrivateEntranceFromMarkers() != null || TaskNeoHET.GetApartmentEntrance() != null) && (!C.NoTeleportHetWhenNextToBell || Utils.GetReachableRetainerBell(false) == null);
 
     internal static void Init()
     {

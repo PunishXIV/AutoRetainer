@@ -18,7 +18,7 @@ internal static unsafe class HouseEnterTask
 
     internal static bool? SelectYesno()
     {
-        if(!ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType))
+        if(!ResidentalAreas.List.Contains((ushort)Svc.ClientState.TerritoryType))
         {
             return null;
         }
@@ -45,7 +45,7 @@ internal static unsafe class HouseEnterTask
 
     internal static bool? WaitUntilLeavingZone()
     {
-        return !ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType);
+        return !ResidentalAreas.List.Contains((ushort)Svc.ClientState.TerritoryType);
     }
 
     internal static bool? LockonBell()

@@ -1528,7 +1528,7 @@ public static unsafe class Utils
         {
             return 6.5f;
         }
-        else if(Inns.List.Contains(Svc.ClientState.TerritoryType))
+        else if(Inns.List.Contains((ushort)Svc.ClientState.TerritoryType))
         {
             return 4.75f;
         }

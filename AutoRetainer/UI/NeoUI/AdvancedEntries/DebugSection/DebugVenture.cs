@@ -57,10 +57,10 @@ internal unsafe class DebugVenture : DebugSectionBase
             {
                 for(var i = 0; i < data->AtkArrayData.Size; i++)
                 {
-                    var item = data->StringArray[i];
+                    var item = data->StringArray[i].Value;
                     if(item != null)
                     {
-                        var str = MemoryHelper.ReadSeStringNullTerminated((nint)item.Value);
+                        var str = MemoryHelper.ReadSeStringNullTerminated((nint)item);
                         ImGuiEx.Text($"{i}: {str.GetText()}");
                     }
                     else

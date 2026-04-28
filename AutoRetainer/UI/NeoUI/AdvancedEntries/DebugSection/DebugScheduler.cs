@@ -171,7 +171,7 @@ internal unsafe class DebugScheduler : DebugSectionBase
                 {
                                         new()
                                         {
-                                                Type = FFXIVClientStructs.FFXIV.Component.GUI.ValueType.Int,
+                                                Type = AtkValueType.Int,
                                                 Int = -1
                                         }
                                 };
@@ -186,8 +186,8 @@ internal unsafe class DebugScheduler : DebugSectionBase
                 {
                     var values = stackalloc AtkValue[2]
                     {
-                                                new() { Type = FFXIVClientStructs.FFXIV.Component.GUI.ValueType.Int, Int = 3 },
-                                                new() { Type = FFXIVClientStructs.FFXIV.Component.GUI.ValueType.UInt, Int = 50 },
+                                                new() { Type = AtkValueType.Int, Int = 3 },
+                                                new() { Type = AtkValueType.UInt, Int = 50 },
                                         };
                     addon->FireCallback(2, values);
                 }

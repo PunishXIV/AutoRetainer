@@ -6,6 +6,7 @@ using ECommons.EzHookManager;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
+using FFXIVClientStructs.FFXIV.Client.Network;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace AutoRetainer.Internal;
@@ -22,9 +23,8 @@ internal unsafe class Memory : IDisposable
     [Signature("48 89 5C 24 ?? 57 48 83 EC 20 8B D9 8B F9")]
     private GetIsGatheringItemGatheredDelegate GetIsGatheringItemGathered;
 
-    internal delegate nint OnReceiveMarketPricePacketDelegate(nint a1, nint data);
-    [Signature("48 89 5C 24 ?? 57 48 83 EC 20 48 8B 0D ?? ?? ?? ?? 48 8B DA E8", DetourName = nameof(AddonItemSearchResult_OnRequestedUpdateDelegateDetour), Fallibility = Fallibility.Fallible)]
-    internal Hook<OnReceiveMarketPricePacketDelegate> OnReceiveMarketPricePacketHook;
+    [EzHookFromCS(false)]
+    internal EzHook<PacketDispatcher.Delegates.HandleMarketBoardItemRequestStartPacket> OnReceiveMarketPricePacketHook;
 
     internal delegate byte OutdoorTerritory_IsEstateResidentDelegate(nint a1, byte a2);
     [Signature("8B 05 ?? ?? ?? ?? 44 0F B6 D2 44 8B 81")]
@@ -75,17 +75,15 @@ internal unsafe class Memory : IDisposable
         return ret;
     }
 
-    private nint AddonItemSearchResult_OnRequestedUpdateDelegateDetour(nint a1, nint data)
+    private void OnReceiveMarketPricePacketDetour(uint a1, nint data)
     {
-        var ret = OnReceiveMarketPricePacketHook.Original(a1, data);
+        OnReceiveMarketPricePacketHook.Original(a1, data);
         P.MarketCooldownOverlay.UnlockAt = Environment.TickCount64 + 2000;
-        return ret;
     }
 
     public void Dispose()
     {
         InteractWithObjectHook?.Dispose();
-        OnReceiveMarketPricePacketHook?.Dispose();
         ReceiveRetainerVentureListUpdateHook?.Dispose();
     }
 

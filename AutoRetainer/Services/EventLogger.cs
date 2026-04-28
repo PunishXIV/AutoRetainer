@@ -15,7 +15,7 @@ public unsafe class EventLogger : IDisposable
     private void Handler(AddonEvent type, AddonArgs args)
     {
         var evt = (AddonReceiveEventArgs)args;
-        if(evt.AtkEventType.EqualsAny<byte>(33, 34)) return;
+        if(((byte)evt.AtkEventType).EqualsAny<byte>(33, 34)) return;
         PluginLog.Information($"""
             Event:
             Param: {evt.EventParam:X16}

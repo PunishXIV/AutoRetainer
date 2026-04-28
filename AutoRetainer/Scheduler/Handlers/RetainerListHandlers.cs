@@ -45,7 +45,7 @@ internal static unsafe class RetainerListHandlers
                 {
                     new()
                     {
-                        Type = FFXIVClientStructs.FFXIV.Component.GUI.ValueType.Int,
+                        Type = AtkValueType.Int,
                         Int = -1
                     }
                 };

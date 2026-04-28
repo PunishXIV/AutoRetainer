@@ -72,7 +72,7 @@ internal unsafe class DebugMulti : DebugSectionBase
         if(ImGui.CollapsingHeader("Estate territories"))
         {
             ImGuiEx.Text(ResidentalAreas.List.Select(x => GenericHelpers.GetTerritoryName(x)).Join("\n"));
-            ImGuiEx.Text($"In residental area: {ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType)}");
+            ImGuiEx.Text($"In residental area: {ResidentalAreas.List.Contains((ushort)Svc.ClientState.TerritoryType)}");
         }
         ImGuiEx.Text($"Is in sanctuary: {TerritoryInfo.Instance()->InSanctuary}");
         ImGuiEx.Text($"Is in sanctuary ExcelTerritoryHelper: {ExcelTerritoryHelper.IsSanctuary(Svc.ClientState.TerritoryType)}");

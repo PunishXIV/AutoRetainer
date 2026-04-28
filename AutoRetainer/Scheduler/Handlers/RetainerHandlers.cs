@@ -292,8 +292,8 @@ internal static unsafe class RetainerHandlers
                     {
                         var v = stackalloc AtkValue[]
                         {
-                            new() { Type = FFXIVClientStructs.FFXIV.Component.GUI.ValueType.Int, Int = 3 },
-                            new() { Type = FFXIVClientStructs.FFXIV.Component.GUI.ValueType.UInt, UInt = gilToWithdraw }
+                            new() { Type = AtkValueType.Int, Int = 3 },
+                            new() { Type = AtkValueType.UInt, UInt = gilToWithdraw }
                         };
                         addon->FireCallback(2, v);
                         DebugLog($"Set gil to withdraw {gilToWithdraw} (total: {numGil})");
@@ -331,8 +331,8 @@ internal static unsafe class RetainerHandlers
                 {
                     var v = stackalloc AtkValue[]
                     {
-                        new() { Type = FFXIVClientStructs.FFXIV.Component.GUI.ValueType.Int, Int = 3 },
-                        new() { Type = FFXIVClientStructs.FFXIV.Component.GUI.ValueType.UInt, UInt = gilToDeposit }
+                        new() { Type = AtkValueType.Int, Int = 3 },
+                        new() { Type = AtkValueType.UInt, UInt = gilToDeposit }
                     };
                     addon->FireCallback(2, v);
                     DebugLog($"Set gil to deposit {gilToDeposit} (total: {numGil})");
@@ -365,8 +365,8 @@ internal static unsafe class RetainerHandlers
                 {
                     var v = stackalloc AtkValue[]
                     {
-                        new() { Type = FFXIVClientStructs.FFXIV.Component.GUI.ValueType.Int, Int = 3 },
-                        new() { Type = FFXIVClientStructs.FFXIV.Component.GUI.ValueType.UInt, UInt = gilToDeposit }
+                        new() { Type = AtkValueType.Int, Int = 3 },
+                        new() { Type = AtkValueType.UInt, UInt = gilToDeposit }
                     };
                     addon->FireCallback(2, v);
                     DebugLog($"Set gil to deposit {gilToDeposit} (total: {numGil})");
@@ -393,7 +393,7 @@ internal static unsafe class RetainerHandlers
             {
                 var v = stackalloc AtkValue[]
                 {
-                    new() { Type = FFXIVClientStructs.FFXIV.Component.GUI.ValueType.Int, Int = 2 },
+                    new() { Type = AtkValueType.Int, Int = 2 },
                     new() { Type = 0, UInt = 0 }
                 };
                 addon->FireCallback(2, v);
@@ -424,7 +424,7 @@ internal static unsafe class RetainerHandlers
                 {
                     var v = stackalloc AtkValue[]
                     {
-                        new() { Type = FFXIVClientStructs.FFXIV.Component.GUI.ValueType.Int, Int = 0 },
+                        new() { Type = AtkValueType.Int, Int = 0 },
                         new() { Type = 0, Int = 0 }
                     };
                     addon->FireCallback(2, v);
@@ -444,7 +444,7 @@ internal static unsafe class RetainerHandlers
                     {
                         var v = stackalloc AtkValue[]
                     {
-                            new() { Type = FFXIVClientStructs.FFXIV.Component.GUI.ValueType.Int, Int = 1 },
+                            new() { Type = AtkValueType.Int, Int = 1 },
                             new() { Type = 0, Int = 0 }
                         };
                         addon->FireCallback(2, v);

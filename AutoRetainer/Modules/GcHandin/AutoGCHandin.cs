@@ -374,9 +374,7 @@ internal static unsafe class AutoGCHandin
 
     public static byte GetRank()
     {
-        if(GetGC() == 1) return PlayerState.Instance()->GCRankMaelstrom;
-        if(GetGC() == 2) return PlayerState.Instance()->GCRankTwinAdders;
-        if(GetGC() == 3) return PlayerState.Instance()->GCRankImmortalFlames;
+        if(GetGC() != 0) return PlayerState.Instance()->GetGrandCompanyRank();
         return 0;
     }
 

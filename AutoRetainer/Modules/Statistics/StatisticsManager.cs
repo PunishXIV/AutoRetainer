@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.Internal.InventoryManagement;
+using Dalamud.Game.Chat;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
@@ -16,6 +17,11 @@ internal static unsafe class StatisticsManager
         Svc.ClientState.TerritoryChanged += ClientState_TerritoryChanged;
     }
 
+    private static void Chat_ChatMessage(IHandleableChatMessage message)
+    {
+        Chat_ChatMessage(message.LogKind, message.Message);
+    }
+
     internal static void Shutdown()
     {
         Svc.Chat.ChatMessage -= Chat_ChatMessage;
@@ -23,13 +29,13 @@ internal static unsafe class StatisticsManager
         Files.Clear();
     }
 
-    private static void ClientState_TerritoryChanged(ushort e)
+    private static void ClientState_TerritoryChanged(uint e)
     {
         Files.Clear();
         OfflineDataManager.EnqueueWriteWhenPlayerAvailable();
     }
 
-    private static void Chat_ChatMessage(XivChatType type, int time, ref SeString sender, ref SeString message, ref bool isHandled)
+    private static void Chat_ChatMessage(XivChatType type, SeString message)
     {
         if(Svc.Condition[ConditionFlag.OccupiedSummoningBell] && ProperOnLogin.PlayerPresent && (ushort)type == 2110 && Svc.Targets.Target.IsRetainerBell() && Utils.TryGetCurrentRetainer(out var retName))
         {
