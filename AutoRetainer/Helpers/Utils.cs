@@ -1339,7 +1339,7 @@ public static unsafe class Utils
         IGameObject currentObject = null;
         foreach(var x in Svc.Objects)
         {
-            if(x.IsTargetable && (x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName))
+            if(x.IsTargetable && (x.ObjectKind == ObjectKind.HousingEventObject || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName))
             {
                 var distance = Vector3.Distance(Svc.ClientState.LocalPlayer.Position, x.Position);
                 if(distance < currentDistance)
@@ -1359,7 +1359,7 @@ public static unsafe class Utils
 
         foreach(var x in Svc.Objects)
         {
-            if((x.ObjectKind == ObjectKind.Housing || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName))
+            if((x.ObjectKind == ObjectKind.HousingEventObject || x.ObjectKind == ObjectKind.EventObj) && x.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName))
             {
                 var distance = extend && (VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType) || Player.TerritoryIntendedUse == TerritoryIntendedUseEnum.Inn) ? 20f : GetValidInteractionDistance(x) ;
                 if(Vector3.Distance(x.Position, Svc.ClientState.LocalPlayer.Position) < distance && x.IsTargetable)
@@ -1524,7 +1524,7 @@ public static unsafe class Utils
 
     internal static float GetValidInteractionDistance(IGameObject bell)
     {
-        if(bell.ObjectKind == ObjectKind.Housing)
+        if(bell.ObjectKind == ObjectKind.HousingEventObject)
         {
             return 6.5f;
         }
@@ -1714,7 +1714,7 @@ public static unsafe class Utils
     internal static bool IsRetainerBell(this IGameObject o)
     {
         return o != null &&
-            (o.ObjectKind == ObjectKind.EventObj || o.ObjectKind == ObjectKind.Housing)
+            (o.ObjectKind == ObjectKind.EventObj || o.ObjectKind == ObjectKind.HousingEventObject)
             && o.Name.ToString().EqualsIgnoreCaseAny(Lang.BellName);
     }
 

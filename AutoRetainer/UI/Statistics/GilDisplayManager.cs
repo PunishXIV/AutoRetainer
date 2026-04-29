@@ -23,11 +23,11 @@ public sealed class GilDisplayManager
         {
             if(ExcelWorldHelper.TryGet(x.World, out var world))
             {
-                if(!data.ContainsKey((ExcelWorldHelper.Region)world.DataCenter.Value.Region))
+                if(!data.ContainsKey((ExcelWorldHelper.Region)world.DataCenter.Value.Region.RowId))
                 {
-                    data[(ExcelWorldHelper.Region)world.DataCenter.Value.Region] = [];
+                    data[(ExcelWorldHelper.Region)world.DataCenter.Value.Region.RowId] = [];
                 }
-                data[(ExcelWorldHelper.Region)world.DataCenter.Value.Region].Add(x);
+                data[(ExcelWorldHelper.Region)world.DataCenter.Value.Region.RowId].Add(x);
             }
         }
         var globalTotal = 0L;
