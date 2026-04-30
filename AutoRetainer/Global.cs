@@ -30,3 +30,4 @@ global using Callback = ECommons.Automation.Callback;
 global using CSFramework = FFXIVClientStructs.FFXIV.Client.System.Framework.Framework;
 global using S = AutoRetainer.Services.AutoRetainerServiceManager;
 global using Player = ECommons.GameHelpers.LegacyPlayer.Player;
+global using static ECommons.IPC.ECommonsIPC;

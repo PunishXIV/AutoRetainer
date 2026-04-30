@@ -2,6 +2,7 @@
 using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
+using ECommons.IPC.Subscribers.LifestreamIPC;
 
 namespace AutoRetainer.Scheduler.Tasks;
 public static class TaskTeleportToProperty
@@ -20,9 +21,9 @@ public static class TaskTeleportToProperty
             return false;
         }
         var fcTeleportEnabled = (Data.GetAllowFcTeleportForRetainers() && !isSubmersibleOperation) || (Data.GetAllowFcTeleportForSubs() && isSubmersibleOperation);
-        var data = S.LifestreamIPC.GetHousePathData(Player.CID);
-        var sharedData = S.LifestreamIPC.GetSharedHousePathData();
-        var info = S.LifestreamIPC.GetCurrentPlotInfo();
+        var data = Lifestream.GetHousePathData(Player.CID);
+        var sharedData = Lifestream.GetSharedHousePathData();
+        var info = Lifestream.GetCurrentPlotInfo();
         {
             var canPrivate = Data.GetAllowPrivateTeleportForRetainers() && data.Private != null && data.Private.PathToEntrance.Count > 0;
             var canShared = Data.GetAllowSharedTeleportForRetainers() && sharedData != null && sharedData.PathToEntrance.Count > 0;
@@ -55,9 +56,9 @@ public static class TaskTeleportToProperty
 
         if(C.AllowSimpleTeleport)
         {
-            var canFc = fcTeleportEnabled && S.LifestreamIPC.HasFreeCompanyHouse() != false;
-            var canPrivate = Data.GetAllowPrivateTeleportForRetainers() && S.LifestreamIPC.HasPrivateHouse() != false;
-            var canShared = Data.GetAllowSharedTeleportForRetainers() && S.LifestreamIPC.HasSharedEstate() != false;
+            var canFc = fcTeleportEnabled && Lifestream.HasFreeCompanyHouse() != false;
+            var canPrivate = Data.GetAllowPrivateTeleportForRetainers() && Lifestream.HasPrivateHouse() != false;
+            var canShared = Data.GetAllowSharedTeleportForRetainers() && Lifestream.HasSharedEstate() != false;
             if((isSubmersibleOperation || !(canPrivate || canShared)) && canFc)
             {
                 PluginLog.Information($"Simple Teleport: fc=true, canShared={canShared}");
@@ -75,10 +76,10 @@ public static class TaskTeleportToProperty
             //apartment logic
             if(Data.GetAllowApartmentTeleportForRetainers())
             {
-                if(S.LifestreamIPC.HasApartment() == true && Apartments.Contains(Player.Territory)) return false;
-                if(S.LifestreamIPC.HasApartment() != false)
+                if(Lifestream.HasApartment() == true && Apartments.Contains(Player.Territory)) return false;
+                if(Lifestream.HasApartment() != false)
                 {
-                    P.TaskManager.Enqueue(() => S.LifestreamIPC.EnterApartment(true));
+                    P.TaskManager.Enqueue(() => Lifestream.EnterApartment(true));
                     P.TaskManager.Enqueue(() =>
                     {
                         if(!Svc.ClientState.IsLoggedIn)
@@ -86,12 +87,12 @@ public static class TaskTeleportToProperty
                             PluginLog.Warning($"Logout while waiting to return to home; expecting DC travel. Aborting and waiting for relogging.");
                             return null;
                         }
-                        if(Player.Interactable && S.LifestreamIPC.HasApartment() == false)
+                        if(Player.Interactable && Lifestream.HasApartment() == false)
                         {
                             PluginLog.Warning("Upon returning home, apartment not found. Aborting and retrying.");
                             return null;
                         }
-                        return IsScreenReady() && Player.Interactable && Apartments.Contains(Player.Territory) && !S.LifestreamIPC.IsBusy();
+                        return IsScreenReady() && Player.Interactable && Apartments.Contains(Player.Territory) && !Lifestream.IsBusy();
                     }, new(timeLimitMS: 5 * 60 * 1000));
                     return true;
                 }
@@ -99,7 +100,7 @@ public static class TaskTeleportToProperty
             //inn logic
             if(!Inns.List.Contains((ushort)Player.Territory))
             {
-                P.TaskManager.Enqueue(() => S.LifestreamIPC.EnqueueInnShortcut(null));
+                P.TaskManager.Enqueue(() => Lifestream.EnqueueInnShortcut(null));
                 P.TaskManager.Enqueue(() =>
                 {
                     if(!Svc.ClientState.IsLoggedIn)
@@ -107,7 +108,7 @@ public static class TaskTeleportToProperty
                         PluginLog.Warning($"Logout while waiting to return to home; expecting DC travel. Aborting and waiting for relogging.");
                         return null;
                     }
-                    return IsScreenReady() && Player.Interactable && Inns.List.Contains((ushort)Player.Territory) && !S.LifestreamIPC.IsBusy();
+                    return IsScreenReady() && Player.Interactable && Inns.List.Contains((ushort)Player.Territory) && !Lifestream.IsBusy();
                 }, new(timeLimitMS: 5 * 60 * 1000));
                 PluginLog.Debug($"TeleportTask: {isSubmersibleOperation} | Success, going to inn");
                 return true;
@@ -156,7 +157,7 @@ public static class TaskTeleportToProperty
                     return true; //already here
                 }
             }
-            P.TaskManager.Enqueue(() => S.LifestreamIPC.EnqueuePropertyShortcut(fc ? 2 : (shared?5:1), 1));
+            P.TaskManager.Enqueue(() => Lifestream.EnqueuePropertyShortcut((fc ? PropertyType.FC : (shared?PropertyType.Shared_Estate:PropertyType.Home)), HouseEnterMode.Walk_to_door));
             P.TaskManager.Enqueue(() =>
             {
                 if(!Svc.ClientState.IsLoggedIn)
@@ -165,10 +166,10 @@ public static class TaskTeleportToProperty
                     return null;
                 }
                 return Player.Interactable
-                && S.LifestreamIPC.GetCurrentPlotInfo()?.Plot == pathData.Plot
-                && S.LifestreamIPC.GetCurrentPlotInfo()?.Ward == pathData.Ward
-                && S.LifestreamIPC.GetCurrentPlotInfo()?.Kind == pathData.ResidentialDistrict
-                && !S.LifestreamIPC.IsBusy();
+                && Lifestream.GetCurrentPlotInfo()?.Plot == pathData.Plot
+                && Lifestream.GetCurrentPlotInfo()?.Ward == pathData.Ward
+                && Lifestream.GetCurrentPlotInfo()?.Kind == pathData.ResidentialDistrict
+                && !Lifestream.IsBusy();
             }, new(timeLimitMS: 5 * 60 * 1000));
             TaskNeoHET.Enqueue(null);
             PluginLog.Debug($"TeleportTask: {isSubmersibleOperation} | Success, full sequence");
@@ -178,7 +179,7 @@ public static class TaskTeleportToProperty
         bool ProcessSimple(bool fc, bool shared)
         {
             var isHere = TaskNeoHET.IsInMarkerHousingPlot(fc ? TaskNeoHET.FcMarkers : (shared?TaskNeoHET.SharedMarkers:TaskNeoHET.PrivateMarkers));
-            var noProperty = !(fc ? S.LifestreamIPC.HasFreeCompanyHouse() : (shared?S.LifestreamIPC.HasSharedEstate() != false:S.LifestreamIPC.HasPrivateHouse()));
+            var noProperty = !(fc ? Lifestream.HasFreeCompanyHouse() : (shared?Lifestream.HasSharedEstate() != false:Lifestream.HasPrivateHouse()));
             if(noProperty == true)
             {
                 PluginLog.Debug($"TeleportTask: {isSubmersibleOperation} | Simple failed, no property found");
@@ -195,7 +196,7 @@ public static class TaskTeleportToProperty
                 PluginLog.Debug($"TeleportTask: {isSubmersibleOperation} | Simple success, enqueued HET");
                 return true; //already here
             }
-            P.TaskManager.Enqueue(() => S.LifestreamIPC.EnqueuePropertyShortcut(fc ? 2 : (shared?5:1), 1));
+            P.TaskManager.Enqueue(() => Lifestream.EnqueuePropertyShortcut(fc ? PropertyType.FC : (shared ? PropertyType.Shared_Estate : PropertyType.Home), HouseEnterMode.Walk_to_door));
             P.TaskManager.Enqueue(() =>
             {
                 if(!Svc.ClientState.IsLoggedIn)
@@ -205,7 +206,7 @@ public static class TaskTeleportToProperty
                 }
                 return Player.Interactable
                 && Player.Territory.EqualsAny([.. ResidentalAreas.List])
-                && !S.LifestreamIPC.IsBusy();
+                && !Lifestream.IsBusy();
             }, new(timeLimitMS: 5 * 60 * 1000));
             TaskNeoHET.Enqueue(null);
             PluginLog.Debug($"TeleportTask: {isSubmersibleOperation} | Simple success, full sequence");
@@ -221,8 +222,8 @@ public static class TaskTeleportToProperty
         var retainersSoon = MultiMode.AnyRetainersAvailable(0) && MultiMode.EnabledRetainers;
         var blockHet = subsSoon || retainersSoon;
         if(C.AllowSimpleTeleport && (Data.GetAllowFcTeleportForRetainers() || Data.GetAllowPrivateTeleportForRetainers() || Data.GetAllowSharedTeleportForRetainers())) return blockHet;
-        var data = S.LifestreamIPC.GetHousePathData(Player.CID);
-        var sharedData = S.LifestreamIPC.GetSharedHousePathData();
+        var data = Lifestream.GetHousePathData(Player.CID);
+        var sharedData = Lifestream.GetSharedHousePathData();
         if(Data.GetAllowFcTeleportForRetainers() && data.FC != null && data.FC.PathToEntrance.Count > 0) return blockHet;
         if(Data.GetAllowPrivateTeleportForRetainers() && data.Private != null && data.Private.PathToEntrance.Count > 0) return blockHet;
         if(Data.GetAllowSharedTeleportForRetainers() && sharedData != null && sharedData.PathToEntrance.Count > 0) return blockHet;

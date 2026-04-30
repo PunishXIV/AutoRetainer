@@ -1,5 +1,5 @@
 ﻿using AutoRetainer.Modules.EzIPCManagers;
-using AutoRetainer.Services.Lifestream;
+
 using AutoRetainer.UI.NeoUI;
 using AutoRetainer.UI.Overlays;
 using AutoRetainer.UI.Statistics;
@@ -13,7 +13,6 @@ public static class AutoRetainerServiceManager
     public static FcDataManager FCData;
     public static GilDisplayManager GilDisplay;
     public static VentureStatsManager VentureStats;
-    public static LifestreamIPC LifestreamIPC;
     //public static EventLogger EventLogger;
     public static AutoBuyFuelOverlay AutoBuyFuelOverlay;
     public static TitleScreenButton TitleScreenButton;

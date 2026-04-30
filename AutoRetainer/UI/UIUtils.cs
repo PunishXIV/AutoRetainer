@@ -100,7 +100,7 @@ internal static class UIUtils
     {
         var offlineData = C.OfflineData.FirstOrDefault(x => x.CID == cid);
         if(offlineData == null) return;
-        var data = S.LifestreamIPC.GetHousePathData(cid);
+        var data = Lifestream.GetHousePathData(cid);
         if(offlineData.GetAllowFcTeleportForSubs() || offlineData.GetAllowFcTeleportForRetainers())
         {
             string error = null;
@@ -142,7 +142,7 @@ internal static class UIUtils
             var black = false;
             if(Player.CID == offlineData.CID && Player.IsInHomeWorld)
             {
-                var sharedData = S.LifestreamIPC.GetSharedHousePathData();
+                var sharedData = Lifestream.GetSharedHousePathData();
                 if(sharedData == null)
                 {
                     error = "Shared estate is not registered in Lifestream.";

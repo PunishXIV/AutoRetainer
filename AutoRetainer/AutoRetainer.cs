@@ -22,6 +22,8 @@ using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.EzSharedDataManager;
 using ECommons.GameHelpers;
+using ECommons.IPC;
+using ECommons.IPC.Subscribers;
 using ECommons.Reflection;
 using ECommons.Singletons;
 using ECommons.Throttlers;
@@ -84,6 +86,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
     {
         //PluginLoader.CheckAndLoad(pi, "https://love.puni.sh/plugins/AutoRetainer/blacklist.txt", delegate
         {
+            IPCBase.DefaultWrapper
             P = this;
             ECommonsMain.Init(pi, this, Module.DalamudReflector);
 #if CUSTOMCS
@@ -560,7 +563,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         MultiMode.Tick();
         NotificationHandler.Tick();
         NewYesAlreadyManager.Tick();
-        Artisan.ArtisanTick();
+        ArtisanManager.ArtisanTick();
         FPSManager.Tick();
         PriorityManager.Tick();
         TextAdvanceManager.Tick();

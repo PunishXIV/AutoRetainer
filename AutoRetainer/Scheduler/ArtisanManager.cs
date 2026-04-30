@@ -4,26 +4,8 @@ using ECommons.Throttlers;
 
 namespace AutoRetainer.Scheduler;
 
-internal static class Artisan
+internal static class ArtisanManager
 {
-    internal static bool IsListRunning => Svc.PluginInterface.GetIpcSubscriber<bool>("Artisan.IsListRunning").InvokeFunc();
-    internal static bool IsListPaused => Svc.PluginInterface.GetIpcSubscriber<bool>("Artisan.IsListPaused").InvokeFunc();
-    internal static bool GetStopRequest => Svc.PluginInterface.GetIpcSubscriber<bool>("Artisan.GetStopRequest").InvokeFunc();
-    internal static bool GetEnduranceStatus => Svc.PluginInterface.GetIpcSubscriber<bool>("Artisan.GetEnduranceStatus").InvokeFunc();
-    internal static void SetEnduranceStatus(bool b)
-    {
-        Svc.PluginInterface.GetIpcSubscriber<bool, object>("Artisan.IsListRunning").InvokeAction(b);
-    }
-
-    internal static void SetListPause(bool b)
-    {
-        Svc.PluginInterface.GetIpcSubscriber<bool, object>("Artisan.SetListPause").InvokeAction(b);
-    }
-
-    internal static void SetStopRequest(bool b)
-    {
-        Svc.PluginInterface.GetIpcSubscriber<bool, object>("Artisan.SetStopRequest").InvokeAction(b);
-    }
 
     internal static bool WasPaused = false;
 
@@ -41,7 +23,7 @@ internal static class Artisan
                         if(!WasPaused)
                         {
                             WasPaused = true;
-                            SetStopRequest(true);
+                            Artisan.SetStopRequest(true);
                         }
 
                         if(!SchedulerMain.PluginEnabled || SchedulerMain.Reason != PluginEnableReason.Artisan)
@@ -68,7 +50,7 @@ internal static class Artisan
                 if(EzThrottler.Check("ArtisanCanReenableOccupied"))
                 {
                     WasPaused = false;
-                    SetStopRequest(false);
+                    Artisan.SetStopRequest(false);
                 }
             }
         }
@@ -87,7 +69,7 @@ internal static class Artisan
     {
         try
         {
-            return IsListRunning || GetEnduranceStatus;
+            return Artisan.IsListRunning() || Artisan.GetEnduranceStatus();
         }
         catch(IpcNotReadyError) { }
         catch(Exception ex)

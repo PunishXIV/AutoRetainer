@@ -22,7 +22,7 @@ internal class DebugArtisan : DebugSectionBase
             }
         }
         ImGui.Separator();
-        ImGui.Checkbox(nameof(Artisan.WasPaused), ref Artisan.WasPaused);
+        ImGui.Checkbox(nameof(ArtisanManager.WasPaused), ref ArtisanManager.WasPaused);
         {
             var r = SchedulerMain.Reason;
             if(ImGuiEx.EnumCombo(nameof(SchedulerMain.Reason), ref r)) SchedulerMain.Reason = r;

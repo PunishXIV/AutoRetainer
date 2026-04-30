@@ -2,7 +2,7 @@
 using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainer.Scheduler.Tasks;
-using AutoRetainer.Services.Lifestream;
+
 using AutoRetainer.UI.MainWindow.MultiModeTab;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game.Config;
@@ -163,7 +163,7 @@ internal static unsafe class MultiMode
             {
                 BlockInteraction(1);
             }
-            if(P.TaskManager.IsBusy || S.LifestreamIPC.IsBusy())
+            if(P.TaskManager.IsBusy || Lifestream.IsBusy())
             {
                 return;
             }
@@ -520,11 +520,11 @@ internal static unsafe class MultiMode
                     P.TaskManager.Enqueue(() => Player.Interactable && IsScreenReady());
                     if(data != null)
                     {
-                        P.TaskManager.Enqueue(() => S.LifestreamIPC.ChangeCharacter(data.Name, data.World));
+                        P.TaskManager.Enqueue(() => Lifestream.ChangeCharacter(data.Name, data.World));
                     }
                     else
                     {
-                        P.TaskManager.Enqueue(() => S.LifestreamIPC.Logout());
+                        P.TaskManager.Enqueue(() => Lifestream.Logout());
                     }
                     return true;
                 }
@@ -533,7 +533,7 @@ internal static unsafe class MultiMode
             {
                 if(Utils.CanAutoLogin() || (allowFromTaskManager && Utils.CanAutoLoginFromTaskManager()))
                 {
-                    P.TaskManager.Enqueue(() => S.LifestreamIPC.ChangeCharacter(data.Name, data.World));
+                    P.TaskManager.Enqueue(() => Lifestream.ChangeCharacter(data.Name, data.World));
                     return true;
                 }
                 else

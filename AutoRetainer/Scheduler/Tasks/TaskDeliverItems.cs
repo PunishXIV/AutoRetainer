@@ -30,7 +30,7 @@ public static unsafe class TaskDeliverItems
             Notify.Error("Can not enqueue GC delivery as it is disabled for current character");
             return false;
         }
-        if(S.LifestreamIPC.IsBusy())
+        if(Lifestream.IsBusy())
         {
             Notify.Error("Lifestream is busy");
             return false;
@@ -83,7 +83,7 @@ public static unsafe class TaskDeliverItems
         });
         if(!gcInfo.IsReadyToExchange())
         {
-            P.TaskManager.Enqueue(() => S.LifestreamIPC.ExecuteCommand("gc " + Player.GrandCompany switch
+            P.TaskManager.Enqueue(() => Lifestream.ExecuteCommand("gc " + Player.GrandCompany switch
             {
                 ECommons.ExcelServices.GrandCompany.ImmortalFlames => "if",
                 ECommons.ExcelServices.GrandCompany.Maelstrom => "m",
@@ -91,7 +91,7 @@ public static unsafe class TaskDeliverItems
                 _ => throw new ArgumentOutOfRangeException()
             }), "Teleport to GC");
         }
-        P.TaskManager.Enqueue(() => !S.LifestreamIPC.IsBusy(), "Wait until teleportation completed", new(timeLimitMS: 5 * 60 * 1000) { CompanionAction = _ => EzThrottler.Throttle("GcBusy", 60000, true)});
+        P.TaskManager.Enqueue(() => !Lifestream.IsBusy(), "Wait until teleportation completed", new(timeLimitMS: 5 * 60 * 1000) { CompanionAction = _ => EzThrottler.Throttle("GcBusy", 60000, true)});
         P.TaskManager.Enqueue(() => GCContinuation.EnqueueInitiation(true), "Initiate GC delivery");
         return true;
     }

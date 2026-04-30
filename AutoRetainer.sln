@@ -31,6 +31,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InteropGenerator.Runtime", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFXIVClientStructs.Generators", "FFXIVClientStructs\FFXIVClientStructs.Generators\FFXIVClientStructs.Generators.csproj", "{808935D9-D13C-49EF-92A4-EBC5A64A8F2A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommons.IPC", "ECommons.IPC\ECommons.IPC\ECommons.IPC.csproj", "{46BCE827-5FEF-F90B-9FDE-C93AC92B91CB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -127,6 +129,14 @@ Global
 		{808935D9-D13C-49EF-92A4-EBC5A64A8F2A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{808935D9-D13C-49EF-92A4-EBC5A64A8F2A}.Release|x64.ActiveCfg = Release|Any CPU
 		{808935D9-D13C-49EF-92A4-EBC5A64A8F2A}.Release|x64.Build.0 = Release|Any CPU
+		{46BCE827-5FEF-F90B-9FDE-C93AC92B91CB}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{46BCE827-5FEF-F90B-9FDE-C93AC92B91CB}.Debug|Any CPU.Build.0 = Debug|x64
+		{46BCE827-5FEF-F90B-9FDE-C93AC92B91CB}.Debug|x64.ActiveCfg = Debug|x64
+		{46BCE827-5FEF-F90B-9FDE-C93AC92B91CB}.Debug|x64.Build.0 = Debug|x64
+		{46BCE827-5FEF-F90B-9FDE-C93AC92B91CB}.Release|Any CPU.ActiveCfg = Release|x64
+		{46BCE827-5FEF-F90B-9FDE-C93AC92B91CB}.Release|Any CPU.Build.0 = Release|x64
+		{46BCE827-5FEF-F90B-9FDE-C93AC92B91CB}.Release|x64.ActiveCfg = Release|x64
+		{46BCE827-5FEF-F90B-9FDE-C93AC92B91CB}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -91,11 +91,11 @@ public static unsafe class TaskNeoHET
             if(GetWorkshopEntrance() != null)
             {
                 var tasks = new List<TaskManagerTask>();
-                if(S.LifestreamIPC.CanMoveToWorkshop())
+                if(Lifestream.CanMoveToWorkshop())
                 {
                     tasks.AddRange([
-                        new(S.LifestreamIPC.MoveToWorkshop),
-                        new(() => !S.LifestreamIPC.IsBusy())
+                        new(() => Lifestream.MoveToWorkshop()),
+                        new(() => !Lifestream.IsBusy())
                         ]);
                 }
                 tasks.AddRange([
