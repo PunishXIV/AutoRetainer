@@ -25,7 +25,7 @@ internal static unsafe class MultiMode
 {
     internal static bool Active => Enabled && !IPC.Suppressed;
 
-    internal static bool Enabled = false;
+    internal static ref bool Enabled => ref C.MultiModeEnabled;
     public static (string Name, string World)? ExpectedCharacter = null;
 
     internal static bool WaitOnLoginScreen => C.MultiWaitOnLoginScreen || BailoutManager.IsLogOnTitleEnabled || C.NightMode;
@@ -44,6 +44,10 @@ internal static unsafe class MultiMode
 
     internal static void Init()
     {
+        if(!C.PreserveMultiModeState)
+        {
+            Enabled = false;
+        }
         ProperOnLogin.RegisterInteractable(delegate
         {
             TaskActivateSealSweetener.LastAttemptAt = 0;
@@ -388,7 +392,10 @@ internal static unsafe class MultiMode
         if(!GCContinuation.IsGCRankSufficientForExpertExchange()) return false;
         if(!GCContinuation.DoesInventoryHaveDeliverableItem()) return false;
         var canDeliver = false;
-        if(Utils.GetInventoryFreeSlotCount() <= C.FullAutoGCDeliveryInventory) canDeliver = true;
+        if(Utils.GetInventoryFreeSlotCount() <= C.FullAutoGCDeliveryInventory)
+        {
+            canDeliver = GCContinuation.DoesInventoryHaveDeliverableItem(Utils.PlayerInvetories);
+        }
         if(C.FullAutoGCDeliveryDeliverOnVentureExhaust && InventoryManager.Instance()->GetInventoryItemCount(GCContinuation.VentureItem) <= C.FullAutoGCDeliveryDeliverOnVentureLessThan) canDeliver = true;
         return canDeliver;
     }
@@ -744,7 +751,7 @@ internal static unsafe class MultiMode
         }
         P.TaskManager.Enqueue(() =>
         {
-            if(C.AutoLogin != "")
+            if(C.AutoLogin != "" && !Svc.ClientState.IsLoggedIn)
             {
                 OfflineCharacterData data;
                 if(C.AutoLogin == "~")

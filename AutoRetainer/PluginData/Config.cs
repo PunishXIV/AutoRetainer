@@ -285,4 +285,7 @@ internal unsafe class Config
     public bool MultiOnPluginLoad = false;
     public int MultiModeOnPluginLoadDelay = 10;
     public bool IgnoreGCRankCheck = false;
+
+    public bool PreserveMultiModeState = false;
+    public bool MultiModeEnabled = false;
 }
