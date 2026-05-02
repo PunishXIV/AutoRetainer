@@ -160,7 +160,14 @@ public static class Unlocks
     { 140, new UnlockedFrom(139) },                         // D    Oeyaseik                        <-       Southernmost Hanthbyrt
     { 141, new UnlockedFrom(138) },                         // E    Northeast Hanthbyrt             <-      Sea Wolf Cove
     { 142, new UnlockedFrom(140) },                         // F    Vyrstrant                       <-       Oeyaseik
-    { 143, new UnlockedFrom(9876) },                        // G    The Sunken Jawbone (G)          <-
+    { 143, new UnlockedFrom(142) },                         // G    The Sunken Jawbone (G)          <-      Vyrstrant
+
+    { 144, new UnlockedFrom(143) },                         // H    the Vyrstrant Dropoff               <-      The Sunken Jawbone (G)
+    { 145, new UnlockedFrom(141) },                         // I    Axeblade Bight                      <-      Northeast Hanthbyrt
+    { 146, new UnlockedFrom(9876) },                         // J    the Puffin Assembly                 <-
+    { 147, new UnlockedFrom(144) },                         // K    southern Aerslaent Plunge           <-     the Vyrstrant Dropoff
+    { 148, new UnlockedFrom(9876) },                         // L    the Solkronn Gallery                <-
+    { 149, new UnlockedFrom(144) },                         // M    central Den of the Greatsword       <-    the Vyrstrant Dropoff
 };
 
     public static List<(uint, UnlockedFrom)> FindUnlockPath(uint finalPoint)
