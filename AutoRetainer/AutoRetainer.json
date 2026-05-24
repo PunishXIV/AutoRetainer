@@ -1,5 +1,5 @@
 ﻿{
-    "Author": "кайт машина (Puni.sh), NightmareXIV",
+    "Author": "kawaii, NightmareXIV (Puni.sh), NightmareXIV",
     "Name": "AutoRetainer",
     "InternalName": "AutoRetainer",
     "Punchline": "Collect and assign ventures to your retainers from the comfort of your bed.",
@@ -8,5 +8,5 @@
     "RepoUrl": "https://github.com/PunishXIV/AutoRetainer",
     "DalamudApiLevel": 15,
     "LoadPriority": 0,
-    "IconUrl": "https://s3.puni.sh/media/plugin/24/icon-drb6aywk5m9.png"
+  "IconUrl": "https://s3.puni.sh/media/plugin/24/icon-drb6aywk5m9.png"
 }
