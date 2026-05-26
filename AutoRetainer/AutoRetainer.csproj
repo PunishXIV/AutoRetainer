@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<Authors>Puni.sh</Authors>
-		<Version>4.6.0.8</Version>
+		<Authors>NightmareXIV, kawaii</Authors>
+		<Version>4.6.0.9</Version>
 	</PropertyGroup>
 
 	<PropertyGroup>

@@ -19,7 +19,7 @@ internal static unsafe class StatisticsManager
 
     private static void Chat_ChatMessage(IHandleableChatMessage message)
     {
-        Chat_ChatMessage(message.LogKind, message.Message);
+        Chat_ChatMessage(message.Type, message.Message);
     }
 
     internal static void Shutdown()

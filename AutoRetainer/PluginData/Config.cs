@@ -155,6 +155,10 @@ internal unsafe class Config
     public bool ExitOnSubCompletion = false;
     public int ExitOnSubCompletionTime = 60;
 
+    public bool MultiDisableRender = false;
+    public bool MultiDisableRenderNightModeOnly = false;
+    public bool MultiDisableRenderOnlyInactive = true;
+
     internal bool DontReassign
     {
         get

@@ -12,6 +12,7 @@ using ECommons.Configuration;
 using ECommons.Events;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.EzSharedDataManager;
+using ECommons.GameFunctions;
 using ECommons.GameHelpers;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
@@ -159,6 +160,15 @@ internal static unsafe class MultiMode
         {
             if(EzThrottler.Throttle("MultiNotify", 15000)) Utils.NotifyIfLifestreamIsNotInstalled("Multi Mode");
             ValidateAutoAfkSettings();
+            var shouldDisableRender = C.MultiDisableRender && (!C.MultiDisableRenderNightModeOnly || C.NightMode) && (!C.MultiDisableRenderOnlyInactive || TerraFX.Interop.Windows.Windows.IsIconic((TerraFX.Interop.Windows.HWND)(*ECommonsMain.MainWindowHandle)) || CSFramework.Instance()->WindowInactive);
+            if(shouldDisableRender)
+            {
+                RenderDisableManager.PlaceRequest();
+            }
+            else
+            {
+                RenderDisableManager.RemoveRequest();
+            }
             if(!Svc.ClientState.IsLoggedIn && TryGetAddonByName<AtkUnitBase>("Title", out _) && !P.TaskManager.IsBusy)
             {
                 LastLogin = 0;
@@ -382,6 +392,10 @@ internal static unsafe class MultiMode
                     }
                 }
             }
+        }
+        else
+        {
+            RenderDisableManager.RemoveRequest();
         }
     }
 

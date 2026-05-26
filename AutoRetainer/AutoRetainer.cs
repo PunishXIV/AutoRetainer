@@ -22,6 +22,7 @@ using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.EzIpcManager;
 using ECommons.EzSharedDataManager;
+using ECommons.GameFunctions;
 using ECommons.GameHelpers;
 using ECommons.IPC;
 using ECommons.IPC.Subscribers;
@@ -565,6 +566,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
         MultiMode.Tick();
         NotificationHandler.Tick();
         NewYesAlreadyManager.Tick();
+        S.AetherBagsManager.OnUpdate();
         ArtisanManager.ArtisanTick();
         FPSManager.Tick();
         PriorityManager.Tick();
