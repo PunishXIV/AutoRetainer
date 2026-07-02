@@ -13,7 +13,7 @@ public unsafe class TaskRecursivelyBuyFuel
         {
             if(TryGetAddonMaster<AddonMaster.SelectYesno>(out var m))
             {
-                if(m.Text.Contains("ceruleum"))
+                if(m.Text.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.CeruleumTank))
                 {
                     if(EzThrottler.Throttle("CeruleumYesNo")) m.Yes();
                 }

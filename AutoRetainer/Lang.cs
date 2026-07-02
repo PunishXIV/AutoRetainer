@@ -117,7 +117,7 @@ internal static class Lang
         "Schneller Streifzug (2 Wertmarken)",
         "Tâche improvisée (2 jetons)",
         "自由探索委托（需要2枚探险币）",
-        "自由探索委託（需要2枚探險幣）",
+        "自由尋寶委託（需要2枚探險幣）",
         "발굴수행 (필요한 집사 급료: 2개)",
     ];
 
@@ -188,7 +188,7 @@ internal static class Lang
     //11	TEXT_CMNDEFHOUSINGPERSONALROOMENTRANCE_00178_GOTO_WORKSHOP	地下工房に移動する
     //11	TEXT_CMNDEFHOUSINGPERSONALROOMENTRANCE_00178_GOTO_WORKSHOP	Die Ge<SoftHyphen/>sell<SoftHyphen/>schaftswerkstätte betreten
     //11	TEXT_CMNDEFHOUSINGPERSONALROOMENTRANCE_00178_GOTO_WORKSHOP	Aller dans l'atelier de compagnie
-    internal static readonly string[] EnterWorkshop = ["Move to the company workshop", "地下工房に移動する", "移动到部队工房", "移動到部隊工房", "Die Gesellschaftswerkstätte betreten", "Aller dans l'atelier de compagnie", "지하공방으로 이동"];
+    internal static readonly string[] EnterWorkshop = ["Move to the company workshop", "地下工房に移動する", "移动到部队工房", "移動到公會工坊", "Die Gesellschaftswerkstätte betreten", "Aller dans l'atelier de compagnie", "지하공방으로 이동"];
 
     internal static readonly string[] AirshipManagement = ["Airship Management", "飛空艇の管理", "管理飞空艇", "管理飛空艇", "Luftschiff verwalten", "Contrôle aérien", "비공정 관리"];
     internal static readonly string[] SubmarineManagement = ["Submersible Management", "潜水艦の管理", "管理潜水艇", "管理潛水艇", "Tauchboot verwalten", "Contrôle sous-marin", "잠수함 관리"];
@@ -197,8 +197,11 @@ internal static class Lang
     internal static readonly string[] DeployOnSubaquaticVoyage = ["Deploy submersible on subaquatic voyage", "ボイジャー出港", "出发", "出發", "Auf Erkundung gehen", "Expédier le sous-marin", "탐사 출항"];
     internal static readonly string[] ViewPrevVoyageLog = ["View previous voyage log", "前回のボイジャー報告", "上次的远航报告", "上次的遠航報告", "Bericht der letzten Erkundung", "Consulter le journal de la précédente expédition", "이전 탐사 보고서"];
     internal static readonly string[] VoyageQuitEntry = ["Quit", "やめる", "取消", "Beenden", "Annuler", "그만두기"];
-    internal static readonly string[] ChangeSubmersibleComponents = ["Change submersible components", "パーツの変更", "Bauteile austauschen", "Changer les éléments", "부품 변경"]; // Missing Chinese
-    internal static readonly string[] RegisterSub = ["Outfit and register a submersible.", "潜水艦の新規登録", "Registrierung eines neuen Tauchboots", "Enregistrement d'un sous-marin", "새 잠수함 등록"]; // Missing Chinese
+    internal static readonly string[] ChangeSubmersibleComponents = ["Change submersible components", "パーツの変更", "更换配件", "更換配件", "Bauteile austauschen", "Changer les éléments", "부품 변경"];
+    internal static readonly string[] RegisterSub = ["Outfit and register a submersible.", "潜水艦の新規登録", "登记新的潜水艇", "登記新的潛水艇", "Registrierung eines neuen Tauchboots", "Enregistrement d'un sous-marin", "새 잠수함 등록"];
+
+    //10155 = Ceruleum Tank; name is resolved from the Item sheet so it always matches the client language
+    internal static string[] CeruleumTank => ["ceruleum", Svc.Data.GetExcelSheet<Item>().GetRow(10155).Name.GetText()];
 
     internal static readonly string[] PanelAirship = ["Select an airship.", "飛空艇を選択してください。", "请选择飞空艇。", "請選擇飛空艇。", "Wähle ein Luftschiff.", "Choisissez un aéronef.", "비공정을 선택하십시오."];
     internal static readonly string[] PanelSubmersible = ["Select a submersible.", "潜水艦を選択してください。", "请选择潜水艇。", "請選擇潛水艇。", "Wähle ein Tauchboot.", "Choisissez un sous-marin.", "잠수함을 선택하십시오."];
@@ -216,7 +219,7 @@ internal static class Lang
     //4160	60	9	0	False	Unable to retrieve extracted items. Insufficient inventory/crystal inventory space.
     internal static string VoyageInventoryError => Svc.Data.GetExcelSheet<LogMessage>().GetRow(4160).Text.ToDalamudString().GetText();
 
-    internal static string[] UnableToVisitWorld = ["Unable to execute command. Character is currently visiting the", "他のデータセンター", "无法进行该操作，其他玩家正在操作该潜水艇。", "無法進行該操作，其他玩家正在操作該潛水艇。", "Der Vorgang kann nicht ausgeführt werden, da der Charakter gerade das Datenzentrum", "Impossible d'exécuter cette commande. Le personnage se trouve dans un autre centre de traitement de données", "다른 데이터 센터"];
+    internal static string[] UnableToVisitWorld = ["Unable to execute command. Character is currently visiting the", "他のデータセンター", "角色正在", "由於正前往", "Der Vorgang kann nicht ausgeführt werden, da der Charakter gerade das Datenzentrum", "Impossible d'exécuter cette commande. Le personnage se trouve dans un autre centre de traitement de données", "다른 데이터 센터"];
 
     //4169	60	9	0	False	Unable to repair vessel component without the required <SheetEn(Item,3,IntegerParameter(1),1,1)/>.
     //4272	60	9	0	False Unable to repair vessel.Insufficient<SheetEn(Item,3,IntegerParameter(1),3,1)/>.
@@ -269,8 +272,7 @@ internal static class Lang
             "reparieren",
             "réparer",
             "要修理下列部件吗",
-            "要修理下列部件嗎",
-            "要修理下列元件嗎",
+            "要修理下列組件嗎",
             "수리하시겠습니까?",
         ];
 
@@ -290,9 +292,9 @@ internal static class Lang
             "枚消費して潜水艦を登録します", 
             "Das Tauchboot mit den gewählten Bauteilen registrieren", 
             "pour équiper et enregistrer le sous-marin",
+            "登记新的潜水艇吗",
+            "登記新的潛水艇嗎",
             "잠수함을 등록하시겠습니까",
-            //"",
-            //""    Missing chinese and korean (Addonsheet - 6886)
     ];
 
     //Your retainer will be unable to process item buyback requests once recalled. Are you sure you wish to proceed?
@@ -309,12 +311,12 @@ internal static class Lang
         "집사를 돌려보내면 판매 의뢰한 아이템을 재매입할 수 없게 됩니다. 계속하시겠습니까?",
         ];
 
-    internal static readonly string[] LogInPartialText = ["Logging in with", "Log in with", "でログインします。", "einloggen?", "eingeloggt.", "Se connecter avec", "Vous allez vous connecter avec", "Souhaitez-vous vous connecter avec", "登入吗", "登入嗎", "登录吗", "접속하시겠습니까?"];
+    internal static readonly string[] LogInPartialText = ["Logging in with", "Log in with", "でログインします。", "einloggen?", "eingeloggt.", "Se connecter avec", "Vous allez vous connecter avec", "Souhaitez-vous vous connecter avec", "登录吗", "登入嗎", "접속하시겠습니까?"];
 
     //3290	<Sheet(Item,IntegerParameter(1),0)/>×<Value>IntegerParameter(2)</Value>を、<Format(IntegerParameter(3),FF022C)/>枚の軍票と交換します。
     //よろしいですか？
     //3290	<Format(IntegerParameter(3),FF022E)/> Staatstaler gegen <If(Equal(IntegerParameter(2),1))><SheetDe(Item,1,IntegerParameter(1),1,4,1)/><Else/><Format(IntegerParameter(2),FF022E)/> <SheetDe(Item,5,IntegerParameter(1),2,4,1)/></If> eintauschen?
     //3290	Acheter <Value>IntegerParameter(2)</Value> <SheetFr(Item,12,IntegerParameter(1),IntegerParameter(2),1)/> pour <Format(IntegerParameter(3),FF05021D0103)/> sceau<If(LessThanOrEqualTo(IntegerParameter(3),1))><Else/>x</If><Indent/>?
 
-    internal static readonly string[] GCSealExchangeConfirm = ["Exchange", "よろしいですか？", "Staatstaler gegen", "Acheter", "要交换吗", "교환하시겠습니까"];
+    internal static readonly string[] GCSealExchangeConfirm = ["Exchange", "よろしいですか？", "Staatstaler gegen", "Acheter", "要交换吗", "要交換嗎", "교환하시겠습니까"];
 }

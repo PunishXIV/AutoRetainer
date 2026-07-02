@@ -429,11 +429,11 @@ internal static unsafe class VoyageUtils
     {
         var textptr = addon->UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText;
         var text = GenericHelpers.ReadSeString(&textptr).GetText();
-        if(text.Contains("Select an airship."))
+        if(text.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.PanelAirship))
         {
             return VoyageType.Airship;
         }
-        if(text.Contains("Select a submersible."))
+        if(text.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.PanelSubmersible))
         {
             return VoyageType.Submersible;
         }
