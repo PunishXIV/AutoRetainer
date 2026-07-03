@@ -218,7 +218,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             //4330	57	33	0	False	リテイナーベンチャー「<Value>IntegerParameter(2)</Value> <Sheet(Item,IntegerParameter(1),0)/>」を依頼しました。
             //4330	57	33	0	False	Du hast deinen Gehilfen mit der Beschaffung von <SheetDe(Item,1,IntegerParameter(1),IntegerParameter(3),3,1)/> ( <Value>IntegerParameter(2)</Value>) beauftragt.
             //4330	57	33	0	False	Vous avez confié la tâche “<SheetFr(Item,12,IntegerParameter(1),2,1)/> ( <Value>IntegerParameter(2)</Value>)” à votre servant.
-            if(text.StartsWithAny("You assign your retainer".Cleanup(), "リテイナーベンチャー".Cleanup(), "Du hast deinen Gehilfen mit".Cleanup(), "Vous avez confié la tâche".Cleanup())
+            if(text.StartsWithAny("You assign your retainer".Cleanup(), "リテイナーベンチャー".Cleanup(), "Du hast deinen Gehilfen mit".Cleanup(), "Vous avez confié la tâche".Cleanup(), "向雇员下达了".Cleanup(), "向僱員下達了".Cleanup())
                 && Utils.TryGetCurrentRetainer(out var ret)
                 && C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var offlineData)
                 && offlineData.RetainerData.TryGetFirst(x => x.Name == ret, out var offlineRetainerData))
