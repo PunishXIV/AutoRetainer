@@ -37,6 +37,17 @@ public static unsafe class RetainerTable
                         retainers.Remove(ret.Name.ToString());
                     }
                 }
+                ImGuiEx.DragDropRepopulate<bool>("SubEn", retainers.Contains(ret.Name), x =>
+                { 
+                    if(x)
+                    {
+                        retainers.Add(ret.Name);
+                    }
+                    else
+                    {
+                        retainers.Remove(ret.Name);
+                    }
+                });
                 {
                     if(C.EntrustPlans.TryGetFirst(s => s.Guid == adata.EntrustPlan, out var plan))
                     {

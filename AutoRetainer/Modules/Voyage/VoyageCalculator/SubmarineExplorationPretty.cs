@@ -34,8 +34,13 @@ public static class SubmarineSheetUtils
         return Utils.UpperCaseStr(Row.Destination);
     }
 
+    public static string FirstLetter(this SubmarineExploration Row)
+    {
+        return $"{Svc.Data.GetExcelSheet<SubmarineExploration>(ClientLanguage.Japanese).GetRowOrDefault(Row.RowId)?.Location}";
+    }
+
     public static string FancyDestination(this SubmarineExploration Row)
     {
-        return $"[{Svc.Data.GetExcelSheet<SubmarineExploration>(ClientLanguage.Japanese).GetRow(Row.RowId).Location}] " + Utils.UpperCaseStr(Row.Destination);
+        return $"[{Svc.Data.GetExcelSheet<SubmarineExploration>(ClientLanguage.Japanese).GetRowOrDefault(Row.RowId)?.Location}] " + Utils.UpperCaseStr(Row.Destination);
     }
 }

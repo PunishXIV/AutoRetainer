@@ -27,6 +27,7 @@ internal static class TaskInteractWithNearestPanel
                 P.TaskManager.InsertStack();
             }
         }, "ApproachPanelIfNeeded");
+        P.TaskManager.Enqueue(Utils.ValidateEnoughCeruleumTanks);
         if(interact) P.TaskManager.Enqueue(VoyageScheduler.InteractWithVoyagePanel);
     }
 }

@@ -346,6 +346,17 @@ internal static unsafe class WorkshopUI
         var disabled = data.OfflineSubmarineData.Count(x => data.EnabledSubs.Contains(x.Name)) + data.OfflineAirshipData.Count(x => data.EnabledAirships.Contains(x.Name)) >= 4 && !enabled.Contains(vessel.Name);
         if(disabled) ImGui.BeginDisabled();
         ImGuiEx.CollectionCheckbox($"{vessel.Name}##sub", vessel.Name, enabled);
+        ImGuiEx.DragDropRepopulate<bool>("SubEn", enabled.Contains(vessel.Name), x =>
+        {
+            if(x)
+            {
+                enabled.Add(vessel.Name);
+            }
+            else
+            {
+                enabled.Remove(vessel.Name);
+            }
+        });
         if(disabled) ImGui.EndDisabled();
         ImGui.SameLine();
         if(adata.VesselBehavior == VesselBehavior.Finalize)
@@ -396,6 +407,12 @@ internal static unsafe class WorkshopUI
             if(col != null) ImGui.PopStyleColor();
             if(valid) ImGuiEx.Tooltip(plan.Points.Select(x => $"{VoyageUtils.GetSubmarineExploration(x)?.FancyDestination()}").Print("\n"));
             repop();
+            if(valid)
+            {
+                ImGui.SameLine();
+                ImGuiEx.Text($"{plan.Points.Select(x => VoyageUtils.GetSubmarineExploration(x)?.FirstLetter()).Print("")}");
+            }
+
         }
         else
         {
@@ -589,4 +606,8 @@ internal static unsafe class WorkshopUI
         }
         ImGui.PopID();
     }
+}
+
+public class WorkshopMetadata(string Name, HashSet<string> Collection)
+{
 }

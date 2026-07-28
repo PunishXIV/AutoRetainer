@@ -30,6 +30,7 @@ public unsafe sealed class DiscardList : InventoryManagementBase
                     ImGuiEx.CollectionButtonCheckbox(FontAwesomeIcon.Database.ToIconString(), x, InventoryCleanupCommon.SelectedPlan.IMDiscardIgnoreStack);
                     ImGui.PopFont();
                     ImGuiEx.Tooltip($"Ignore stack setting for this item");
+                    ImGuiEx.DragDropRepopulate("StkStg", x, InventoryCleanupCommon.SelectedPlan.IMDiscardIgnoreStack);
                 }))
             .Separator()
             .Widget(() =>

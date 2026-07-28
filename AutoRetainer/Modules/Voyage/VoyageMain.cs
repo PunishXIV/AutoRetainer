@@ -5,7 +5,9 @@ using AutoRetainer.Modules.Voyage.VoyageCalculator;
 using AutoRetainer.Scheduler.Tasks;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game.Text.SeStringHandling;
+using ECommons.GameFunctions;
 using ECommons.Throttlers;
+using Lumina.Excel.Sheets;
 
 namespace AutoRetainer.Modules.Voyage;
 
@@ -28,40 +30,25 @@ internal static unsafe class VoyageMain
         if(MultiMode.Active || P.TaskManager.IsBusy)
         {
             var txt = message.GetText();
+            if(txt == LogMessage.Get(4141).Text.GetText())
+            {
+                //You are not authorized to finalize exploratory or subaquatic voyages.
+                S.AnomalyWindow.Add($"You lack sufficient permissions to resend submarines. Character excluded from submarines. (FC {(Player.Available?Player.Object.Struct()->FreeCompanyTagString:"")})");
+                Utils.CleanupOperations();
+                Data.WorkshopEnabled = false;
+            }
             if(txt == Lang.VoyageInventoryError)
             {
-                DuoLog.Warning($"[Voyage] Your inventory is full!");
-                VoyageScheduler.Enabled = false;
-                P.TaskManager.Abort();
-                P.TaskManager.Enqueue(VoyageScheduler.SelectQuitVesselSelectorMenu);
-                P.TaskManager.Enqueue(VoyageScheduler.SelectExitMainPanel);
-                if(C.FailureNoInventory == WorkshopFailAction.StopPlugin)
-                {
-                    MultiMode.Enabled = false;
-                    VoyageScheduler.Enabled = false;
-                }
-                else if(C.FailureNoInventory == WorkshopFailAction.ExcludeChar)
-                {
-                    Data.WorkshopEnabled = false;
-                }
+                S.AnomalyWindow.Add($"Your inventory is full. Character excluded from submarines.");
+                Utils.CleanupOperations();
+                Data.WorkshopEnabled = false;
             }
             if(txt.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.UnableToRepairVessel))
             {
                 TaskRepairAll.Abort = true;
                 DuoLog.Warning($"[Voyage] You are out of repair components!");
-                if(C.FailureNoRepair == WorkshopFailAction.ExcludeVessel)
-                {
-                    Data.GetEnabledVesselsData(TaskRepairAll.Type).Remove(TaskRepairAll.Name);
-                }
-                else if(C.FailureNoRepair == WorkshopFailAction.ExcludeChar)
-                {
-                    Data.WorkshopEnabled = false;
-                }
-                else if(C.FailureNoRepair == WorkshopFailAction.StopPlugin)
-                {
-                    MultiMode.Enabled = false;
-                    VoyageScheduler.Enabled = false;
-                }
+                Data.GetEnabledVesselsData(TaskRepairAll.Type).Remove(TaskRepairAll.Name);
+                S.AnomalyWindow.Add($"Out of repair materials, could not repair {TaskRepairAll.Type} {TaskRepairAll.Name}");
             }
         }
     }

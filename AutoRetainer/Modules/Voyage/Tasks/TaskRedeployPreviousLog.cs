@@ -36,15 +36,7 @@ internal static unsafe class TaskRedeployPreviousLog
                     {
                         P.TaskManager.Abort();
                         DuoLog.Warning($"[Voyage] You are out of fuel!");
-                        if(C.FailureNoFuel == WorkshopFailAction.ExcludeChar)
-                        {
-                            Data.WorkshopEnabled = false;
-                        }
-                        else if(C.FailureNoFuel == WorkshopFailAction.StopPlugin)
-                        {
-                            MultiMode.Enabled = false;
-                            VoyageScheduler.Enabled = false;
-                        }
+                        Data.WorkshopEnabled = false;
                         P.TaskManager.BeginStack();
                         P.TaskManager.Enqueue(VoyageScheduler.CancelDeployVessel);
                         P.TaskManager.Enqueue(VoyageScheduler.WaitUntilFinalizeDeployAddonExists);

@@ -43,7 +43,7 @@ public sealed class GilDisplayManager
                 var charTotal = c.Gil + c.RetainerData.Sum(s => s.Gil);
                 foreach(var fc in C.FCData)
                 {
-                    if(S.FCData.GetHolderChara(fc.Key, fc.Value) == c && fc.Value.GilCountsTowardsChara)
+                    if(fc.Value.GilCountsTowardsChara && S.FCData.GetHolderChara(fc.Key, fc.Value) == c)
                     {
                         fcdata = fc.Value;
                         charTotal += fcdata.Gil;

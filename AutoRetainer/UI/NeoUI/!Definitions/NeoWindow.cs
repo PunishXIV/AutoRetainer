@@ -20,7 +20,6 @@ public sealed class NeoWindow : Window
         new MultiModeCommon(),
         new MultiModeRetainers(),
         new MultiModeDeployables(),
-        new MultiModeContingency(),
         new CharaOrder(),
         new MultiModeFPSLimiter(),
         new MultiModeDisableRender(),

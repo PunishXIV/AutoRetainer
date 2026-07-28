@@ -7,6 +7,7 @@ using ECommons.ExcelServices;
 using ECommons.GameFunctions;
 using ECommons.Interop;
 using ECommons.MathHelpers;
+using ECommons.Throttlers;
 using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
@@ -20,6 +21,27 @@ internal unsafe class DebugMisc : DebugSectionBase
 {
     public override void Draw()
     {
+        if(ImGui.CollapsingHeader("Move stuck detection"))
+        {
+            ImGuiEx.Text($"""
+                
+                LastRefreshTime {BailoutManager.LastRefreshTime} ({Environment.TickCount64 - BailoutManager.LastRefreshTime})
+                LastPosition {BailoutManager.LastPosition}
+                ExtendIsMoving {EzThrottler.GetRemainingTime("ExtendIsMoving")}
+                """);
+        }
+        if(ImGui.CollapsingHeader("AddonOpenedAt"))
+        {
+            foreach(var x in BailoutManager.AddonOpenedAt.Keys)
+            {
+                ImGuiEx.Text($"{x}: {BailoutManager.AddonOpenedAt[x]} ({Environment.TickCount64 - BailoutManager.AddonOpenedAt[x]} ago)");
+                ImGui.SameLine();
+                if(ImGui.SmallButton($"-1 min##{x}"))
+                {
+                    BailoutManager.AddonOpenedAt[x] -= 60 * 1000;
+                }
+            }
+        }
         ImGui.Checkbox("RenderDisable verbose log", ref RenderDisableManager.Debug);
         if(ImGui.Button("Execute plugin terminator"))
         {

@@ -49,6 +49,25 @@ namespace AutoRetainer.Helpers;
 
 public static unsafe class Utils
 {
+    public static void CleanupOperations()
+    {
+        VoyageScheduler.Enabled = false;
+        SchedulerMain.PluginEnabledInternal = false;
+        P.TaskManager.Abort();
+        TaskCleanupUi.Enqueue();
+    }
+
+    public static void ValidateEnoughCeruleumTanks()
+    {
+        var fuelInInventory = Utils.CountItemsInInventory(10155, null, Utils.PlayerEntireInventory);
+        if(fuelInInventory < 30)
+        {
+            Data.WorkshopEnabled = false;
+            CleanupOperations();
+            S.AnomalyWindow.Add($"Insufficient fuel. To ensure stable operation, you must have 30 or more ceruleum tanks, this is a hard requirement. You have only {fuelInInventory} ceruleum tanks. Please replenish your fuel. Character excluded from submarines.");
+        }
+    }
+
     public static bool HasVentureOrReadyToAssign(this OfflineRetainerData data, OfflineCharacterData characterData)
     {
         var adata = Utils.GetAdditionalData(characterData.CID, data.Name);

@@ -87,6 +87,7 @@ public sealed class FcDataManager
                 ImGui.PushFont(UiBuilder.IconFont);
                 ImGuiEx.ButtonCheckbox($"\uf555##FC{x.Key}", ref x.Value.GilCountsTowardsChara, EColor.Green);
                 ImGui.PopFont();
+                ImGuiEx.DragDropRepopulate("GCTC", x.Value.GilCountsTowardsChara, ref x.Value.GilCountsTowardsChara);
                 ImGuiEx.Tooltip("Mark this free company as Wallet FC. Gil Display tab will include money of this FC.");
                 ImGui.SameLine();
                 if(ImGuiEx.IconButton(FontAwesomeIcon.Trash, $"{x.Key}Dele", enabled: ImGuiEx.Ctrl))

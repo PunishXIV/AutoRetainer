@@ -199,9 +199,6 @@ internal unsafe class Config
     //public bool SubsRepairFinalize = true;
     public MultiModeType MultiModeType = MultiModeType.Everything;
     public bool NoErrorCheckPlanner2 = true;
-    public WorkshopFailAction FailureNoFuel = WorkshopFailAction.ExcludeChar;
-    public WorkshopFailAction FailureNoRepair = WorkshopFailAction.ExcludeVessel;
-    public WorkshopFailAction FailureNoInventory = WorkshopFailAction.ExcludeChar;
     public WorkshopFailAction FailureGeneric = WorkshopFailAction.StopPlugin;
     internal bool SimpleTweaksCompat = true;
     public bool FinalizeBeforeResend = false;
@@ -227,23 +224,8 @@ internal unsafe class Config
     public bool StatusBarMSI = false;
     public int StatusBarIconWidth = 96;
 
-    [Obsolete] public bool IMEnableCofferAutoOpen = false;
-    [Obsolete] public bool IMEnableAutoVendor = false;
-    [Obsolete] public bool IMEnableContextMenu = false;
-    [Obsolete] public bool IMSkipVendorIfRetainer = false;
-    [Obsolete] public List<uint> IMAutoVendorHard = [];
-    [Obsolete] public List<uint> IMAutoVendorHardIgnoreStack = [];
-    [Obsolete] public List<uint> IMAutoVendorSoft = [];
-    [Obsolete] public List<uint> IMProtectList = [];
-    [Obsolete] public int IMAutoVendorHardStackLimit = 20;
-    [Obsolete] public bool IMDry = false;
-    [Obsolete] public bool IMEnableItemDesynthesis = false;
-    [Obsolete] public bool IMEnableNpcSell = false;
-    [Obsolete] public bool AllowSellFromArmory = false;
-
     public InventoryManagementSettings DefaultIMSettings = new();
     public List<InventoryManagementSettings> AdditionalIMSettings = [];
-    public bool IMMigrated = false;
 
     public Vector2 WindowSize;
     public Vector2 WindowPos;

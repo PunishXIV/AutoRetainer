@@ -24,4 +24,5 @@ public static class AutoRetainerServiceManager
     public static AetherBagsManager AetherBagsManager;
     public static PluginTerminator PluginTerminator;
     public static CabinetManager CabinetManager;
+    public static AnomalyWindow AnomalyWindow;
 }
