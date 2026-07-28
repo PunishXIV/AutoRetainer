@@ -120,6 +120,7 @@ internal static class Lang
         "自由探索委托（需要2枚探险币）",
         "自由探索委託（需要2枚探險幣）",
         "발굴수행 (필요한 집사 급료: 2개)",
+        "自由尋寶委託（需要2枚探險幣）",
     ];
 
     internal static readonly string[] Entrance =
@@ -273,6 +274,7 @@ internal static class Lang
             "要修理下列部件嗎",
             "要修理下列元件嗎",
             "수리하시겠습니까?",
+            "要修理下列組件嗎",
         ];
 
     // Use the components selected and <If(Equal(IntegerParameter(1),1))>the following item<Else/><Value>IntegerParameter(1)</Value> of the following items</If> to outfit and register your submersible?
