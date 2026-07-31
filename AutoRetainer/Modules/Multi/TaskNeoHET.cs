@@ -1,7 +1,7 @@
 ﻿using AutoRetainer.Internal.InventoryManagement;
 using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Modules.Voyage.Tasks;
-using AutoRetainer.StaticData;
+using AutoRetainerAPI.StaticData;
 using Dalamud.Game.ClientState.Objects.Types;
 using ECommons.Automation.NeoTaskManager;
 using ECommons.Automation.NeoTaskManager.Tasks;

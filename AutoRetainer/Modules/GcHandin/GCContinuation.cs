@@ -1,4 +1,4 @@
-﻿using AutoRetainer.StaticData;
+﻿using AutoRetainerAPI.StaticData;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using ECommons;

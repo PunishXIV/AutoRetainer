@@ -1,5 +1,6 @@
 ﻿using AutoRetainerAPI.Configuration;
 using Dalamud.Utility;
+using ECommons.ExcelServices.Sheets;
 using Lumina.Excel.Sheets;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
@@ -119,6 +120,7 @@ internal static class Lang
         "自由探索委托（需要2枚探险币）",
         "自由探索委託（需要2枚探險幣）",
         "발굴수행 (필요한 집사 급료: 2개)",
+        "自由尋寶委託（需要2枚探險幣）",
     ];
 
     internal static readonly string[] Entrance =
@@ -188,7 +190,7 @@ internal static class Lang
     //11	TEXT_CMNDEFHOUSINGPERSONALROOMENTRANCE_00178_GOTO_WORKSHOP	地下工房に移動する
     //11	TEXT_CMNDEFHOUSINGPERSONALROOMENTRANCE_00178_GOTO_WORKSHOP	Die Ge<SoftHyphen/>sell<SoftHyphen/>schaftswerkstätte betreten
     //11	TEXT_CMNDEFHOUSINGPERSONALROOMENTRANCE_00178_GOTO_WORKSHOP	Aller dans l'atelier de compagnie
-    internal static readonly string[] EnterWorkshop = ["Move to the company workshop", "地下工房に移動する", "移动到部队工房", "移動到部隊工房", "Die Gesellschaftswerkstätte betreten", "Aller dans l'atelier de compagnie", "지하공방으로 이동"];
+    internal static readonly string[] EnterWorkshop = ["Move to the company workshop", "地下工房に移動する", "移动到部队工房", "移動到部隊工房", "Die Gesellschaftswerkstätte betreten", "Aller dans l'atelier de compagnie", "지하공방으로 이동", Svc.Data.GetExcelSheet<QuestDialogueText>(name: "custom/001/CmnDefHousingPersonalRoomEntrance_00178").GetRow(11).Value.GetText()];
 
     internal static readonly string[] AirshipManagement = ["Airship Management", "飛空艇の管理", "管理飞空艇", "管理飛空艇", "Luftschiff verwalten", "Contrôle aérien", "비공정 관리"];
     internal static readonly string[] SubmarineManagement = ["Submersible Management", "潜水艦の管理", "管理潜水艇", "管理潛水艇", "Tauchboot verwalten", "Contrôle sous-marin", "잠수함 관리"];
@@ -197,8 +199,8 @@ internal static class Lang
     internal static readonly string[] DeployOnSubaquaticVoyage = ["Deploy submersible on subaquatic voyage", "ボイジャー出港", "出发", "出發", "Auf Erkundung gehen", "Expédier le sous-marin", "탐사 출항"];
     internal static readonly string[] ViewPrevVoyageLog = ["View previous voyage log", "前回のボイジャー報告", "上次的远航报告", "上次的遠航報告", "Bericht der letzten Erkundung", "Consulter le journal de la précédente expédition", "이전 탐사 보고서"];
     internal static readonly string[] VoyageQuitEntry = ["Quit", "やめる", "取消", "Beenden", "Annuler", "그만두기"];
-    internal static readonly string[] ChangeSubmersibleComponents = ["Change submersible components", "パーツの変更", "Bauteile austauschen", "Changer les éléments", "부품 변경","更换配件","更換配件"];
-    internal static readonly string[] RegisterSub = ["Outfit and register a submersible.", "潜水艦の新規登録", "Registrierung eines neuen Tauchboots", "Enregistrement d'un sous-marin", "새 잠수함 등록","登记新的潜水艇","登記新的潛水艇"]; 
+    internal static readonly string[] ChangeSubmersibleComponents = ["Change submersible components", "パーツの変更", "Bauteile austauschen", "Changer les éléments", "부품 변경", "更换配件", "更換配件"];
+    internal static readonly string[] RegisterSub = ["Outfit and register a submersible.", "潜水艦の新規登録", "Registrierung eines neuen Tauchboots", "Enregistrement d'un sous-marin", "새 잠수함 등록", "登记新的潜水艇", "登記新的潛水艇"];
 
     internal static readonly string[] PanelAirship = ["Select an airship.", "飛空艇を選択してください。", "请选择飞空艇。", "請選擇飛空艇。", "Wähle ein Luftschiff.", "Choisissez un aéronef.", "비공정을 선택하십시오."];
     internal static readonly string[] PanelSubmersible = ["Select a submersible.", "潜水艦を選択してください。", "请选择潜水艇。", "請選擇潛水艇。", "Wähle ein Tauchboot.", "Choisissez un sous-marin.", "잠수함을 선택하십시오."];
@@ -272,6 +274,7 @@ internal static class Lang
             "要修理下列部件嗎",
             "要修理下列元件嗎",
             "수리하시겠습니까?",
+            "要修理下列組件嗎",
         ];
 
     // Use the components selected and <If(Equal(IntegerParameter(1),1))>the following item<Else/><Value>IntegerParameter(1)</Value> of the following items</If> to outfit and register your submersible?
@@ -301,17 +304,9 @@ internal static class Lang
     //215	TEXT_CMNDEFRETAINERCALL_00010_ASK_RETURN_WITH_BUYBACK	Wenn du deinen Gehilfen wegschickst, kannst du die von ihm verkauften Gegenstände nicht mehr zurückkaufen. Möchtest du trotzdem fortfahren?
     //215	TEXT_CMNDEFRETAINERCALL_00010_ASK_RETURN_WITH_BUYBACK	Renvoyer le servant effacera la liste de rachat. Confirmer<Indent/>?
 
-    internal static readonly string[] WillBeUnableToProcessBuyback = [
-        "Your retainer will be unable to process item buyback requests once recalled. Are you sure you wish to proceed?",
-        "リテイナーを帰すと売却依頼アイテムの買い戻しができなくなりますが、よろしいですか？",
-        "Renvoyer le servant effacera la liste de rachat. Confirmer",
-        "Wenn du deinen Gehilfen wegschickst, kannst du die von ihm verkauften Gegenstände nicht mehr zurückkaufen. Möchtest du trotzdem fortfahren",
-        "让雇员返回后将无法购回委托卖掉的道具",
-        "讓僱員返回後將無法購回委託賣掉的道具",
-        "집사를 돌려보내면 판매 의뢰한 아이템을 재매입할 수 없게 됩니다. 계속하시겠습니까?",
+    internal static string[] WillBeUnableToProcessBuyback => field ??= [
+        Svc.Data.GetExcelSheet<QuestDialogueText>(name:"custom/000/CmnDefRetainerCall_00010").GetRow(215).Value.GetText(),
         ];
-
-    internal static readonly string[] LogInPartialText = ["Logging in with", "Log in with", "でログインします。", "einloggen?", "eingeloggt.", "Se connecter avec", "Vous allez vous connecter avec", "Souhaitez-vous vous connecter avec", "登入吗", "登入嗎", "登录吗", "접속하시겠습니까?", "三可以通过次级指令重新编辑角色形象"];
 
     //3290	<Sheet(Item,IntegerParameter(1),0)/>×<Value>IntegerParameter(2)</Value>を、<Format(IntegerParameter(3),FF022C)/>枚の軍票と交換します。
     //よろしいですか？
@@ -320,5 +315,5 @@ internal static class Lang
 
     internal static readonly string[] GCSealExchangeConfirm = ["Exchange", "よろしいですか？", "Staatstaler gegen", "Acheter", "要交换吗", "교환하시겠습니까", "要交換嗎"];
 
-    internal static readonly string[] DiscardItem = ["Discard", "を捨てます。", "wegwerfen", "Jeter","确定要舍弃","確定要捨棄"];
+    internal static readonly string[] DiscardItem = ["Discard", "を捨てます。", "wegwerfen", "Jeter", "确定要舍弃", "確定要捨棄"];
 }
