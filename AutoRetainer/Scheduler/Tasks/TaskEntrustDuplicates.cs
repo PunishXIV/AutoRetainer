@@ -5,6 +5,8 @@ using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using ECommons.ExcelServices;
 using ECommons.Throttlers;
+using ECommons.UIHelpers.AddonMasterCombinedImplementations;
+using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.Sheets;
@@ -36,6 +38,11 @@ internal static unsafe class TaskEntrustDuplicates
     {
         try
         {
+            var invComb = AddonMasterCombined.ICombinedInventory.Get();
+            if(invComb != null)
+            {
+                if(EzThrottler.Throttle("openArmory")) invComb.OpenArmoryChest();
+            }
             var s = Data.GetIMSettings();
             var allowedPlayerInventories = plan.GetAllowedInventories();
             if(TryGetAddonByName<AtkUnitBase>("InputNumeric", out var numeric))

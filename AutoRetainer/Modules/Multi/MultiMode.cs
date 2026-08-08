@@ -1,4 +1,5 @@
 ﻿using AutoRetainer.Internal;
+using AutoRetainer.Modules.EzIPCManagers;
 using AutoRetainer.Modules.Voyage;
 using AutoRetainer.Modules.Voyage.Tasks;
 using AutoRetainer.Scheduler.Tasks;
@@ -24,7 +25,7 @@ namespace AutoRetainer.Modules.Multi;
 internal static unsafe class MultiMode
 {
     internal static bool Active => Enabled && !IPC.Suppressed;
-    internal static HashSet<string> SingleMultiMide = null;
+    internal static HashSet<string> SingleMultiMode = null;
     internal static ref bool Enabled => ref C.MultiModeEnabled;
 
     public static (string Name, string World)? ExpectedCharacter = null;
@@ -51,12 +52,17 @@ internal static unsafe class MultiMode
         }
         ProperOnLogin.RegisterInteractable(delegate
         {
+            if(MultiMode.Enabled)
+            {
+                SingleMultiMode?.Add(Player.NameWithWorld);
+            }
             TaskActivateSealSweetener.LastAttemptAt = 0;
             if(Data != null)
             {
                 C.LastLoggedInChara = Data.CID;
                 EzThrottler.Reset($"ExpertDeliver_{Data?.Identity}");
                 EzThrottler.Reset($"CabinetDeliver_{Data?.Identity}");
+                EzThrottler.Reset($"MirageDeliver_{Data?.Identity}");
                 EzThrottler.Reset($"GcBusy");
             }
             if(MultiMode.ExpectedCharacter != null)
@@ -118,10 +124,16 @@ internal static unsafe class MultiMode
         {
             return;
         }
+        if(Utils.CanAutoLogin())
+        {
+            
+        }
+        MultiMode.SingleMultiMode = null;
         EzThrottler.Throttle("ForceShutdownForSubs", 10 * 60 * 1000, true);
         EzThrottler.Reset("GcBusy");
         EzThrottler.Reset($"ExpertDeliver_{Data?.Identity}");
         EzThrottler.Reset($"CabinetDeliver_{Data?.Identity}");
+        EzThrottler.Reset($"MirageDeliver_{Data?.Identity}");
         LastLogin = 0;
         if(!TaskTeleportToProperty.ShouldVoidHET())
         {
@@ -140,7 +152,7 @@ internal static unsafe class MultiMode
                 if(val != 0)
                 {
                     Svc.GameConfig.Set(SystemConfigOption.AutoAfkSwitchingTime, 0u);
-                    DuoLog.Warning($"Your Auto Afk Switching Time option was incompatible with current AutoRetainer configuration and was set to (Never). This is not an error.");
+                    S.AnomalyWindow.Add($"Your Auto Afk Switching Time option was incompatible with current AutoRetainer configuration and was set to (Never). This is not an error.");
                 }
             }
         }
@@ -150,7 +162,7 @@ internal static unsafe class MultiMode
                 if(val != 0)
                 {
                     Svc.GameConfig.Set(SystemConfigOption.IdlingCameraAFK, 0u);
-                    DuoLog.Warning($"Your Idling Camera AFK option was incompatible with current AutoRetainer configuration and was set to (Disabled). This is not an error.");
+                    S.AnomalyWindow.Add($"Your Idling Camera AFK option was incompatible with current AutoRetainer configuration and was set to (Disabled). This is not an error.");
                 }
             }
         }
@@ -296,6 +308,7 @@ internal static unsafe class MultiMode
             }
             var eligibleForGcDelivery = CanExpertDeliver() && EzThrottler.Check($"ExpertDeliver_{Data.Identity}");
             var eligibleForCabinet = CanCabinetDeliver() && EzThrottler.Check($"CabinetDeliver_{Data.Identity}");
+            var eligibleForMirage = CanMirageDeliver() && EzThrottler.Check($"MirageDeliver_{Data.Identity}");
             if(ProperOnLogin.PlayerPresent && !P.TaskManager.IsBusy)
             {
                 if(!Utils.IsInventoryFree() && !eligibleForGcDelivery && !eligibleForCabinet)
@@ -314,6 +327,12 @@ internal static unsafe class MultiMode
                     EzThrottler.Throttle("GcBusy", 10000, true);
                     EzThrottler.Throttle($"CabinetDeliver_{Data.Identity}", 30 * 60 * 1000, true);
                 }
+                else if(eligibleForMirage && !IsOccupied())
+                {
+                    S.MirageManager.EnqueueGoToInnAndDeliverEverything();
+                    EzThrottler.Throttle("GcBusy", 10000, true);
+                    EzThrottler.Throttle($"MirageDeliver_{Data.Identity}", 30 * 60 * 1000, true);
+                }
                 else if(eligibleForGcDelivery && !IsOccupied())
                 {
                     TaskDeliverItems.Enqueue();
@@ -323,41 +342,51 @@ internal static unsafe class MultiMode
                 else if(IsCurrentCharacterDone() && !IsOccupied())
                 {
                     var next = GetCurrentTargetCharacter();
-                    if(next == null && IsAllRetainersHaveMoreThan15Mins())
+                    if(next == null && SingleMultiMode != null)
                     {
-                        next = GetPreferredCharacter();
-                    }
-                    if(next != null)
-                    {
-                        DebugLog($"Enqueueing relog");
-                        BlockInteraction(20);
-                        if(!Relog(next, out var error, RelogReason.MultiMode))
-                        {
-                            DuoLog.Error(error);
-                        }
-                        else
-                        {
-                            DebugLog($"Relog command success");
-                        }
-                        Interactions.PushBack(Environment.TickCount64);
-                        DebugLog($"Added interaction because of relogging (state: {Interactions.Print()})");
+                        MultiMode.Enabled = false;
+                        SingleMultiMode = null;
+                        PluginLog.Information($"Single MultiMode is finished.");
+                        S.EzIPCManager.IPC_PluginState.OnSingleMultiModeFinished();
                     }
                     else
                     {
-                        if(MultiMode.WaitOnLoginScreen)
+                        if(next == null && IsAllRetainersHaveMoreThan15Mins())
                         {
-                            DebugLog($"Enqueueing logoff");
+                            next = GetPreferredCharacter();
+                        }
+                        if(next != null)
+                        {
+                            DebugLog($"Enqueueing relog");
                             BlockInteraction(20);
-                            if(!Relog(null, out var error, RelogReason.MultiMode))
+                            if(!Relog(next, out var error, RelogReason.MultiMode))
                             {
                                 DuoLog.Error(error);
                             }
                             else
                             {
-                                DebugLog($"Logoff command success");
+                                DebugLog($"Relog command success");
                             }
                             Interactions.PushBack(Environment.TickCount64);
-                            DebugLog($"Added interaction because of logging off (state: {Interactions.Print()})");
+                            DebugLog($"Added interaction because of relogging (state: {Interactions.Print()})");
+                        }
+                        else
+                        {
+                            if(MultiMode.WaitOnLoginScreen)
+                            {
+                                DebugLog($"Enqueueing logoff");
+                                BlockInteraction(20);
+                                if(!Relog(null, out var error, RelogReason.MultiMode))
+                                {
+                                    DuoLog.Error(error);
+                                }
+                                else
+                                {
+                                    DebugLog($"Logoff command success");
+                                }
+                                Interactions.PushBack(Environment.TickCount64);
+                                DebugLog($"Added interaction because of logging off (state: {Interactions.Print()})");
+                            }
                         }
                     }
                 }
@@ -371,6 +400,7 @@ internal static unsafe class MultiMode
                             {
                                 EzThrottler.Reset($"ExpertDeliver_{Data.Identity}");
                                 EzThrottler.Reset($"CabinetDeliver_{Data?.Identity}");
+                                EzThrottler.Reset($"MirageDeliver_{Data?.Identity}");
                                 DebugLog($"Enqueueing interaction with panel");
                                 BlockInteraction(10);
                                 TaskInteractWithNearestPanel.Enqueue();
@@ -392,6 +422,7 @@ internal static unsafe class MultiMode
                                 {
                                     EzThrottler.Reset($"ExpertDeliver_{Data.Identity}");
                                     EzThrottler.Reset($"CabinetDeliver_{Data?.Identity}");
+                                    EzThrottler.Reset($"MirageDeliver_{Data?.Identity}");
                                     DebugLog($"Enqueueing interaction with bell");
                                     TaskInteractWithNearestBell.Enqueue();
                                     P.TaskManager.Enqueue(() => { SchedulerMain.EnablePlugin(PluginEnableReason.MultiMode); return true; });
@@ -435,6 +466,20 @@ internal static unsafe class MultiMode
         if(Utils.GetInventoryFreeSlotCount() <= C.FullAutoGCDeliveryInventory)
         {
             canDeliver = S.CabinetManager.CanDeliverCabinet();
+        }
+        return canDeliver;
+    }
+
+    internal static bool CanMirageDeliver()
+    {
+        var data = Data;
+        if(Data == null) return false;
+        if(!GlamourLog.Available) return false;
+        if(!data.GetIMSettings(true).EnableMirageAutoDelivery) return false;
+        var canDeliver = false;
+        if(Utils.GetInventoryFreeSlotCount() <= C.FullAutoGCDeliveryInventory && Utils.CountItemsInInventory(21800, null, Utils.PlayerEntireInventory) > 0)
+        {
+            canDeliver = S.MirageManager.HasEligibleItems();
         }
         return canDeliver;
     }
@@ -659,6 +704,7 @@ internal static unsafe class MultiMode
             var data = GetRetainerSortedOfflineDatas(false);
             foreach(var x in data)
             {
+                if(SingleMultiMode?.Contains(x.NameWithWorld) == true) continue;
                 if(x.CID == Player.CID) continue;
                 if(x.WorkshopEnabled && x.GetEnabledVesselsData(VoyageType.Airship).Count + x.GetEnabledVesselsData(VoyageType.Submersible).Count > 0)
                 {
@@ -670,6 +716,7 @@ internal static unsafe class MultiMode
             }
             foreach(var x in data)
             {
+                if(SingleMultiMode?.Contains(x.NameWithWorld) == true) continue;
                 if(x.CID == Player.CID) continue;
                 if(x.WorkshopEnabled && x.GetEnabledVesselsData(VoyageType.Airship).Count + x.GetEnabledVesselsData(VoyageType.Submersible).Count > 0)
                 {

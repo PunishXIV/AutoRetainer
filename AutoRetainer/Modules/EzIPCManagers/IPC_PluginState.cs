@@ -54,6 +54,14 @@ public class IPC_PluginState
     }
 
     [EzIPC]
+    public void EnableSingleMultiMode()
+    {
+        EnableMultiMode();
+        MultiMode.SingleMultiMode = [];
+        if(Player.Available) MultiMode.SingleMultiMode.Add(Player.NameWithWorld);
+    }
+
+    [EzIPC]
     public void EnableMultiModeSingle()
     {
         Svc.Commands.ProcessCommand("/autoretainer multi single");
@@ -155,4 +163,6 @@ public class IPC_PluginState
         }
         return false;
     }
+
+    [EzIPCEvent] public Action OnSingleMultiModeFinished;
 }

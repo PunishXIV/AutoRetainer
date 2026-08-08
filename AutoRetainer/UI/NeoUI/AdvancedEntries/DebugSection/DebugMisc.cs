@@ -6,6 +6,7 @@ using ECommons.Events;
 using ECommons.ExcelServices;
 using ECommons.GameFunctions;
 using ECommons.Interop;
+using ECommons.IPC;
 using ECommons.MathHelpers;
 using ECommons.Throttlers;
 using ECommons.UIHelpers.AddonMasterImplementations;
@@ -21,6 +22,7 @@ internal unsafe class DebugMisc : DebugSectionBase
 {
     public override void Draw()
     {
+        if(ImGui.Button("EnableSingleMultiMode")) ECommonsIPC.AutoRetainer.EnableSingleMultiMode();
         if(ImGui.CollapsingHeader("Move stuck detection"))
         {
             ImGuiEx.Text($"""

@@ -35,8 +35,15 @@ public class AnomalyWindow : Window
 
     public void Add(string description)
     {
-        this.Anomalieis.Add(new(description));
-        this.IsOpen = true;
+        if(MultiMode.Enabled || !Svc.ClientState.IsLoggedIn)
+        {
+            this.Anomalieis.Add(new(description));
+            this.IsOpen = true;
+        }
+        else
+        {
+            DuoLog.Warning(description);
+        }
     }
 
     public override void OnClose()

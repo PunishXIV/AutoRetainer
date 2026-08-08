@@ -173,8 +173,35 @@ internal class MultiModeOverlay : Window
                     if(ImGui.IsItemClicked(ImGuiMouseButton.Right))
                     {
                         MultiMode.Enabled = false;
+                        MultiMode.SingleMultiMode = null;
                     }
                     ImGui.SetTooltip("MultiMode enabled. \nLeft click - open AutoRetainer. \nRight click - disable Multi Mode.");
+                }
+            }
+            else
+            {
+                ImGuiEx.Text($"loading multi.png");
+            }
+            ImGui.SameLine();
+        }
+        if(MultiMode.Enabled && MultiMode.SingleMultiMode != null && ShouldDisplay())
+        {
+            displayed = true;
+            if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "single.png"), out var t))
+            {
+                ImGui.Image(t.Handle, StatusPanelSize);
+                if(ImGui.IsItemHovered())
+                {
+                    ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+                    if(ImGui.IsItemClicked(ImGuiMouseButton.Left))
+                    {
+                        Svc.Commands.ProcessCommand("/ays");
+                    }
+                    if(ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                    {
+                        MultiMode.SingleMultiMode = null;
+                    }
+                    ImGui.SetTooltip($"Single pass MultiMode enabled.\nCharacters processed:\n{MultiMode.SingleMultiMode?.Select(x => $"- {Censor.Character(x)}").Print("\n")} \n\nLeft click - open AutoRetainer. \nRight click - convert to regular Multi Mode.");
                 }
             }
             else

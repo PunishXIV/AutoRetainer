@@ -102,13 +102,16 @@ internal unsafe class RetainerListOverlay : Window
                         var selectedPlan = C.EntrustPlans.FirstOrDefault(x => x.Guid == adata.EntrustPlan);
                         if(selectedPlan != null)
                         {
-                            P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
-                            TaskEntrustDuplicates.EnqueueNew(selectedPlan);
-                            if(C.RetainerMenuDelay > 0)
+                            if(selectedPlan.DoesInventoryHaveMatchingItems())
                             {
-                                TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
+                                P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
+                                TaskEntrustDuplicates.EnqueueNew(selectedPlan);
+                                if(C.RetainerMenuDelay > 0)
+                                {
+                                    TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
+                                }
+                                P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
                             }
-                            P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
                         }
                         else
                         {
@@ -140,13 +143,20 @@ internal unsafe class RetainerListOverlay : Window
                                 var adata = Utils.GetAdditionalData(Data.CID, ret.Name);
                                 if(selectedPlan != null)
                                 {
-                                    P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
-                                    TaskEntrustDuplicates.EnqueueNew(selectedPlan);
-                                    if(C.RetainerMenuDelay > 0)
+                                    if(selectedPlan.DoesInventoryHaveMatchingItems())
                                     {
-                                        TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
+                                        P.TaskManager.Enqueue(() => RetainerListHandlers.SelectRetainerByName(ret.Name.ToString()));
+                                        TaskEntrustDuplicates.EnqueueNew(selectedPlan);
+                                        if(C.RetainerMenuDelay > 0)
+                                        {
+                                            TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
+                                        }
+                                        P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
                                     }
-                                    P.TaskManager.Enqueue(RetainerHandlers.SelectQuit);
+                                    else
+                                    {
+                                        Notify.Warning("No items in inventory to entrust");
+                                    }
                                 }
                             }
                         }

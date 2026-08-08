@@ -41,6 +41,7 @@ using System.Reflection;
 
 //using OtterGui.Text.EndObjects;
 using System.Text.RegularExpressions;
+using TerraFX.Interop.DirectX;
 using TerraFX.Interop.Windows;
 using CharaData = (string Name, ushort World);
 using GrandCompany = ECommons.ExcelServices.GrandCompany;
@@ -49,6 +50,37 @@ namespace AutoRetainer.Helpers;
 
 public static unsafe class Utils
 {
+    public static bool IsItemAlreadyMiraged(uint itemId)
+    {
+        return GlamourLog.IsItemOwned(itemId);
+    }
+
+    public static bool CanItemBePartOfMirageSet(uint itemId)
+    {
+        return Ref<bool>.Get($"{itemId}_mirageset", () =>
+        {
+            foreach(var x in MirageStoreSetItem.Values)
+            {
+                if(x.Head.RowId == itemId
+                || x.Body.RowId == itemId
+                || x.Hands.RowId == itemId
+                || x.Legs.RowId == itemId
+                || x.Feet.RowId == itemId
+                || x.Earrings.RowId == itemId
+                || x.Bracelets.RowId == itemId
+                || x.Ring.RowId == itemId
+                || x.Necklace.RowId == itemId
+                || x.MainHand.RowId == itemId
+                || x.OffHand.RowId == itemId
+                )
+                {
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+
     public static void CleanupOperations()
     {
         VoyageScheduler.Enabled = false;
@@ -677,6 +709,45 @@ public static unsafe class Utils
     private static void ExecuteDiscardUnsafe(InventoryItem* ptr, InventoryType type, int slotIndex)
     {
         AgentInventoryContext.Instance()->DiscardItem(ptr, type, slotIndex, 0);
+    }
+
+    public static bool DoesInventoryHaveMatchingItems(this EntrustPlan plan)
+    {
+        if(plan.Duplicates) return true;
+        var types = (InventoryType[])([.. Utils.PlayerInvetoriesWithCrystals, .. (plan.AllowEntrustFromArmory ? Utils.PlayerArmory : [])]);
+        foreach(var x in plan.EntrustCategories)
+        {
+            foreach(var inv in types)
+            {
+                var cont = InventoryManager.Instance()->GetInventoryContainer(inv);
+                for(int i = 0; i < cont->Size; i++)
+                {
+                    var item = cont->Items[i];
+                    if(item.ItemId > 0 && item.Quantity > 0 && (!plan.ExcludeProtected || !IsProtected(item.ItemId)) && Svc.Data.GetExcelSheet<Item>().TryGetRow(item.ItemId, out var data))
+                    {
+                        if(data.ItemUICategory.RowId == x.ID)
+                        {
+                            var cnt = Utils.CountItemsInInventory(item.ItemId, null, types);
+                            if(cnt > x.AmountToKeep) 
+                            { 
+                                PluginLog.Debug($"DoesInventoryHaveMatchingItems: Found category: {data.ItemUICategory.ValueNullable?.Name} ({data.ItemUICategory.RowId}) count: {cnt}>{x.AmountToKeep} from item {data.GetName(true)}");
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        foreach(var x in plan.EntrustItems)
+        {
+            var cnt = Utils.CountItemsInInventory(x, null, types);
+            if(cnt > plan.EntrustItemsAmountToKeep.SafeSelect(x))
+            {
+                PluginLog.Debug($"DoesInventoryHaveMatchingItems: Found item: {ExcelItemHelper.GetName(x, true)}, amount {cnt}>{plan.EntrustItemsAmountToKeep.SafeSelect(x)}");
+                return true;
+            }
+        }
+        return false;
     }
 
     public static int CountItemsInInventory(uint id, bool? hq, IEnumerable<InventoryType> inventories, Predicate<InventoryItem> itemPredicate = null)

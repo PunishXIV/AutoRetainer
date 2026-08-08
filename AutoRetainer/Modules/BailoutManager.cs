@@ -35,6 +35,7 @@ internal static unsafe class BailoutManager
         new("GrandCompanySupplyReward", TimeSpan.FromSeconds(30)),
         new("GrandCompanyExchange", TimeSpan.FromMinutes(15)),
         new("RetainerList", TimeSpan.FromMinutes(7)),
+        new("MiragePrismPrismBox", TimeSpan.FromMinutes(11)),
         ];
     public static Dictionary<string, long> AddonOpenedAt = [];
 
@@ -43,6 +44,7 @@ internal static unsafe class BailoutManager
         if(MultiMode.Active && !SchedulerMain.CharacterPostProcessLocked && !SchedulerMain.RetainerPostProcessLocked)
         {
             RunStuckDetection();
+            RunPluginStateDetection();
             foreach(var x in MonitoredAddons)
             {
                 if(!AddonOpenedAt.ContainsKey(x.Name)) AddonOpenedAt[x.Name] = Environment.TickCount64;
@@ -132,6 +134,29 @@ internal static unsafe class BailoutManager
                 {
                     S.AnomalyWindow.Add("You need to restart your game to continue playing.");
                 }
+            }
+        }
+    }
+
+    private static void RunPluginStateDetection()
+    {
+        if(EzThrottler.Throttle("CheckPluginStates"))
+        {
+            if(WrathCombo.Available && WrathCombo.GetAutoRotationState())
+            {
+                Svc.Commands.ProcessCommand("/wrath auto off");
+                S.AnomalyWindow.Add("Wrath Combo autorotation is on. Autoretainer has turned it off.");
+            }
+            if(BossMod.Available && BossMod.Presets_GetActiveList().Count > 0)
+            {
+                BossMod.Presets_ClearActive();
+                Svc.Commands.ProcessCommand("/vbm ai off");
+                S.AnomalyWindow.Add("Boss mod was active. Autoretainer has turned it off.");
+            }
+            if(Questionable.Available && Questionable.IsRunning())
+            {
+                Questionable.Stop(Svc.PluginInterface.InternalName);
+                S.AnomalyWindow.Add("Questionable was active. Autoretainer has turned it off.");
             }
         }
     }

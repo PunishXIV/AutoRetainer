@@ -1,6 +1,6 @@
 ﻿namespace AutoRetainer.Modules.GcHandin;
 [StructLayout(LayoutKind.Explicit, Size = 152)]
-public unsafe struct GCExpectEntry
+public unsafe struct GCExpertEntry
 {
     [FieldOffset(112)] public int Unk112;
     [FieldOffset(116)] public uint Unk116;

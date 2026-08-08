@@ -347,7 +347,7 @@ internal static unsafe class AutoGCHandin
             var reader = new ReaderGrandCompanySupplyList(addon);
             if(IsListReady())
             {
-                var ptr = (GCExpectEntry*)*(nint*)((nint)(addon) + 648);
+                var ptr = (GCExpertEntry*)*(nint*)((nint)(addon) + 648);
                 for(var i = 0; i < reader.NumItems; i++)
                 {
                     var entry = ptr[i];

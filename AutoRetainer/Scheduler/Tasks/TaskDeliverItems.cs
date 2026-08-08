@@ -42,7 +42,7 @@ public static unsafe class TaskDeliverItems
         }
         P.TaskManager.Enqueue(() =>
         {
-            if(C.FullAutoGCDeliveryUseBuffItem)
+            if(C.FullAutoGCDeliveryUseBuffItem && !Data.NoItemBuffUse)
             {
                 if(Player.Object.IsCasting(14946, ActionType.Item))
                 {
@@ -72,6 +72,7 @@ public static unsafe class TaskDeliverItems
         {
             if(UsingItemBuff) return;
             if(!C.FullAutoGCDeliveryUseBuffFCAction) return;
+            if(Data.NoFcBuffUse) return;
             if(Player.Character->FreeCompanyTagString != "" && Player.IsInHomeWorld)
             {
                 P.TaskManager.InsertStack(() =>

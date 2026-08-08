@@ -179,6 +179,8 @@ public unsafe class AutoRetainer : IDalamudPlugin
             /autoretainer het - enter nearby own house or apartment if possible
             /autoretainer reset - reset all pending tasks
             /autoretainer deliver - deliver expert delivery items
+            /autoretainer armoire - deliver all eligible items into armoire
+            /autoretainer dresser - deliver all eligible items into glamour dresser (requires Glamour Log plugin)
             """);
         EzCmd.Add("/ays", CommandHandler);
         Svc.Toasts.ErrorToast += Toasts_ErrorToast;
@@ -406,6 +408,35 @@ public unsafe class AutoRetainer : IDalamudPlugin
             else
             {
                 DuoLog.Error($"No valid housing NPC or retainer bell were found, or AutoRetainer is busy, or sale function is disabled");
+            }
+        }
+        else if(arguments.EqualsIgnoreCaseAny("armoire"))
+        {
+            if(!IsOccupied() && !TaskManager.IsBusy)
+            {
+                S.CabinetManager.EnqueueGoToInnAndDeliverEverything();
+            }
+            else
+            {
+                DuoLog.Warning("AutoRetainer is busy or player is occupied.");
+            }
+        }
+        else if(arguments.EqualsIgnoreCaseAny("dresser"))
+        {
+            if(GlamourLog.Available)
+            {
+                if(!IsOccupied() && !TaskManager.IsBusy)
+                {
+                    S.MirageManager.EnqueueGoToInnAndDeliverEverything();
+                }
+                else
+                {
+                    DuoLog.Warning("AutoRetainer is busy or player is occupied.");
+                }
+            }
+            else
+            {
+                DuoLog.Warning($"Glamour Log plugin is required for this function.");
             }
         }
         else if(arguments.StartsWith("shutdown"))

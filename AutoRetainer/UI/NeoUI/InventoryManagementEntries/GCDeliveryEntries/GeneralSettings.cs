@@ -36,7 +36,35 @@ public sealed unsafe class GeneralSettings : InventoryManagementBase
         .InputInt(150f, "Ventures remaining to trigger delivery, less or equal", () => ref C.FullAutoGCDeliveryDeliverOnVentureLessThan)
         .Unindent()
         .Checkbox("Use Priority seal allowance, if possible", () => ref C.FullAutoGCDeliveryUseBuffItem)
+        .Widget(() =>
+        {
+            if(C.FullAutoGCDeliveryUseBuffItem)
+            {
+                ImGui.Indent();
+                if(Data != null)
+                {
+                    ImGuiEx.Checkbox($"Exclude {Data.NameWithWorldCensored}##item", ref Data.NoItemBuffUse);
+                }
+                var cnt = C.OfflineData.Count(x => x.NoItemBuffUse);
+                ImGuiEx.Text($"{(cnt > 0 ? $"{cnt} character(s) are excluded from buff item usage. " : "")} Navigate to \"Functions, Exclusions, Order\" section to exclude a character.");
+                ImGui.Unindent();
+            }
+        })
         .Checkbox("Use Free Company seal buff, if possible", () => ref C.FullAutoGCDeliveryUseBuffFCAction)
+        .Widget(() =>
+        {
+            if(C.FullAutoGCDeliveryUseBuffFCAction)
+            {
+                ImGui.Indent();
+                if(Data != null)
+                {
+                    ImGuiEx.Checkbox($"Exclude {Data.NameWithWorldCensored}", ref Data.NoFcBuffUse);
+                }
+                var cnt = C.OfflineData.Count(x => x.NoFcBuffUse);
+                ImGuiEx.Text($"{(cnt > 0 ? $"{cnt} character(s) are excluded from buff item usage. " : "")} Navigate to \"Functions, Exclusions, Order\" section to exclude a character.");
+                ImGui.Unindent();
+            }
+        })
         .Checkbox("Teleport back to house/inn after delivery", () => ref C.TeleportAfterGCExchange)
         .Indent()
         .Checkbox("Only when Multi Mode is active", () => ref C.TeleportAfterGCExchangeMulti)

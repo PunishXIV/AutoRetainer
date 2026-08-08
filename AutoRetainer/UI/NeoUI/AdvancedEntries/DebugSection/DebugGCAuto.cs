@@ -28,11 +28,13 @@ internal unsafe class DebugGCAuto : DebugSectionBase
                 var reader = new ReaderGrandCompanySupplyList(addon);
                 if(reader.IsLoaded)
                 {
-                    var ptr = (GCExpectEntry*)*(nint*)((nint)addon + 648);
+                    var ptr = (GCExpertEntry*)*(nint*)((nint)addon + 648);
                     for(var i = 0; i < reader.NumItems; i++)
                     {
                         var entry = ptr[i];
                         ImGuiEx.Text($"{entry.Unk112}/{entry.Unk116}/{entry.Seals}/{entry.ItemID} {ExcelItemHelper.GetName(entry.ItemID)}/{entry.Unk136}/{entry.Unk145}");
+                        ImGui.SameLine();
+                        ImGuiEx.TextCopy($"{(nint)(&ptr[i])}");
                     }
                 }
             }

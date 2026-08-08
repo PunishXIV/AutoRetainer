@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<Authors>NightmareXIV, kawaii</Authors>
-		<Version>4.6.1.17</Version>
+		<Version>4.6.1.25</Version>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -152,6 +152,9 @@
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="res\processing.png">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="res\single.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="res\submarine.png">
