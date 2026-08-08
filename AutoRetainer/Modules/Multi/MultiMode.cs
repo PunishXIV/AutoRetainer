@@ -18,6 +18,7 @@ using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using TerraFX.Interop.Windows;
 using static AutoRetainer.Modules.OfflineDataManager;
 
 namespace AutoRetainer.Modules.Multi;
@@ -26,14 +27,15 @@ internal static unsafe class MultiMode
 {
     internal static bool Active => Enabled && !IPC.Suppressed;
     internal static HashSet<string> SingleMultiMode = null;
+    internal static MultiModeType? SingleMultiModeType = null;
     internal static ref bool Enabled => ref C.MultiModeEnabled;
 
     public static (string Name, string World)? ExpectedCharacter = null;
 
     internal static bool WaitOnLoginScreen => C.MultiWaitOnLoginScreen || BailoutManager.IsLogOnTitleEnabled || C.NightMode;
 
-    internal static bool EnabledRetainers => C.MultiModeType.EqualsAny(MultiModeType.Retainers, MultiModeType.Everything) && !VoyageUtils.IsRetainerBlockedByVoyage() && (!C.NightMode || C.NightModeRetainers);
-    internal static bool EnabledSubmarines => C.MultiModeType.EqualsAny(MultiModeType.Submersibles, MultiModeType.Everything) && (!C.NightMode || C.NightModeDeployables);
+    internal static bool EnabledRetainers => Utils.GetActiveMultiModeType().EqualsAny(MultiModeType.Retainers, MultiModeType.Everything) && !VoyageUtils.IsRetainerBlockedByVoyage() && (!C.NightMode || C.NightModeRetainers);
+    internal static bool EnabledSubmarines => Utils.GetActiveMultiModeType().EqualsAny(MultiModeType.Submersibles, MultiModeType.Everything) && (!C.NightMode || C.NightModeDeployables);
 
     internal static bool Synchronize = false;
     internal static long NextInteractionAt { get; private set; } = 0;
@@ -124,9 +126,9 @@ internal static unsafe class MultiMode
         {
             return;
         }
-        if(Utils.CanAutoLogin())
+        if(!Svc.ClientState.IsLoggedIn)
         {
-            
+            BailoutManager.IsLogOnTitleEnabled = true;
         }
         MultiMode.SingleMultiMode = null;
         EzThrottler.Throttle("ForceShutdownForSubs", 10 * 60 * 1000, true);
@@ -172,6 +174,10 @@ internal static unsafe class MultiMode
     {
         if(Active)
         {
+            if(C.MultiModeType != MultiModeType.Everything && !C.MultiModeUIBar)
+            {
+                C.MultiModeUIBar = true;
+            }
             if(EzThrottler.Throttle("MultiNotify", 15000)) Utils.NotifyIfLifestreamIsNotInstalled("Multi Mode");
             ValidateAutoAfkSettings();
             var shouldDisableRender = (C.MultiDisableRender && (!C.MultiDisableRenderNightModeOnly || C.NightMode) && (!C.MultiDisableRenderOnlyInactive || TerraFX.Interop.Windows.Windows.IsIconic((TerraFX.Interop.Windows.HWND)(*ECommonsMain.MainWindowHandle)) || CSFramework.Instance()->WindowInactive)) || P.TestRenderDisable;

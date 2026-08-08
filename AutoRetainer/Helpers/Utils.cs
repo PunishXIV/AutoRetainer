@@ -958,11 +958,20 @@ public static unsafe class Utils
         "Champion",
     ];
 
+    public static MultiModeType GetActiveMultiModeType()
+    {
+        if(MultiMode.SingleMultiMode != null)
+        {
+            return MultiMode.SingleMultiModeType ?? C.MultiModeType;
+        }
+        return C.MultiModeType;
+    }
+
     public static bool ShouldSkipNPCVendor()
     {
         if(!Data.GetIMSettings().IMSkipVendorIfRetainer) return false;
         if(!Data.GetIMSettings().IMEnableAutoVendor) return false;
-        if(C.MultiModeType == MultiModeType.Submersibles) return false;
+        if(GetActiveMultiModeType() == MultiModeType.Submersibles) return false;
         if(Data == null) return false;
         if(!Data.Enabled) return false;
         if(Data.GetEnabledRetainers().Length == 0) return false;

@@ -1,5 +1,6 @@
 using AutoRetainer.Internal;
 using AutoRetainer.Modules.Voyage;
+using AutoRetainerAPI.Configuration;
 using ECommons.EzIpcManager;
 
 namespace AutoRetainer.Modules.EzIPCManagers;
@@ -54,10 +55,11 @@ public class IPC_PluginState
     }
 
     [EzIPC]
-    public void EnableSingleMultiMode()
+    public void EnableSingleMultiMode(MultiModeType? multiModeType)
     {
         EnableMultiMode();
         MultiMode.SingleMultiMode = [];
+        MultiMode.SingleMultiModeType = multiModeType;
         if(Player.Available) MultiMode.SingleMultiMode.Add(Player.NameWithWorld);
     }
 
