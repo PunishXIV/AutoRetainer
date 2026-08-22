@@ -315,5 +315,5 @@ internal static class Lang
 
     internal static readonly string[] GCSealExchangeConfirm = ["Exchange", "よろしいですか？", "Staatstaler gegen", "Acheter", "要交换吗", "교환하시겠습니까", "要交換嗎"];
 
-    internal static readonly string[] DiscardItem = ["Discard", "を捨てます。", "wegwerfen", "Jeter","确定要舍弃","確定要捨棄"];
+    internal static readonly string[] DiscardItem = ["Discard", "を捨てます。", "wegwerfen", "Jeter", "确定要舍弃", "버리시겠습니까", "確定要捨棄"];
 }
