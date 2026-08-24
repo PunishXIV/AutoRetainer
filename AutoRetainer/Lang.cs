@@ -77,6 +77,10 @@ internal static class Lang
         "탐색수행: 산악 (필요한 집사 급료: 2개)",
         "탐색수행: 삼림 (필요한 집사 급료: 2개)",
         "탐색수행: 물가 (필요한 집사 급료: 2개)",
+        "Exploración de llanura.",
+        "Exploración de montaña.",
+        "Exploración de bosque.",
+        "Exploración de ribera.",
     ];
 
     internal static readonly string[] HuntingVentureNames =
@@ -109,6 +113,10 @@ internal static class Lang
         "조달수행: 광부 (필요한 집사 급료: 1개)",
         "조달수행: 원예가 (필요한 집사 급료: 1개)",
         "조달수행: 어부 (필요한 집사 급료: 1개)",
+        "Caza.",
+        "Minería.",
+        "Botánica.",
+        "Pesca.",
     ];
 
     internal static readonly string[] QuickExploration =
@@ -121,6 +129,7 @@ internal static class Lang
         "自由探索委託（需要2枚探險幣）",
         "발굴수행 (필요한 집사 급료: 2개)",
         "自由尋寶委託（需要2枚探險幣）",
+        "Exploración rápida.",
     ];
 
     internal static readonly string[] Entrance =
@@ -156,9 +165,10 @@ internal static class Lang
         "Choisissez un type de tâche :",
         "Select a category.",
         "집사 수행의 종류를 선택하십시오.",
+        "Seleccione una categoría.",
     ];
 
-    internal static string[] BellName => [Svc.Data.GetExcelSheet<EObjName>().GetRow(2000401).Singular.GetText(), "リテイナーベル"];
+    internal static string[] BellName => [Svc.Data.GetExcelSheet<EObjName>().GetRow(2000401).Singular.GetText(), "リテイナーベル", "campanilla"];
 
     //0	TEXT_HOUFIXMANSIONENTRANCE_00359_HOUSINGAREA_MENU_ENTER_MYROOM	Go to your apartment
     //0	TEXT_HOUFIXMANSIONENTRANCE_00359_HOUSINGAREA_MENU_ENTER_MYROOM	自分の部屋に移動する
@@ -306,7 +316,23 @@ internal static class Lang
 
     internal static string[] WillBeUnableToProcessBuyback => field ??= [
         Svc.Data.GetExcelSheet<QuestDialogueText>(name:"custom/000/CmnDefRetainerCall_00010").GetRow(215).Value.GetText(),
+        "Una vez que lo haga volver, su sirviente no podrá gestionar recompras de objetos. ¿Seguro que desea continuar?",
         ];
+
+    //2385	View venture report. (Complete)
+    internal static readonly string[] ViewVentureReportComplete = ["Ver informe de expedición. (Completada)"];
+
+    //2386	Assign venture.        2387	Assign venture. (In progress)
+    internal static readonly string[] AssignVenture = ["Asignar expedición."];
+
+    //2383	Quit.
+    internal static readonly string[] QuitRetainerMenu = ["Salir."];
+
+    //2378	Entrust or withdraw items. (Slots filled: …)
+    internal static readonly string[] EntrustOrWithdrawItems = ["Entregar o retirar objetos."];
+
+    //2379	Entrust or withdraw gil. (Gil entrusted: …)
+    internal static readonly string[] EntrustOrWithdrawGil = ["Entregar o retirar gil."];
 
     //3290	<Sheet(Item,IntegerParameter(1),0)/>×<Value>IntegerParameter(2)</Value>を、<Format(IntegerParameter(3),FF022C)/>枚の軍票と交換します。
     //よろしいですか？
