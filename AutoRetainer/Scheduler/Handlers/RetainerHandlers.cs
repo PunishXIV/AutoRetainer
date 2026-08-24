@@ -44,7 +44,7 @@ internal static unsafe class RetainerHandlers
     internal static bool? SelectAssignVenture()
     {
         var text = new string[] { Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(2386).Text.ToDalamudString().GetText(), Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(2387).Text.ToDalamudString().GetText() };
-        return Utils.TrySelectSpecificEntry(text);
+        return Utils.TrySelectSpecificEntry([.. text, .. Lang.AssignVenture]);
     }
 
     internal static bool? SelectQuit()
@@ -59,7 +59,7 @@ internal static unsafe class RetainerHandlers
             return false;
         }
         var text = Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(2383).Text.ToDalamudString().GetText();
-        return Utils.TrySelectSpecificEntry(text);
+        return Utils.TrySelectSpecificEntry([text, .. Lang.QuitRetainerMenu]);
     }
 
     internal static void EnforceSelectStringThrottle()
@@ -72,7 +72,7 @@ internal static unsafe class RetainerHandlers
         EnforceSelectStringThrottle();
         //2385	View venture report. (Complete)
         var text = Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(2385).Text.ToDalamudString().GetText();
-        var ret = Utils.TrySelectSpecificEntry(text);
+        var ret = Utils.TrySelectSpecificEntry([text, .. Lang.ViewVentureReportComplete]);
         return ret;
     }
 
@@ -194,14 +194,14 @@ internal static unsafe class RetainerHandlers
     {
         //2378	Entrust or withdraw items.
         var text = Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(2378).Text.ToDalamudString().GetText(true);
-        return Utils.TrySelectSpecificEntry(text);
+        return Utils.TrySelectSpecificEntry([text, .. Lang.EntrustOrWithdrawItems]);
     }
 
     internal static bool? SelectEntrustGil()
     {
         //2379	Entrust or withdraw gil.
         var text = Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(2379).Text.ToDalamudString().GetText(true);
-        return Utils.TrySelectSpecificEntry(text);
+        return Utils.TrySelectSpecificEntry([text, .. Lang.EntrustOrWithdrawGil]);
     }
 
     internal static bool? ClickEntrustDuplicates()
