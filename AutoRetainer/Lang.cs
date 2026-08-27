@@ -1,4 +1,5 @@
 ﻿using AutoRetainerAPI.Configuration;
+using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Utility;
 using ECommons.ExcelServices.Sheets;
 using Lumina.Excel.Sheets;
@@ -47,90 +48,61 @@ internal static class Lang
 
     internal static readonly (string Normal, string GameFont) Digits = ("0123456789", "");
 
-    internal static readonly string[] FieldExplorationNames =
+    //The summoning bell's own menu, in whatever language the client runs.
+    private const string RetainerBellDialogue = "custom/000/CmnDefRetainerCall_00010";
+
+    private static string BellText(uint row) => Svc.Data.GetExcelSheet<QuestDialogueText>(name: RetainerBellDialogue)?.GetRowOrDefault(row)?.Value.GetText() ?? "";
+
+    //Everything a log message says before its first macro, which is fixed text in any language.
+    internal static string LogMessageOpening(uint row)
+    {
+        var text = Svc.Data.GetExcelSheet<LogMessage>()?.GetRowOrDefault(row)?.Text.ToDalamudString();
+        if(text == null) return "";
+        var opening = "";
+        foreach(var payload in text.Payloads)
+        {
+            if(payload is not TextPayload literal) break;
+            opening += literal.Text;
+        }
+        return opening.Trim();
+    }
+
+    //196	TASK_CATEGORY_TREASURE	Field Exploration.
+    //198	TASK_CATEGORY_MINER_2	Highland Exploration.
+    //200	TASK_CATEGORY_BOTANIST_2	Woodland Exploration.
+    //202	TASK_CATEGORY_FISHER_2	Waterside Exploration.
+    internal static string[] FieldExplorationNames => field ??=
     [
-        "Field Exploration.",
-        "Highland Exploration.",
-        "Woodland Exploration.",
-        "Waterside Exploration.",
-        "探索依頼：平地　　（必要ベンチャースクリップ：2枚）",
-        "探索依頼：山岳　　（必要ベンチャースクリップ：2枚）",
-        "探索依頼：森林　　（必要ベンチャースクリップ：2枚）",
-        "探索依頼：水辺　　（必要ベンチャースクリップ：2枚）",
-        "Felderkundung (2 Wertmarken)",
-        "Hochlanderkundung (2 Wertmarken)",
-        "Forsterkundung (2 Wertmarken)",
-        "Gewässererkundung (2 Wertmarken)",
-        "Exploration en plaine (2 jetons)",
-        "Exploration en montagne (2 jetons)",
-        "Exploration en forêt (2 jetons)",
-        "Exploration en rivage (2 jetons)",
-        "平地探索委托（需要2枚探险币）",
-        "山岳探索委托（需要2枚探险币）",
-        "森林探索委托（需要2枚探险币）",
-        "水岸探索委托（需要2枚探险币）",
+        BellText(196),
+        BellText(198),
+        BellText(200),
+        BellText(202),
+        //zh-TW: row ids unverified on that client, so it stays a literal
         "平地探索委託（需要2枚探險幣）",
         "山岳探索委託（需要2枚探險幣）",
         "森林探索委託（需要2枚探險幣）",
         "水岸探索委託（需要2枚探險幣）",
-        "탐색수행: 평지 (필요한 집사 급료: 2개)",
-        "탐색수행: 산악 (필요한 집사 급료: 2개)",
-        "탐색수행: 삼림 (필요한 집사 급료: 2개)",
-        "탐색수행: 물가 (필요한 집사 급료: 2개)",
-        "Exploración de llanura.",
-        "Exploración de montaña.",
-        "Exploración de bosque.",
-        "Exploración de ribera.",
     ];
 
-    internal static readonly string[] HuntingVentureNames =
+    //195	TASK_CATEGORY_NORMAL	Hunting.
+    //197	TASK_CATEGORY_MINER_1	Mining.
+    //199	TASK_CATEGORY_BOTANIST_1	Botany.
+    //201	TASK_CATEGORY_FISHER_1	Fishing.
+    internal static string[] HuntingVentureNames => field ??=
     [
-        "Hunting.",
-        "Mining.",
-        "Botany.",
-        "Fishing.",
-        "調達依頼：渉猟　　（必要ベンチャースクリップ：1枚）",
-        "調達依頼：採掘　　（必要ベンチャースクリップ：1枚）",
-        "調達依頼：園芸　　（必要ベンチャースクリップ：1枚）",
-        "調達依頼：漁猟　　（必要ベンチャースクリップ：1枚）",
-        "Beutezug (1 Wertmarke)",
-        "Mineraliensuche (1 Wertmarke)",
-        "Ernteausflug (1 Wertmarke)",
-        "Fischzug (1 Wertmarke)",
-        "Travail de chasse (1 jeton)",
-        "Travail de mineur (1 jeton)",
-        "Travail de botaniste (1 jeton)",
-        "Travail de pêche (1 jeton)",
-        "狩猎筹集委托（需要1枚探险币）",
-        "采矿筹集委托（需要1枚探险币）",
-        "采伐筹集委托（需要1枚探险币）",
-        "捕鱼筹集委托（需要1枚探险币）",
+        BellText(195),
+        BellText(197),
+        BellText(199),
+        BellText(201),
+        //zh-TW: row ids unverified on that client, so it stays a literal
         "狩獵籌集委託（需要1枚探險幣）",
         "採礦籌集委託（需要1枚探險幣）",
         "採伐籌集委託（需要1枚探險幣）",
         "捕魚籌集委託（需要1枚探險幣）",
-        "조달수행: 사냥 (필요한 집사 급료: 1개)",
-        "조달수행: 광부 (필요한 집사 급료: 1개)",
-        "조달수행: 원예가 (필요한 집사 급료: 1개)",
-        "조달수행: 어부 (필요한 집사 급료: 1개)",
-        "Caza.",
-        "Minería.",
-        "Botánica.",
-        "Pesca.",
     ];
 
-    internal static readonly string[] QuickExploration =
-    [
-        "Quick Exploration.",
-        "ほりだしもの依頼　（必要ベンチャースクリップ：2枚）",
-        "Schneller Streifzug (2 Wertmarken)",
-        "Tâche improvisée (2 jetons)",
-        "自由探索委托（需要2枚探险币）",
-        "自由探索委託（需要2枚探險幣）",
-        "발굴수행 (필요한 집사 급료: 2개)",
-        "自由尋寶委託（需要2枚探險幣）",
-        "Exploración rápida.",
-    ];
+    //402	TASK_CATEGORY_FORTUNE	Quick Exploration.
+    internal static string[] QuickExploration => field ??= [BellText(402), /*zh-TW: row id unverified, stays a literal*/ "自由尋寶委託（需要2枚探險幣）"];
 
     internal static readonly string[] Entrance =
     [
@@ -156,19 +128,10 @@ internal static class Lang
         "'주택'으로 들어가시겠습니까?",
     ];
 
-    internal static readonly string[] RetainerAskCategoryText =
-    [
-        "依頼するリテイナーベンチャーを選んでください",
-        "请选择要委托的探险",
-        "請選擇要委託的探險",
-        "Wähle eine Unternehmung, auf die du den Gehilfen schicken möchtest.",
-        "Choisissez un type de tâche :",
-        "Select a category.",
-        "집사 수행의 종류를 선택하십시오.",
-        "Seleccione una categoría.",
-    ];
+    //194	ASK_CATEGORY	Select a category.
+    internal static string[] RetainerAskCategoryText => field ??= [BellText(194), /*zh-TW: row id unverified, stays a literal*/ "請選擇要委託的探險"];
 
-    internal static string[] BellName => [Svc.Data.GetExcelSheet<EObjName>().GetRow(2000401).Singular.GetText(), "リテイナーベル", "campanilla"];
+    internal static string[] BellName => [Svc.Data.GetExcelSheet<EObjName>().GetRow(2000401).Singular.GetText(), "リテイナーベル"];
 
     //0	TEXT_HOUFIXMANSIONENTRANCE_00359_HOUSINGAREA_MENU_ENTER_MYROOM	Go to your apartment
     //0	TEXT_HOUFIXMANSIONENTRANCE_00359_HOUSINGAREA_MENU_ENTER_MYROOM	自分の部屋に移動する
@@ -314,25 +277,8 @@ internal static class Lang
     //215	TEXT_CMNDEFRETAINERCALL_00010_ASK_RETURN_WITH_BUYBACK	Wenn du deinen Gehilfen wegschickst, kannst du die von ihm verkauften Gegenstände nicht mehr zurückkaufen. Möchtest du trotzdem fortfahren?
     //215	TEXT_CMNDEFRETAINERCALL_00010_ASK_RETURN_WITH_BUYBACK	Renvoyer le servant effacera la liste de rachat. Confirmer<Indent/>?
 
-    internal static string[] WillBeUnableToProcessBuyback => field ??= [
-        Svc.Data.GetExcelSheet<QuestDialogueText>(name:"custom/000/CmnDefRetainerCall_00010").GetRow(215).Value.GetText(),
-        "Una vez que lo haga volver, su sirviente no podrá gestionar recompras de objetos. ¿Seguro que desea continuar?",
-        ];
-
-    //2385	View venture report. (Complete)
-    internal static readonly string[] ViewVentureReportComplete = ["Ver informe de expedición. (Completada)"];
-
-    //2386	Assign venture.        2387	Assign venture. (In progress)
-    internal static readonly string[] AssignVenture = ["Asignar expedición."];
-
-    //2383	Quit.
-    internal static readonly string[] QuitRetainerMenu = ["Salir."];
-
-    //2378	Entrust or withdraw items. (Slots filled: …)
-    internal static readonly string[] EntrustOrWithdrawItems = ["Entregar o retirar objetos."];
-
-    //2379	Entrust or withdraw gil. (Gil entrusted: …)
-    internal static readonly string[] EntrustOrWithdrawGil = ["Entregar o retirar gil."];
+    //215	ASK_RETURN_WITH_BUYBACK	Your retainer will be unable to process item buyback requests once recalled.
+    internal static string[] WillBeUnableToProcessBuyback => field ??= [BellText(215)];
 
     //3290	<Sheet(Item,IntegerParameter(1),0)/>×<Value>IntegerParameter(2)</Value>を、<Format(IntegerParameter(3),FF022C)/>枚の軍票と交換します。
     //よろしいですか？
