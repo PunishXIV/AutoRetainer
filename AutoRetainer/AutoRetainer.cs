@@ -693,7 +693,7 @@ public unsafe class AutoRetainer : IDalamudPlugin
             //5800	60	8	0	False	他のデータセンター<Highlight>StringParameter(1)</Highlight>へ遊びに行っているため操作できません。
             //5800	60	8	0	False	Der Vorgang kann nicht ausgeführt werden, da der Charakter gerade das Datenzentrum <Highlight>StringParameter(1)</Highlight> bereist.
             //5800	60	8	0	False	Impossible d'exécuter cette commande. Le personnage se trouve dans un autre centre de traitement de données (<Highlight>StringParameter(1)</Highlight>).
-            if(message.ToString().StartsWithAny(Lang.UnableToVisitWorld))
+            if(message.ToString().StartsWithAny(Lang.UnableToVisitWorld) || Lang.IsLogMessage(message.ToString(), 5800))
             {
 
                 MultiMode.Enabled = false;

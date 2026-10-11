@@ -231,11 +231,11 @@ internal static unsafe class VoyageUtils
                 return PanelType.TypeSelector;
             }
             var text = GenericHelpers.ReadSeString(&addon->UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText).GetText();
-            if(text.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.PanelSubmersible))
+            if(text.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.PanelSubmersible) || Lang.IsPanelSubmersible(text))
             {
                 return PanelType.Submersible;
             }
-            if(text.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.PanelAirship))
+            if(text.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.PanelAirship) || Lang.IsPanelAirship(text))
             {
                 return PanelType.Airship;
             }
