@@ -56,7 +56,7 @@ internal static unsafe class MiniTA
 
     internal static void ConfirmRepair()
     {
-        var x = Utils.GetSpecificYesno((s) => s.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.WorkshopRepairConfirm));
+        var x = Utils.GetSpecificYesno(Lang.WorkshopRepairConfirm);
         if(x != null && Utils.GenericThrottle)
         {
             VoyageUtils.Log("Confirming repair");
@@ -66,7 +66,7 @@ internal static unsafe class MiniTA
 
     internal static void ConfirmRegister()
     {
-        var x = Utils.GetSpecificYesno((s) => s.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.WorkshopRegisterConfirm));
+        var x = Utils.GetSpecificYesno(Lang.WorkshopRegisterConfirm);
         if(x != null && Utils.GenericThrottle)
         {
             VoyageUtils.Log("Confirming registration");
@@ -84,7 +84,7 @@ internal static unsafe class MiniTA
             return;
         }
         //DebugLog($"1: {selectStrAddon->AtkUnitBase.UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText.ToString()}");
-        if(!Lang.SkipCutsceneStr.Contains(selectStrAddon->AtkUnitBase.UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText.ToString())) return;
+        if(!Lang.SkipCutsceneStr.Contains(selectStrAddon->AtkUnitBase.UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText.GetText())) return;
         if(EzThrottler.Throttle("SkipCutsceneConfirm"))
         {
             DebugLog("Selecting cutscene skipping");

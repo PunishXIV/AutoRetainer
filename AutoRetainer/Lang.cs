@@ -3,6 +3,7 @@ using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Utility;
 using ECommons.ExcelServices.Sheets;
 using Lumina.Excel.Sheets;
+using Lumina.Text.ReadOnly;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Windows.Forms.VisualStyles;
@@ -104,29 +105,13 @@ internal static class Lang
     //402	TASK_CATEGORY_FORTUNE	Quick Exploration.
     internal static string[] QuickExploration => field ??= [BellText(402), /*zh-TW: row id unverified, stays a literal*/ "自由尋寶委託（需要2枚探險幣）"];
 
-    internal static readonly string[] Entrance =
-    [
-        "ハウスへ入る",
-        "进入房屋",
-        "進入房屋",
-        "Eingang",
-        "Entrée",
-        "Entrance",
-        "주택으로 들어가기",
-    ];
+    internal static string[] Entrance => field ??= MenuEntries(
+        Svc.Data.GetExcelSheet<EObjName>()?.GetRowOrDefault(2002737)?.Singular.GetText(), "進入房屋");
 
     internal static string ApartmentEntrance => Svc.Data.GetExcelSheet<EObjName>().GetRow(2007402).Singular.ToString();
 
-    internal static readonly string[] ConfirmHouseEntrance =
-    [
-        "「ハウス」へ入りますか？",
-        "要进入这间房屋吗？",
-        "要進入這間房屋嗎？",
-        "Das Gebäude betreten?",
-        "Entrer dans la maison ?",
-        "Enter the estate hall?",
-        "'주택'으로 들어가시겠습니까?",
-    ];
+    internal static bool ConfirmHouseEntrance(string text) => MatchesTemplate(text, Svc.Data.GetExcelSheet<Warp>()?.GetRowOrDefault(131148)?.Question)
+        || text.ContainsAny(StringComparison.OrdinalIgnoreCase, ["要進入這間房屋嗎？"]);
 
     //194	ASK_CATEGORY	Select a category.
     internal static string[] RetainerAskCategoryText => field ??= [BellText(194), /*zh-TW: row id unverified, stays a literal*/ "請選擇要委託的探險"];
@@ -138,45 +123,54 @@ internal static class Lang
     //0	TEXT_HOUFIXMANSIONENTRANCE_00359_HOUSINGAREA_MENU_ENTER_MYROOM	Die eigene Wohnung betreten
     //0	TEXT_HOUFIXMANSIONENTRANCE_00359_HOUSINGAREA_MENU_ENTER_MYROOM	Aller dans votre appartement
 
-    internal static readonly string[] GoToYourApartment =
-    [
-        "Go to your apartment",
-        "自分の部屋に移動する",
-        "移动到自己的房间",
-        "移動到自己的房間",
-        "Die eigene Wohnung betreten",
-        "Aller dans votre appartement",
-        "자신의 방으로 이동",
-    ];
+    internal static string[] GoToYourApartment => field ??= MenuEntries(
+        DialogueText("custom/003/HouFixMansionEntrance_00359", 0)?.GetText(),
+        DialogueText("custom/003/HouFixMansionEntrance_00359", 4)?.GetText(), "移動到自己的房間");
 
-    internal static readonly string[] SkipCutsceneStr =
-    [
-        "Skip cutscene?",
-        "要跳过这段过场动画吗？",
-        "要跳過這段過場動畫嗎？",
-        "Videosequenz überspringen?",
-        "Passer la scène cinématique ?",
-        "このカットシーンをスキップしますか？",
-        "영상을 건너뛰시겠습니까?",
-    ];
+    private const string AirshipDialogue = "custom/002/CmnDefCompanyCommanderBoard_00258";
+    private const string SubmersibleDialogue = "custom/004/HouFixCompanySubmarine_00447";
+
+    private static ReadOnlySeString? DialogueText(string sheet, uint row) => Svc.Data.GetExcelSheet<QuestDialogueText>(name: sheet)?.GetRowOrDefault(row)?.Value;
+
+    private static string AddonText(uint row) => Svc.Data.GetExcelSheet<Addon>()?.GetRowOrDefault(row)?.Text.GetText() ?? "";
+
+    private static string ManagementText(uint row) => Svc.Data.GetExcelSheet<CustomTalk>()?.GetRowOrDefault(row)?.MainOption.GetText() ?? "";
+
+    // An empty entry must not match the first menu option.
+    private static string[] MenuEntries(params string[] entries) => entries.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+
+    // Match each fixed text part. Parameters can change the displayed numbers and item names.
+    private static bool MatchesTemplate(string text, ReadOnlySeString? template)
+    {
+        if(template == null) return false;
+        var parts = template.Value.ToDalamudString().Payloads.OfType<TextPayload>()
+            .Select(x => x.Text?.Trim()).Where(x => !string.IsNullOrEmpty(x)).ToArray();
+        return parts.Length > 0 && parts.All(x => text.Contains(x, StringComparison.OrdinalIgnoreCase));
+    }
+
+    // Keep zh-TW literals until the row IDs are verified on that client.
+    internal static string[] SkipCutsceneStr => field ??= MenuEntries(AddonText(281), "要跳過這段過場動畫嗎？");
     //11	TEXT_CMNDEFHOUSINGPERSONALROOMENTRANCE_00178_GOTO_WORKSHOP	Move to the company workshop
     //11	TEXT_CMNDEFHOUSINGPERSONALROOMENTRANCE_00178_GOTO_WORKSHOP	地下工房に移動する
     //11	TEXT_CMNDEFHOUSINGPERSONALROOMENTRANCE_00178_GOTO_WORKSHOP	Die Ge<SoftHyphen/>sell<SoftHyphen/>schaftswerkstätte betreten
     //11	TEXT_CMNDEFHOUSINGPERSONALROOMENTRANCE_00178_GOTO_WORKSHOP	Aller dans l'atelier de compagnie
-    internal static readonly string[] EnterWorkshop = ["Move to the company workshop", "地下工房に移動する", "移动到部队工房", "移動到部隊工房", "Die Gesellschaftswerkstätte betreten", "Aller dans l'atelier de compagnie", "지하공방으로 이동", Svc.Data.GetExcelSheet<QuestDialogueText>(name: "custom/001/CmnDefHousingPersonalRoomEntrance_00178").GetRow(11).Value.GetText()];
+    internal static string[] EnterWorkshop => field ??= MenuEntries(DialogueText("custom/001/CmnDefHousingPersonalRoomEntrance_00178", 11)?.GetText(), "移動到部隊工房");
 
-    internal static readonly string[] AirshipManagement = ["Airship Management", "飛空艇の管理", "管理飞空艇", "管理飛空艇", "Luftschiff verwalten", "Contrôle aérien", "비공정 관리"];
-    internal static readonly string[] SubmarineManagement = ["Submersible Management", "潜水艦の管理", "管理潜水艇", "管理潛水艇", "Tauchboot verwalten", "Contrôle sous-marin", "잠수함 관리"];
-    internal static readonly string[] CancelVoyage = ["Cancel", "キャンセル", "取消", "Abbrechen", "Annuler", "취소"];
-    internal static readonly string[] NothingVoyage = ["Nothing.", "やめる", "取消", "Nichts", "Annuler", "그만두기"];
-    internal static readonly string[] DeployOnSubaquaticVoyage = ["Deploy submersible on subaquatic voyage", "ボイジャー出港", "出发", "出發", "Auf Erkundung gehen", "Expédier le sous-marin", "탐사 출항"];
-    internal static readonly string[] ViewPrevVoyageLog = ["View previous voyage log", "前回のボイジャー報告", "上次的远航报告", "上次的遠航報告", "Bericht der letzten Erkundung", "Consulter le journal de la précédente expédition", "이전 탐사 보고서"];
-    internal static readonly string[] VoyageQuitEntry = ["Quit", "やめる", "取消", "Beenden", "Annuler", "그만두기"];
-    internal static readonly string[] ChangeSubmersibleComponents = ["Change submersible components", "パーツの変更", "Bauteile austauschen", "Changer les éléments", "부품 변경","更换配件","更換配件"];
-    internal static readonly string[] RegisterSub = ["Outfit and register a submersible.", "潜水艦の新規登録", "Registrierung eines neuen Tauchboots", "Enregistrement d'un sous-marin", "새 잠수함 등록","登记新的潜水艇","登記新的潛水艇"]; 
+    internal static string[] AirshipManagement => field ??= MenuEntries(ManagementText(721154), "管理飛空艇");
+    internal static string[] SubmarineManagement => field ??= MenuEntries(ManagementText(721343), "管理潛水艇");
+    internal static string[] CancelVoyage => field ??= MenuEntries(AddonText(2), "取消");
+    internal static string[] NothingVoyage => field ??= MenuEntries(DialogueText(AirshipDialogue, 5)?.GetText(), DialogueText(SubmersibleDialogue, 6)?.GetText(), "取消");
+    internal static string[] DeployOnSubaquaticVoyage => field ??= MenuEntries(DialogueText(SubmersibleDialogue, 8)?.GetText(), "出發");
+    internal static string[] ViewPrevVoyageLog => field ??= MenuEntries(DialogueText(AirshipDialogue, 8)?.GetText(), DialogueText(SubmersibleDialogue, 9)?.GetText(), "上次的遠航報告");
+    internal static string[] VoyageQuitEntry => field ??= MenuEntries(AddonText(5), "取消");
+    internal static string[] ChangeSubmersibleComponents => field ??= MenuEntries(DialogueText(SubmersibleDialogue, 10)?.GetText(), "更換配件");
+    internal static bool RegisterSub(string text) => MatchesTemplate(text, DialogueText(SubmersibleDialogue, 3))
+        || text.StartsWithAny(["登記新的潛水艇"]);
 
-    internal static readonly string[] PanelAirship = ["Select an airship.", "飛空艇を選択してください。", "请选择飞空艇。", "請選擇飛空艇。", "Wähle ein Luftschiff.", "Choisissez un aéronef.", "비공정을 선택하십시오."];
-    internal static readonly string[] PanelSubmersible = ["Select a submersible.", "潜水艦を選択してください。", "请选择潜水艇。", "請選擇潛水艇。", "Wähle ein Tauchboot.", "Choisissez un sous-marin.", "잠수함을 선택하십시오."];
+    internal static bool PanelAirship(string text) => MatchesTemplate(text, DialogueText(AirshipDialogue, 1))
+        || text.ContainsAny(StringComparison.OrdinalIgnoreCase, ["請選擇飛空艇。"]);
+    internal static bool PanelSubmersible(string text) => MatchesTemplate(text, DialogueText(SubmersibleDialogue, 2))
+        || text.ContainsAny(StringComparison.OrdinalIgnoreCase, ["請選擇潛水艇。"]);
 
     //2004353	entrance to additional chambers	0	entrances to additional chambers	0	1	1	0	0
     internal static string[] AdditionalChambersEntrance =>
@@ -191,7 +185,7 @@ internal static class Lang
     //4160	60	9	0	False	Unable to retrieve extracted items. Insufficient inventory/crystal inventory space.
     internal static string VoyageInventoryError => Svc.Data.GetExcelSheet<LogMessage>().GetRow(4160).Text.ToDalamudString().GetText();
 
-    internal static string[] UnableToVisitWorld = ["Unable to execute command. Character is currently visiting the", "他のデータセンター", "无法进行该操作，其他玩家正在操作该潜水艇。", "無法進行該操作，其他玩家正在操作該潛水艇。", "Der Vorgang kann nicht ausgeführt werden, da der Charakter gerade das Datenzentrum", "Impossible d'exécuter cette commande. Le personnage se trouve dans un autre centre de traitement de données", "다른 데이터 센터"];
+    internal static bool UnableToVisitWorld(string text) => MatchesTemplate(text, Svc.Data.GetExcelSheet<LogMessage>()?.GetRowOrDefault(5800)?.Text);
 
     //4169	60	9	0	False	Unable to repair vessel component without the required <SheetEn(Item,3,IntegerParameter(1),1,1)/>.
     //4272	60	9	0	False Unable to repair vessel.Insufficient<SheetEn(Item,3,IntegerParameter(1),3,1)/>.
@@ -204,7 +198,9 @@ internal static class Lang
     //4169	60	9	0	False	Réparation impossible. Vous n'avez pas <SheetFr(Item,2,IntegerParameter(1),1,1)/> nécessaire.
     //4272	60	9	0	False	Vous n'avez pas <SheetFr(Item,2,IntegerParameter(1),1,1)/> nécessaire à la réparation.
 
-    internal static readonly string[] UnableToRepairVessel = ["修理に必要な", "修理所必需的", "Unable to repair vessel", "Du hast nicht genug", "Für die Reparatur ist", "Réparation impossible. Vous n'avez pas", "nécessaire à la réparation", "수리에 필요한"];
+    internal static bool UnableToRepairVessel(string text) => MatchesTemplate(text, Svc.Data.GetExcelSheet<LogMessage>()?.GetRowOrDefault(4169)?.Text)
+        || MatchesTemplate(text, Svc.Data.GetExcelSheet<LogMessage>()?.GetRowOrDefault(4272)?.Text)
+        || text.ContainsAny(StringComparison.OrdinalIgnoreCase, ["修理所必需的"]);
 
     //11	TEXT_HOUFIXCOMPANYSUBMARINE_00447_SUBMARINE_CMD_REPAIR_PARTS	パーツの修理
     //11	TEXT_HOUFIXCOMPANYSUBMARINE_00447_SUBMARINE_CMD_REPAIR_PARTS	Bauteile reparieren
@@ -215,19 +211,7 @@ internal static class Lang
     //10	TEXT_CMNDEFCOMPANYCOMMANDERBOARD_00258_AIRSHIP_CMD_REPAIR_PARTS	Réparer des éléments
     //10	TEXT_CMNDEFCOMPANYCOMMANDERBOARD_00258_AIRSHIP_CMD_REPAIR_PARTS	修理配件
 
-    internal static readonly string[] WorkshopRepair =
-    [
-        "Repair submersible components",
-        "Repair airship components",
-        "パーツの修理",
-        "Bauteile reparieren",
-        "Réparer des éléments",
-        "パーツの修理",
-        "Bauteile reparieren",
-        "Réparer des éléments",
-        "修理配件",
-        "부품 수리",
-    ];
+    internal static string[] WorkshopRepair => field ??= MenuEntries(DialogueText(AirshipDialogue, 10)?.GetText(), DialogueText(SubmersibleDialogue, 11)?.GetText(), "修理配件");
 
     //Use <If(Equal(IntegerParameter(4),1))>your last <SheetEn(Item,3,IntegerParameter(2),1,1)/><Else/><Value>IntegerParameter(3)</Value> of your <Value>IntegerParameter(4)</Value> <SheetEn(Item,3,IntegerParameter(2),2,1)/></If> to repair your vessel's <SheetEn(Item,3,IntegerParameter(1),1,1)/>?
     //6587	<If(Equal(IntegerParameter(3),1))><Clickable(<SheetDe(Item,2,IntegerParameter(2),1,4,1)/>)/><Else/><Value>IntegerParameter(3)</Value> <SheetDe(Item,5,IntegerParameter(2),2,4,1)/></If> (Besitz: <Value>IntegerParameter(4)</Value>) benutzen, um <SheetDe(Item,2,IntegerParameter(1),1,4,1)/> zu reparieren?
@@ -237,18 +221,8 @@ internal static class Lang
     消費:<Sheet(Item,IntegerParameter(2),0)/>×<Value>IntegerParameter(3)</Value>(所持数 <Value>IntegerParameter(4)</Value>)
     */
 
-    internal static readonly string[] WorkshopRepairConfirm =
-        [
-            "repair",
-            "下記のアイテムを修理しますか",
-            "reparieren",
-            "réparer",
-            "要修理下列部件吗",
-            "要修理下列部件嗎",
-            "要修理下列元件嗎",
-            "수리하시겠습니까?",
-            "要修理下列組件嗎",
-        ];
+    internal static bool WorkshopRepairConfirm(string text) => MatchesTemplate(text, Svc.Data.GetExcelSheet<Addon>()?.GetRowOrDefault(6587)?.Text)
+        || text.ContainsAny(StringComparison.OrdinalIgnoreCase, ["要修理下列部件嗎", "要修理下列元件嗎", "要修理下列組件嗎"]);
 
     // Use the components selected and <If(Equal(IntegerParameter(1),1))>the following item<Else/><Value>IntegerParameter(1)</Value> of the following items</If> to outfit and register your submersible?
     /* 6886 Das Tauchboot mit den gewählten Bauteilen registrieren?
@@ -260,18 +234,8 @@ internal static class Lang
        よろしいですか？
     */
 
-    internal static readonly string[] WorkshopRegisterConfirm =
-    [
-            "to outfit and register your submersible",
-            "枚消費して潜水艦を登録します",
-            "Das Tauchboot mit den gewählten Bauteilen registrieren",
-            "pour équiper et enregistrer le sous-marin",
-            "잠수함을 등록하시겠습니까",
-            "张下列道具登记新的潜水艇吗",
-            "張下列道具登記新的潛水艇嗎",
-            //"",
-            //""     (Addonsheet - 6886)
-    ];
+    internal static bool WorkshopRegisterConfirm(string text) => MatchesTemplate(text, Svc.Data.GetExcelSheet<Addon>()?.GetRowOrDefault(6886)?.Text)
+        || text.ContainsAny(StringComparison.OrdinalIgnoreCase, ["張下列道具登記新的潛水艇嗎"]);
 
     //Your retainer will be unable to process item buyback requests once recalled. Are you sure you wish to proceed?
     //215	TEXT_CMNDEFRETAINERCALL_00010_ASK_RETURN_WITH_BUYBACK	Wenn du deinen Gehilfen wegschickst, kannst du die von ihm verkauften Gegenstände nicht mehr zurückkaufen. Möchtest du trotzdem fortfahren?
@@ -285,7 +249,24 @@ internal static class Lang
     //3290	<Format(IntegerParameter(3),FF022E)/> Staatstaler gegen <If(Equal(IntegerParameter(2),1))><SheetDe(Item,1,IntegerParameter(1),1,4,1)/><Else/><Format(IntegerParameter(2),FF022E)/> <SheetDe(Item,5,IntegerParameter(1),2,4,1)/></If> eintauschen?
     //3290	Acheter <Value>IntegerParameter(2)</Value> <SheetFr(Item,12,IntegerParameter(1),IntegerParameter(2),1)/> pour <Format(IntegerParameter(3),FF05021D0103)/> sceau<If(LessThanOrEqualTo(IntegerParameter(3),1))><Else/>x</If><Indent/>?
 
-    internal static readonly string[] GCSealExchangeConfirm = ["Exchange", "よろしいですか？", "Staatstaler gegen", "Acheter", "要交换吗", "교환하시겠습니까", "要交換嗎"];
+    internal static bool GCSealExchangeConfirm(string text) => MatchesTemplate(text, Svc.Data.GetExcelSheet<Addon>()?.GetRowOrDefault(3290)?.Text)
+        || text.ContainsAny(StringComparison.OrdinalIgnoreCase, ["要交換嗎"]);
 
-    internal static readonly string[] DiscardItem = ["Discard", "を捨てます。", "wegwerfen", "Jeter", "确定要舍弃", "버리시겠습니까", "確定要捨棄"];
+    internal static bool DiscardItem(string text) => MatchesTemplate(text, Svc.Data.GetExcelSheet<Addon>()?.GetRowOrDefault(110)?.Text)
+        || MatchesTemplate(text, Svc.Data.GetExcelSheet<Addon>()?.GetRowOrDefault(153)?.Text)
+        || text.ContainsAny(StringComparison.OrdinalIgnoreCase, ["確定要捨棄"]);
+
+    private static string[] FuelNames => field ??= ItemNames(10155);
+
+    private static string[] ItemNames(uint row)
+    {
+        var item = Svc.Data.GetExcelSheet<Item>()?.GetRowOrDefault(row);
+        return MenuEntries(item?.Singular.GetText(), item?.Plural.GetText(), item?.Name.GetText());
+    }
+
+    internal static bool FuelPurchaseConfirm(string text) => MatchesTemplate(text, Svc.Data.GetExcelSheet<Addon>()?.GetRowOrDefault(3473)?.Text)
+        && FuelNames.Any(x => text.Contains(x, StringComparison.OrdinalIgnoreCase));
+
+    internal static bool RetainerMenu(string text) => MatchesTemplate(text, Svc.Data.GetExcelSheet<Addon>()?.GetRowOrDefault(2376)?.Text)
+        || MatchesTemplate(text, Svc.Data.GetExcelSheet<Addon>()?.GetRowOrDefault(2377)?.Text);
 }
