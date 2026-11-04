@@ -109,7 +109,7 @@ internal static unsafe class GCContinuation
             }
         }
         {
-            var x = Utils.GetSpecificYesno(x => x.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.GCSealExchangeConfirm));
+            var x = Utils.GetSpecificYesno(Lang.GCSealExchangeConfirm);
             if(x != null && EzThrottler.Throttle("GC ConfirmExchange"))
             {
                 new AddonMaster.SelectYesno((nint)x).Yes();
