@@ -56,7 +56,7 @@ internal static unsafe class MiniTA
 
     internal static void ConfirmRepair()
     {
-        var x = Utils.GetSpecificYesno((s) => s.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.WorkshopRepairConfirm));
+        var x = Utils.GetSpecificYesno((s) => s.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.WorkshopRepairConfirm) || Lang.IsAddon(s, 6587));
         if(x != null && Utils.GenericThrottle)
         {
             VoyageUtils.Log("Confirming repair");
@@ -66,7 +66,7 @@ internal static unsafe class MiniTA
 
     internal static void ConfirmRegister()
     {
-        var x = Utils.GetSpecificYesno((s) => s.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.WorkshopRegisterConfirm));
+        var x = Utils.GetSpecificYesno((s) => s.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.WorkshopRegisterConfirm) || Lang.IsAddon(s, 6886));
         if(x != null && Utils.GenericThrottle)
         {
             VoyageUtils.Log("Confirming registration");
