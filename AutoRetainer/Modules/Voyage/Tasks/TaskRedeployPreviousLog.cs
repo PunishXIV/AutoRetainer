@@ -35,7 +35,7 @@ internal static unsafe class TaskRedeployPreviousLog
                     if(req > have)
                     {
                         P.TaskManager.Abort();
-                        DuoLog.Warning($"[Voyage] You are out of fuel!");
+                        S.AnomalyWindow.Add($"[Voyage] You are out of fuel! Character excluded from submarine processing.");
                         Data.WorkshopEnabled = false;
                         P.TaskManager.BeginStack();
                         P.TaskManager.Enqueue(VoyageScheduler.CancelDeployVessel);

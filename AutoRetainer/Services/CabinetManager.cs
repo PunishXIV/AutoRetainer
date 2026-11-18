@@ -8,6 +8,7 @@ using ECommons.Throttlers;
 using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.Sheets;
 using System;
@@ -15,6 +16,7 @@ using System.Collections.Generic;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using TerraFX.Interop.Windows;
+using static FFXIVClientStructs.FFXIV.Client.Game.UI.Cabinet;
 using Cabinet = Lumina.Excel.Sheets.Cabinet;
 
 namespace AutoRetainer.Services;
@@ -26,11 +28,17 @@ public unsafe class CabinetManager : IDisposable
         Svc.AddonLifecycle.RegisterListener(AddonEvent.PreClose, ["Cabinet", "CabinetWithdraw"], OnCabinetClose);
     }
 
-    public bool ShouldExcludeItemFromProcessing(uint id)
+    public bool IsCabinetStateReady()
+    {
+        return false;
+    }
+
+    public bool ShouldExcludeItemFromProcessing(uint id, uint? condition)
     {
         if(Data.GetIMSettings(true).EnableCabinetAutoDelivery)
         {
-            if(this.CanStoreItemInCabinetForCurrentCharacter(id)) return true; 
+            if(condition != null && condition < 30000) return false;
+            if(this.CanStoreItemInCabinetForCurrentCharacter(id, condition)) return true; 
         }
         return false;
     }
@@ -42,6 +50,12 @@ public unsafe class CabinetManager : IDisposable
         OfflineDataManager.WriteOfflineData(false, true);
     }
 
+    public bool IsCabinetReady()
+    {
+        return UIState.Instance()->Cabinet.State == CabinetState.Loaded
+             && *(int*)((nint)(&UIState.Instance()->Cabinet) + 4) == (int)CabinetState.Loaded;
+    }
+
     /// <summary>
     /// Returns item IDs, not cabinet IDs
     /// </summary>
@@ -51,8 +65,7 @@ public unsafe class CabinetManager : IDisposable
     public bool TryGetStoredCabinetItems(out bool cached, out List<uint> items)
     {
         items = [];
-        var state = UIState.Instance()->Cabinet.State;
-        if(state == FFXIVClientStructs.FFXIV.Client.Game.UI.Cabinet.CabinetState.Loaded)
+        if(IsCabinetReady())
         {
             foreach(var x in Cabinet.Values)
             {
@@ -77,13 +90,15 @@ public unsafe class CabinetManager : IDisposable
         return false;
     }
 
-    public bool CanItemGoIntoCabinet(uint itemId)
+    public bool CanItemGoIntoCabinet(uint itemId, uint? condition)
     {
+        if(condition != null && condition < 30000) return false;
         return CabinetValidItems.Contains(itemId);
     }
 
-    public bool CanStoreItemInCabinetForCurrentCharacter(uint itemId)
+    public bool CanStoreItemInCabinetForCurrentCharacter(uint itemId, uint? condition)
     {
+        if(condition != null && condition < 30000) return false;
         return CabinetValidItems.Contains(itemId) && !Data.StoredCabinetItems.Contains(itemId) && !Utils.IsProtected(itemId);
     }
 
@@ -156,7 +171,7 @@ public unsafe class CabinetManager : IDisposable
                     if(item->GetConditionPercentage() == 100 && !Utils.IsProtected(item->ItemId))
                     {
                         var id = item->ItemId;
-                        if(CanItemGoIntoCabinet(id) && !storedItems.Contains(id) && !Utils.IsProtected(item->ItemId))
+                        if(CanItemGoIntoCabinet(id, item->Condition) && !storedItems.Contains(id) && !Utils.IsProtected(item->ItemId))
                         {
                             P.TaskManager.Insert(() =>
                             {
@@ -208,7 +223,7 @@ public unsafe class CabinetManager : IDisposable
                     if(item->GetConditionPercentage() == 100)
                     {
                         var id = item->ItemId;
-                        if(CanItemGoIntoCabinet(id) && !storedItems.Contains(id) && !Utils.IsProtected(id))
+                        if(CanItemGoIntoCabinet(id, item->Condition) && !storedItems.Contains(id) && !Utils.IsProtected(id))
                         {
                             return true;
                         }

@@ -3,6 +3,7 @@ using AutoRetainer.Scheduler.Tasks;
 using ECommons.Automation;
 using ECommons.Automation.UIInput;
 using ECommons.Throttlers;
+using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
@@ -19,6 +20,7 @@ internal static unsafe class BailoutManager
         [
         new("SelectYesno", TimeSpan.FromSeconds(30)),
         new("SelectString", TimeSpan.FromMinutes(7)),
+        new("Shop", TimeSpan.FromMinutes(5)),
         new("SelectIconString", TimeSpan.FromSeconds(30)),
         new("AirShipExplorationDetail", TimeSpan.FromSeconds(30)),
         new("AirShipExplorationResult", TimeSpan.FromSeconds(30)),
@@ -41,98 +43,126 @@ internal static unsafe class BailoutManager
 
     internal static void Tick()
     {
-        if(MultiMode.Active && !SchedulerMain.CharacterPostProcessLocked && !SchedulerMain.RetainerPostProcessLocked)
+        if(MultiMode.Active)
         {
-            RunStuckDetection();
-            RunPluginStateDetection();
+            if(!Svc.ClientState.IsLoggedIn && TryGetAddonByName<AtkUnitBase>("Dialogue", out _))
+            {
+                MultiMode.LastLogin = 0;
+            }
+            if(SchedulerMain.CharacterPostProcessLocked != null)
+            {
+                if(EzThrottler.Throttle("InformCharaPostprocessLocked", 60000))
+                {
+                    PluginLog.Information($"Character postprocess locked by {SchedulerMain.CharacterPostProcessLocked}");
+                }
+            }
+            if(SchedulerMain.RetainerPostProcessLocked != null)
+            {
+                if(EzThrottler.Throttle("InformRetainerPostProcessLocked", 60000))
+                {
+                    PluginLog.Information($"Retainer postprocess locked by {SchedulerMain.RetainerPostProcessLocked}");
+                }
+            }
+            var isNotPostprocessing = SchedulerMain.CharacterPostProcessLocked == null && SchedulerMain.RetainerPostProcessLocked == null;
+            if(isNotPostprocessing)
+            {
+                RunStuckDetection();
+                RunPluginStateDetection();
+            }
             foreach(var x in MonitoredAddons)
             {
                 if(!AddonOpenedAt.ContainsKey(x.Name)) AddonOpenedAt[x.Name] = Environment.TickCount64;
-                if(!TryGetAddonByName<AtkUnitBase>(x.Name, out _))
+                if(!TryGetAddonByName<AtkUnitBase>(x.Name, out var addon) || !isNotPostprocessing)
                 {
                     AddonOpenedAt[x.Name] = Environment.TickCount64;
                 }
-                if(AddonOpenedAt.TryGetValue(x.Name, out var value) && value != 0 && Environment.TickCount64 - value > x.Timeout.TotalMilliseconds)
+                if(isNotPostprocessing && AddonOpenedAt.TryGetValue(x.Name, out var value) && value != 0 && Environment.TickCount64 - value > x.Timeout.TotalMilliseconds)
                 {
                     Utils.CleanupOperations();
-                    S.AnomalyWindow.Add($"UI stuck during multi mode ({x}). Cleaning up operations and trying to resume.");
+                    var str = $"UI stuck during multi mode ({x}). Cleaning up operations and trying to resume.\nAddon: {(addon == null ? "Null" : $"ID: {addon->Id} {addon->NameString}, visible: {addon->IsVisible}, ready: {addon->IsReady()}")}";
+                    if(addon != null && addon->IsReady())
+                    {
+                        if(addon->NameString == "SelectYesno") str += $"\nPrompt: {new AddonMaster.SelectYesno(addon).Text}";
+                        if(addon->NameString == "SelectString") str += $"\nPrompt: {new AddonMaster.SelectString(addon).Text}";
+                    }
+                    S.AnomalyWindow.Add(str);
                     AddonOpenedAt.Clear();
                     break;
                 }
             }
-        }
-        if(C.EnableBailout)
-        {
-            if(SchedulerMain.PluginEnabled || (MultiMode.Enabled && VoyageUtils.IsInVoyagePanel()))
+            if(C.EnableBailout)
             {
-                if(!Utils.IsBusy && !VoyageScheduler.Enabled && TryGetAddonByName<AtkUnitBase>("SelectString", out var addon) && IsAddonReady(addon))
+                if(SchedulerMain.PluginEnabled || (MultiMode.Enabled && VoyageUtils.IsInVoyagePanel()))
                 {
-                    if(Environment.TickCount64 - NoSelectString > C.BailoutTimeout * 1000)
+                    if(!Utils.IsBusy && !VoyageScheduler.Enabled && TryGetAddonByName<AtkUnitBase>("SelectString", out var addon) && IsAddonReady(addon))
                     {
-                        if(Utils.GenericThrottle)
-                        {
-                            DuoLog.Warning($"[Bailout] Closing stuck SelectString window");
-                            Callback.Fire(addon, true, -1);
-                            NoSelectString = Environment.TickCount64;
-                        }
-                    }
-                }
-                else
-                {
-                    NoSelectString = Environment.TickCount64;
-                }
-            }
-
-            if(!Svc.ClientState.IsLoggedIn && C.EnableCharaSelectBailout)
-            {
-                if(MultiMode.Enabled)
-                {
-                    var lobby = AgentLobby.Instance();
-                    if(!Utils.IsBusy && !TryGetAddonByName<AtkUnitBase>("SelectOk", out _) && TryGetAddonByName<AtkUnitBase>("_CharaSelectReturn", out var addon) && IsAddonReady(addon) && (!lobby->AgentInterface.IsAgentActive() || !lobby->TemporaryLocked))
-                    {
-                        if(Environment.TickCount64 - CharaSelectStuck > 10 * 1000)
+                        if(Environment.TickCount64 - NoSelectString > C.BailoutTimeout * 1000)
                         {
                             if(Utils.GenericThrottle)
                             {
-                                DuoLog.Warning($"[Bailout] Backing out of CharaSelect");
-                                addon->GetComponentButtonById(4)->ClickAddonButton(addon);
-                                CharaSelectStuck = Environment.TickCount64;
-                                EzThrottler.Throttle("MultiModeAfkOnTitleLogin", 60000, true);
-                                IsLogOnTitleEnabled = true;
-                                S.AnomalyWindow.Add("Stuck character select encountered. Retrying login...");
+                                DuoLog.Warning($"[Bailout] Closing stuck SelectString window");
+                                Callback.Fire(addon, true, -1);
+                                NoSelectString = Environment.TickCount64;
                             }
                         }
                     }
                     else
                     {
-                        CharaSelectStuck = Environment.TickCount64;
+                        NoSelectString = Environment.TickCount64;
                     }
                 }
-                else
-                {
-                    IsLogOnTitleEnabled = false;
-                    CharaSelectStuck = long.MaxValue;
-                }
-            }
 
-            if(!Svc.ClientState.IsLoggedIn && C.ResolveConnectionErrors && MultiMode.Enabled)
-            {
-                if(Utils.GetRemainingSessionMiliSeconds() > 10 * 60 * 1000)
+                if(!Svc.ClientState.IsLoggedIn && C.EnableCharaSelectBailout)
                 {
-                    if(TryGetAddonByName<AtkUnitBase>("Dialogue", out var addon) && IsAddonReady(addon))
+                    if(MultiMode.Enabled)
                     {
-                        if(EzThrottler.Throttle("ClickDialogueOk", 10000))
+                        var lobby = AgentLobby.Instance();
+                        if(!Utils.IsBusy && !TryGetAddonByName<AtkUnitBase>("SelectOk", out _) && TryGetAddonByName<AtkUnitBase>("_CharaSelectReturn", out var addon) && IsAddonReady(addon) && (!lobby->AgentInterface.IsAgentActive() || !lobby->TemporaryLocked))
                         {
-                            addon->GetComponentButtonById(4)->ClickAddonButton(addon);
-                            EzThrottler.Throttle("MultiModeAfkOnTitleLogin", 60000, true);
-                            IsLogOnTitleEnabled = true;
-                            S.AnomalyWindow.Add("Disconnected. Trying to log back in...");
+                            if(Environment.TickCount64 - CharaSelectStuck > 10 * 1000)
+                            {
+                                if(Utils.GenericThrottle)
+                                {
+                                    DuoLog.Warning($"[Bailout] Backing out of CharaSelect");
+                                    addon->GetComponentButtonById(4)->ClickAddonButton(addon);
+                                    CharaSelectStuck = Environment.TickCount64;
+                                    EzThrottler.Throttle("MultiModeAfkOnTitleLogin", 60000, true);
+                                    IsLogOnTitleEnabled = true;
+                                    S.AnomalyWindow.Add("Stuck character select encountered. Retrying login...");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            CharaSelectStuck = Environment.TickCount64;
                         }
                     }
+                    else
+                    {
+                        IsLogOnTitleEnabled = false;
+                        CharaSelectStuck = long.MaxValue;
+                    }
                 }
-                else if(EzThrottler.Throttle("NotifyRestart", TimeSpan.FromDays(10)))
+
+                if(!Svc.ClientState.IsLoggedIn && C.ResolveConnectionErrors && MultiMode.Enabled)
                 {
-                    S.AnomalyWindow.Add("You need to restart your game to continue playing.");
+                    if(Utils.GetRemainingSessionMiliSeconds() > 10 * 60 * 1000)
+                    {
+                        if(TryGetAddonByName<AtkUnitBase>("Dialogue", out var addon) && IsAddonReady(addon))
+                        {
+                            if(EzThrottler.Throttle("ClickDialogueOk", 10000))
+                            {
+                                addon->GetComponentButtonById(4)->ClickAddonButton(addon);
+                                EzThrottler.Throttle("MultiModeAfkOnTitleLogin", 60000, true);
+                                IsLogOnTitleEnabled = true;
+                                S.AnomalyWindow.Add("Disconnected. Trying to log back in...");
+                            }
+                        }
+                    }
+                    else if(EzThrottler.Throttle("NotifyRestart", TimeSpan.FromDays(10)))
+                    {
+                        S.AnomalyWindow.Add("You need to restart your game to continue playing.");
+                    }
                 }
             }
         }
@@ -165,6 +195,7 @@ internal static unsafe class BailoutManager
     public static long LastRefreshTime = 0;
     public static void RunStuckDetection()
     {
+        if(!Player.Available) return;
         if(!EzThrottler.Check("NoMoveCheck")) return;
         var isMoving = AgentMap.Instance()->IsPlayerMoving;
         if(isMoving) EzThrottler.Throttle("ExtendIsMoving", 1000, true);

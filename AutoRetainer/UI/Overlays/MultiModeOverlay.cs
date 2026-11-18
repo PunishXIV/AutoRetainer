@@ -18,7 +18,7 @@ internal class MultiModeOverlay : Window
 
     public override bool DrawConditions()
     {
-        return !C.HideOverlayIcons && (P.TaskManager.IsBusy || P.IsNextToBell || MultiMode.Enabled || SchedulerMain.PluginEnabled || DisplayNotify || VoyageScheduler.Enabled || Shutdown.Active || SchedulerMain.CharacterPostProcessLocked);
+        return !C.HideOverlayIcons && (P.TaskManager.IsBusy || P.IsNextToBell || MultiMode.Enabled || SchedulerMain.PluginEnabled || DisplayNotify || VoyageScheduler.Enabled || Shutdown.Active || SchedulerMain.CharacterPostProcessLocked != null);
     }
 
     private Vector2 StatusPanelSize => new(C.StatusBarIconWidth);
@@ -81,7 +81,7 @@ internal class MultiModeOverlay : Window
             }
             ImGui.SameLine();
         }
-        if(SchedulerMain.CharacterPostProcessLocked && ShouldDisplay())
+        if(SchedulerMain.CharacterPostProcessLocked != null && ShouldDisplay())
         {
             displayed = true;
             if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "processing.png"), out var t))
@@ -96,7 +96,7 @@ internal class MultiModeOverlay : Window
                     }
                     if(ImGui.IsItemClicked(ImGuiMouseButton.Right))
                     {
-                        SchedulerMain.CharacterPostProcessLocked = false;
+                        SchedulerMain.CharacterPostProcessLocked = null;
                     }
                     ImGui.SetTooltip("AutoRetainer is in postprocessing. \nLeft click - open AutoRetainer. \nRight click - abort.");
                 }
@@ -210,7 +210,7 @@ internal class MultiModeOverlay : Window
             }
             ImGui.SameLine();
         }
-        if(C.NightMode && MultiMode.Enabled && ShouldDisplay())
+        if(Utils.IsNightModeActive() && MultiMode.Enabled && ShouldDisplay())
         {
             displayed = true;
             if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "Night.png"), out var t))

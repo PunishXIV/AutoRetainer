@@ -41,7 +41,7 @@ public unsafe static class TaskVendorItems
                     var slot = inv->GetInventorySlot(i);
                     if(slot != null && slot->ItemId != 0)
                     {
-                        if(Utils.IsItemSellableByHardList(slot->ItemId, slot->Quantity))
+                        if(Utils.IsItemSellableByHardList(slot->ItemId, slot->Quantity, slot->Condition))
                         {
                             return true;
                         }

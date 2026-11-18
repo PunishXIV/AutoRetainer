@@ -26,11 +26,11 @@ internal static class TaskWithdrawGil
         {
             TaskWaitSelectString.Enqueue(C.RetainerMenuDelay);
         }
-        P.TaskManager.Enqueue(() => HasGil == false ? true : RetainerHandlers.SelectEntrustGil());
-        P.TaskManager.Enqueue(() => HasGil == false ? true : GenericHandlers.Throttle(500));
-        P.TaskManager.Enqueue(() => HasGil == false ? true : GenericHandlers.WaitFor(500));
-        P.TaskManager.Enqueue(() => HasGil == false ? true : RetainerHandlers.SetWithdrawGilAmount(percent));
-        P.TaskManager.Enqueue(() => HasGil == false ? true : RetainerHandlers.ProcessBankOrCancel());
+        P.TaskManager.Enqueue(() => !HasGil ? true : RetainerHandlers.SelectEntrustGil());
+        P.TaskManager.Enqueue(() => !HasGil ? true : GenericHandlers.Throttle(500));
+        P.TaskManager.Enqueue(() => !HasGil ? true : GenericHandlers.WaitFor(500));
+        P.TaskManager.Enqueue(() => !HasGil ? true : RetainerHandlers.SetWithdrawGilAmount(percent));
+        P.TaskManager.Enqueue(() => !HasGil ? true : RetainerHandlers.ProcessBankOrCancel());
         P.TaskManager.Enqueue(() => { forceCheck = false; return true; });
     }
 

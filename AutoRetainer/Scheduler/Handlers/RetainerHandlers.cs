@@ -8,10 +8,12 @@ using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.Sheets;
+using Lumina.Excel.Sheets.Experimental;
 using Microsoft.VisualBasic.ApplicationServices;
 using System.Text.RegularExpressions;
 using TerraFX.Interop.Windows;
 using static FFXIVClientStructs.FFXIV.Client.UI.RaptureAtkHistory.Delegates;
+using RetainerTask = Lumina.Excel.Sheets.RetainerTask;
 
 namespace AutoRetainer.Scheduler.Handlers;
 
@@ -279,29 +281,23 @@ internal static unsafe class RetainerHandlers
 
     internal static bool? SetWithdrawGilAmount(int percent)
     {
-        if(TryGetAddonByName<AtkUnitBase>("Bank", out var addon) && IsAddonReady(addon) && Utils.TryGetCurrentRetainer(out var name) && Utils.TryGetRetainerByName(name, out var retainer))
+        if(TryGetAddonMaster<AddonMaster.Bank>(out var m) && m.IsAddonReady && Utils.TryGetCurrentRetainer(out var name) && Utils.TryGetRetainerByName(name, out var retainer))
         {
             if(percent < 1 || percent > 100) throw new ArgumentOutOfRangeException(nameof(percent), percent, "Percent must be between 1 and 100");
-            if(uint.TryParse(GenericHelpers.ReadSeString(&addon->UldManager.NodeList[27]->GetAsAtkTextNode()->NodeText).GetText().RemoveOtherChars("0123456789"), out var numGil))
+            var numGil = m.Addon->AtkValues[6].Int;
+            DebugLog($"Gil: {numGil}");
+            var gilToWithdraw = (uint)(percent == 100 ? numGil : (double)numGil / 100d * percent);
+            if(gilToWithdraw > 0 && gilToWithdraw <= numGil)
             {
-                DebugLog($"Gil: {numGil}");
-                var gilToWithdraw = (uint)(percent == 100 ? numGil : numGil / 100f * percent);
-                if(gilToWithdraw > 0 && gilToWithdraw <= numGil)
+                if(Utils.GenericThrottle)
                 {
-                    if(Utils.GenericThrottle)
+                    var v = stackalloc AtkValue[]
                     {
-                        var v = stackalloc AtkValue[]
-                        {
                             new() { Type = AtkValueType.Int, Int = 3 },
                             new() { Type = AtkValueType.UInt, UInt = gilToWithdraw }
                         };
-                        addon->FireCallback(2, v);
-                        DebugLog($"Set gil to withdraw {gilToWithdraw} (total: {numGil})");
-                        return true;
-                    }
-                }
-                else
-                {
+                    m.Addon->FireCallback(2, v);
+                    DebugLog($"Set gil to withdraw {gilToWithdraw} (total: {numGil})");
                     return true;
                 }
             }
@@ -415,52 +411,27 @@ internal static unsafe class RetainerHandlers
 
     internal static bool? ProcessBankOrCancel(bool forceCancel = false)
     {
-        if(TryGetAddonByName<AtkUnitBase>("Bank", out var addon) && IsAddonReady(addon))
+        if(TryGetAddonMaster<AddonMaster.Bank>(out var m))
         {
-            var withdraw = (AtkComponentButton*)addon->UldManager.NodeList[3]->GetComponent();
-            if(addon->UldManager.NodeList[3]->IsVisible() && withdraw->IsEnabled && !forceCancel)
+            if(m.IsAddonReady)
             {
-                if(Utils.GenericThrottle)
+                if(forceCancel || m.InputNumeric->Value == 0)
                 {
-                    var v = stackalloc AtkValue[]
-                    {
-                        new() { Type = AtkValueType.Int, Int = 0 },
-                        new() { Type = 0, Int = 0 }
-                    };
-                    addon->FireCallback(2, v);
-                    addon->Close(true);
-
-                    DebugLog($"Clicked withdraw");
-                    //new ClickButtonGeneric(addon, "Bank").Click(withdraw);
-                    return true;
+                    if(Utils.GenericThrottle) m.Cancel();
+                    return false;
+                }
+                if(m.ProceedButton->IsEnabled)
+                {
+                    if(Utils.GenericThrottle) m.Proceed();
+                    return false;
                 }
             }
-            else
-            {
-                var cancel = (AtkComponentButton*)addon->UldManager.NodeList[2]->GetComponent();
-                if(addon->UldManager.NodeList[2]->IsVisible() && cancel->IsEnabled)
-                {
-                    if(Utils.GenericThrottle)
-                    {
-                        var v = stackalloc AtkValue[]
-                    {
-                            new() { Type = AtkValueType.Int, Int = 1 },
-                            new() { Type = 0, Int = 0 }
-                        };
-                        addon->FireCallback(2, v);
-                        addon->Close(true);
-                        DebugLog($"Clicked cancel");
-                        //new ClickButtonGeneric(addon, "Bank").Click(cancel);
-                        return true;
-                    }
-                }
-            }
+            return false;
         }
         else
         {
-            Utils.RethrottleGeneric();
+            return true;
         }
-        return false;
     }
 
     public static bool? GenericSelectByName(params string[] text)

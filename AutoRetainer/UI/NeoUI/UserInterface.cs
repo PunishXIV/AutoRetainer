@@ -22,6 +22,7 @@ public sealed unsafe class UserInterface : NeoUIEntry
         .Checkbox("Display only most significant icon in status bar", () => ref C.StatusBarMSI)
         .SliderInt(120f, "Status bar icon size", () => ref C.StatusBarIconWidth, 32, 128)
         .Checkbox("Open AutoRetainer window on game start", () => ref C.DisplayOnStart)
+        .Checkbox("Open UI at plugin start", () => ref C.WindowDefaultOpen)
         //.Checkbox("Skip item sell/trade confirmation while plugin is active", () => ref C.SkipItemConfirmations)
         .Checkbox("Enable title screen button (requires plugin restart)", () => ref C.UseTitleScreenButton)
         .Checkbox("Hide character search", () => ref C.NoCharaSearch)
@@ -37,7 +38,4 @@ public sealed unsafe class UserInterface : NeoUIEntry
         .Checkbox("Enable", () => ref C.EnableDeployablesSort)
         .TextWrapped("This is purely visual order and does not affects character processing in any way.")
         .Widget(() => UIUtils.DrawSortableEnumList("dorder", C.DeployablesVisualOrders));
-
-
-
 }

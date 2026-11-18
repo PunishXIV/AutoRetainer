@@ -3,7 +3,10 @@ using ECommons.Automation.NeoTaskManager;
 using ECommons.Events;
 using ECommons.EzEventManager;
 using ECommons.GameHelpers;
+using ECommons.Throttlers;
 using ECommons.UIHelpers;
+using ECommons.UIHelpers.AddonMasterImplementations;
+using FFXIVClientStructs.FFXIV.Client.UI.Info;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace AutoRetainer.Modules;
@@ -17,6 +20,38 @@ public sealed unsafe class FCPointsUpdater
         ProperOnLogin.RegisterInteractable(() => ScheduleUpdateIfNeeded(), true);
         new EzLogout(() => TaskManager.Abort());
         new EzTerritoryChanged((x) => ScheduleUpdateIfNeeded());
+    }
+
+    public bool SelectFCChestTab(int num)
+    {
+        if(TryGetAddonMaster<AddonMaster.FreeCompanyChest>("FreeCompanyChest", out var m) && m.IsAddonReady)
+        {
+            var reader = new ReaderFreeCompanyChest(m.Addon);
+            if(reader.Ready)
+            {
+                PluginLog.Debug($"Clicking button {num}");
+                var button = m.ItemsButtons[num];
+                if(button != null)
+                {
+                    if(EzThrottler.Throttle("FCButton"))
+                    {
+                        button.Select();
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public int GetFCChestNum()
+    {
+        var rank = InfoProxyFreeCompany.Instance()->Rank;
+        if(rank >= 15) return 5;
+        if(rank >= 10) return 4;
+        if(rank >= 3) return 3;
+        if(rank >= 1) return 2;
+        return 0;
     }
 
     public bool IsFCChestReady()

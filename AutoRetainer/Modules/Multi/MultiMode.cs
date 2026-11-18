@@ -32,10 +32,10 @@ internal static unsafe class MultiMode
 
     public static (string Name, string World)? ExpectedCharacter = null;
 
-    internal static bool WaitOnLoginScreen => C.MultiWaitOnLoginScreen || BailoutManager.IsLogOnTitleEnabled || C.NightMode;
+    internal static bool WaitOnLoginScreen => C.MultiWaitOnLoginScreen || (BailoutManager.IsLogOnTitleEnabled && !Svc.ClientState.IsLoggedIn) || Utils.IsNightModeActive();
 
-    internal static bool EnabledRetainers => Utils.GetActiveMultiModeType().EqualsAny(MultiModeType.Retainers, MultiModeType.Everything) && !VoyageUtils.IsRetainerBlockedByVoyage() && (!C.NightMode || C.NightModeRetainers);
-    internal static bool EnabledSubmarines => Utils.GetActiveMultiModeType().EqualsAny(MultiModeType.Submersibles, MultiModeType.Everything) && (!C.NightMode || C.NightModeDeployables);
+    internal static bool EnabledRetainers => Utils.GetActiveMultiModeType().EqualsAny(MultiModeType.Retainers, MultiModeType.Everything) && !VoyageUtils.IsRetainerBlockedByVoyage() && (!Utils.IsNightModeActive() || C.NightModeRetainers);
+    internal static bool EnabledSubmarines => Utils.GetActiveMultiModeType().EqualsAny(MultiModeType.Submersibles, MultiModeType.Everything) && (!Utils.IsNightModeActive() || C.NightModeDeployables);
 
     internal static bool Synchronize = false;
     internal static long NextInteractionAt { get; private set; } = 0;
@@ -93,7 +93,7 @@ internal static unsafe class MultiMode
                 if(!TaskTeleportToProperty.ShouldVoidHET()) TaskNeoHET.Enqueue(null);
             }
             MultiModeUI.JustRelogged = true;
-            if(!MultiMode.Enabled && C.HETWhenDisabled && CanHETRaw)
+            if(!MultiMode.Enabled && C.HETWhenDisabled && CanHETRaw && Data.ShouldHETBySettings())
             {
                 TaskNeoHET.Enqueue(null);
             }
@@ -108,13 +108,13 @@ internal static unsafe class MultiMode
         }
     }
 
-    internal static void BailoutNightMode()
+    internal static void BailoutNightMode(bool activate = true)
     {
         if(!C.NightMode && !C.MultiWaitOnLoginScreen && C.EnableBailout)
         {
             BailoutManager.IsLogOnTitleEnabled = true;
         }
-        if(C.NightMode)
+        if(C.NightMode && activate)
         {
             MultiMode.Enabled = true;
         }
@@ -139,7 +139,7 @@ internal static unsafe class MultiMode
         LastLogin = 0;
         if(!TaskTeleportToProperty.ShouldVoidHET())
         {
-            if(C.MultiHETOnEnable && Player.Available && CanHET)
+            if(C.MultiHETOnEnable && Player.Available && CanHET && Data.ShouldHETBySettings())
             {
                 TaskNeoHET.Enqueue(null);
             }
@@ -180,7 +180,7 @@ internal static unsafe class MultiMode
             }
             if(EzThrottler.Throttle("MultiNotify", 15000)) Utils.NotifyIfLifestreamIsNotInstalled("Multi Mode");
             ValidateAutoAfkSettings();
-            var shouldDisableRender = (C.MultiDisableRender && (!C.MultiDisableRenderNightModeOnly || C.NightMode) && (!C.MultiDisableRenderOnlyInactive || TerraFX.Interop.Windows.Windows.IsIconic((TerraFX.Interop.Windows.HWND)(*ECommonsMain.MainWindowHandle)) || CSFramework.Instance()->WindowInactive)) || P.TestRenderDisable;
+            var shouldDisableRender = (C.MultiDisableRender && (!C.MultiDisableRenderNightModeOnly || Utils.IsNightModeActive()) && (!C.MultiDisableRenderOnlyInactive || TerraFX.Interop.Windows.Windows.IsIconic((TerraFX.Interop.Windows.HWND)(*ECommonsMain.MainWindowHandle)) || CSFramework.Instance()->WindowInactive)) || P.TestRenderDisable;
             if(shouldDisableRender)
             {
                 RenderDisableManager.PlaceRequest();
@@ -299,6 +299,7 @@ internal static unsafe class MultiMode
                 {
                     data.Enabled = false;
                     data.WorkshopEnabled = false;
+                    S.AnomalyWindow.Add("Too many interaction errors, current character is excluded.");
                     DuoLog.Warning("Too many errors, current character is excluded.");
                     Interactions.Clear();
                     return;
@@ -307,6 +308,7 @@ internal static unsafe class MultiMode
                 {
                     Enabled = false;
                     data.WorkshopEnabled = false;
+                    S.AnomalyWindow.Add("Unknown error. Character is excluded.");
                     DuoLog.Error("Fatal error. Please report this with logs.");
                     Interactions.Clear();
                     return;
@@ -317,8 +319,9 @@ internal static unsafe class MultiMode
             var eligibleForMirage = CanMirageDeliver() && EzThrottler.Check($"MirageDeliver_{Data.Identity}");
             if(ProperOnLogin.PlayerPresent && !P.TaskManager.IsBusy)
             {
-                if(!Utils.IsInventoryFree() && !eligibleForGcDelivery && !eligibleForCabinet)
+                if(!Utils.IsInventoryFree() && !eligibleForGcDelivery && !eligibleForCabinet && !eligibleForMirage)
                 {
+                    S.AnomalyWindow.Add("AutoRetainer has detemined that you lack sufficient inventory space and no suitable cleanup method is found, therefore retainer processing was disabled.");
                     Data.Enabled = false;
                 }
             }
@@ -460,6 +463,7 @@ internal static unsafe class MultiMode
             canDeliver = GCContinuation.DoesInventoryHaveDeliverableItem(Utils.PlayerInvetories);
         }
         if(C.FullAutoGCDeliveryDeliverOnVentureExhaust && InventoryManager.Instance()->GetInventoryItemCount(GCContinuation.VentureItem) <= C.FullAutoGCDeliveryDeliverOnVentureLessThan) canDeliver = true;
+        if(C.FullAutoGCDeliveryDeliverOnCeruleumExhaust && InventoryManager.Instance()->GetInventoryItemCount(10155) <= C.FullAutoGCDeliveryDeliverOnCeruleumLessThan && C.FCData.TryGetValue(Data.FCID, out var fcid) && fcid.FCPoints < C.FullAutoGCDeliveryDeliverOnFcPointsLessThan) canDeliver = true;
         return canDeliver;
     }
 
@@ -575,9 +579,9 @@ internal static unsafe class MultiMode
         {
             ErrorMessage = "AutoRetainer is processing tasks";
         }
-        else if(SchedulerMain.CharacterPostProcessLocked)
+        else if(SchedulerMain.CharacterPostProcessLocked != null)
         {
-            ErrorMessage = "Currently in post-processing of character";
+            ErrorMessage = $"Currently in post-processing of character by {SchedulerMain.CharacterPostProcessLocked}";
         }
         /*else if (data != null && !data.Index.InRange(1, 9))
         {
@@ -648,6 +652,16 @@ internal static unsafe class MultiMode
     internal static List<OfflineCharacterData> GetRetainerSortedOfflineDatas(bool sort)
     {
         var data = C.OfflineData.Where(x => !x.IsLockedOut()).ToList();
+
+        if(C.MultiPreferredCharLast)
+        {
+            var pref = data.FirstOrDefault(x => x.Preferred);
+            if(pref != null)
+            {
+                data.Remove(pref);
+                data.Add(pref);
+            }
+        }
         if(sort)
         {
             if(C.CharEqualize)
@@ -689,15 +703,6 @@ internal static unsafe class MultiMode
                 }
                 data.RemoveAll(levelling.Contains);
                 data = [.. levelling, .. data, .. capped];
-            }
-        }
-        if(C.MultiPreferredCharLast)
-        {
-            var pref = data.FirstOrDefault(x => x.Preferred);
-            if(pref != null)
-            {
-                data.Remove(pref);
-                data.Add(pref);
             }
         }
         return data;
@@ -813,12 +818,23 @@ internal static unsafe class MultiMode
         if(!ProperOnLogin.PlayerPresent) return false;
         if(C.OfflineData.TryGetFirst(x => x.CID == Svc.ClientState.LocalContentId, out var data))
         {
-            if(Svc.ClientState.LocalPlayer.HomeWorld.RowId == Svc.ClientState.LocalPlayer.CurrentWorld.RowId && Utils.GetVenturesAmount() >= data.GetNeededVentureAmount() && Utils.IsInventoryFree() && Utils.GetReachableRetainerBell(true) != null)
+            var atHomeWorld = Svc.ClientState.LocalPlayer.HomeWorld.RowId == Svc.ClientState.LocalPlayer.CurrentWorld.RowId;
+            var sufficientVentures = Utils.GetVenturesAmount() >= data.GetNeededVentureAmount();
+            var isInventoryFree = Utils.IsInventoryFree();
+            var isBellReachable = Utils.GetReachableRetainerBell(true) != null;
+            if(atHomeWorld && sufficientVentures && isInventoryFree && isBellReachable)
             {
                 return true;
             }
             if(!ro)
             {
+                S.AnomalyWindow.Add($"""
+                    Character state validation failed, therefore retainer processing was disabled.
+                    At home world: {atHomeWorld} (home: {Svc.ClientState.LocalPlayer.HomeWorld.ValueNullable?.Name}, current: {Svc.ClientState.LocalPlayer.CurrentWorld.ValueNullable?.Name})
+                    Has sufficient ventures: {sufficientVentures} (has: {Utils.GetVenturesAmount()}, needed: {data.GetNeededVentureAmount()})
+                    Is inventory free: {isInventoryFree} (slots available: {Utils.GetInventoryFreeSlotCount()}, needed {C.MultiMinInventorySlots}):
+                    Is bell reachable: {isBellReachable} ({Utils.GetReachableRetainerBell(true)})
+                    """);
                 data.Enabled = false;
             }
         }

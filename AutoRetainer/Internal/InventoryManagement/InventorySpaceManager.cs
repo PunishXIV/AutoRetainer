@@ -86,9 +86,9 @@ public static unsafe class InventorySpaceManager
         return SellSlotTasks.Any(x => x.InventoryType == type && x.Slot == slot);
     }
 
-    public static void EnqueueSoftItemIfAllowed(uint ItemId, uint Quantity)
+    public static void EnqueueSoftItemIfAllowed(uint ItemId, uint Quantity, uint? condition)
     {
-        if(S.CabinetManager.ShouldExcludeItemFromProcessing(ItemId)) return;
+        if(Utils.ShouldExcludeItemByMirageOrCabinet(ItemId, condition)) return;
         var im = InventoryManager.Instance();
         foreach(var invType in InventorySpaceManager.GetAllowedToSellInventoryTypes())
         {
@@ -123,7 +123,7 @@ public static unsafe class InventorySpaceManager
                 {
                     if((Data.GetIMSettings().IMAutoVendorHard.Contains(item.ItemId) || (softAsHard && Data.GetIMSettings().IMAutoVendorSoft.Contains(item.ItemId))) 
                         && !TaskDesynthItems.DesynthEligible(item.ItemId)
-                        && !S.CabinetManager.ShouldExcludeItemFromProcessing(item.ItemId))
+                        && !Utils.ShouldExcludeItemByMirageOrCabinet(item.ItemId, item.Condition))
                     {
                         var task = new SellSlotTask(invType, (uint)i, item.ItemId, item.Quantity);
                         PluginLog.Information($"Enqueueing {task} for hard sale");

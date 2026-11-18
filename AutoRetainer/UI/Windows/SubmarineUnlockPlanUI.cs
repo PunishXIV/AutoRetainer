@@ -75,8 +75,9 @@ internal unsafe class SubmarineUnlockPlanUI : Window
     internal bool IsSubDataAvail()
     {
         if(HousingManager.Instance()->WorkshopTerritory == null) return false;
-        if(HousingManager.Instance()->WorkshopTerritory->Submersible.Data.Length == 0) return false;
-        if(HousingManager.Instance()->WorkshopTerritory->Submersible.Data[0].Name[0] == 0) return false;
+        if(HousingManager.Instance()->WorkshopTerritory->Submersible.DataPointers.Length == 0) return false;
+        if(HousingManager.Instance()->WorkshopTerritory->Submersible.DataPointers[0] == null) return false;
+        if(HousingManager.Instance()->WorkshopTerritory->Submersible.DataPointers[0].Value->Name[0] == 0) return false;
         return true;
     }
 

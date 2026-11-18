@@ -66,13 +66,13 @@ internal static class IPC
     private static void FinishRetainerPostprocessRequest()
     {
         Log("Received retainer postprocess request finish");
-        SchedulerMain.RetainerPostProcessLocked = false;
+        SchedulerMain.RetainerPostProcessLocked = null;
     }
 
     private static void FinishCharacterPostprocessRequest()
     {
         Log("Received character postprocess request finish");
-        SchedulerMain.CharacterPostProcessLocked = false;
+        SchedulerMain.CharacterPostProcessLocked = null;
     }
 
     private static void RequestRetainerPostprocess(string pluginName)

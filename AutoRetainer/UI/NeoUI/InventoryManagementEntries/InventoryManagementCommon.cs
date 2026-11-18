@@ -47,6 +47,16 @@ public unsafe class InventoryManagementCommon
             }
         }
         ImGuiEx.Tooltip("Hold CTRL and click");
+        ImGui.SameLine();
+        if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Trash, "Clear list", ImGuiEx.Ctrl))
+        {
+            for(var i = itemList.Count - 1; i >= 0; i--)
+            {
+                var x = itemList[i];
+                removeAction(x);
+            }
+        }
+        ImGuiEx.Tooltip("Hold CTRL and click");
         ImGuiEx.TreeNodeCollapsingHeader("Mass addition/removal", () =>
         {
             ImGui.SetNextItemWidth(200f);

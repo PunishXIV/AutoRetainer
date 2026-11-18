@@ -5,6 +5,7 @@ using AutoRetainer.UI.Windows;
 using AutoRetainerAPI.Configuration;
 using Dalamud.Game;
 using ECommons;
+using ECommons.Configuration;
 using ECommons.Interop;
 using ECommons.MathHelpers;
 using Lumina.Excel.Sheets;
@@ -14,6 +15,7 @@ using OpenFileDialog = ECommons.Interop.OpenFileDialog;
 using VesselDescriptor = (ulong CID, string VesselName);
 
 namespace AutoRetainer.UI.NeoUI;
+
 public class DeployablesTab : NeoUIEntry
 {
     public override string Path => "Deployables";
@@ -32,6 +34,7 @@ public class DeployablesTab : NeoUIEntry
         .Checkbox($"Resend vessels when accessing the Voyage Control Panel", () => ref C.SubsAutoResend2)
         .Checkbox($"Finalize all vessels before resending them", () => ref C.FinalizeBeforeResend)
         .Checkbox($"Hide Airships from Deployables UI", () => ref C.HideAirships)
+        .Checkbox("Show characters that don't have any deployables", () => ref C.ShowAllInWorkshop)
 
         .Section("Plans")
         .Widget(SubmarineUnlockPlanUI.DrawButtonText, x =>
@@ -100,15 +103,27 @@ public class DeployablesTab : NeoUIEntry
                 List<string[]> data = [];
                 foreach(var x in C.OfflineData)
                 {
-                    if(!x.WorkshopEnabled && exportEnabledCharas) continue;
+                    if(!x.WorkshopEnabled && exportEnabledCharas)
+                    {
+                        continue;
+                    }
+
                     var entry = "".CreateArray((uint)headers.Length);
                     entry[0] = x.NameWithWorld;
                     var list = x.GetVesselData(VoyageType.Submersible);
-                    if(list.Count == 0) continue;
-                    int i = 0;
+                    if(list.Count == 0)
+                    {
+                        continue;
+                    }
+
+                    var i = 0;
                     foreach(var sub in list)
                     {
-                        if(exportEnabledSubs && !x.EnabledSubs.Contains(sub.Name)) continue;
+                        if(exportEnabledSubs && !x.EnabledSubs.Contains(sub.Name))
+                        {
+                            continue;
+                        }
+
                         var a = x.GetAdditionalVesselData(sub.Name, VoyageType.Submersible); ;
                         if(a != null)
                         {
@@ -128,7 +143,10 @@ public class DeployablesTab : NeoUIEntry
                             }
                             entry[i + 9] = $"{points.Join("").Trim()}";
                             i++;
-                            if(i > 3) break;
+                            if(i > 3)
+                            {
+                                break;
+                            }
                         }
                     }
                     data.Add(entry);
@@ -141,7 +159,7 @@ public class DeployablesTab : NeoUIEntry
                         name = $"{name}.csv";
                     }
                     Utils.WriteCsv(name, headers, data);
-                }, title: "Save as...", fileTypes: [("Comma-separated values", ["csv"])], save:true);
+                }, title: "Save as...", fileTypes: [("Comma-separated values", ["csv"])], save: true);
             }
         });
     }
@@ -164,8 +182,16 @@ public class DeployablesTab : NeoUIEntry
             ImGui.InputTextWithHint("##searchSubs", "Character search", ref search, 100);
             foreach(var x in C.OfflineData)
             {
-                if(x.ExcludeWorkshop) continue;
-                if(search.Length > 0 && !$"{x.Name}@{x.World}".Contains(search, StringComparison.OrdinalIgnoreCase)) continue;
+                if(x.ExcludeWorkshop)
+                {
+                    continue;
+                }
+
+                if(search.Length > 0 && !$"{x.Name}@{x.World}".Contains(search, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
                 if(x.OfflineSubmarineData.Count > 0)
                 {
                     ImGui.PushID(x.CID.ToString());
@@ -189,7 +215,13 @@ public class DeployablesTab : NeoUIEntry
         if(ImGuiEx.IconButtonWithText((FontAwesomeIcon)'\uf055', "Select All"))
         {
             SelectedVessels.Clear();
-            foreach(var x in C.OfflineData) foreach(var v in x.OfflineSubmarineData) SelectedVessels.Add((x.CID, v.Name));
+            foreach(var x in C.OfflineData)
+            {
+                foreach(var v in x.OfflineSubmarineData)
+                {
+                    SelectedVessels.Add((x.CID, v.Name));
+                }
+            }
         }
         ImGui.Separator();
         ImGuiEx.TextV("By level:");
@@ -398,7 +430,34 @@ public class DeployablesTab : NeoUIEntry
     {
         ImGui.Checkbox("Enable automatic sub registration", ref C.EnableAutomaticSubRegistration);
         ImGui.Checkbox("Enable automatic components and plan change", ref C.EnableAutomaticComponentsAndPlanChange);
-        ImGuiEx.Text("Ranges:");
+        ImGui.SameLine();
+        ImGuiEx.TextV("Ranges:");
+        if(ImGuiEx.IconButton(FontAwesomeIcon.Copy, "Copy"))
+        {
+            Copy(EzConfig.DefaultSerializationFactory.Serialize(C.LevelAndPartsData));
+        }
+        ImGui.SameLine();
+        if(ImGuiEx.IconButton(FontAwesomeIcon.Paste, "Paste Override"))
+        {
+            try
+            {
+                var result = EzConfig.DefaultSerializationFactory.Deserialize<List<LevelAndPartsData>>(Paste());
+                if(result == null || result.ContainsNull())
+                {
+                    Notify.Error("Invalid data");
+                }
+                else
+                {
+                    C.LevelAndPartsData = result;
+                    Notify.Success("Pasted successfully");
+                }
+            }
+            catch(Exception e)
+            {
+                e.Log();
+            }
+        }
+
         for(var index = C.LevelAndPartsData.Count - 1; index >= 0; index--)
         {
             var entry = C.LevelAndPartsData[index];
@@ -449,9 +508,9 @@ public class DeployablesTab : NeoUIEntry
                 {
                     ImGui.SetNextItemWidth(150f);
                     if(ImGui.BeginCombo($"##unlockplan{entry.GUID}", C.SubmarineUnlockPlans.Any(x => x.GUID == entry.SelectedUnlockPlan)
-                                                                              ? C.SubmarineUnlockPlans.First(x => x.GUID == entry.SelectedUnlockPlan)
-                                                                                 .Name
-                                                                              : "Non selected", ImGuiComboFlags.HeightLarge))
+                    ? C.SubmarineUnlockPlans.First(x => x.GUID == entry.SelectedUnlockPlan)
+                        .Name
+                    : "Not selected", ImGuiComboFlags.HeightLarge))
                     {
                         foreach(var plan in C.SubmarineUnlockPlans)
                         {

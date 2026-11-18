@@ -22,9 +22,16 @@ internal unsafe class DebugVoyage : DebugSectionBase
                 var h = HousingManager.Instance()->WorkshopTerritory;
                 if(h != null)
                 {
-                    foreach(var x in h->Submersible.Data)
+                    foreach(var x in h->Submersible.DataPointers)
                     {
-                        ImGuiEx.Text($"{x.Name.Read()}/{x.ReturnTime}/{x.CurrentExplorationPoints.ToArray().Print()}");
+                        if(x.Value != null)
+                        {
+                            ImGuiEx.Text($"{x.Value->Name.Read()}/{x.Value->ReturnTime}/{x.Value->CurrentExplorationPoints.ToArray().Print()}");
+                        }
+                        else
+                        {
+                            ImGuiEx.Text("Null");
+                        }
                     }
                 }
                 if(ImGui.Button("Erase offline data"))
@@ -133,11 +140,11 @@ internal unsafe class DebugVoyage : DebugSectionBase
                     }
                 }
                 {
-                    var data = HousingManager.Instance()->WorkshopTerritory->Submersible.Data;
+                    var data = HousingManager.Instance()->WorkshopTerritory->Submersible.DataPointers;
                     for(var i = 0; i < data.Length; i++)
                     {
                         var d = data[i];
-                        ImGuiEx.Text($"Sub: {d.Name.Read()}, returns at {d.GetReturnTime()}, current: {d.CurrentExp}");
+                        ImGuiEx.Text($"Sub: {d.Value->Name.Read()}, returns at {d.Value->GetReturnTime()}, current: {d.Value->CurrentExp}");
                     }
                 }
             }

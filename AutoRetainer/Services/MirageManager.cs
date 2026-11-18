@@ -23,17 +23,15 @@ public unsafe class MirageManager
 
     public bool HasEligibleItems()
     {
-        foreach(var inv in Utils.PlayerEntireInventory)
+        return GlamourLog.HasAnythingToStore().HasFlag(ECommons.IPC.Subscribers.GlamourLog.StoreTargets.Dresser);
+    }
+
+    public bool ShouldExcludeItemFromProcessing(uint id, uint? condition)
+    {
+        if(Data.GetIMSettings(true).EnableMirageAutoDelivery)
         {
-            var invCont = InventoryManager.Instance()->GetInventoryContainer(inv);
-            for(int i = 0; i < invCont->Size; i++)
-            {
-                var item = invCont->Items[i];
-                if(item.ItemId != 0 && Svc.Data.GetExcelSheet<Item>().TryGetRow(item.ItemId, out var data) && Utils.CanItemBePartOfMirageSet(item.ItemId))
-                {
-                    if(!Utils.IsItemAlreadyMiraged(item.ItemId)) return true; 
-                }
-            }
+            if(condition != null && condition < 30000) return false;
+            if(GlamourLog.IsItemStorable(id)) return true;
         }
         return false;
     }

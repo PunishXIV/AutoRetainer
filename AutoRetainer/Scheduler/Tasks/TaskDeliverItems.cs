@@ -93,6 +93,23 @@ public static unsafe class TaskDeliverItems
             }), "Teleport to GC");
         }
         P.TaskManager.Enqueue(() => !Lifestream.IsBusy(), "Wait until teleportation completed", new(timeLimitMS: 5 * 60 * 1000) { CompanionAction = _ => EzThrottler.Throttle("GcBusy", 60000, true)});
+        if(C.FullAutoGCDeliveryUseBuffFCAction && !Data.NoFcBuffUse && C.FullAutoGCDeliveryBuyBuffFCAction && !Data.DisallowedFromBuffPurchase)
+        {
+            P.TaskManager.Enqueue(() =>
+            {
+                TaskActivateSealSweetener.LastAttemptAt = 0;
+                var hasEffect = Player.Object.HasStatus([414, 1078]);
+                if(!hasEffect)
+                {
+                    P.TaskManager.InsertStack(() =>
+                    {
+                        TaskBuySealSweetener.Enqueue();
+                        P.TaskManager.EnqueueDelay(8, true);
+                        TaskActivateSealSweetener.EnqueueThrottled();
+                    });
+                }
+            });
+        }
         P.TaskManager.Enqueue(() => GCContinuation.EnqueueInitiation(true), "Initiate GC delivery");
         return true;
     }

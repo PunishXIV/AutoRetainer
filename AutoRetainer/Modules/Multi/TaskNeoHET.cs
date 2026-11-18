@@ -100,6 +100,7 @@ public static unsafe class TaskNeoHET
                 }
                 tasks.AddRange([
                     NeoTasks.ApproachObjectViaAutomove(GetWorkshopEntrance, 4f),
+                    new(NpcSaleManager.EnqueueIfItemsPresent),
                     NeoTasks.InteractWithObject(GetWorkshopEntrance),
                     new(TaskContinueHET.SelectEnterWorkshop),
                     new(() => VoyageUtils.Workshops.Contains(Svc.ClientState.TerritoryType), "Wait Until entered workshop"),
@@ -111,6 +112,7 @@ public static unsafe class TaskNeoHET
                     new(UpdateGilFromChest, new(timeLimitMS:10000, abortOnTimeout:false)),
                     new(WaitUntilChestVisible, new(timeLimitMS: 10000, abortOnTimeout: false)),
                     new(() => S.FCPointsUpdater.IsFCChestReady() == true, new(timeLimitMS: 10000, abortOnTimeout: false)),
+                    ..MakeFcTabsUpdateTasks(),
                     new DelayTask(5000),
                     new(() => OfflineDataManager.WriteOfflineData(false, false)),
                     new(() => C.FCChestGilCheckTimes[Player.CID] = DateTimeOffset.Now.ToUnixTimeMilliseconds()),
@@ -136,6 +138,23 @@ public static unsafe class TaskNeoHET
                 onFailure?.Invoke();
             }
         }, "TryEnterWorkshop");
+    }
+
+    public static List<TaskManagerTask> MakeFcTabsUpdateTasks()
+    {
+        if(!C.FCChestItemCheck) return [];
+        var ret = new List<TaskManagerTask>();
+        for(int index = 0; index < S.FCPointsUpdater.GetFCChestNum(); index++)
+        {
+            var i = index;
+            ret.Add(new(() => S.FCPointsUpdater.SelectFCChestTab(i), $"Select tab {i}"));
+            ret.Add(new FrameDelayTask(4));
+            ret.Add(new(() => S.FCPointsUpdater.IsFCChestReady(), $"Wait for FC chest ready {i}"));
+            ret.Add(new FrameDelayTask(4));
+        }
+
+        PluginLog.Information($"Generated tasks for {ret.Count / 4} tabs");
+        return ret;
     }
 
     public static bool UpdateGilFromChest()

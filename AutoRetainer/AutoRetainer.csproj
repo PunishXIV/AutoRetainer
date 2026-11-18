@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<Authors>NightmareXIV, kawaii</Authors>
-		<Version>4.6.1.26</Version>
+		<Version>4.6.2.24</Version>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -25,6 +25,7 @@
       <UseWindowsForms>true</UseWindowsForms>
       <OutputPath>bin/Release</OutputPath>
       <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+      <WarningsAsErrors>RS0030</WarningsAsErrors>
 	</PropertyGroup>
 
     <!--Import Project="_build\BuildExtensions.targets" /-->
@@ -39,11 +40,26 @@
         <ExcludeAssets>runtime;build;native;contentfiles;analyzers</ExcludeAssets>
         <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="MemoryPack" Version="1.21.4" />
 		<ProjectReference Include="..\NightmareUI.OtterGuiWrapper\NightmareUI.OtterGuiWrapper\NightmareUI.OtterGuiWrapper.csproj" />
 		<ProjectReference Include="..\NightmareUI\NightmareUI\NightmareUI.csproj" />
 		<ProjectReference Include="..\OtterGui\OtterGui.csproj" />
 		<ProjectReference Include="..\PunishLib\PunishLib\PunishLib.csproj" />
 	</ItemGroup>
+
+    <ItemGroup>
+        <None Remove="BannedSymbols.txt" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <AdditionalFiles Include="BannedSymbols.txt" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="3.12.0-beta1.25218.8">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
 
 	<PropertyGroup Condition="'$(OS)' != 'Windows_NT' OR '$(CI)' == 'true'">
 		<DalamudLibPath>$(DALAMUD_HOME)/</DalamudLibPath>
@@ -73,7 +89,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="CsvHelper" Version="33.1.0" />
-		<PackageReference Include="MessagePack" Version="3.1.7" />
 		<PackageReference Include="NotificationMasterAPI" Version="1.0.0.1" />
 		<Reference Include="Newtonsoft.Json">
 			<HintPath>$(DalamudLibPath)Newtonsoft.Json.dll</HintPath>
