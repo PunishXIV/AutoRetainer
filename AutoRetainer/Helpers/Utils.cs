@@ -50,6 +50,81 @@ namespace AutoRetainer.Helpers;
 
 public static unsafe class Utils
 {
+    public static uint FindMinimumItemCondition(uint itemId, bool searchArmory)
+    {
+        var minConddition = 60000u;
+        foreach(var x in searchArmory ? Utils.PlayerInventoryWithArmory : Utils.PlayerInvetories)
+        {
+            var cont = InventoryManager.Instance()->GetInventoryContainer(x);
+            for(int i = 0; i < cont->Size; i++)
+            {
+                var item = cont->GetInventorySlot(i);
+                if(item->ItemId == itemId)
+                {
+                    if(item->Condition < minConddition) minConddition = item->Condition;
+                }
+            }
+        }
+        return minConddition;
+    }
+
+    public static bool ShouldExcludeItemByMirageOrCabinet(uint itemId, uint? condition)
+    {
+        return S.CabinetManager.ShouldExcludeItemFromProcessing(itemId, condition) || S.MirageManager.ShouldExcludeItemFromProcessing(itemId, condition);
+    }
+
+    public static void EvaluateGrandfathering()
+    {
+        if(C.ShouldGrandfatherSubmarineCharacterCount == null)
+        {
+            var charactersEnabledToGrandfather = 10;
+            var cnt = C.OfflineData.Where(x => x.WorkshopEnabled && x.EnabledSubs.Count > 0);
+            C.ShouldGrandfatherSubmarineCharacterCount = cnt.Count() > charactersEnabledToGrandfather;
+            PluginLog.Information($"Submersible-enabled characters count: {cnt.Count()}, grandfathering result: {C.ShouldGrandfatherSubmarineCharacterCount}");
+        }
+        if(C.ShouldGrandfatherRetainerCount == null)
+        {
+            var retainersEnabledToGrandfather = 4;
+            var cnt = C.OfflineData.Where(x => x.Enabled && x.GetEnabledRetainers().Length > retainersEnabledToGrandfather);
+            C.ShouldGrandfatherRetainerCount = cnt.Any();
+            PluginLog.Information($"Submersible-enabled characters count: {cnt.Count()}, grandfathering result: {C.ShouldGrandfatherSubmarineCharacterCount}");
+        }
+    }
+
+    public static string FormatGil(long input)
+    {
+        if(input < 1000) return $"{input:N0}";
+        if(input < 10000) return $"{input / 1000d:N2}K";
+        if(input < 100000) return $"{input / 1000d:N1}K";
+        if(input < 1000000) return $"{input / 1000d:N0}K";
+        if(input < 10000000) return $"{input / 1000000d:N2}M";
+        if(input < 100000000) return $"{input / 1000000d:N1}M";
+        return $"{input / 1000000d:N0}M";
+    }
+
+    public static void ConfirmYesno(IEnumerable<string> options)
+    {
+        var addon = GetSpecificYesno([..options]);
+        if(addon != null)
+        {
+            var m = new AddonMaster.SelectYesno(addon);
+            if(EzThrottler.Throttle("ConfirmYesno" + m.Text))
+            {
+                m.Yes();
+            }
+        }
+    }
+
+    public static bool ShouldHETBySettings(this OfflineCharacterData data)
+    {
+        return !C.NoHetWhenNothingEnabled || data.Enabled || data.WorkshopEnabled;
+    }
+
+    public static bool IsNightModeActive()
+    {
+        return C.NightMode || (C.NightModeAutoWsLocked && S.WorkstationMonitor.Locked);
+    }
+
     public static bool IsItemAlreadyMiraged(uint itemId)
     {
         return GlamourLog.IsItemOwned(itemId);
@@ -86,6 +161,12 @@ public static unsafe class Utils
         VoyageScheduler.Enabled = false;
         SchedulerMain.PluginEnabledInternal = false;
         P.TaskManager.Abort();
+        Lifestream.Abort();
+        MultiMode.LastLogin = 0;
+        SchedulerMain.RetainerPostProcessLocked = null;
+        SchedulerMain.RetainerPostprocess = [];
+        SchedulerMain.CharacterPostProcessLocked = null;
+        SchedulerMain.CharacterPostprocess = [];
         TaskCleanupUi.Enqueue();
     }
 
@@ -576,8 +657,10 @@ public static unsafe class Utils
 
         public InventoryManagementSettings GetIMSettings(bool raw = false)
         {
+            PluginLog.Trace($"Cleanup plan: {thisRef.InventoryCleanupPlan}");
             if(C.AdditionalIMSettings.TryGetFirst(x => x.GUID == thisRef.InventoryCleanupPlan, out var plan))
             {
+                PluginLog.Trace($"Cleanup plan found: {plan.DisplayName} - {plan.GUID}");
                 if(!raw && (plan.AdditionModeProtectList || plan.AdditionModeSoftSellList || plan.AdditionModeHardSellList))
                 {
                     var newPlan = plan.DSFClone();
@@ -648,6 +731,7 @@ public static unsafe class Utils
             }
             else
             {
+                PluginLog.Trace("Default IM settings");
                 return C.DefaultIMSettings;
             }
         }
@@ -1234,14 +1318,20 @@ public static unsafe class Utils
         return ret;
     }
 
-    public static bool IsItemSellableByHardList(Number item, Number quantity)
+    public static bool IsItemSellableByHardList(uint item, int quantity, uint? condition)
     {
-        if(S.CabinetManager.ShouldExcludeItemFromProcessing(item)) return false;
+        PluginLog.Trace($"IsItemSellableByHardList: {ExcelItemHelper.GetName(item)} x{quantity}");
+        if(Utils.ShouldExcludeItemByMirageOrCabinet(item, condition)) return false;
+        PluginLog.Trace($"Step 1");
         if(Data.GetIMSettings().IMProtectList.Contains(item)) return false;
+        PluginLog.Trace($"Step 2");
         if(Data.GetIMSettings().IMAutoVendorHard.Contains(item))
         {
+            PluginLog.Trace($"Step 3 : {Data.GetIMSettings().IMAutoVendorHardIgnoreStack.Select(x => ExcelItemHelper.GetName(x, true)).Print()}");
             if(Data.GetIMSettings().IMAutoVendorHardIgnoreStack.Contains(item)) return true;
-            return quantity < Data.GetIMSettings().IMAutoVendorHardStackLimit;
+            var ret = quantity < Data.GetIMSettings().IMAutoVendorHardStackLimit;
+            PluginLog.Trace($"Step 4 ({ret})");
+            return ret;
         }
         else
         {
@@ -1272,7 +1362,8 @@ public static unsafe class Utils
     }
 
     internal static bool MultiModeOrArtisan => MultiMode.Active || (SchedulerMain.PluginEnabled && SchedulerMain.Reason == PluginEnableReason.Artisan);
-    internal static bool IsBusy => P.TaskManager.IsBusy || AutoGCHandin.Operation || Lifestream.IsBusy();
+    internal static bool IsBusy => IsAROnlyBusy || Lifestream.IsBusy();
+    internal static bool IsAROnlyBusy => P.TaskManager.IsBusy || AutoGCHandin.Operation;
     internal static AtkValue ZeroAtkValue = new() { Type = 0, Int = 0 };
 
     internal static IEnumerable<string> GetEObjNames(params uint[] values)
@@ -1959,7 +2050,7 @@ public static unsafe class Utils
 
     private static bool PopupContains(string source, string name)
     {
-        return source.Contains(name, StringComparison.Ordinal) && Lang.RetainerMenu(source);
+        return source.Contains(name, StringComparison.Ordinal) && Lang.IsAddon(source, 2376, 2377);
     }
 
     internal static IGameObject GetNearestWorkshopEntrance(out float Distance)

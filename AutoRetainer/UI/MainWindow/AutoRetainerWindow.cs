@@ -38,6 +38,7 @@ internal unsafe class AutoRetainerWindow : Window
             ShowTooltip = () => ImGui.SetTooltip("Open settings window"),
         });
         TitleBarButtons.Add(LockButton);
+        if(C.WindowDefaultOpen) this.IsOpen = true;
     }
 
     private Action<string> SomeAction;

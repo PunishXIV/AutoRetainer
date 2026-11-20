@@ -37,21 +37,31 @@ internal static unsafe class RetainerListHandlers
 
     internal static bool? CloseRetainerList()
     {
-        if(TryGetAddonByName<AtkUnitBase>("RetainerList", out var retainerList) && IsAddonReady(retainerList))
+        if(TryGetAddonByName<AtkUnitBase>("RetainerList", out var retainerList))
         {
-            if(Utils.GenericThrottle)
+            if(IsAddonReady(retainerList))
             {
-                var v = stackalloc AtkValue[1]
+                if(Utils.GenericThrottle)
                 {
+                    var v = stackalloc AtkValue[1]
+                    {
                     new()
                     {
                         Type = AtkValueType.Int,
                         Int = -1
                     }
                 };
-                P.IsCloseActionAutomatic = true;
-                retainerList->FireCallback(1, v);
-                DebugLog($"Closing retainer window");
+                    P.IsCloseActionAutomatic = true;
+                    retainerList->FireCallback(1, v);
+                    DebugLog($"Closing retainer window");
+                    return false;
+                }
+            }
+        }
+        else
+        {
+            if(!Svc.Condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.OccupiedSummoningBell])
+            {
                 return true;
             }
         }

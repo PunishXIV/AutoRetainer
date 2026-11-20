@@ -1,4 +1,5 @@
 ﻿using ECommons.Throttlers;
+using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,13 @@ public static class TaskCleanupUi
     {
         foreach(var x in StandardAddons)
         {
+            {
+                if(TryGetAddonMaster<AddonMaster.CompanyCraftSupply>(out var m) && m.IsAddonReady)
+                {
+                    m.Close();
+                    continue;
+                }
+            }
             if(TryGetAddonByName<AtkUnitBase>(x, out var addon))
             {
                 EzThrottler.Throttle("RCUIAddonDetected", 10000, true);

@@ -90,6 +90,8 @@ public static unsafe class RetainerConfig
             }
             ImGui.EndPopup();
         }
+
+        ImGui.Separator();
         ImGui.Checkbox($"Withdraw/Deposit Gil", ref adata.WithdrawGil);
         if(adata.WithdrawGil)
         {
@@ -98,6 +100,42 @@ public static unsafe class RetainerConfig
             ImGuiEx.SetNextItemWidthScaled(200f);
             ImGui.InputInt($"Amount, %", ref adata.WithdrawGilPercent.ValidateRange(1, 100), 1, 10);
         }
+        if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Copy, "Copy gil settings to..."))
+        {
+            ImGui.OpenPopup($"CopyGilSettingsTo");
+        }
+        if(ImGui.BeginPopup("CopyGilSettingsTo"))
+        {
+            if(ImGui.Selectable("To all other retainers of this character"))
+            {
+                var cnt = 0;
+                foreach(var x in data.RetainerData)
+                {
+                    cnt++;
+                    Utils.GetAdditionalData(data.CID, x.Name).WithdrawGil = adata.WithdrawGil;
+                    Utils.GetAdditionalData(data.CID, x.Name).WithdrawGilPercent = adata.WithdrawGilPercent;
+                    Utils.GetAdditionalData(data.CID, x.Name).Deposit = adata.Deposit;
+                }
+                Notify.Info($"Changed {cnt} retainers");
+            }
+            if(ImGui.Selectable("To all other retainers of ALL characters"))
+            {
+                var cnt = 0;
+                foreach(var offlineData in C.OfflineData)
+                {
+                    foreach(var x in offlineData.RetainerData)
+                    {
+                        Utils.GetAdditionalData(offlineData.CID, x.Name).WithdrawGil = adata.WithdrawGil;
+                        Utils.GetAdditionalData(offlineData.CID, x.Name).WithdrawGilPercent = adata.WithdrawGilPercent;
+                        Utils.GetAdditionalData(offlineData.CID, x.Name).Deposit = adata.Deposit;
+                        cnt++;
+                    }
+                }
+                Notify.Info($"Changed {cnt} retainers");
+            }
+            ImGui.EndPopup();
+        }
+
         ImGui.Separator();
         Svc.PluginInterface.GetIpcProvider<ulong, string, object>(ApiConsts.OnRetainerSettingsDraw).SendMessage(data.CID, ret.Name);
         if(C.Verbose)

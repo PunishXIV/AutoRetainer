@@ -123,38 +123,6 @@ internal static unsafe class VoyageUtils
         return Svc.Data.GetExcelSheet<SubmarineMap>().GetRowOrDefault(id)?.Name.ToString();
     }
 
-    internal static int? GetVesselIndex(string name, VoyageType type)
-    {
-        var w = HousingManager.Instance()->WorkshopTerritory;
-        if(w == null) return null;
-        var adata = GetAdditionalVesselData(Data, name, type);
-        if(adata.IndexOverride > 0) return adata.IndexOverride - 1;
-        if(type == VoyageType.Airship)
-        {
-            var v = w->Airship.Data;
-            for(var i = 0; i < v.Length; i++)
-            {
-                var sub = v[i];
-                if(GenericHelpers.Read(sub.Name) == name)
-                {
-                    return i;
-                }
-            }
-        }
-        if(type == VoyageType.Submersible)
-        {
-            var v = w->Submersible.Data;
-            for(var i = 0; i < v.Length; i++)
-            {
-                var sub = v[i];
-                if(GenericHelpers.Read(sub.Name) == name)
-                {
-                    return i;
-                }
-            }
-        }
-        return null;
-    }
 
     internal static List<(uint point, string justification)> GetPrioritizedPointList(this SubmarineUnlockPlan plan)
     {
@@ -231,11 +199,11 @@ internal static unsafe class VoyageUtils
                 return PanelType.TypeSelector;
             }
             var text = GenericHelpers.ReadSeString(&addon->UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText).GetText();
-            if(Lang.PanelSubmersible(text))
+            if(Lang.IsPanelSubmersible(text))
             {
                 return PanelType.Submersible;
             }
-            if(Lang.PanelAirship(text))
+            if(Lang.IsPanelAirship(text))
             {
                 return PanelType.Airship;
             }
@@ -363,10 +331,10 @@ internal static unsafe class VoyageUtils
                         adata.NextLevelExp = vessel->NextLevelExp;
                         adata.CurrentExp = vessel->CurrentExp;
                         //DebugLog("Write offline sub data");
-                        adata.Part1 = (int)GetVesselComponent(i, VoyageType.Submersible, 0)->ItemId;
-                        adata.Part2 = (int)GetVesselComponent(i, VoyageType.Submersible, 1)->ItemId;
-                        adata.Part3 = (int)GetVesselComponent(i, VoyageType.Submersible, 2)->ItemId;
-                        adata.Part4 = (int)GetVesselComponent(i, VoyageType.Submersible, 3)->ItemId;
+                        adata.Part1 = (int)GetVesselComponent(name, VoyageType.Submersible, 0)->ItemId;
+                        adata.Part2 = (int)GetVesselComponent(name, VoyageType.Submersible, 1)->ItemId;
+                        adata.Part3 = (int)GetVesselComponent(name, VoyageType.Submersible, 2)->ItemId;
+                        adata.Part4 = (int)GetVesselComponent(name, VoyageType.Submersible, 3)->ItemId;
                         adata.Points = vessel->CurrentExplorationPoints.ToArray();
                     }
                 }
@@ -429,30 +397,24 @@ internal static unsafe class VoyageUtils
     {
         var textptr = addon->UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText;
         var text = GenericHelpers.ReadSeString(&textptr).GetText();
-        if(Lang.PanelAirship(text))
+        if(Lang.IsPanelAirship(text))
         {
             return VoyageType.Airship;
         }
-        if(Lang.PanelSubmersible(text))
+        if(Lang.IsPanelSubmersible(text))
         {
             return VoyageType.Submersible;
         }
         return null;
     }
-
-    internal static List<int> GetIsVesselNeedsRepair(string name, VoyageType type, out List<string> log)
-    {
-        return GetIsVesselNeedsRepair(GetVesselIndexByName(name, type), type, out log);
-    }
-
-    internal static List<int> GetIsVesselNeedsRepair(int num, VoyageType type, out List<string> log)
+    internal static List<int> GetIsVesselNeedsRepair(string vesselName, VoyageType type, out List<string> log)
     {
         log = [];
         var ret = new List<int>();
 
         for(var i = 0; i < 4; i++)
         {
-            var slot = GetVesselComponent(num, type, i);
+            var slot = GetVesselComponent(vesselName, type, i);
             log.Add($"index: {i}, id: {slot->ItemId}, cond: {slot->Condition}");
             if(slot->ItemId == 0)
             {
@@ -468,27 +430,31 @@ internal static unsafe class VoyageUtils
     }
 
 
-    internal static InventoryItem* GetVesselComponent(int vesselIndex, VoyageType type, int slotIndex)
+    internal static InventoryItem* GetVesselComponent(string vesselName, VoyageType type, int slotIndex)
     {
         int begin;
         InventoryType itype;
         if(type == VoyageType.Airship)
         {
-            begin = 30 + vesselIndex * 5;
+            var index = VoyageUtils.GetInventoryVesselIndexByName(vesselName, VoyageType.Airship);
+            begin = 30 + index * 5;
             itype = InventoryType.HousingInteriorPlacedItems1;
         }
         else if(type == VoyageType.Submersible)
         {
-            begin = vesselIndex * 5;
+            var index = VoyageUtils.GetInventoryVesselIndexByName(vesselName, VoyageType.Submersible);
+            begin = index * 5;
             itype = InventoryType.HousingInteriorPlacedItems2;
         }
         else
         {
             throw new ArgumentOutOfRangeException(nameof(type));
         }
-        var index = begin + slotIndex;
-        var slot = FFXIVClientStructs.FFXIV.Client.Game.InventoryManager.Instance()->GetInventoryContainer(itype)->GetInventorySlot(index);
-        return slot;
+        {
+            var index = begin + slotIndex;
+            var slot = FFXIVClientStructs.FFXIV.Client.Game.InventoryManager.Instance()->GetInventoryContainer(itype)->GetInventorySlot(index);
+            return slot;
+        }
     }
 
     internal static int GetVesselIndexByName(string name, VoyageType type)
@@ -513,7 +479,59 @@ internal static unsafe class VoyageUtils
             }
             else if(type == VoyageType.Submersible)
             {
+                foreach(var x in h->Submersible.DataPointers)
+                {
+                    if(x.Value->Name.Read() == name)
+                    {
+                        return index;
+                    }
+                    else
+                    {
+                        index++;
+                    }
+                }
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(type));
+            }
+        }
+        throw new Exception($"Could not retrieve vessel's index: {name} {type}");
+    }
+
+    /// <summary>
+    /// returns index of associated vessel inventory
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    /// <exception cref="Exception"></exception>
+    internal static int GetInventoryVesselIndexByName(string name, VoyageType type)
+    {
+        var index = 0;
+        var h = HousingManager.Instance()->WorkshopTerritory;
+        if(h != null)
+        {
+            if(type == VoyageType.Airship)
+            {
+                foreach(var x in h->Airship.Data)
+                {
+                    if(x.Name.Read() == name)
+                    {
+                        return index;
+                    }
+                    else
+                    {
+                        index++;
+                    }
+                }
+            }
+            else if(type == VoyageType.Submersible)
+            {
+#pragma warning disable RS0030
                 foreach(var x in h->Submersible.Data)
+#pragma warning restore RS0030
                 {
                     if(x.Name.Read() == name)
                     {
@@ -530,7 +548,7 @@ internal static unsafe class VoyageUtils
                 throw new ArgumentOutOfRangeException(nameof(type));
             }
         }
-        throw new Exception($"Could not retrieve airship's index: {name}");
+        throw new Exception($"Could not retrieve vessel's index: {name} {type}");
     }
 
     internal static string Seconds2Time(long seconds)

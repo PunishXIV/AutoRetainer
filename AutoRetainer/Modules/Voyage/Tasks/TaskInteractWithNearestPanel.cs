@@ -12,7 +12,7 @@ internal static class TaskInteractWithNearestPanel
             TaskNeoHET.TryEnterWorkshop(() =>
             {
                 Data.WorkshopEnabled = false;
-                DuoLog.Error($"Due to failure to find workshop, character is excluded from processing deployables");
+                S.AnomalyWindow.Add($"Due to failure to find workshop, character is excluded from processing deployables");
                 P.TaskManager.Abort();
             });
         }

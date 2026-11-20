@@ -12,7 +12,7 @@ internal static unsafe class FPSLimiter
         {
             if(
                 (!C.NoFPSLockWhenActive || CSFramework.Instance()->WindowInactive)
-                && (!C.FpsLockOnlyShutdownTimer || Shutdown.Active || (C.NightMode && C.NightModeFPSLimit))
+                && (!C.FpsLockOnlyShutdownTimer || Shutdown.Active || (Utils.IsNightModeActive() && C.NightModeFPSLimit))
                 )
             {
                 if(Utils.IsBusy || !IsScreenReady())
@@ -31,7 +31,7 @@ internal static unsafe class FPSLimiter
                     if(C.TargetMSPTIdle > 0)
                     {
                         var targetMSPT = C.TargetMSPTIdle;
-                        if(C.NightMode && Utils.CanAutoLogin() && MultiMode.Active)
+                        if(Utils.IsNightModeActive() && Utils.CanAutoLogin() && MultiMode.Active)
                         {
                             targetMSPT = CSFramework.Instance()->WindowInactive ? 5000 : 100;
                         }

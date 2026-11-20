@@ -114,7 +114,10 @@ internal static unsafe class AutoGCHandin
                 var str = addon->PromptText->NodeText.GetText().Cleanup();
                 DebugLog($"SelectYesno encountered: {str}");
                 //102434	Do you really want to trade a high-quality item?
-                if(str.Equals(GenericHelpers.GetText(Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(102434).Text).Cleanup()))
+                if(str.EqualsAny(
+                    GenericHelpers.GetText(Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(102434).Text).Cleanup(),
+                    GenericHelpers.GetText(Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRow(4605).Text).Cleanup()
+                    ))
                 {
                     if(FrameThrottler.Throttle(Throttler, 10))
                     {
@@ -323,7 +326,7 @@ internal static unsafe class AutoGCHandin
         {
             var item = items[i];
             if(Data.GetIMSettings().IMProtectList.Contains(item.ItemID)) continue;
-            if(S.CabinetManager.ShouldExcludeItemFromProcessing(item.ItemID)) continue;
+            if(Utils.ShouldExcludeItemByMirageOrCabinet(item.ItemID, Utils.FindMinimumItemCondition(item.ItemID, IsArmoryChestEnabled()))) continue;
             var seals = (uint)(item.Seals * Utils.GetGCSealMultiplier());
             if(!checkSealCap || sealsRemaining > seals) candidates.Add((item.ItemID, seals, i));
         }

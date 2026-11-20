@@ -28,6 +28,10 @@ public unsafe static class TaskActivateSealSweetener
 
     public static void Enqueue()
     {
+        var conf = new TaskManagerConfiguration()
+        {
+            DiscardGuid = Guid.NewGuid()
+        };
         var oldNum = NumActions;
         P.TaskManager.Enqueue(() =>
         {
@@ -43,7 +47,7 @@ public unsafe static class TaskActivateSealSweetener
                 }
                 return false;
             }
-        });
+        }, conf);
         P.TaskManager.Enqueue(() =>
         {
             if(TryGetAddonByName<AtkUnitBase>("FreeCompanyAction", out var addon) && addon->IsReady())
@@ -61,11 +65,11 @@ public unsafe static class TaskActivateSealSweetener
                 }
                 return false;
             }
-        });
-        P.TaskManager.Enqueue(() => NumActions != oldNum, new(timeLimitMS:3000, abortOnTimeout:false));
+        }, conf);
+        P.TaskManager.Enqueue(() => NumActions != oldNum, new(timeLimitMS:3000, abortOnTimeout:false, discardGuid:conf.DiscardGuid));
         P.TaskManager.Enqueue(() =>
         {
-            if(NumActions == 0)
+            if(NumActions == 0 || !Actions.ContainsAny(36, 6))
             {
                 CloseFCAddon();
                 return true;
@@ -101,12 +105,12 @@ public unsafe static class TaskActivateSealSweetener
                                                             if(EzThrottler.Throttle("YesNoCompanyAction"))
                                                             {
                                                                 new AddonMaster.SelectYesno(yesno).Yes();
-                                                                P.TaskManager.Insert(CloseFCAddon);
+                                                                P.TaskManager.Insert(CloseFCAddon, conf);
                                                                 return true;
                                                             }
                                                         }
                                                         return false;
-                                                    }));
+                                                    }, conf));
                                                     return true;
                                                 }
                                             }
@@ -118,7 +122,7 @@ public unsafe static class TaskActivateSealSweetener
                                         }
                                     }
                                     return false;
-                                }));
+                                }, conf));
                                 return true;
                             }
                         }
@@ -126,7 +130,8 @@ public unsafe static class TaskActivateSealSweetener
                 }
                 return false;
             }
-        });
+        }, conf);
+        P.TaskManager.Enqueue(CloseFCAddon);
     }
 
     static void CloseFCAddon()

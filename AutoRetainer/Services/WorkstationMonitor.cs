@@ -25,6 +25,13 @@ public unsafe sealed class WorkstationMonitor : IDisposable
         {
             PluginLog.Debug($"Workstation unlocked ({DateTimeOffset.Now})");
             Locked = false;
+            new TickScheduler(() =>
+            {
+                if(MultiMode.Enabled)
+                {
+                    MultiMode.BailoutNightMode(false);
+                }
+            });
         }
     }
 }

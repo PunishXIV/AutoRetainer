@@ -2,7 +2,7 @@
 using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.GameHelpers;
-using ECommons.IPC.Subscribers.LifestreamIPC;
+using ECommons.IPC.Subscribers.Lifestream;
 
 namespace AutoRetainer.Scheduler.Tasks;
 public static class TaskTeleportToProperty

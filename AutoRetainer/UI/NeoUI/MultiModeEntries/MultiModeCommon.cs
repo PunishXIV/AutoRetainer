@@ -11,6 +11,8 @@ public class MultiModeCommon : NeoUIEntry
         .Checkbox("Allow entering shared houses", () => ref C.SharedHET)
         .Checkbox("Attempt to enter house on login even when Multi Mode is disabled", () => ref C.HETWhenDisabled)
         .Checkbox("Do not teleport or enter house for retainers when already next to bell", () => ref C.NoTeleportHetWhenNextToBell)
+        .Checkbox("Never enter houses on characters that do not have neither retainers nor deployables enabled", () => ref C.NoHetWhenNothingEnabled)
+        .Checkbox("Do not try to auto-enter houses when enabling multi mode", () => ref C.MultiHETOnEnable, "If you don't have teleportation options enabled you will have problems")
 
         .Section("Game startup")
         .Checkbox($"Enable Multi Mode on Game Boot", () => ref C.MultiAutoStart)
@@ -36,6 +38,7 @@ public class MultiModeCommon : NeoUIEntry
         .InputInt(100f, $"Deployables list: remaining inventory slots warning", () => ref C.UIWarningDepSlotNum.ValidateRange(2, 1000))
         .InputInt(100f, $"Deployables list: remaining fuel warning", () => ref C.UIWarningDepTanksNum.ValidateRange(20, 1000))
         .InputInt(100f, $"Deployables list: remaining repair kit warning", () => ref C.UIWarningDepRepairNum.ValidateRange(5, 1000))
+        .InputInt(100f, $"Both lists: remaining gil warning", () => ref C.MinGilDisplay)
 
         .Section("Teleportation")
         .Widget(() => ImGuiEx.Text("Lifestream plugin is required"))

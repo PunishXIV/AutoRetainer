@@ -9,7 +9,6 @@ using Dalamud.Game;
 using Dalamud.Interface.Components;
 using ECommons.MathHelpers;
 using Lumina.Excel.Sheets;
-using MessagePack;
 
 
 namespace AutoRetainer.UI.MainWindow;
@@ -41,7 +40,7 @@ internal static unsafe class WorkshopUI
             }
         }
         UIUtils.DrawSearch();
-        foreach(var data in sortedData.Where(x => x.OfflineAirshipData.Count + x.OfflineSubmarineData.Count > 0 && !x.ExcludeWorkshop))
+        foreach(var data in sortedData.Where(x => (C.ShowAllInWorkshop || x.OfflineAirshipData.Count + x.OfflineSubmarineData.Count > 0) && !x.ExcludeWorkshop))
         {
             var search = Ref<string>.Get("SearchChara");
             if(search != "" && !$"{data.Name}@{data.World}".Contains(search, StringComparison.OrdinalIgnoreCase)) continue;
@@ -54,17 +53,23 @@ internal static unsafe class WorkshopUI
             ImGuiEx.Tooltip($"Enable submersibles in multi mode on this character");
             ImGuiEx.DragDropRepopulate("RepopWsEn", data.WorkshopEnabled, ref data.WorkshopEnabled);
             ImGui.SameLine(0, 3);
+
             if(ImGuiEx.IconButton(FontAwesomeIcon.DoorOpen))
             {
-                if(MultiMode.Relog(data, out var error, RelogReason.ConfigGUI))
+                if(!Utils.IsBusy)
                 {
-                    Notify.Success("Relogging...");
-                }
-                else
-                {
-                    Notify.Error(error);
+                    MultiMode.Relog(data, out _, RelogReason.ConfigGUI);
                 }
             }
+            if(ImGuiEx.HoveredAndClicked("Left click - relog to this character\nRight click - open quick travel window", ImGuiMouseButton.Right))
+            {
+                if(C.MultiDisableOnRelog)
+                {
+                    MultiMode.Enabled = false;
+                }
+                Svc.Commands.ProcessCommand($"/li w {data.Name}@{data.World}");
+            }
+
             ImGui.SameLine(0, 3);
             if(ImGuiEx.IconButton(FontAwesomeIcon.UserCog))
             {
@@ -78,6 +83,7 @@ internal static unsafe class WorkshopUI
                 CharaConfig.Draw(data, false);
                 ImGui.EndPopup();
             }
+            UIUtils.DrawTeleportIcons(data.CID);
 
             if(data.NumSubSlots > data.GetVesselData(VoyageType.Submersible).Count)
             {
@@ -85,6 +91,15 @@ internal static unsafe class WorkshopUI
                 ImGuiEx.TextV(ImGuiColors.DalamudYellow, "\uf6e3");
                 ImGui.PopFont();
                 ImGuiEx.Tooltip($"You can construct new submersible ({data.GetVesselData(VoyageType.Submersible).Count}/{data.NumSubSlots})");
+                ImGui.SameLine(0, 3);
+            }
+
+            if(data.OfflineAirshipData.Count + data.OfflineSubmarineData.Count == 0)
+            {
+                ImGui.PushFont(UiBuilder.IconFont);
+                ImGuiEx.TextV(ImGuiColors.DalamudViolet, FontAwesomeIcon.ShopSlash.ToIconString());
+                ImGui.PopFont();
+                ImGuiEx.Tooltip($"There are no submarines registered or detected on this character");
                 ImGui.SameLine(0, 3);
             }
 
@@ -145,7 +160,6 @@ internal static unsafe class WorkshopUI
             }
 
             data.DrawDCV();
-            UIUtils.DrawTeleportIcons(data.CID);
             SharedUI.DrawLockout(data);
 
             var initCurpos = ImGui.GetCursorPos();
@@ -181,7 +195,11 @@ internal static unsafe class WorkshopUI
             }
 
             ImGui.SameLine(0, 0);
-            List<(bool, string)> texts = [(data.RepairKits < C.UIWarningDepRepairNum, $"R: {data.RepairKits}"), (data.Ceruleum < C.UIWarningDepTanksNum, $"C: {data.Ceruleum}"), (data.InventorySpace < C.UIWarningDepSlotNum, $"I: {data.InventorySpace}")];
+            List<(bool, string)> texts = [
+                (data.Gil < C.UIWarningGil, $"G: {Utils.FormatGil(data.Gil)}"),
+                (data.RepairKits < C.UIWarningDepRepairNum, $"R: {data.RepairKits}"), 
+                (data.Ceruleum < C.UIWarningDepTanksNum, $"C: {data.Ceruleum}"), 
+                (data.InventorySpace < C.UIWarningDepSlotNum, $"I: {data.InventorySpace}")];
             overlayTexts.Add((new Vector2(ImGui.GetContentRegionMax().X - ImGui.GetStyle().FramePadding.X, rCurPos.Y + ImGui.GetStyle().FramePadding.Y), [.. texts]));
             ImGui.NewLine();
 
@@ -434,11 +452,6 @@ internal static unsafe class WorkshopUI
                 }
             });
         }
-        if(adata.IndexOverride > 0)
-        {
-            ImGui.SameLine();
-            ImGuiEx.Text(ImGuiColors.DalamudGrey3, $"Index override: {adata.IndexOverride}");
-        }
         var end = ImGui.GetCursorPos();
         var p = vessel.GetRemainingSeconds() / (60f * 60f * 24f);
         if(vessel.ReturnTime != 0) Bars.Add((data.CID, Svc.PluginInterface.UiBuilder.FrameCount, start, end, vessel.ReturnTime == 0 ? 0 : p.ValidateRange(0f, 1f)));
@@ -561,9 +574,6 @@ internal static unsafe class WorkshopUI
                 }
             }
             ImGui.Separator();
-            ImGuiEx.SetNextItemWidthScaled(150f);
-            ImGuiEx.SliderInt("Index override", ref adata.IndexOverride, 0, 4, adata.IndexOverride == 0 ? "Disabled" : $"{adata.IndexOverride}");
-            ImGuiComponents.HelpMarker($"If your vessel order in AutoRetainer is different than in voyage panel menu, you must use this feature to set correct index to incorrectly ordered vessels. Make sure that index is matching order in control panel.");
             if(ImGui.CollapsingHeader("I have recently renamed this vessel"))
             {
                 if(ImGui.BeginCombo("##selprev", "Select previous vessel name", ImGuiComboFlags.HeightLarge))

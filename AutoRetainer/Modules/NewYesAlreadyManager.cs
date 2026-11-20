@@ -7,7 +7,7 @@ internal static class NewYesAlreadyManager
 {
     private static bool WasChanged = false;
 
-    private static bool IsBusy => (Utils.IsBusy || VoyageScheduler.Enabled) && !SchedulerMain.CharacterPostProcessLocked;
+    private static bool IsBusy => (Utils.IsAROnlyBusy || VoyageScheduler.Enabled) && SchedulerMain.CharacterPostProcessLocked == null;
     internal static void Tick()
     {
         if(WasChanged)

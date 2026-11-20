@@ -33,7 +33,7 @@ public static unsafe class NpcSaleManager
                         var slot = inv->GetInventorySlot(i);
                         if(slot != null && slot->ItemId != 0)
                         {
-                            if(Utils.IsItemSellableByHardList(slot->ItemId, slot->Quantity))
+                            if(Utils.IsItemSellableByHardList(slot->ItemId, slot->Quantity, slot->Condition))
                             {
                                 P.TaskManager.BeginStack();
                                 P.TaskManager.EnqueueDelay(500);
@@ -59,7 +59,7 @@ public static unsafe class NpcSaleManager
                     var slot = inv->GetInventorySlot(i);
                     if(slot != null && slot->ItemId != 0)
                     {
-                        if(Utils.IsItemSellableByHardList(slot->ItemId, slot->Quantity))
+                        if(Utils.IsItemSellableByHardList(slot->ItemId, slot->Quantity, slot->Condition))
                         {
                             P.TaskManager.BeginStack();
                             P.TaskManager.Enqueue(Utils.WaitForScreen);
@@ -95,7 +95,7 @@ public static unsafe class NpcSaleManager
                     var slot = inv->GetInventorySlot(i);
                     if(!Processed.Contains((type, i)) && slot != null && slot->ItemId != 0)
                     {
-                        if(Utils.IsItemSellableByHardList(slot->ItemId, slot->Quantity))
+                        if(Utils.IsItemSellableByHardList(slot->ItemId, slot->Quantity, slot->Condition))
                         {
                             if(EzThrottler.Throttle("VendorItem", 500))
                             {

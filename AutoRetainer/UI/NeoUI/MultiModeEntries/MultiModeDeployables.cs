@@ -17,6 +17,7 @@ public class MultiModeDeployables : NeoUIEntry
         .Checkbox("Sell items from Unconditional sell list right after deployment (requires retainers)", () => ref C.VendorItemAfterVoyage)
         .Checkbox("Periodically check FC chest for gil upon entering workshop", () => ref C.FCChestGilCheck, "Periodically checks the Free Company chest when entering the Workshop to keep the gil counter up to date.")
         .Indent()
+        .Checkbox("Also scan items in FC chests", () => ref C.FCChestItemCheck)
         .SliderInt(150f, "Check frequency, hours", () => ref C.FCChestGilCheckCd, 0, 24 * 5)
         .Widget("Reset cooldowns", (x) =>
         {

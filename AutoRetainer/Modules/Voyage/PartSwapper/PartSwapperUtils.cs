@@ -5,20 +5,16 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 namespace AutoRetainer.Modules.Voyage.PartSwapper;
 public static unsafe class PartSwapperUtils
 {
-    internal static List<(int, uint)>? GetIsVesselNeedsPartsSwap(string name, VoyageType type, out List<string> log)
-    {
-        return GetIsVesselNeedsPartsSwap(VoyageUtils.GetVesselIndexByName(name, type), type, out log);
-    }
-
-    internal static List<(int, uint)>? GetIsVesselNeedsPartsSwap(int num, VoyageType type, out List<string> log)
+    internal static List<(int, uint)>? GetIsVesselNeedsPartsSwap(string vesselName, VoyageType type, out List<string> log)
     {
         log = [];
         var workshop = HousingManager.Instance()->WorkshopTerritory;
+        if(type == VoyageType.Airship) throw new NotImplementedException("Airship part swap not implemented yet");
 
-        DebugLog($"Change - Num: {num}");
-        var vesselLevel = (int)workshop->Submersible.Data[num].RankId;
+        DebugLog($"Change: {vesselName}");
+        var vesselLevel = (int)workshop->Submersible.DataPointers[VoyageUtils.GetVesselIndexByName(vesselName, type)].Value->RankId;
 
-        CheckAndLogParts(num, type, GetPlanInLevelRange(vesselLevel), log, out var requiredChanges);
+        CheckAndLogParts(vesselName, type, GetPlanInLevelRange(vesselLevel), log, out var requiredChanges);
 
         return AreRequiredPartsAvailable(requiredChanges) ? requiredChanges : null;
     }
@@ -43,12 +39,12 @@ public static unsafe class PartSwapperUtils
         return minLevel <= level && level <= maxLevel;
     }
 
-    internal static void CheckAndLogParts(int num, VoyageType type, LevelAndPartsData partsData, List<string> log, out List<(int, uint)> changes)
+    internal static void CheckAndLogParts(string vesselName, VoyageType type, LevelAndPartsData partsData, List<string> log, out List<(int, uint)> changes)
     {
         changes = [];
         for(var slotIndex = 0; slotIndex < 4; slotIndex++)
         {
-            var slot = VoyageUtils.GetVesselComponent(num, type, slotIndex);
+            var slot = VoyageUtils.GetVesselComponent(vesselName, type, slotIndex);
             var requiredPart = GetRequiredPart(partsData, slotIndex);
 
             if(slot->ItemId != requiredPart)

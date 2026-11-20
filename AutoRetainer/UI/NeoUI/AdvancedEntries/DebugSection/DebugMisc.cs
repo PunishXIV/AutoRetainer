@@ -12,6 +12,7 @@ using ECommons.Throttlers;
 using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
+using FFXIVClientStructs.FFXIV.Client.UI.Info;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.Sheets;
 using ItemLevel = AutoRetainer.Helpers.ItemLevel;
@@ -22,6 +23,21 @@ internal unsafe class DebugMisc : DebugSectionBase
 {
     public override void Draw()
     {
+        if(ImGui.CollapsingHeader("FreeCompanyExchange"))
+        {
+            if(ImGui.Button("Buy seal sweetener"))
+            {
+                TaskBuySealSweetener.Enqueue();
+            }
+            if(TryGetAddonMaster<AddonMaster.FreeCompanyExchange>(out var m) && m.IsAddonReady)
+            {
+                foreach(var x in m.Entries)
+                {
+                    if(ImGui.Button(x.Action.ValueNullable?.Name.ToString() ?? x.Action.RowId.ToString())) x.Buy();
+                }
+            }
+        }
+        ImGuiEx.Text($"FC rank: {InfoProxyFreeCompany.Instance()->Rank}, chest num: {S.FCPointsUpdater.GetFCChestNum()}");
         if(ImGui.Button("EnableSingleMultiMode")) ECommonsIPC.AutoRetainer.EnableSingleMultiMode(null);
         if(ImGui.Button("EnableSingleMultiMode (subs)")) ECommonsIPC.AutoRetainer.EnableSingleMultiMode(ECommons.IPC.Subscribers.AutoRetainer.MultiModeType.Submersibles);
         if(ImGui.CollapsingHeader("Move stuck detection"))

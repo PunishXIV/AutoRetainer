@@ -6,6 +6,7 @@ using ECommons.GameFunctions;
 using ECommons.GameHelpers;
 using ECommons.Throttlers;
 using ECommons.UIHelpers.AddonMasterImplementations;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -202,26 +203,22 @@ internal static unsafe class VoyageScheduler
 
     internal static bool? SelectVesselByName(string name, VoyageType type)
     {
-        var index = VoyageUtils.GetVesselIndex(name, type);
-        if(index != null)
+        if(TryGetAddonMaster<AddonMaster.SelectString>(out var m) && m.IsAddonReady)
         {
-            if(TryGetAddonByName<AddonSelectString>("SelectString", out var addon) && IsAddonReady(&addon->AtkUnitBase))
+            var index = HousingManager.Instance()->WorkshopTerritory->Submersible.DataPointers.IndexOf(x => (x != null?x.Value->NameString:null) == name);
+            var entry = m.Entries.SafeSelectNullable(index);
+            if(entry != null)
             {
-                var entries = Utils.GetEntries(addon);
-                if(index.Value < entries.Count && entries[index.Value].Contains(name))
+                if(entry.Value.SeString.GetText().Contains(name) && Utils.GenericThrottle && EzThrottler.Throttle("SelectVesselByName"))
                 {
-                    if(index >= 0 && Utils.GenericThrottle && EzThrottler.Throttle("SelectVesselByName"))
-                    {
-                        DebugLog($"Selecting vessel {name}/{type}/{entries[index.Value]}/{index}");
-                        new AddonMaster.SelectString(addon).Entries[index.Value].Select();
-                        return true;
-                    }
+                    entry.Value.Select();
+                    return true;
                 }
             }
-            else
-            {
-                Utils.RethrottleGeneric();
-            }
+        }
+        else
+        {
+            Utils.RethrottleGeneric();
         }
         return false;
     }
