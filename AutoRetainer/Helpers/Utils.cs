@@ -2050,22 +2050,7 @@ public static unsafe class Utils
 
     private static bool PopupContains(string source, string name)
     {
-        if(Svc.Data.Language == ClientLanguage.Japanese)
-        {
-            return source.Contains($"（{name}）");
-        }
-        else if(Svc.Data.Language == ClientLanguage.French)
-        {
-            return source.Contains($"Menu de {name}");
-        }
-        else if(Svc.Data.Language == ClientLanguage.German)
-        {
-            return source.Contains($"Du hast {name}");
-        }
-        else
-        {
-            return source.Contains($"Retainer: {name}");
-        }
+        return source.Contains(name, StringComparison.Ordinal) && Lang.IsAddon(source, 2376, 2377);
     }
 
     internal static IGameObject GetNearestWorkshopEntrance(out float Distance)

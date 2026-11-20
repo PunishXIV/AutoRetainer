@@ -199,11 +199,11 @@ internal static unsafe class VoyageUtils
                 return PanelType.TypeSelector;
             }
             var text = GenericHelpers.ReadSeString(&addon->UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText).GetText();
-            if(text.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.PanelSubmersible) || Lang.IsPanelSubmersible(text))
+            if(Lang.IsPanelSubmersible(text))
             {
                 return PanelType.Submersible;
             }
-            if(text.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.PanelAirship) || Lang.IsPanelAirship(text))
+            if(Lang.IsPanelAirship(text))
             {
                 return PanelType.Airship;
             }
@@ -397,11 +397,11 @@ internal static unsafe class VoyageUtils
     {
         var textptr = addon->UldManager.NodeList[3]->GetAsAtkTextNode()->NodeText;
         var text = GenericHelpers.ReadSeString(&textptr).GetText();
-        if(text.Contains("Select an airship."))
+        if(Lang.IsPanelAirship(text))
         {
             return VoyageType.Airship;
         }
-        if(text.Contains("Select a submersible."))
+        if(Lang.IsPanelSubmersible(text))
         {
             return VoyageType.Submersible;
         }

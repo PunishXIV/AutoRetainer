@@ -72,7 +72,6 @@ public unsafe static class TaskRecursiveItemDiscard
         else
         {
             var addon = Utils.GetSpecificYesno(Lang.DiscardItem);
-            if(addon == null) addon = Utils.GetSpecificYesno(x => Lang.IsAddon(x, 110, 153));
             return addon != null && addon->IsReady();
         }
     }
@@ -86,7 +85,6 @@ public unsafe static class TaskRecursiveItemDiscard
         else
         {
             var addon = Utils.GetSpecificYesno(Lang.DiscardItem);
-            if(addon == null) addon = Utils.GetSpecificYesno(x => Lang.IsAddon(x, 110, 153));
             if(addon != null && addon->IsReady())
             {
                 var m = new AddonMaster.SelectYesno(addon);

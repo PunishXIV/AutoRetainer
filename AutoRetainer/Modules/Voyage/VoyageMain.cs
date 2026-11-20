@@ -43,7 +43,7 @@ internal static unsafe class VoyageMain
                 Utils.CleanupOperations();
                 Data.WorkshopEnabled = false;
             }
-            if(txt.ContainsAny(StringComparison.OrdinalIgnoreCase, Lang.UnableToRepairVessel) || Lang.IsLogMessage(txt, 4169, 4272))
+            if(Lang.UnableToRepairVessel(txt))
             {
                 TaskRepairAll.Abort = true;
                 DuoLog.Warning($"[Voyage] You are out of repair components!");
