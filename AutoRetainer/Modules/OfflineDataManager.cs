@@ -150,6 +150,7 @@ internal static unsafe class OfflineDataManager
             data.FCID = fc->Id;
             if(!C.FCData.ContainsKey(fc->Id)) C.FCData[fc->Id] = new();
             C.FCData[fc->Id].Name = fc->NameString;
+            C.FCData[fc->Id].ID = fc->Id;
             var numArray = UIModule.Instance()->GetRaptureAtkModule()->AtkModule.GetNumberArrayData(58);
             if(numArray != null)
             {
